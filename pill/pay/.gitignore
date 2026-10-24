@@ -3,3 +3,4 @@
 node_modules
 dist
 .spend-ledger.json
+.serve.log

@@ -1,9 +1,12 @@
 // Add a bottle: photograph the label → five editable fields → openFDA recall lookup → save.
-// Label reading is NOT wired yet: fields are prefilled from ?demo= or the file name, and the screen says so.
+// Label reading: with VITE_PAY_URL set, the photo goes to the pill-pay service's POST /label (Gemini vision) and the fields
+// type in from its answer; unreadable fields stay empty. Without the service, or when it is unavailable, the fields are the
+// demo prefill (?demo= or the file name) and the chip says `demo`. The photo is only held in memory, then dropped.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Action, Screen } from '../components/Shell';
 import { actions, useStore } from '../lib/store';
+import { PAY_URL, readLabel } from '../lib/api';
 import type { RecallStatus } from '../lib/types';
 
 interface Fields { drug: string; strength: string; lot: string; maker: string; expiry: string }
@@ -29,7 +32,7 @@ const TYPE_TOTAL = TYPE_GAP * (KEYS.length - 1) + TYPE_MS;
 
 type Step = 'photo' | 'reading' | 'fields' | 'attach';
 
-function Viewfinder({ preview, reading, onFile }: { preview: string | null; reading: boolean; onFile: (f: File) => void }) {
+function Viewfinder({ preview, reading, live, onFile }: { preview: string | null; reading: boolean; live: boolean; onFile: (f: File) => void }) {
   // corners breathe outward (--dx/--dy) while waiting for a photo; a scan line sweeps once when reading starts
   const corner = (dx: number, dy: number, pos: React.CSSProperties): React.CSSProperties => ({ borderColor: preview ? '#fff' : 'var(--ink-2)', '--dx': dx, '--dy': dy, ...pos } as React.CSSProperties);
   return (
@@ -52,9 +55,9 @@ function Viewfinder({ preview, reading, onFile }: { preview: string | null; read
       {reading && <span aria-hidden="true" className="bot-scan" />}
       {reading && (
         <span style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: '12px 16px 0', background: 'var(--glass)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }} role="status">
-          <span style={{ display: 'block', fontWeight: 500, paddingBottom: 10 }}>Reading the label…</span>
+          <span style={{ display: 'block', fontWeight: 500, paddingBottom: 10 }}>{live ? 'Gemini is reading the label…' : 'Reading the label…'}</span>
           <span style={{ display: 'block', height: 3, marginInline: -16, background: 'var(--sky-tint)' }}>
-            <span className="bottle-progress" style={{ display: 'block', height: '100%', background: 'var(--sky)' }} />
+            <span className={'bottle-progress' + (live ? ' live' : '')} style={{ display: 'block', height: '100%', background: 'var(--sky)' }} />
           </span>
         </span>
       )}
@@ -82,16 +85,39 @@ export default function Bottle() {
   const [bottleId, setBottleId] = useState<string | null>(null);
   const [pick, setPick] = useState<string | null>(null);
   const timer = useRef<number | undefined>(undefined);
+  const readToken = useRef(0);
+  const [label, setLabel] = useState<{ src: 'gemini' | 'demo'; note: string | null; confidence: number | null } | null>(null);
+  const [liveRead, setLiveRead] = useState(false);
 
   useEffect(() => () => clearTimeout(timer.current), []);
   useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
 
+  const showFields = (v: Fields, src: 'gemini' | 'demo', note: string | null, confidence: number | null) => {
+    setValues(v);
+    setLabel({ src, note, confidence });
+    setPreview(null); setTypedMs(0); setStep('fields');
+  };
+
   const startReading = (file: File | null) => {
-    setValues(prefill(params.get('demo'), file?.name ?? null));
+    const demo = prefill(params.get('demo'), file?.name ?? null);
     setPreview(file ? URL.createObjectURL(file) : null);
     setStep('reading');
     clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => { setPreview(null); setTypedMs(0); setStep('fields'); }, READ_MS);
+    const token = ++readToken.current;
+    setLiveRead(Boolean(file && PAY_URL));
+    if (file && PAY_URL) {
+      void readLabel(file).then((r) => {
+        if (token !== readToken.current) return;
+        if (r.mode === 'live') {
+          // Only what Gemini read; a field it could not read stays empty for the person to fill in.
+          showFields({ drug: r.drug ?? '', strength: r.strength ?? '', lot: r.lot ?? '', maker: r.maker ?? '', expiry: r.expiry ?? '' }, 'gemini', null, r.confidence);
+        } else {
+          showFields(demo, 'demo', `Gemini unavailable (${r.error}); demo values filled in.`, null);
+        }
+      });
+      return;
+    }
+    timer.current = window.setTimeout(() => showFields(demo, 'demo', file && !PAY_URL ? 'Label reading needs the pill-pay service (VITE_PAY_URL); demo values filled in.' : null, null), READ_MS);
   };
 
   // Fields type themselves in, one after another; editable once typed.
@@ -149,21 +175,27 @@ export default function Bottle() {
     <Screen title={step === 'attach' ? 'Attach to delivery' : 'Add a bottle'} eyebrow={`Step ${stepNo} of 3`} back="/">
       {step !== 'attach' && (
         <div className="row" style={{ gap: 8, flexWrap: 'wrap', marginTop: -4 }}>
-          <span className="chip" title="Label reading is not connected yet; fields are demo values."><span className="dot" />label reading · demo</span>
+          {label?.src === 'gemini'
+            ? <span className="chip ok pop-in" data-label-src="gemini" title="Read by Gemini through the pill-pay service; the percentage is the model's own confidence."><span className="dot" />label reading · gemini{label.confidence !== null ? ` · ${Math.round(label.confidence * 100)} %` : ''}</span>
+            : label?.src === 'demo'
+              ? <span className="chip warn" data-label-src="demo" title={label.note ?? 'Demo label: no photo was read.'}><span className="dot" />label reading · demo</span>
+              : <span className={'chip' + (step === 'reading' && liveRead ? ' live' : '')} title={PAY_URL ? 'A photo goes to Gemini through the pill-pay service; demo values only if it is unavailable.' : 'No pill-pay service (VITE_PAY_URL): fields will be demo values.'}><span className="dot" />label reading · {PAY_URL ? 'gemini' : 'demo'}</span>}
           {step === 'fields' && <span className="chip ok rise"><span className="dot" />photo deleted</span>}
         </div>
       )}
       <style>{`
         .bottle-progress { animation: bottle-fill ${READ_MS}ms linear both; }
+        .bottle-progress.live { animation: bottle-wait 8s cubic-bezier(.2,.7,.3,1) both; }
         @keyframes bottle-fill { from { width: 0 } to { width: 100% } }
+        @keyframes bottle-wait { from { width: 0 } to { width: 92% } }
         .bottle-spin { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--sky-tint); border-top-color: var(--sky); animation: bottle-spin .8s linear infinite; }
         @keyframes bottle-spin { to { transform: rotate(360deg) } }
-        @media (prefers-reduced-motion: reduce) { .bottle-spin { animation: none; border-color: var(--sky); } }
+        @media (prefers-reduced-motion: reduce) { .bottle-spin { animation: none; border-color: var(--sky); } .bottle-progress.live { animation: none; width: 60%; } }
       `}</style>
 
       {(step === 'photo' || step === 'reading') && (
         <>
-          <Viewfinder preview={preview} reading={step === 'reading'} onFile={startReading} />
+          <Viewfinder preview={preview} reading={step === 'reading'} live={liveRead} onFile={startReading} />
           <p className="footnote" style={{ textAlign: 'center' }}>Front of the bottle, lot number in view. Good light helps.</p>
           {step === 'photo' && (
             <button type="button" className="btn ghost" onClick={() => startReading(null)} style={{ marginTop: 'auto' }}>
@@ -192,7 +224,9 @@ export default function Bottle() {
                 </span>
               </label>
             ))}
-            <p className="footnote" style={{ gridColumn: '1 / -1' }}>Fields stay editable. The photo is deleted after reading.</p>
+            <p className="footnote" style={{ gridColumn: '1 / -1' }}>
+              {label?.src === 'gemini' ? 'Read by Gemini. Check every field against the bottle; empty means it could not read it.' : label?.note ?? 'Demo label values.'}{' '}Fields stay editable. The photo is deleted after reading.
+            </p>
           </section>
           {ready && (
             <div className="stack rise" style={{ gap: 8 }}>

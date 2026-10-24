@@ -6,7 +6,8 @@ import Timetable from '../components/Timetable';
 import NextUp from '../components/NextUp';
 import { actions, useStore } from '../lib/store';
 import { doseItems, myBottles, nextUp, takenToday } from '../lib/doses';
-import { dateLong, hm, useNow } from '../lib/when';
+import { hm, useNow } from '../lib/when';
+import EmptyState, { SettingsLink } from '../components/EmptyState';
 import type { Bottle, Delivery, Run } from '../lib/types';
 
 const OUTCOME: Record<Delivery['outcome'], [string, string]> = {
@@ -50,22 +51,24 @@ function Settings() {
   );
 }
 
-const rowLink: React.CSSProperties = { textDecoration: 'none', display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'center', gap: 12, padding: '12px 0' };
+const rowLink: React.CSSProperties = { textDecoration: 'none', display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'center', gap: 12, padding: '12px 10px', margin: '0 -10px' };
 
 function Medical() {
   const station = useStore((s) => s.station);
+  const now = useNow();
   const deliveries = useStore((s) => s.deliveries);
   return (
-    <Screen title="Deliveries" right={
+    <Screen title="Deliveries" eyebrow={new Date(now).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })} right={<>
       <span className={'chip ' + (station.online ? 'ok' : '')}><span className="dot" />{station.id} · {station.online ? 'online' : 'offline'}</span>
-    }>
-      <Link to="/bottle" className="btn" style={{ textDecoration: 'none' }}>Scan a bottle</Link>
-      <section className="card" style={{ padding: '6px 18px' }} aria-label="Latest deliveries">
-        {deliveries.length === 0 && <p className="muted" style={{ padding: '14px 0' }}>No deliveries logged yet.</p>}
+      <SettingsLink />
+    </>}>
+      {deliveries.length > 0 && <Link to="/bottle" className="btn" style={{ textDecoration: 'none' }}>Scan a bottle</Link>}
+      <section className="card" style={{ padding: '4px 20px' }} aria-label="Latest deliveries">
+        {deliveries.length === 0 && <EmptyState art="box" action={<Link to="/bottle" className="btn" style={{ textDecoration: 'none' }}>Scan a bottle</Link>}>No deliveries logged yet. Scan the first bottle of a delivery to start.</EmptyState>}
         {deliveries.slice(0, 3).map((d, i) => {
           const [cls, word] = OUTCOME[d.outcome];
           return (
-            <Link key={d.id} to={`/delivery/${d.id}`} style={{ ...rowLink, borderTop: i ? '1px solid var(--line)' : 0 }}>
+            <Link key={d.id} to={`/delivery/${d.id}`} className="row-hover" style={{ ...rowLink, borderTop: i ? '1px solid var(--line)' : 0 }}>
               <span style={{ minWidth: 0 }}>
                 <span style={{ display: 'block', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.supplier}</span>
                 <span className="mono" style={{ display: 'block', fontSize: 12.5, color: 'var(--ink-2)', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>lot {d.lot} · {d.drug}</span>
@@ -76,7 +79,7 @@ function Medical() {
           );
         })}
       </section>
-      <div className="stack">
+      <div className="stack" style={{ gap: 12 }}>
         <Link to="/deliveries" className="btn ghost" style={{ textDecoration: 'none' }}>All deliveries</Link>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <Link to="/log" className="btn ghost" style={{ textDecoration: 'none', padding: '0 12px' }}>Decision log</Link>
@@ -99,10 +102,13 @@ function Personal() {
   const hour = new Date(now).getHours();
   const greet = hour < 5 ? 'Good night' : hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
   return (
-    <main className="screen rise" style={{ gap: 14 }}>
-      <header>
-        <p className="eyebrow">{dateLong(now)}</p>
-        <h1 style={{ fontSize: '2.2rem', letterSpacing: '-0.03em', marginTop: 4 }}>{greet}</h1>
+    <main className="screen rise" style={{ gap: 16 }}>
+      <header className="row between" style={{ alignItems: 'flex-start' }}>
+        <div>
+          <p className="eyebrow">{new Date(now).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+          <h1 style={{ fontSize: '2.2rem', letterSpacing: '-0.03em', marginTop: 4 }}>{greet}</h1>
+        </div>
+        <SettingsLink />
       </header>
       <NextUp next={nextUp(planned, now)} now={now} />
       {planned.length > 0 && (
@@ -111,12 +117,14 @@ function Personal() {
           <Timetable label="Today's doses" items={items} start={6} end={22} nowLine horizontal rowPx={28} minSpan={3} now={now} />
         </section>
       )}
-      <section className="stack" style={{ gap: 10 }} aria-label="My bottles">
-        {mine.length === 0 && <p className="card" style={{ fontSize: '1.05rem', color: 'var(--ink-2)' }}>No bottles yet. Photograph a label to add one.</p>}
+      <section className="stack" style={{ gap: 12 }} aria-label="My bottles">
+        {mine.length === 0 && (
+          <div className="card"><EmptyState art="bottle" action={<Link to="/bottle" className="btn" style={{ textDecoration: 'none' }}>Scan a bottle</Link>}>No bottles yet. Photograph a label and test one tablet from it.</EmptyState></div>
+        )}
         {mine.slice(0, 4).map((b) => {
           const taken = takenToday(b, now);
           return (
-            <div key={b.id} className="card" style={{ padding: '12px 14px 12px 16px', display: 'grid', gridTemplateColumns: '1fr auto', gap: '8px 12px', alignItems: 'center', borderLeft: `4px solid ${taken.length ? 'var(--mint)' : b.reminder ? 'var(--sky)' : 'var(--line-2)'}` }}>
+            <div key={b.id} className="card lift" style={{ padding: '12px 16px', display: 'grid', gridTemplateColumns: '1fr auto', gap: '8px 12px', alignItems: 'center', borderLeft: `4px solid ${taken.length ? 'var(--mint)' : b.reminder ? 'var(--sky)' : 'var(--line-2)'}` }}>
               <Link to="/medicines" style={{ textDecoration: 'none', minWidth: 0 }}>
                 <span style={{ display: 'block', fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><b style={{ textTransform: 'capitalize' }}>{b.drug}</b> <span style={{ color: 'var(--ink-2)' }}>{b.strength}</span></span>
                 <span className="mono" style={{ display: 'block', fontSize: 12.5, color: 'var(--ink-2)' }}>lot {b.lot}{b.reminder ? ` · ${b.reminder}` : ' · as needed'}</span>
@@ -133,7 +141,7 @@ function Personal() {
         })}
         {mine.length > 4 && <Link to="/medicines" className="footnote" style={{ textDecoration: 'none' }}>All {mine.length} bottles <span className="pointer">→</span></Link>}
       </section>
-      <Link to="/bottle" className="btn" style={{ textDecoration: 'none' }}>Scan a new bottle</Link>
+      {mine.length > 0 && <Link to="/bottle" className="btn" style={{ textDecoration: 'none' }}>Scan a new bottle</Link>}
       <Link to="/ask" className="btn ghost" style={{ textDecoration: 'none' }}>Ask Pill</Link>
       <div style={{ marginTop: 'auto' }}><Settings /></div>
     </main>

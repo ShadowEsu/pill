@@ -6,6 +6,7 @@ import SpinPill from '../components/SpinPill';
 import { actions } from '../lib/store';
 import { useMediaQuery, useReducedMotion, useViewNavigate } from '../lib/motion';
 import type { Mode } from '../lib/types';
+import '../story.css';
 
 const CHOICES: { mode: Mode; eyebrow: string; title: string; sub: string }[] = [
   { mode: 'medical', eyebrow: 'Medical', title: 'I’m a hospital, clinic or medical center', sub: 'Check deliveries by lot. The verdict holds the payment.' },
@@ -64,9 +65,21 @@ export default function Onboarding() {
               <span aria-hidden="true" className="onb-arrow">→</span>
             </button>
           ))}
-          <footer style={{ display: 'grid', gap: 6, justifyItems: 'center', marginTop: 4, '--i': 3 } as React.CSSProperties}>
+          <div style={{ display: 'grid', justifyItems: 'center', marginTop: 8, '--i': 3 } as React.CSSProperties}>
+            <Link to="/story" className="onb-story" aria-label="How Pill works: seven short chapters">
+              <span className="play" aria-hidden="true">▶</span>
+              <span style={{ display: 'grid', gap: 2, textAlign: 'left' }}>
+                <span>How Pill works</span>
+                <span className="sub">one quarter tablet · seven short chapters</span>
+              </span>
+            </Link>
+          </div>
+          <footer style={{ display: 'grid', gap: 6, justifyItems: 'center', marginTop: 4, '--i': 4 } as React.CSSProperties}>
             <p className="footnote">You can change this later in settings.</p>
-            <Link to="/kiosk" className="mono" style={{ fontSize: 12, color: 'var(--muted)', padding: '10px 12px' }}>Station screen</Link>
+            <div className="row" style={{ gap: 4 }}>
+              <Link to="/story" className="mono" style={{ fontSize: 12, color: 'var(--muted)', padding: '10px 12px' }}>How Pill works</Link>
+              <Link to="/kiosk" className="mono" style={{ fontSize: 12, color: 'var(--muted)', padding: '10px 12px' }}>Station screen</Link>
+            </div>
           </footer>
         </section>
       </div>

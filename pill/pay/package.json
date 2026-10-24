@@ -11,7 +11,8 @@
     "serve": "tsx src/server.ts",
     "buy": "tsx src/buy-verdict.ts",
     "faucet": "tsx src/faucet.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:policy": "tsx src/test-policy.ts"
   },
   "license": "MIT",
   "dependencies": {

@@ -7,6 +7,8 @@ import Checklist from '../components/Checklist';
 import SensorPath from '../components/SensorPath';
 import { Action, Screen } from '../components/Shell';
 import { actions, useStore } from '../lib/store';
+import { playSound } from '../lib/sound';
+import ReadAloud from '../components/ReadAloud';
 
 const STEPS = [
   { key: 'place', text: 'Drop in a quarter tablet', color: 'var(--c1)' },
@@ -70,7 +72,7 @@ export default function Place() {
 
   useEffect(() => {
     if (live) return;
-    const ids = CHECKS.map((_, i) => window.setTimeout(() => setDone(i + 1), 500 * (i + 1)));
+    const ids = CHECKS.map((_, i) => window.setTimeout(() => { setDone(i + 1); playSound('tick', { step: i }); }, 500 * (i + 1)));
     return () => ids.forEach(clearTimeout);
   }, [live]);
 
@@ -79,6 +81,7 @@ export default function Place() {
   const allDone = done >= CHECKS.length;
 
   const start = () => {
+    playSound('rise');
     const run = actions.startRun({ drug: drug.toLowerCase(), lot, src: 'replay', bottleId: bottle?.id ?? null, deliveryId });
     nav(`/run/${run.id}?replay=${drug.toLowerCase() === 'calcium carbonate' ? 'TM-02' : 'B2-07'}`);
   };
@@ -111,6 +114,7 @@ export default function Place() {
           <p style={{ fontSize: '1.45rem', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
             Drop one quarter tablet into the water. Close the lid.
           </p>
+          <ReadAloud text="Drop one quarter tablet into the water. Close the lid. Then press Start." size={56} />
         </section>
       </div>
       <Action note="About three minutes. Keep the lid closed.">

@@ -1,6 +1,8 @@
 // The evaluation: the verdict on a tinted hero with the gauge, the two numbers that decided it, which channel decided, why,
-// what to do next, and a one-line summary to share. Said once, calmly.
-import { useState } from 'react';
+// what to do next, and a one-line summary to share. Said once, calmly, and read aloud on a tap.
+// With VITE_PAY_URL set, Claude writes the why (POST /why, clause-filtered on the service) above the deterministic rule text;
+// the answer lives in component state + sessionStorage per run, never in the store.
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Action, NavLink, Screen, SrcBadge } from '../components/Shell';
 import VerdictCard, { BandBar, Channels, CountUp, SRC_TEXT, STEP, VERDICT_CLASS } from '../components/VerdictCard';
@@ -9,7 +11,10 @@ import Gauge from '../components/Gauge';
 import Curve from '../components/Curve';
 import { actions, useStore } from '../lib/store';
 import { DRUGS, REFERENCES } from '../data/reference';
-import type { Evaluation as Ev, Verdict } from '../lib/types';
+import type { Evaluation as Ev, Mode, Run, Verdict } from '../lib/types';
+import { PAY_URL, fetchWhy, type Unavailable, type WhyLive, type WhyTemplate } from '../lib/api';
+import { playSound, verdictSound } from '../lib/sound';
+import ReadAloud from '../components/ReadAloud';
 
 const HERO_TINT: Record<Verdict, string> = { PASS: 'var(--mint-tint)', 'NEEDS LAB': 'var(--amber-tint)', 'UNABLE TO VERIFY': 'var(--grey-tint)' };
 
@@ -19,6 +24,40 @@ const PLAIN: Record<Verdict, string> = {
   'UNABLE TO VERIFY': 'The box could not measure this one. Try again or ask a pharmacist.',
 };
 const SHIP: { key: Ev['ship']; word: string }[] = [{ key: 'yes', word: 'release' }, { key: 'hold', word: 'hold' }, { key: 'ask', word: 'escalate' }];
+
+type WhyResult = WhyLive | WhyTemplate | Unavailable;
+/** One request per run+mode even under StrictMode's double effects. */
+const inflight = new Map<string, Promise<WhyResult>>();
+
+/** Claude's why for this run: null while loading (or without the service). Only live answers are cached for the session. */
+function useWhy(run: Run | undefined, mode: Mode, stationRef: string | null, recall: string): WhyResult | null {
+  const ev = run?.evaluation ?? null;
+  const key = run && ev && PAY_URL ? `pill.why.${run.id}.${mode}` : null;
+  const [res, setRes] = useState<{ key: string; r: WhyResult } | null>(() => {
+    try { const c = key && sessionStorage.getItem(key); return c && key ? { key, r: JSON.parse(c) as WhyResult } : null; } catch { return null; }
+  });
+  useEffect(() => {
+    if (!key || !run || !ev) return;
+    try { const c = sessionStorage.getItem(key); if (c) { setRes({ key, r: JSON.parse(c) as WhyResult }); return; } } catch { /* storage off: just fetch */ }
+    let alive = true;
+    let p = inflight.get(key);
+    if (!p) {
+      const ref = ev.rule === 'U1' ? null : REFERENCES[run.drug] ?? REFERENCES[stationRef ?? ''] ?? null;
+      p = fetchWhy({
+        verdict: ev.verdict, rule: ev.rule, plateau: ev.plateau, band: ref ? [ref.bandLow, ref.bandHigh] : null, glowMin: ref?.glowMin ?? null, scatterMax: ref?.scatterMax ?? null,
+        glowRise: ev.glowRise, scatter: ev.scatter, temp: ev.temp, fault: ev.fault, recall, mode,
+      });
+      inflight.set(key, p);
+      void p.finally(() => inflight.delete(key));
+    }
+    void p.then((r) => {
+      if (r.mode === 'live') { try { sessionStorage.setItem(key, JSON.stringify(r)); } catch { /* storage off */ } }
+      if (alive) setRes({ key, r });
+    });
+    return () => { alive = false; };
+  }, [key, run, ev, mode, stationRef, recall]);
+  return res && res.key === key ? res.r : null;
+}
 
 export default function Evaluation() {
   const { id = '' } = useParams();
@@ -30,6 +69,9 @@ export default function Evaluation() {
   const bottle = useStore((s) => s.bottles.find((b) => b.runId === id));
   const [curveOpen, setCurveOpen] = useState(false);
   const [copied, setCopied] = useState<'copied' | 'failed' | null>(null);
+  const ai = useWhy(run, mode === 'personal' ? 'personal' : 'medical', stationRef, bottle?.recall ?? 'unchecked');
+  const verdict = run?.evaluation?.verdict ?? null;
+  useEffect(() => { if (verdict) playSound(verdictSound(verdict)); }, [id, verdict]);
 
   if (!run) return (
     <Screen title="No such run" back="/">
@@ -50,6 +92,9 @@ export default function Evaluation() {
   const drug = DRUGS[run.drug];
   const usedFor = bottle?.usedFor ?? drug?.usedFor ?? 'Ask your pharmacist what this is for.';
   const personal = mode === 'personal';
+  const live = ai?.mode === 'live' ? ai : null;
+  // Read aloud: the verdict word, then the plain sentence (personal) or the why (medical); Claude's when it answered.
+  const spoken = `${ev.verdict}. ${personal ? live?.plain ?? PLAIN[ev.verdict] : live?.why ?? ev.why}`;
   const note = 'Screening result, not a pharmacopeial test. ' + (ref ? `${ref.drug[0].toUpperCase()}${ref.drug.slice(1)} reference, ${ref.runs} runs, CV ${ref.cv} %.` : `No reference for ${drug?.name ?? run.drug} on this station.`);
 
   const retest = () => {
@@ -131,6 +176,9 @@ export default function Evaluation() {
                 empty={ref ? 'not compared · see why' : 'no reference'} />
             </div>
           </section>
+          <section className="card rise" style={{ ...STEP(1), padding: '14px 16px' }} aria-label="Read aloud">
+            <ReadAloud text={spoken} label="Read the result aloud" />
+          </section>
           {personal && meaning}
 
           <section className="card tile rise stack" style={{ ...STEP(2), gap: 16, '--tile-accent': VERDICT_FILL[ev.verdict] } as React.CSSProperties}>
@@ -161,6 +209,24 @@ export default function Evaluation() {
             <p className="eyebrow">why · two channels</p>
             <Channels evaluation={ev} reference={ref} />
             <hr className="hr" />
+            {PAY_URL && (
+              <div className="stack" style={{ gap: 8 }} aria-live="polite">
+                {ai === null
+                  ? <div><span className="chip live"><span className="dot" />claude · writing…</span></div>
+                  : live
+                    ? <>
+                        <div className="row" style={{ gap: 6, flexWrap: 'wrap' }}>
+                          <span className="chip live" data-why="claude" title={`${live.model_id}; every clause passed the word filter on the service`}><span className="dot" />claude · filtered</span>
+                          {live.dropped.length > 0 && <span className="chip warn" title={live.dropped.join(' / ')}><span className="dot" />{live.dropped.length} clause{live.dropped.length > 1 ? 's' : ''} dropped</span>}
+                          {live.contradiction && <span className="chip warn"><span className="dot" />inputs disagree</span>}
+                        </div>
+                        {personal && live.plain && <p style={{ fontSize: 18, fontWeight: 500, lineHeight: 1.4 }}>{live.plain}</p>}
+                        <p style={{ lineHeight: 1.5 }}>{live.why}</p>
+                      </>
+                    : <div><span className="chip" data-why="unavailable" title={ai.mode === 'template' ? ai.reason : ai.mode === 'unavailable' ? ai.error : undefined}><span className="dot" />claude unavailable · rule text only</span></div>}
+              </div>
+            )}
+            <p className="eyebrow" style={{ marginTop: PAY_URL ? 4 : 0 }}>rule text</p>
             <p style={{ color: 'var(--ink-2)' }}>{ev.why}</p>
           </section>
 

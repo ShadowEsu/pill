@@ -1,5 +1,7 @@
 // One delivery: the held money, the tested tablet, the policy proposal, the pharmacist's tap, the log.
-import { useEffect, useRef, useState } from 'react';
+// With VITE_PAY_URL set: the release goes to the pill-pay service (USDC TESTNET + the Capital One Nessie SANDBOX mirror),
+// and a card shows the three Nessie SANDBOX balances when the service has a NESSIE_KEY.
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { animate } from 'animejs';
 import { Action, Screen, SrcBadge } from '../components/Shell';
@@ -10,23 +12,58 @@ import { DRUGS, REFERENCES } from '../data/reference';
 import { PEOPLE } from '../data/history';
 import type { Delivery as D, LogLine } from '../lib/types';
 import CalendarButton from '../components/CalendarButton';
+import { PAY_URL, nessieAccounts, type NessieAccounts, type NessieTransfer } from '../lib/api';
 
 const usd = (n: number) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const CAP = 2000;
-const PAY_URL = (import.meta.env.VITE_PAY_URL as string | undefined)?.replace(/\/$/, '') || null;
+const NESSIE_ROLE: Record<NessieAccounts['accounts'][number]['role'], string> = { clinic: 'Clinic', escrow: 'Escrow', supplier: 'Supplier' };
 
-/** After the tap: ask the pill-pay service to move escrow → supplier on Base Sepolia, and log exactly what it reports. */
-async function releaseOnChain(url: string, d: D) {
+/** After the tap: ask the pill-pay service to move escrow → supplier on Base Sepolia (and mirror it in Nessie), and log exactly what it reports. */
+async function releaseOnChain(url: string, d: D): Promise<NessieTransfer | null> {
   const ref = { kind: 'delivery' as const, id: d.id };
   try {
     const res = await fetch(`${url}/escrow/release`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ deliveryId: d.id, amount: d.amountUsd }) });
-    const r = (await res.json()) as { mode?: string; tx?: string; explorer?: string; amount_usdc?: string; moved?: boolean; confirmation?: string; note?: string; error?: string };
+    const r = (await res.json()) as { mode?: string; tx?: string; explorer?: string; amount_usdc?: string; moved?: boolean; confirmation?: string; note?: string; error?: string; nessie?: NessieTransfer | { mode: 'unavailable' | 'skipped'; reason: string } };
     if (!res.ok || !r.tx) actions.activity(PEOPLE.cdp, `escrow service refused the release for lot ${d.lot}: ${r.error ?? res.statusText} · nothing moved`, 'info', ref);
     else if (r.mode === 'cdp') actions.activity(PEOPLE.cdp, `released ${r.amount_usdc} USDC escrow → ${d.supplier} on Base Sepolia (TESTNET) · ${r.confirmation} · tx ${r.tx} · ${r.explorer}`, 'money', ref);
     else actions.activity(PEOPLE.cdp, `escrow service is SIMULATED: ${r.note ?? 'no CDP credentials; nothing moved'} · ref ${r.tx} · no explorer link`, 'info', ref);
+    const n = r.nessie;
+    if (n?.mode === 'sandbox') {
+      actions.activity(PEOPLE.nessie, `mirrored $${usd(n.amount)} ${n.from} → ${n.to} · SANDBOX · transfer ${n.transfer_id ?? 'id not returned'}`, 'money', ref);
+      return n;
+    }
+    if (n) actions.activity(PEOPLE.nessie, `Nessie mirror ${n.mode}: ${n.reason} · nothing mirrored`, 'info', ref);
   } catch (e) {
     actions.activity(PEOPLE.cdp, `escrow service at ${url} did not answer (${(e as Error).message}) · nothing moved`, 'info', ref);
   }
+  return null;
+}
+
+/** Capital One Nessie SANDBOX balances, straight from GET /nessie/accounts; one footnote line when the service has no key. */
+function NessieCard({ refresh, transfer }: { refresh: number; transfer: NessieTransfer | null }) {
+  const [data, setData] = useState<NessieAccounts | { mode: 'unavailable'; reason: string } | null>(null);
+  useEffect(() => {
+    let alive = true;
+    void nessieAccounts().then((r) => { if (alive) setData(r); });
+    return () => { alive = false; };
+  }, [refresh]);
+  if (!data) return null;
+  if (data.mode !== 'sandbox') {
+    return <p className="footnote" data-nessie="unavailable" title={data.reason}>Nessie SANDBOX mirror: not connected ({data.reason}).</p>;
+  }
+  return (
+    <section className="card stack rise" aria-label="Nessie sandbox accounts" data-nessie="sandbox">
+      <div className="row between">
+        <span className="eyebrow">Capital One Nessie · fiat mirror</span>
+        <span className="chip"><span className="dot" style={{ background: 'var(--cb)' }} />SANDBOX</span>
+      </div>
+      <dl className="kv">
+        {data.accounts.map((a) => <Fragment key={a.id}><dt>{NESSIE_ROLE[a.role]}</dt><dd>${usd(a.balance)}</dd></Fragment>)}
+      </dl>
+      {transfer && <p className="mono" style={{ fontSize: 12, color: 'var(--ink-2)', overflowWrap: 'anywhere' }}>release mirrored · {transfer.from} → {transfer.to} · transfer {transfer.transfer_id ?? 'id not returned'} · SANDBOX</p>}
+      <p className="footnote">Sandbox dollars on Capital One's Nessie API. They mirror the escrow moves; no real money.</p>
+    </section>
+  );
 }
 
 /** Policy clauses, verbatim (policy.md P1–P6). */
@@ -83,6 +120,8 @@ export default function Delivery() {
   const run = useStore((s) => (d?.runId ? s.runs.find((r) => r.id === d.runId) : undefined));
   const bottle = useStore((s) => (d?.bottleId ? s.bottles.find((b) => b.id === d.bottleId) : undefined));
   const [note, setNote] = useState<string | null>(null);
+  const [nessieTx, setNessieTx] = useState<NessieTransfer | null>(null);
+  const [nessieRefresh, setNessieRefresh] = useState(0);
   const releaseRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -126,6 +165,8 @@ export default function Delivery() {
           <dt style={{ whiteSpace: 'nowrap' }}>Spend cap</dt><dd>{usd(CAP)}</dd>
         </dl>
       </section>
+
+      {PAY_URL && <NessieCard refresh={nessieRefresh} transfer={nessieTx} />}
 
       {/* the tested tablet */}
       {ev && run ? (
@@ -185,7 +226,7 @@ export default function Delivery() {
           </span>
           <div className="stack" style={{ gap: 4, minWidth: 0 }}>
             <p style={{ fontWeight: 600 }}>USDC {usd(d.amountUsd)} escrow → supplier</p>
-            <p className="mono" style={{ fontSize: 12, color: 'var(--ink-2)', overflowWrap: 'anywhere' }}>Base Sepolia tx {tx ?? '—'} · TESTNET · Nessie SANDBOX mirror</p>
+            <p className="mono" style={{ fontSize: 12, color: 'var(--ink-2)', overflowWrap: 'anywhere' }}>Base Sepolia tx {tx ?? '—'} · TESTNET · {nessieTx ? `Nessie transfer ${nessieTx.transfer_id ?? 'id not returned'} · SANDBOX` : 'Nessie SANDBOX mirror'}</p>
           </div>
         </div>
       )}
@@ -203,7 +244,7 @@ export default function Delivery() {
         {run && !proposed && <button type="button" className="btn" disabled={!ev} onClick={() => actions.propose(d.id)}>Run policy</button>}
         {proposed && !released && (
           <>
-            <button type="button" className="btn mint" disabled={d.outcome !== 'release'} onClick={() => { actions.approve(d.id); if (PAY_URL) void releaseOnChain(PAY_URL, d); }} aria-describedby="release-why">
+            <button type="button" className="btn mint" disabled={d.outcome !== 'release'} onClick={() => { actions.approve(d.id); if (PAY_URL) void releaseOnChain(PAY_URL, d).then((n) => { setNessieTx(n); setNessieRefresh((x) => x + 1); }); }} aria-describedby="release-why">
               Release ${usd(d.amountUsd)}
             </button>
             <p id="release-why" className="footnote" style={{ textAlign: 'center' }}>{d.outcome === 'release' ? 'Your tap moves TESTNET USDC to the supplier.' : `Release is off: ${d.clause} decided ${d.outcome}.`}</p>

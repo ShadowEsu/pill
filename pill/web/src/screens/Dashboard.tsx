@@ -11,7 +11,8 @@ import { useStore } from '../lib/store';
 import { PEOPLE } from '../data/history';
 import { REFERENCES } from '../data/reference';
 import type { Activity, Delivery, Run, Verdict } from '../lib/types';
-import { DAY, H, dateLong, dayStart, hm, hourOf, refTo, usd, useNow } from '../lib/when';
+import { DAY, H, dayStart, hm, hourOf, refTo, usd, useNow } from '../lib/when';
+import EmptyState, { SettingsLink } from '../components/EmptyState';
 import '../components/viz.css';
 
 const HELD: Record<Delivery['outcome'], boolean> = { pending: false, release: false, released: false, hold: true, escalate: true };
@@ -126,7 +127,10 @@ export default function Dashboard() {
   const ref = station.reference ? REFERENCES[station.reference] : null;
 
   return (
-    <Screen title="Dashboard" eyebrow={dateLong(now)} right={<span className={'chip ' + (station.online ? 'ok' : 'bad')}><span className="dot" />{station.id}</span>}>
+    <Screen title="Dashboard" eyebrow={new Date(now).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })} right={<>
+      <span className={'chip ' + (station.online ? 'ok' : 'bad')}><span className="dot" />{station.id}</span>
+      <SettingsLink />
+    </>}>
       <div className="wide-4">
         <Kpi label="Deliveries this week" value={k.count.value} trend={k.count.trend} delta={`${signed(k.count.trend)} vs prior 3d`} series={k.count.series} accent="var(--c1)" />
         <Kpi label="PASS rate" value={k.passRate.value} unit="%" trend={k.passRate.trend} delta={`${signed(k.passRate.trend, ' pts')} · ${k.passRate.n} runs`} series={k.passRate.series} accent="var(--c2)" />
@@ -135,10 +139,10 @@ export default function Dashboard() {
       </div>
 
       <div className="wide-2">
-        <section className="card panel" aria-label="Timetable">
+        <section className="card panel hover-line" aria-label="Timetable">
           <div className="panel-head"><h2>Timetable</h2><span className="eyebrow">yesterday · today</span></div>
           {items.length ? <Timetable items={items} start={start} end={end} nowLine lanes={['Yesterday', 'Today']} hourPx={40} label="Deliveries, runs and releases by time" now={now} />
-            : <p className="muted">Nothing logged yesterday or today.</p>}
+            : <EmptyState art="clock" action={<Link to="/bottle" className="btn" style={{ textDecoration: 'none' }}>Scan a bottle</Link>}>Nothing logged yesterday or today. The first scan starts the day.</EmptyState>}
           <div className="legend">
             <span><i style={{ background: 'var(--cb-tint)', boxShadow: 'inset 3px 0 var(--cb)' }} />logged</span>
             <span><i style={{ background: 'var(--sky-tint)', boxShadow: 'inset 3px 0 var(--sky)' }} />run</span>
@@ -148,18 +152,18 @@ export default function Dashboard() {
             <span><i style={{ background: 'rgba(180,140,255,.16)', boxShadow: 'inset 3px 0 var(--c4)' }} />calibration</span>
           </div>
         </section>
-        <section className="card panel" aria-label="Verdicts by lot and day">
+        <section className="card panel hover-line" aria-label="Verdicts by lot and day">
           <div className="panel-head"><h2>Verdicts by lot and day</h2><span className="eyebrow">{heat.lots.length} lots · 7 days</span></div>
-          <Heatmap label="Verdicts by lot and day" rows={heat.lots.length} cols={7} rowLabels={heat.lots} colLabels={colLabels}
+          {heat.lots.length === 0 ? <EmptyState art="grid" action={<Link to="/run/new?replay=B2-07" className="btn ghost" style={{ textDecoration: 'none' }}>Run a replay</Link>}>No lots tested this week. Each run lands here as one square.</EmptyState> : <Heatmap label="Verdicts by lot and day" rows={heat.lots.length} cols={7} rowLabels={heat.lots} colLabels={colLabels}
             value={(r, c) => { const x = heat.pick(r, c); return x ? (x.evaluation ? HEAT[x.evaluation.verdict] : 0) : null; }}
             cellText={(r, c) => { const x = heat.pick(r, c); return `${heat.lots[r]} · ${new Date(heat.days[c]).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' })} · ${x ? `${x.evaluation?.verdict ?? 'running'} · ${x.id}${x.evaluation?.pct ? ` · ${x.evaluation.pct} % of ref` : ''}` : 'not tested'}`; }}
-            legend={[{ v: 4, label: 'PASS' }, { v: 2, label: 'NEEDS LAB' }, { v: 1, label: 'UNABLE TO VERIFY' }, { v: 0, label: 'running' }, { v: null, label: 'not tested' }]} />
+            legend={[{ v: 4, label: 'PASS' }, { v: 2, label: 'NEEDS LAB' }, { v: 1, label: 'UNABLE TO VERIFY' }, { v: 0, label: 'running' }, { v: null, label: 'not tested' }]} />}
           <p className="footnote">Screening result, not a pharmacopeial test.</p>
         </section>
       </div>
 
       <div className="wide-3">
-        <section className="card panel" aria-label="Money path today">
+        <section className="card panel hover-line" aria-label="Money path today">
           <div className="panel-head"><h2>Money path</h2><span className="eyebrow">today · SANDBOX</span></div>
           <FlowArrows label="Money path today"
             nodes={[
@@ -174,20 +178,20 @@ export default function Dashboard() {
           <p className="footnote">USDC on Base Sepolia (TESTNET), mirrored in the Nessie SANDBOX. A release needs a pharmacist's tap.</p>
         </section>
 
-        <section className="card panel" aria-label="Who did what today">
+        <section className="card panel hover-line" aria-label="Who did what today">
           <div className="panel-head"><h2>Who did what today</h2><Link to="/activity" className="eyebrow" style={{ textDecoration: 'none', color: 'var(--sky-ink)' }}>All <span className="pointer">→</span></Link></div>
-          <ul className="feed">
+          {acts.length === 0 ? <EmptyState art="feed">Nobody has done anything yet. Every scan, run and tap is named here.</EmptyState> : <ul className="feed">
             {acts.slice(0, 8).map((a) => {
               const to = refTo(a.ref);
               const body = <><ActorAvatar actor={a.actor} /><span className="feed-text"><b>{a.actor}</b> {a.text}</span><span className="feed-time">{a.at >= today ? hm(a.at) : new Date(a.at).toLocaleDateString('en-US', { weekday: 'short' }) + ' ' + hm(a.at)}</span></>;
               return <li key={a.id}>{to ? <Link to={to} className={'feed-line k-' + a.kind}>{body}</Link> : <div className={'feed-line k-' + a.kind}>{body}</div>}</li>;
             })}
-          </ul>
+          </ul>}
         </section>
 
-        <section className="card panel" aria-label="Suppliers">
+        <section className="card panel hover-line" aria-label="Suppliers">
           <div className="panel-head"><h2>Suppliers</h2><span className="eyebrow">delivered · SANDBOX</span></div>
-          <ul className="stack" style={{ listStyle: 'none', margin: 0, padding: 0, gap: 14 }}>
+          {suppliers.length === 0 ? <EmptyState art="box" action={<Link to="/deliveries" className="btn ghost" style={{ textDecoration: 'none' }}>Open deliveries</Link>}>No deliveries logged yet. Each one waits in escrow until its lot is tested.</EmptyState> : <ul className="stack" style={{ listStyle: 'none', margin: 0, padding: 0, gap: 14 }}>
             {suppliers.map((s, i) => (
               <li key={s.name} className="stack" style={{ gap: 6 }}>
                 <div className="row between" style={{ gap: 8 }}>
@@ -201,7 +205,7 @@ export default function Dashboard() {
                 <span className="mono muted" style={{ fontSize: 11 }}>{s.n} lots · PASS {usd(s.pass)} · held {usd(s.held)}</span>
               </li>
             ))}
-          </ul>
+          </ul>}
           <div className="legend">
             <span><i style={{ background: 'var(--mint)' }} />PASS, not held</span>
             <span><i style={{ background: 'var(--warm)' }} />held</span>

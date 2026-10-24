@@ -14,10 +14,13 @@ import { NETWORK, PORT, PRICE, PUBLIC_FACILITATOR, has, localWallet, missing, ty
 import { REFERENCES, evaluate, parseCurve, type CurveInput } from './rules.ts';
 import { accounts, escrowMode, move, type Move } from './escrow.ts';
 import { calendarStatus, createEvent, type CalendarEventInput } from './calendar.ts';
+import { CLAUDE_MODEL, GEMINI_MODEL, aiHas, escrowLog, explainWhy, parseEscrow, parseWhy, readLabel } from './ai.ts';
+import { nessieAccounts, nessieMode, nessieTransfer, setupNessie } from './nessie.ts';
+import { MAX_SPEAK_CHARS, speak, speechMode } from './speech.ts';
 
 const DESCRIPTION = 'Pill dissolution verdict for a curve';
 const ROUTE = 'POST /verify';
-const ORIGINS = new Set((process.env.CORS_ORIGINS || 'http://127.0.0.1:5183,http://localhost:5183,http://127.0.0.1:5186,http://localhost:5186,http://localhost:5173').split(',').map((s) => s.trim()).filter(Boolean));
+const ORIGINS = new Set((process.env.CORS_ORIGINS || 'http://127.0.0.1:5183,http://localhost:5183,http://127.0.0.1:5186,http://localhost:5186,http://127.0.0.1:5189,http://localhost:5189,http://localhost:5173').split(',').map((s) => s.trim()).filter(Boolean));
 
 const app = express();
 
@@ -29,13 +32,13 @@ app.use((req, res, next) => {
     res.setHeader('Vary', 'Origin');
     res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, PAYMENT-SIGNATURE, X-PAYMENT');
-    res.setHeader('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED, PAYMENT-RESPONSE, X-PILL-MODE');
+    res.setHeader('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED, PAYMENT-RESPONSE, X-PILL-MODE, X-PILL-VOICE');
   }
   if (req.method === 'OPTIONS') { res.status(204).end(); return; }
   next();
 });
 
-// Parse every body as JSON regardless of content type (`curl -d` sends form-urlencoded by default).
+// Parse every body as JSON regardless of content type (`curl -d` sends form-urlencoded by default). 1 MB cap (a label photo is downscaled in the app first).
 app.use(express.json({ type: () => true, limit: '1mb' }));
 
 // ---- choose the mode ----
@@ -93,8 +96,45 @@ app.use((_req, res, next) => { res.setHeader('X-PILL-MODE', mode); next(); });
 
 // ---- free routes ----
 app.get('/health', (_req, res) => {
-  res.json({ mode, facilitator, network: NETWORK, payTo, price: PRICE, why: picked.why, escrow: escrowMode(), has, label: 'TESTNET' });
+  res.json({
+    mode, facilitator, network: NETWORK, payTo, price: PRICE, why: picked.why, escrow: escrowMode(), has, label: 'TESTNET',
+    ai: { claude: aiHas().claude ? CLAUDE_MODEL : 'unavailable', gemini: aiHas().gemini ? GEMINI_MODEL : 'unavailable' },
+    nessie: nessieMode(), speech: speechMode(),
+  });
 });
+
+// ---- model features (keys stay in .env; every model text passes the clause filter) ----
+// Gemini reads the label photo in memory; nothing is written to disk.
+app.post('/label', async (req, res) => {
+  const r = await readLabel((req.body as { image?: unknown } | undefined)?.image);
+  if (r.mode === 'live') console.log(`[label gemini] ${r.drug ?? '?'} ${r.strength ?? '?'} lot ${r.lot ?? '?'} conf ${r.confidence}`);
+  else console.warn(`[label] unavailable: ${r.error}`);
+  res.json(r);
+});
+
+app.post('/why', async (req, res) => {
+  const w = parseWhy(req.body);
+  if ('error' in w) { res.status(400).json({ mode: 'unavailable', error: w.error }); return; }
+  const r = await explainWhy(w);
+  console.log(`[why ${r.mode}] ${w.verdict} ${w.rule}${r.mode === 'template' ? ` (${r.reason})` : ''}${r.dropped.length ? ` · dropped ${r.dropped.length}` : ''}`);
+  res.json(r);
+});
+
+app.post('/escrow-log', async (req, res) => {
+  const i = parseEscrow(req.body);
+  if ('error' in i) { res.status(400).json({ mode: 'unavailable', error: i.error }); return; }
+  const r = await escrowLog(i);
+  console.log(`[escrow-log ${r.mode}] ${i.verdict} proposed ${i.proposed} → ${r.outcome} ${r.clause_id}${r.guards.length ? ` · ${r.guards.join('; ')}` : ''}`);
+  res.json(r);
+});
+
+app.post('/speak', async (req, res) => {
+  const text = (req.body as { text?: unknown } | undefined)?.text;
+  if (typeof text !== 'string' || !text.trim()) { res.status(400).json({ mode: 'unavailable', error: 'send {"text": string}' }); return; }
+  await speak(text.trim().slice(0, MAX_SPEAK_CHARS), res);
+});
+
+app.get('/nessie/accounts', async (_req, res) => { res.json(await nessieAccounts()); });
 
 app.get('/escrow/accounts', async (_req, res, next) => {
   try { res.json({ ...(await accounts()), verify_mode: mode }); } catch (e) { next(e); }
@@ -113,17 +153,19 @@ app.post('/calendar/event', async (req, res) => {
 });
 
 for (const kind of ['hold', 'release', 'refund'] as Move[]) {
-  app.post(`/escrow/${kind}`, async (req, res, next) => {
+  app.post(`/escrow/${kind}`, async (req, res) => {
     const { deliveryId, amount } = (req.body ?? {}) as { deliveryId?: unknown; amount?: unknown };
     if (typeof deliveryId !== 'string' || typeof amount !== 'number' || !(amount > 0)) {
       res.status(400).json({ mode: escrowMode(), error: 'send {"deliveryId": string, "amount": number (invoice dollars)}' });
       return;
     }
-    try {
-      const r = await move(kind, deliveryId, amount);
-      console.log(`[escrow ${r.body.mode}] ${kind} ${deliveryId} $${amount} → ${'tx' in r.body ? r.body.tx : r.body.error}`);
-      res.status(r.status).json(r.body);
-    } catch (e) { next(e); }
+    // USDC rail first; the Nessie SANDBOX mirror runs unless the USDC rail refused the request (cap, bad input).
+    let usdc: { status: number; body: Record<string, unknown> };
+    try { usdc = await move(kind, deliveryId, amount); }
+    catch (e) { usdc = { status: 502, body: { kind, deliveryId, mode: escrowMode(), moved: false, error: `USDC rail failed: ${(e as Error).message}` } }; }
+    const nessie = usdc.status === 400 ? { mode: 'skipped' as const, reason: 'USDC rail refused this move' } : await nessieTransfer(kind, deliveryId, amount);
+    console.log(`[escrow ${usdc.body.mode}] ${kind} ${deliveryId} $${amount} → ${usdc.body.tx ?? usdc.body.error} · nessie ${nessie.mode}${'transfer_id' in nessie ? ` ${nessie.transfer_id}` : ''}`);
+    res.status(usdc.status).json({ ...usdc.body, nessie });
   });
 }
 
@@ -159,6 +201,7 @@ app.post('/verify', (_req, res) => {
 });
 
 app.use((err: Error & { status?: number; type?: string }, _req: Request, res: Response, _next: NextFunction) => {
+  if (err.type === 'entity.too.large') { res.status(413).json({ mode: 'unavailable', error: 'body over 1 MB; send a smaller image' }); return; }
   const status = err.type === 'entity.parse.failed' ? 400 : err.status ?? 500;
   if (status >= 500) console.error(err);
   res.status(status).json({ mode, error: status === 400 ? 'body is not JSON; no payment asked' : err.message });
@@ -169,4 +212,6 @@ app.listen(PORT, () => {
   console.log(`  POST /verify  ${PRICE} USDC on ${NETWORK} (Base Sepolia, TESTNET) → payTo ${payTo}`);
   console.log(`  facilitator   ${facilitator}`);
   console.log(`  escrow        ${escrowMode()}${escrowMode() === 'simulated' ? ' (no CDP credentials; /escrow/* moves nothing)' : ''}`);
+  console.log(`  models        claude ${aiHas().claude ? CLAUDE_MODEL : 'unavailable'} · gemini ${aiHas().gemini ? GEMINI_MODEL : 'unavailable'} · speech ${speechMode()}`);
+  void setupNessie().then((r) => console.log(`  nessie        ${r ? `SANDBOX customer ${r.customer}` : nessieMode()}`));
 });

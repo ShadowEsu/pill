@@ -1,8 +1,0 @@
-
-> pill-pay@0.1.0 serve
-> tsx src/server.ts
-
-pill-pay on http://localhost:8402  mode=public-facilitator  (no CDP facilitator: missing CDP_API_KEY_ID, CDP_API_KEY_SECRET, X402_PAY_TO)
-  POST /verify  $0.05 USDC on eip155:84532 (Base Sepolia, TESTNET) → payTo 0x925ec1b85d3E7Da373E3D705bb1De6765e0e0998
-  facilitator   https://x402.org/facilitator
-  escrow        simulated (no CDP credentials; /escrow/* moves nothing)

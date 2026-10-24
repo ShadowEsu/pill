@@ -1,12 +1,13 @@
 // Every run, newest first: verdict, lot, % of reference, the inline curve against its band, time, source. Filter by verdict.
 // Above the list: the data path (station → rules → why → policy) and a runs-per-hour heat map.
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Screen, SrcBadge } from '../components/Shell';
 import VerdictChip from '../components/VerdictChip';
 import Sparkline from '../components/Sparkline';
 import Heatmap, { type Heat } from '../components/Heatmap';
 import FlowArrows from '../components/FlowArrows';
+import { ShareSheet } from '../components/ShareCard';
 import { useStore } from '../lib/store';
 import { curve } from '../lib/rules';
 import { REFERENCES } from '../data/reference';
@@ -27,12 +28,38 @@ const H0 = 6, H1 = 20;
 /** The band a run was judged against: its drug's, else riboflavin's (chalk lots are screened against it), none for U1. */
 const bandOf = (r: Run) => (r.evaluation?.rule === 'U1' ? null : REFERENCES[r.drug] ?? REFERENCES.riboflavin);
 
+/** The ⋯ menu on a run row: Share (runs with a verdict) and Open. Escape or a tap outside closes it. */
+function RowMenu({ run, onShare }: { run: Run; onShare: () => void }) {
+  const [open, setOpen] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const outside = (e: PointerEvent) => { if (!(e.target instanceof Node && box.current?.contains(e.target))) setOpen(false); };
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('pointerdown', outside);
+    document.addEventListener('keydown', esc);
+    return () => { document.removeEventListener('pointerdown', outside); document.removeEventListener('keydown', esc); };
+  }, [open]);
+  return (
+    <div ref={box}>
+      <button type="button" className="run-menu-btn" aria-haspopup="menu" aria-expanded={open} aria-label={`More for run ${run.id}`} onClick={() => setOpen(!open)}>⋯</button>
+      {open && (
+        <div className="run-menu" role="menu" aria-label={`Run ${run.id}`}>
+          {run.evaluation && <button type="button" role="menuitem" onClick={() => { setOpen(false); onShare(); }}>Share</button>}
+          <Link role="menuitem" to={run.evaluation ? `/evaluation/${run.id}` : `/run/${run.id}`}>Open</Link>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Runs() {
   const runs = useStore((s) => s.runs);
   const acts = useStore((s) => s.activities);
   const deliveries = useStore((s) => s.deliveries);
   const now = useNow();
   const [filter, setFilter] = useState<Filter>('all');
+  const [sharing, setSharing] = useState<Run | null>(null);
   const sorted = [...runs].sort((a, b) => b.startedAt - a.startedAt);
   const shown = filter === 'all' ? sorted : sorted.filter((r) => r.evaluation?.verdict === filter);
   const count = (f: Filter) => (f === 'all' ? runs.length : runs.filter((r) => r.evaluation?.verdict === f).length);
@@ -97,7 +124,7 @@ export default function Runs() {
             const ev = r.evaluation;
             const when = (dayStart(r.startedAt) === dayStart(now) ? 'Today' : new Date(r.startedAt).toLocaleDateString('en-US', { weekday: 'short' })) + ' ' + hm(r.startedAt);
             return (
-              <li key={r.id} className="rise" style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}>
+              <li key={r.id} className="rise run-li" style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}>
                 <Link to={ev ? `/evaluation/${r.id}` : `/run/${r.id}`} className="card run-row" aria-label={`Run ${r.id}, lot ${r.lot}, ${ev?.verdict ?? 'running'}`}>
                   <span className="c-chip">{ev ? <VerdictChip verdict={ev.verdict} /> : <span className="chip live"><span className="dot" />running</span>}<span className="c-pct-inline mono" style={{ fontSize: 12 }}>{ev?.pct ? `${ev.pct} %` : ''}</span><span className="c-pct-inline"><SrcBadge src={r.src} /></span></span>
                   <span className="c-main" style={{ minWidth: 0 }}>
@@ -109,12 +136,14 @@ export default function Runs() {
                   <span className="c-time mono muted" style={{ fontSize: 12 }}>{when}</span>
                   <span className="c-src"><SrcBadge src={r.src} /></span>
                 </Link>
+                <RowMenu run={r} onShare={() => setSharing(r)} />
               </li>
             );
           })}
         </ul>
       )}
       <p className="footnote">Screening result, not a pharmacopeial test. The faint band on each curve is the reference band it was judged against.</p>
+      {sharing && <ShareSheet run={sharing} onClose={() => setSharing(null)} />}
     </Screen>
   );
 }

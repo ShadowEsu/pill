@@ -64,7 +64,7 @@ export function seedHistory(): { deliveries: Delivery[]; runs: Run[]; bottles: B
     const d: Delivery = { id, supplier: SUPPLIERS[s.supplier], drug, lot: s.lot, amountUsd: s.amount, bottleId: null, runId: null, outcome: 'pending', clause: null, log: [{ at: t0, text: `delivery logged · ${s.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })} clinic → escrow (SANDBOX / TESTNET)`, kind: 'money' }] };
     act(t0, PEOPLE.tech, `logged delivery ${s.lot} from ${d.supplier} · $${s.amount.toLocaleString('en-US')} into escrow`, 'money', { kind: 'delivery', id });
     const bottle: Bottle = { id: 'b-' + (200 + i), drug, strength: drug === 'riboflavin' ? '100 mg' : '500 mg', lot: s.lot, maker: drug === 'riboflavin' ? "Nature's Bounty" : 'GSK', expiry: '2027-03', usedFor: drug === 'riboflavin' ? 'A vitamin. Used for B2 deficiency and sometimes to help prevent migraines.' : 'An antacid for heartburn, also a calcium supplement.', recall: s.kind === 'recall' ? 'recall' : 'no_record', recallCheckedAt: t0 + 4 * 60e3, runId: null, takenAt: [], reminder: null };
-    act(t0 + 3 * 60e3, PEOPLE.tech, `photographed the ${s.lot} label · Claude read 5 fields`, 'info', { kind: 'bottle', id: bottle.id });
+    act(t0 + 3 * 60e3, PEOPLE.tech, `photographed the ${s.lot} label · Gemini read 5 fields`, 'info', { kind: 'bottle', id: bottle.id });
     act(t0 + 4 * 60e3, PEOPLE.openfda, s.kind === 'recall' ? `RECALL record found for lot ${s.lot}` : `no recall record for lot ${s.lot}`, s.kind === 'recall' ? 'hold' : 'info', { kind: 'bottle', id: bottle.id });
     d.bottleId = bottle.id;
     const samples = samplesFor(s);
