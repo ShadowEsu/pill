@@ -1,17 +1,38 @@
 #!/bin/bash
-# Post a reply into the team's Discord channel through its webhook.
-# Usage: say.sh "text"   or   echo "text" | say.sh
-# Splits at 1900 chars (Discord limit is 2000). Webhook URL lives in .env as DISCORD_WEBHOOK_URL.
+# Post a reply into a channel of the PILL category as the bot.
+# Usage: say.sh <channel-name-or-id> "text"      or      echo "text" | say.sh <channel>
+# Splits at 1900 chars (Discord limit 2000). Needs DISCORD_BOT_TOKEN in .env.
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 # shellcheck disable=SC1091
 set -a; . "$here/.env"; set +a
-: "${DISCORD_WEBHOOK_URL:?DISCORD_WEBHOOK_URL missing in $here/.env}"
+: "${DISCORD_BOT_TOKEN:?DISCORD_BOT_TOKEN missing in $here/.env}"
+chan="${1:?usage: say.sh <channel> \"text\"}"; shift
 if [ $# -gt 0 ]; then text="$*"; else text="$(cat)"; fi
 [ -n "$text" ] || exit 0
-python3 - "$DISCORD_WEBHOOK_URL" "$text" <<'EOF'
+python3 - "$DISCORD_BOT_TOKEN" "$chan" "$text" <<'EOF'
 import json, sys, urllib.request
-url, text = sys.argv[1], sys.argv[2]
+token, chan, text = sys.argv[1], sys.argv[2], sys.argv[3]
+API = "https://discord.com/api/v10"
+H = {"Authorization": f"Bot {token}", "Content-Type": "application/json", "User-Agent": "pill-bridge/1"}
+def get(path):
+    with urllib.request.urlopen(urllib.request.Request(API + path, headers=H), timeout=20) as r:
+        return json.load(r)
+def post(path, body):
+    req = urllib.request.Request(API + path, data=json.dumps(body).encode(), headers=H, method="POST")
+    with urllib.request.urlopen(req, timeout=20) as r:
+        return json.load(r)
+if chan.isdigit():
+    cid = chan
+else:
+    cid = None
+    for g in get("/users/@me/guilds"):
+        for c in get(f"/guilds/{g['id']}/channels"):
+            if c.get("type") == 0 and c["name"] == chan.lstrip("#"):
+                cid = c["id"]; break
+        if cid: break
+    if not cid:
+        sys.exit(f"channel {chan} not found")
 chunks, cur = [], ""
 for line in text.splitlines(keepends=True):
     if len(cur) + len(line) > 1900:
@@ -21,9 +42,6 @@ for line in text.splitlines(keepends=True):
     cur += line
 if cur: chunks.append(cur)
 for c in chunks:
-    req = urllib.request.Request(url, data=json.dumps({"content": c, "username": "Pill"}).encode(),
-                                 headers={"Content-Type": "application/json", "User-Agent": "assay-bridge/1"})
-    with urllib.request.urlopen(req, timeout=20) as r:
-        r.read()
-print(f"posted {len(chunks)} message(s)")
+    post(f"/channels/{cid}/messages", {"content": c})
+print(f"posted {len(chunks)} message(s) to #{chan}")
 EOF

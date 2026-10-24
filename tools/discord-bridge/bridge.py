@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """Discord <-> Cal Hacks helper bridge.
 
-Listens in one Discord channel. Every message there (from anyone Preston lets into the channel)
-is forwarded to the helper's herdr pane as a prompt; attachments are saved under
-~/calhacks-13/discord-inbox/ and their paths are included so the helper can read them.
-The helper answers by running tools/discord-bridge/say.sh, which posts through a channel webhook.
+On start it makes sure a "PILL" category exists in the server with the team's channels, then listens in
+every channel of that category. Each message is forwarded to the helper's herdr pane as a prompt, with the
+channel name and id; attachments are saved under ~/calhacks-13/discord-inbox/. The helper replies with
+tools/discord-bridge/say.sh <channel> "<text>", which posts through the bot's own identity.
 
 Env (tools/discord-bridge/.env, git-ignored):
-  DISCORD_BOT_TOKEN=...      bot token from the Discord Developer Portal (Message Content Intent ON)
-  DISCORD_CHANNEL_ID=...     the one channel to listen in (right-click channel -> Copy Channel ID)
-  HERDR_TARGET=wZ:p1         helper pane
+  DISCORD_BOT_TOKEN=...   bot token (Message Content Intent ON; invited with Manage Channels)
+  DISCORD_CATEGORY=PILL   category name to create/use (default PILL)
+  HERDR_TARGET=wZ:p1      helper pane
+Run:  .venv/bin/python bridge.py            (listen)
+      .venv/bin/python bridge.py --setup    (create channels, print ids, exit)
 """
 import asyncio
 import os
@@ -24,6 +26,19 @@ import discord
 ROOT = Path(__file__).resolve().parent
 INBOX = Path.home() / "calhacks-13" / "discord-inbox"
 LOG = ROOT / "bridge.log"
+
+CHANNELS: list[tuple[str, str]] = [
+    ("ask-pill", "Ask the helper anything; it replies here"),
+    ("documents", "Specs, PDFs, datasheets, drafts"),
+    ("ideas", "New ideas and what-ifs"),
+    ("features", "Feature decisions for the app and station"),
+    ("hardware", "Wiring, sensors, calibration runs, photos of the box"),
+    ("app", "App screens, design, bugs"),
+    ("server-updates", "Deploys, services, bot status"),
+    ("errors", "Paste errors and logs here"),
+    ("pitch", "Devpost text, slides, demo script, video"),
+    ("life-updates", "Where everyone is, food, sleep, schedule"),
+]
 
 
 def load_env() -> None:
@@ -50,23 +65,54 @@ def safe_name(name: str) -> str:
 
 load_env()
 TOKEN = os.environ["DISCORD_BOT_TOKEN"]
-CHANNEL_ID = int(os.environ["DISCORD_CHANNEL_ID"])
+CATEGORY = os.environ.get("DISCORD_CATEGORY", "PILL")
 TARGET = os.environ.get("HERDR_TARGET", "wZ:p1")
+SETUP_ONLY = "--setup" in sys.argv
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.guilds = True
 client = discord.Client(intents=intents)
+watched: set[int] = set()
+
+
+async def ensure_channels(guild: discord.Guild) -> discord.CategoryChannel:
+    cat = discord.utils.get(guild.categories, name=CATEGORY)
+    if cat is None:
+        cat = await guild.create_category(CATEGORY)
+        log(f"created category {CATEGORY} in {guild.name}")
+    existing = {c.name: c for c in cat.text_channels}
+    for name, topic in CHANNELS:
+        if name in existing:
+            continue
+        await guild.create_text_channel(name, category=cat, topic=topic)
+        log(f"created #{name}")
+    return cat
 
 
 @client.event
 async def on_ready() -> None:
-    log(f"ready as {client.user} listening on channel {CHANNEL_ID} -> herdr {TARGET}")
-    print(f"ready as {client.user}; channel {CHANNEL_ID}; target {TARGET}", flush=True)
+    if not client.guilds:
+        print("bot is not in any server yet; invite it first", flush=True)
+        await client.close()
+        return
+    for guild in client.guilds:
+        cat = await ensure_channels(guild)
+        for ch in cat.text_channels:
+            watched.add(ch.id)
+            print(f"{guild.name} #{ch.name} id={ch.id}", flush=True)
+    log(f"ready as {client.user}; watching {len(watched)} channels -> herdr {TARGET}")
+    if SETUP_ONLY:
+        await client.close()
+        return
+    ask = next((c for g in client.guilds for c in g.text_channels if c.name == "ask-pill" and c.id in watched), None)
+    if ask:
+        await ask.send("Pill is online. Ask here, or drop files in #documents. I'll answer in the same channel.")
 
 
 @client.event
 async def on_message(message: discord.Message) -> None:
-    if message.author.bot or message.channel.id != CHANNEL_ID:
+    if message.author.bot or message.channel.id not in watched:
         return
     text = message.content.strip()
     saved: list[str] = []
@@ -82,10 +128,11 @@ async def on_message(message: discord.Message) -> None:
     if not text and not saved:
         return
     author = message.author.display_name
-    parts = [f"DISCORD from {author} in #{message.channel.name}: {text}" if text else f"DISCORD from {author}: (no text)"]
+    chan = message.channel.name
+    parts = [f"DISCORD #{chan} (id {message.channel.id}) from {author}: {text or '(no text)'}"]
     if saved:
         parts.append("Attachments saved: " + ", ".join(saved))
-    parts.append("Reply with tools/discord-bridge/say.sh \"<answer>\" (plain English, short; split long answers).")
+    parts.append(f'Reply with: ~/calhacks-13/tools/discord-bridge/say.sh {chan} "<answer>" (short, plain English).')
     prompt = "\n".join(parts)
     try:
         await message.add_reaction("👀")
@@ -96,8 +143,8 @@ async def on_message(message: discord.Message) -> None:
             "herdr", "agent", "prompt", TARGET, prompt,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         )
-        out, err = await proc.communicate()
-        log(f"forwarded from {author}: {text[:120]!r} attachments={len(saved)} rc={proc.returncode} {err.decode().strip()[:200]}")
+        _, err = await proc.communicate()
+        log(f"#{chan} from {author}: {text[:120]!r} attachments={len(saved)} rc={proc.returncode} {err.decode().strip()[:200]}")
         if proc.returncode != 0:
             await message.reply("Couldn't reach the helper right now; try again in a minute.", mention_author=False)
     except FileNotFoundError:
