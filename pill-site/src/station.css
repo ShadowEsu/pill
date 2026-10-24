@@ -35,6 +35,29 @@
 .station .bf { fill: var(--dark, #0B0C0E); }
 .station .bb { stroke: var(--blue, #2F6BFF); stroke-width: 1.25; stroke-dasharray: 4 3; }
 .station .ok { fill: var(--pass, #1B8A5A); stroke: none; }
+/* fx layer: pulsing beam, travelling light, 90° scatter, ESP32 → Pi data stream */
+.station .st-scatter {
+  stroke: var(--blue, #2F6BFF);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+}
+.station .st-light {
+  stroke: var(--blue, #2F6BFF);
+  stroke-width: 3;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 3px var(--blue, #2F6BFF));
+}
+.station .st-stream {
+  stroke: rgba(255, 255, 255, 0.28);
+  stroke-width: 1;
+  stroke-dasharray: 2 5;
+}
+.station .st-glyph {
+  font-size: 10px;
+  font-weight: 500;
+  fill: var(--dark-text, #E9E7E2);
+  letter-spacing: 0;
+}
 
 /* labels */
 .station .st-leader {

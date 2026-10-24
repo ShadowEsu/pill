@@ -11,32 +11,39 @@
     .bar button { font: inherit; font-size: 12px; padding: 6px 10px; background: #1a1d21; color: inherit; border: 1px solid var(--dark-line); border-radius: 6px; cursor: pointer; }
     .stage { display: flex; gap: 48px; align-items: flex-start; padding: 40px 60px 60px; }
     #phone { width: 390px; }
-    #phone-sm { width: 220px; }
+    .three { display: flex; gap: 56px; justify-content: center; padding: 56px 40px 64px; }
+    .three > div { width: 300px; }
   </style>
 </head>
 <body>
-  <div class="bar">
-    <button data-s="scan">scan</button>
-    <button data-s="pass">pass</button>
-    <button data-s="needslab">needslab</button>
-    <button data-s="unable">unable</button>
-    <button data-s="delivery">delivery</button>
+  <div class="bar" id="bar">
     <button id="play">play()</button>
     <button id="pause">pause()</button>
   </div>
   <div class="stage">
     <div id="shot" style="padding:56px"><div id="phone"></div></div>
-    <div id="phone-sm"></div>
+  </div>
+  <div class="three" id="three">
+    <div id="p-verdict"></div>
+    <div id="p-clinic"></div>
+    <div id="p-personal"></div>
   </div>
   <script type="module">
-    import { mountPhone } from '/src/phone.js';
-    const big = mountPhone(document.getElementById('phone'));
-    const small = mountPhone(document.getElementById('phone-sm'), { state: 'scan', autoplay: true });
+    import { mountPhone, PHONE_STATES, PHONE_SEQUENCES } from '/src/phone.js';
+    const big = mountPhone(document.getElementById('phone'), { caption: true });
     window.phone = big;
-    window.phoneSmall = small;
-    document.querySelectorAll('[data-s]').forEach((b) => b.addEventListener('click', () => big.setState(b.dataset.s)));
+    const bar = document.getElementById('bar');
+    for (const s of PHONE_STATES) {
+      const b = document.createElement('button');
+      b.textContent = s;
+      b.dataset.s = s;
+      b.onclick = () => big.setState(s);
+      bar.insertBefore(b, document.getElementById('play'));
+    }
     document.getElementById('play').onclick = () => big.play();
     document.getElementById('pause').onclick = () => big.pause();
+    window.phones = ['verdict', 'clinic', 'personal'].map((k) =>
+      mountPhone(document.getElementById(`p-${k}`), { sequence: PHONE_SEQUENCES[k], caption: true, autoplay: true }));
   </script>
 </body>
 </html>

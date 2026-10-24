@@ -172,8 +172,8 @@ function partBox(k) {
 }
 
 function partBoxLid(k, st) {
-  // shallow cardboard lid: lifted and tipped at rest, settles shut as the box recedes
-  const tilt = -8 * (1 - st.boxlid) * RAD;
+  // shallow cardboard lid: lifted and tipped at rest; first swings further open, then settles shut as the box recedes
+  const tilt = (-8 * (1 - st.boxlid) - 14 * st.boxUp) * RAD;
   const M = ([x, y, z]) => {
     const dx = x + 11.4;
     return [-11.4 + dx * Math.cos(tilt) - z * Math.sin(tilt), y, 23 + dx * -Math.sin(tilt) + z * Math.cos(tilt)];
@@ -233,13 +233,13 @@ function partPhone(k) {
   return items;
 }
 
-function partStepper(k) {
+function partStepper(k, st) {
   const [sx, sy] = STEP.shaft;
   const items = [k.line([sx, sy, 11.8], [sx, sy, 2.6])];
-  // fan-blade paddle: three pitched blades
+  // fan-blade paddle: three pitched blades, turned by st.paddle (radians, driven by the ambient loop)
   const blades = [];
   for (let i = 0; i < 3; i++) {
-    const t = (i * TAU) / 3 + 0.4;
+    const t = (i * TAU) / 3 + 0.4 + st.paddle;
     const P = (r, dt, dz) => [sx + r * Math.cos(t + dt), sy + r * Math.sin(t + dt), 3.0 + dz];
     blades.push([P(0.35, -0.35, 0.35), P(2.1, -0.3, 0.5), P(2.2, 0.28, -0.4), P(0.35, 0.35, -0.35), P(0.35, -0.35, 0.35)]);
   }
@@ -291,8 +291,8 @@ function partLed(k, st) {
   const dome = [];
   for (const [s, r] of [[-0.25, 0.25], [-0.15, 0.235], [-0.07, 0.19], [-0.02, 0.11], [0, 0.02]]) dome.push(...circ(M(0, s, 0), r * S, a, Z, 20));
   items.push(k.hull(dome, 'bf'));
-  // beam: 1.8 cm path across the corner to the inline LDR
-  items.push(k.line(M(0, 0.02, 0), add3(M(0, 0, 0), mul3(n, 1.8 * Math.max(0.35, 1 - st.spin * 0.6))), 'bb'));
+  // the beam itself lives in the fx layer so it can pulse; record where it leaves the dome
+  st.fx.ledTip = k.pr(M(0, 0.02, 0));
   return items;
 }
 
@@ -318,6 +318,7 @@ function partLdr(k, st) {
   const phi = (90 - 45 * st.spin) * RAD; // faces +y toward the LED → turns to the viewer
   const S = sensorScale(st);
   const { M, n, a } = sensorFrame(LDR_AT, phi, S);
+  st.fx.ldrFace = k.pr(M(0, 0.1, 0));
   return ldrBody(k, M, n, a, S);
 }
 
@@ -325,6 +326,7 @@ function partLdr90(k, st) {
   const phi = (180 - 135 * st.spin) * RAD; // faces -x into the beam → turns to the viewer
   const S = sensorScale(st);
   const { M, n, a } = sensorFrame(LDR90_AT, phi, S);
+  st.fx.ldr90Face = k.pr(M(0, 0.1, 0));
   return ldrBody(k, M, n, a, S);
 }
 
@@ -342,7 +344,7 @@ function partThermistor(k) {
   return items;
 }
 
-function partEsp(k) {
+function partEsp(k, st) {
   const x0 = -9.0, x1 = -3.9, y0 = 5.9, y1 = 8.2, z0 = 0.15, z1 = 0.32;
   const items = k.solid(corners(x0, y0, z0, x1, y1, z1));
   items.push(...k.solid(corners(-6.7, 6.35, z1, -4.3, 7.75, 0.62))); // module can
@@ -353,10 +355,11 @@ function partEsp(k) {
   for (let i = 0; i < 12; i++) pins.push([[x0 + 1.15 + i * 0.254, y1 - 0.15, z1], [x0 + 1.15 + i * 0.254, y1 - 0.15, z1 + 0.32]]);
   items.push(k.multi(pins));
   items.push(k.ring([x0 + 0.95, y1 - 0.55, z1], 0.12, X, Y, 'p', 10)); // reset button
+  st.fx.esp = k.pr([-5.5, 7.05, 0.62]); // where the data stream leaves the module can
   return items;
 }
 
-function partPi(k, st) {
+function partPi(k, st, lead = true) {
   const { x, y0, y1, zb, lean } = PI_BASE;
   const L = ([px, py, pz]) => {
     const h = pz - zb;
@@ -380,19 +383,27 @@ function partPi(k, st) {
   items.push(...k.solid(corners(x - 2.0, y1, zb, x, y0, zb + 11.0, L)));
   const face = (yy, zz) => L([x, yy, zz]);
   items.push(k.poly([face(y0 - 1.95, zb + 1.45), face(y1 + 1.95, zb + 1.45), face(y1 + 1.95, zb + 10.05), face(y0 - 1.95, zb + 10.05)], true));
-  // screen UI: title bar, three rows, PASS dot
+  // screen UI: title bar, three readout rows, PASS box + dot, and the settling curve (draws in last)
   const ui = [
     [face(y0 - 2.8, zb + 9.1), face(y0 - 7.5, zb + 9.1)],
-    [face(y0 - 2.8, zb + 7.2), face(y0 - 12.5, zb + 7.2)],
-    [face(y0 - 2.8, zb + 6.1), face(y0 - 10.0, zb + 6.1)],
-    [face(y0 - 2.8, zb + 5.0), face(y0 - 11.2, zb + 5.0)],
+    [face(y0 - 2.8, zb + 7.2), face(y0 - 8.6, zb + 7.2)],
+    [face(y0 - 2.8, zb + 6.1), face(y0 - 7.2, zb + 6.1)],
+    [face(y0 - 2.8, zb + 5.0), face(y0 - 8.0, zb + 5.0)],
   ];
   items.push(k.multi(ui));
   items.push(k.poly([face(y0 - 2.8, zb + 2.4), face(y0 - 8.4, zb + 2.4), face(y0 - 8.4, zb + 3.7), face(y0 - 2.8, zb + 3.7)], true));
+  items.push(k.poly([face(y0 - 10.2, zb + 8.0), face(y0 - 10.2, zb + 2.4), face(y1 + 2.4, zb + 2.4)], false, 'g'));
+  const curve = [];
+  for (let i = 0; i <= 24; i++) {
+    const t = i / 24;
+    curve.push(face(y0 - 10.5 - 6.3 * t, zb + 2.75 + 4.6 * Math.exp(-3.4 * t)));
+  }
+  items.push({ ...k.poly(curve), draw: st.piCurve });
   const ex = [0, -1, 0], ez = [-Math.sin(lean), 0, Math.cos(lean)];
   items.push(k.ring(face(y1 + 3.4, zb + 8.9), 0.32, ex, ez, 'ok', 16));
+  st.fx.pi = k.pr(face(y0 - 5.2, zb + 8.2)); // the stream lands on the screen's title bar
   // USB lead from the Pi toward the dark box port (guide)
-  items.push(k.poly([[x - 4, y0 + 0.4, 0], [x - 4, -8, 0], [4.0, 11.0, 0], [4.0, 11.0, 1.2]], false, 'g'));
+  if (lead) items.push(k.poly([[x - 4, y0 + 0.4, 0], [x - 4, -8, 0], [4.0, 11.0, 0], [4.0, 11.0, 1.2]], false, 'g'));
   return items;
 }
 
@@ -428,13 +439,12 @@ const PARTS = [
 ];
 
 // Exploded offsets (world cm) at full progress for each part's progress value.
+// The phone and stepper ride on the lid first, so their offsets are composed in frameState().
 const EXPLODE = {
   box: [-11, 7, -6],
   boxlid: [-11, 7, -11.4],
   lid: [0, 0, 8],
-  phone: [-9, -1, 19],
-  stepper: [0, 0, 24],
-  container: [6, 4, -4],
+  container: [6, 4, -6],
   led: [10, 4, -2],
   ldr: [14, -4, -1],
   ldr90: [18, 2, -3],
@@ -442,20 +452,28 @@ const EXPLODE = {
   esp32: [-11, 7, 17],
   pi: [3, -3, 0],
 };
+const PHONE_SLIDE = [-12, 3, 12]; // off the tilted lid to the left, clear of the rising stepper
+const STEP_RISE = [0, 0, 20]; // up the shaft axis, out of the lid, so the paddle hangs clear
+const BOXLID_UP = [0, 0, 5]; // the cardboard lid swings higher before it settles
+const LID_HINGE = [0, -6.2, 11.3];
+const LID_TILT = 14 * RAD;
+const CONT_TILT = -7 * RAD;
 
 const LABELS = [
-  { id: 'lid', no: '01', title: 'PHONE ON LID', sub: 'camera reads through the window', at: [[-5.9, 10.6, 12.6], 'phone'], x: 56, y: 150, side: 'L' },
+  { id: 'lid', no: '01', title: 'PHONE ON LID', sub: 'camera reads the pill through the window', at: [[-5.9, 10.6, 12.6], 'phone'], x: 40, y: 92, side: 'L' },
   { id: 'stepper', no: '02', title: '28BYJ-48 + ULN2003', sub: 'stepper turns a fan-blade paddle', at: [[3.0, 3.6, 13.85], 'stepper'], x: 655, y: 92, side: 'R' },
   { id: 'container', no: '03', title: '946 mL CHAMBER', sub: 'fill line · thermistor in the water', at: [[[3.46, 3.46, 0.3], 'container'], [[-2.0, -3.0, 3.1], 'thermistor']], x: 640, y: 770, side: 'R' },
-  { id: 'optics', no: '04', title: 'OPTICS', sub: 'blue LED → LDR · LDR at 90°, green', at: [[LED_AT, 'led'], [LDR_AT, 'ldr'], [LDR90_AT, 'ldr90']], x: 790, y: 690, side: 'R' },
-  { id: 'esp32', no: '05', title: 'ESP32 FEATHER V2', sub: 'lifted out of the dark box', at: [[-9.0, 8.2, 0.3], 'esp32'], x: 40, y: 296, side: 'L' },
-  { id: 'pi', no: '06', title: 'RASPBERRY PI 3', sub: '7" touchscreen beside the box', at: [[PI_BASE.x, PI_BASE.y1 + 1, PI_BASE.zb + 3], 'pi'], x: 960, y: 440, side: 'R' },
+  { id: 'optics', no: '04', title: 'OPTICS', sub: 'blue LED → LDR · LDR at 90°, green', at: [[LED_AT, 'led'], [LDR_AT, 'ldr'], [LDR90_AT, 'ldr90']], x: 820, y: 690, side: 'R' },
+  { id: 'esp32', no: '05', title: 'ESP32 FEATHER V2', sub: 'reads sensors · streams to Pi', at: [[-9.0, 8.2, 0.3], 'esp32'], x: 40, y: 252, side: 'L' },
+  { id: 'pi', no: '06', title: 'RASPBERRY PI 3', sub: '7" touchscreen plots the reading', at: [[PI_BASE.x, PI_BASE.y1 + 1, PI_BASE.zb + 3], 'pi'], x: 960, y: 440, side: 'R' },
 ];
 
 /* ───────────────────────── mount ───────────────────────── */
 
 const SCENE_CAM = { S: 15, ox: 575, oy: 470, pivot: [2, -14, 6] };
 const CHAR_W = 7.04; // 11px JetBrains Mono advance + letter-spacing
+const GLYPHS = 10; // '1'/'0' glyphs streaming ESP32 → Pi
+const AMBIENT_FROM = 0.05; // paddle, beam pulse, light and stream run above this progress
 
 function el(tag, attrs, parent) {
   const n = document.createElementNS(NS, tag);
@@ -464,18 +482,39 @@ function el(tag, attrs, parent) {
   return n;
 }
 
+function bez(b, u) {
+  const v = 1 - u, a = v * v * v, c = 3 * v * v * u, d = 3 * v * u * u, e = u * u * u;
+  return [a * b[0][0] + c * b[1][0] + d * b[2][0] + e * b[3][0], a * b[0][1] + c * b[1][1] + d * b[2][1] + e * b[3][1]];
+}
+
 export function mountStation(host, opts = {}) {
   const reduced = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
   host.classList.add('station');
   const svg = el('svg', {
     viewBox: `0 0 ${VB_W} ${VB_H}`,
     role: 'img',
-    'aria-label': opts.label || 'Exploded line drawing of the Pill station: dark box, deli container, lid with phone window, stepper paddle, LED and light sensors, thermistor, ESP32 board, Raspberry Pi touchscreen.',
+    'aria-label': opts.label || 'Exploded line drawing of the Pill station: dark box, deli container, lid with phone window, stepper paddle, LED and light sensors, thermistor, ESP32 board streaming readings to a Raspberry Pi touchscreen.',
   });
   const root = el('g', { class: 'st-root' }, svg);
   const guides = el('g', { class: 'st-guides' }, root);
   const groups = {};
-  for (const p of PARTS) groups[p.id] = { g: el('g', { 'data-part': p.id }, root), paths: [] };
+  const partById = {};
+  for (const p of PARTS) {
+    groups[p.id] = { g: el('g', { 'data-part': p.id }, root), paths: [] };
+    partById[p.id] = p;
+  }
+  // fx layer: pulsing beam, travelling light, scatter path, data stream with glyphs
+  const fx = el('g', { class: 'st-fx' }, root);
+  const beam = el('path', { class: 'bb st-beam' }, fx);
+  const scatter = el('path', { class: 'st-scatter' }, fx);
+  const light = el('path', { class: 'st-light' }, fx);
+  const stream = el('path', { class: 'st-stream' }, fx);
+  const glyphs = [];
+  for (let i = 0; i < GLYPHS; i++) {
+    const g = el('text', { class: 'st-glyph', 'text-anchor': 'middle', 'dominant-baseline': 'central' }, fx);
+    g.textContent = '1011001110'[i];
+    glyphs.push({ el: g, u: -1 });
+  }
   const labelLayer = el('g', { class: 'st-labels' }, svg);
   const labels = LABELS.map((L) => {
     const g = el('g', { class: 'st-label', 'data-label': L.id }, labelLayer);
@@ -484,96 +523,220 @@ export function mountStation(host, opts = {}) {
     const dots = anchors.map(() => el('circle', { class: 'st-dot', r: '2' }, g));
     const t = el('text', { x: L.x, y: L.y }, g);
     const t1 = el('tspan', { class: 'st-no' }, t); t1.textContent = L.no + '  ';
-    const t2 = el('tspan', { class: 'st-title' }, t); t2.textContent = L.title;
+    const t2 = el('tspan', { class: 'st-title' }, t);
     const t3 = el('tspan', { class: 'st-sub', x: L.x, dy: '15' }, t); t3.textContent = L.sub;
     const w = Math.max(L.no.length + 2 + L.title.length, L.sub.length) * CHAR_W;
     const end = L.side === 'L' ? L.x + w + 10 : L.x - 10;
-    return { L, g, t, anchors, leaders, dots, end };
+    return { L, g, t, t1, t2, t3, anchors, leaders, dots, end, typed: -1 };
   });
   host.appendChild(svg);
 
   const st = {
     yaw: 0, elev: 0, zoom: 1, panX: 0, panY: -60,
-    box: 0, boxlid: 0, lid: 0, phone: 0, stepper: 0, container: 0,
-    led: 0, ldr: 0, ldr90: 0, spin: 0, thermistor: 0, esp32: 0, pi: 0, piBoard: 0,
-    guide: 0, leader: 0, label: 0,
+    box: 0, boxlid: 0, boxUp: 0, lid: 0, lidTilt: 0, phone: 0, stepper: 0, container: 0,
+    led: 0, ldr: 0, ldr90: 0, spin: 0, thermistor: 0, esp32: 0, pi: 0, piBoard: 0, piCurve: 0,
+    guide: 0, stream: 0,
+    paddle: 0, // radians; advanced by the ambient loop, not the timeline
+    fx: {}, // projected anchor points the parts report while drawing
   };
+  LABELS.forEach((_, i) => { st['ld' + i] = 0; st['ty' + i] = 0; });
 
   function syncPaths(entry, items) {
     const { g, paths } = entry;
     for (let i = 0; i < items.length; i++) {
+      const it = items[i];
       let p = paths[i];
-      if (!p) { p = el('path', { class: items[i].c }, g); paths.push(p); }
-      p.setAttribute('d', items[i].d);
+      if (!p) {
+        p = el('path', { class: it.c }, g);
+        if (it.draw != null) { p.setAttribute('pathLength', '1'); p.style.strokeDasharray = '1'; }
+        paths.push(p);
+      }
+      p.setAttribute('d', it.d);
+      if (it.draw != null) p.style.strokeDashoffset = String(1 - it.draw);
     }
   }
 
   const guideEntry = { g: guides, paths: [] };
+  let frame = null; // { cam, off, pre } of the last render, reused by the ambient loop
+  let streamBez = null;
 
-  function render() {
+  function frameState() {
     const cam = makeCam({ ...SCENE_CAM, ox: SCENE_CAM.ox + st.panX, oy: SCENE_CAM.oy + st.panY, yaw: st.yaw, elev: st.elev, zoom: st.zoom });
     const off = {};
     for (const id in EXPLODE) off[id] = mul3(EXPLODE[id], st[id]);
-    const pre = {};
+    off.boxlid = add3(off.boxlid, mul3(BOXLID_UP, st.boxUp));
+    off.phone = add3(off.lid, mul3(PHONE_SLIDE, st.phone));
+    off.stepper = add3(off.lid, mul3(STEP_RISE, st.stepper));
+    const lt = LID_TILT * st.lidTilt;
+    const pre = {
+      lid: tiltX(lt, LID_HINGE),
+      phone: tiltX(lt * (1 - st.phone), LID_HINGE),
+      stepper: tiltX(lt * (1 - st.stepper), LID_HINGE),
+      container: tiltY(CONT_TILT * st.container, [0, 0, 0]),
+    };
     for (const p of PARTS) {
       if (!p.mag) continue;
       const { c, k } = p.mag;
       const m = 1 + k * st[p.id];
       pre[p.id] = (q) => [c[0] + (q[0] - c[0]) * m, c[1] + (q[1] - c[1]) * m, c[2] + (q[2] - c[2]) * m];
     }
-    for (const p of PARTS) syncPaths(groups[p.id], p.draw(kit(cam, off[p.id], pre[p.id]), st));
+    return { cam, off, pre };
+  }
+
+  function drawPart(id) {
+    const { cam, off, pre } = frame;
+    syncPaths(groups[id], partById[id].draw(kit(cam, off[id], pre[id]), st));
+  }
+
+  function render() {
+    frame = frameState();
+    const { cam, off, pre } = frame;
+    for (const p of PARTS) drawPart(p.id);
     syncPaths(guideEntry, partGuides(kit(cam), st, off));
     guides.style.opacity = String(0.35 + 0.65 * st.guide);
     groups.box.g.style.opacity = String(1 - 0.5 * st.box);
     groups.boxlid.g.style.opacity = String(1 - 0.45 * st.boxlid);
-    for (const lab of labels) {
+    renderFxGeometry();
+    renderFx();
+    labels.forEach((lab, i) => {
       const { L, end } = lab;
+      const ld = st['ld' + i], ty = st['ty' + i];
       const ky = L.y - 4;
       const knee = end + (L.side === 'L' ? 22 : -22);
-      lab.anchors.forEach(([pt, part], i) => {
+      lab.anchors.forEach(([pt, part], j) => {
         const [ax, ay] = cam.P(...add3(pre[part] ? pre[part](pt) : pt, off[part]));
-        lab.leaders[i].setAttribute('d', `M${f1(ax)} ${f1(ay)}L${f1(knee)} ${f1(ky)}L${f1(end)} ${f1(ky)}`);
-        lab.leaders[i].style.strokeDashoffset = String(1 - st.leader);
-        lab.dots[i].setAttribute('cx', f1(ax));
-        lab.dots[i].setAttribute('cy', f1(ay));
-        lab.dots[i].style.opacity = String(st.leader);
+        lab.leaders[j].setAttribute('d', `M${f1(ax)} ${f1(ay)}L${f1(knee)} ${f1(ky)}L${f1(end)} ${f1(ky)}`);
+        lab.leaders[j].style.strokeDashoffset = String(1 - ld);
+        lab.dots[j].setAttribute('cx', f1(ax));
+        lab.dots[j].setAttribute('cy', f1(ay));
+        lab.dots[j].style.opacity = String(clamp01(ld * 4));
       });
-      lab.t.style.opacity = String(st.label);
+      // number lands as the leader arrives, then the title types out and the sub line fades up
+      lab.t.style.opacity = ld > 0 ? '1' : '0';
+      lab.t1.style.opacity = String(clamp01((ld - 0.6) / 0.4));
+      const n = Math.round(L.title.length * ty);
+      const typed = n + (ty > 0 && ty < 1 ? 0.5 : 0);
+      if (typed !== lab.typed) {
+        lab.typed = typed;
+        lab.t2.textContent = L.title.slice(0, n) + (ty > 0 && ty < 1 ? '_' : '');
+      }
+      lab.t3.style.opacity = String(clamp01((ty - 0.45) / 0.55));
+    });
+  }
+
+  function renderFxGeometry() {
+    const { ledTip, ldrFace, ldr90Face, esp, pi } = st.fx;
+    beam.setAttribute('d', `M${f1(ledTip[0])} ${f1(ledTip[1])}L${f1(ldrFace[0])} ${f1(ldrFace[1])}`);
+    const mid = lerp2(ledTip, ldrFace, 0.5);
+    scatter.setAttribute('d', `M${f1(mid[0])} ${f1(mid[1])}L${f1(ldr90Face[0])} ${f1(ldr90Face[1])}`);
+    scatter.style.opacity = String(0.2 + 0.5 * st.spin);
+    // data link: a low arc under the floating lid from the ESP32 module to the Pi's screen
+    const dx = pi[0] - esp[0];
+    streamBez = [esp, [esp[0] + dx * 0.3, esp[1] + 150], [esp[0] + dx * 0.7, pi[1] + 110], pi];
+    const [a, b, c, d] = streamBez;
+    stream.setAttribute('d', `M${f1(a[0])} ${f1(a[1])}C${f1(b[0])} ${f1(b[1])} ${f1(c[0])} ${f1(c[1])} ${f1(d[0])} ${f1(d[1])}`);
+    stream.style.opacity = String(st.stream);
+  }
+
+  // time-driven fx: beam pulse, light travelling LED → LDR, '1'/'0' glyphs travelling ESP32 → Pi
+  let ambT = 0;
+  function renderFx() {
+    const live = !reduced && current > AMBIENT_FROM;
+    const { ledTip, ldrFace } = st.fx;
+    beam.style.opacity = live ? String(0.7 - 0.3 * Math.cos((TAU * ambT) / 1400)) : '1';
+    if (live) {
+      const u = (ambT / 900) % 1;
+      const a = lerp2(ledTip, ldrFace, Math.max(0, u - 0.22)), b = lerp2(ledTip, ldrFace, u);
+      light.setAttribute('d', `M${f1(a[0])} ${f1(a[1])}L${f1(b[0])} ${f1(b[1])}`);
+      light.style.opacity = String(Math.sin(Math.PI * u) * clamp01((current - AMBIENT_FROM) / 0.1));
+    } else light.style.opacity = '0';
+    for (let i = 0; i < GLYPHS; i++) {
+      const gl = glyphs[i];
+      const show = clamp01((st.stream - (i / GLYPHS) * 0.6) / 0.4); // staggered as the stream opens
+      if (show <= 0) { gl.el.style.opacity = '0'; continue; }
+      const u = (ambT / 3600 + i / GLYPHS) % 1;
+      if (u < gl.u) gl.el.textContent = Math.random() < 0.5 ? '0' : '1';
+      gl.u = u;
+      const [x, y] = bez(streamBez, u);
+      gl.el.setAttribute('x', f1(x));
+      gl.el.setAttribute('y', f1(y));
+      gl.el.style.opacity = String(show * Math.min(1, Math.sin(Math.PI * u) * 2.2));
     }
   }
 
-  // Choreography (timeline units: 1000 = full explode)
+  // Choreography (timeline units: 1000 = full explode). Reassembly is the same timeline seeked backwards.
   const tl = createTimeline({ autoplay: false, defaults: { ease: 'inOutCubic' } });
-  tl.add(st, { boxlid: 1, duration: 460 }, 170)
-    .add(st, { zoom: 0.76, panY: -15, panX: 40, duration: 600, ease: 'inOutSine' }, 60)
-    .add(st, { lid: 1, duration: 440, ease: 'inOutQuart' }, 90)
-    .add(st, { phone: 1, duration: 460, ease: 'inOutQuart' }, 130)
-    .add(st, { stepper: 1, duration: 500, ease: 'inOutQuart' }, 150)
-    .add(st, { box: 1, duration: 460 }, 170)
-    .add(st, { container: 1, duration: 460, ease: 'inOutQuart' }, 210)
-    .add(st, { guide: 1, duration: 500, ease: 'inOutSine' }, 200)
-    .add(st, { thermistor: 1, duration: 440 }, 260)
-    .add(st, { esp32: 1, duration: 440 }, 290)
-    .add(st, { led: 1, duration: 460, ease: 'inOutQuart' }, 300)
-    .add(st, { ldr: 1, duration: 460, ease: 'inOutQuart' }, 330)
-    .add(st, { ldr90: 1, duration: 460, ease: 'inOutQuart' }, 360)
-    .add(st, { spin: 1, duration: 420, ease: 'inOutSine' }, 360)
-    .add(st, { pi: 1, duration: 420 }, 320)
-    .add(st, { piBoard: 1, duration: 420, ease: 'inOutQuart' }, 380)
-    .add(st, { leader: 1, duration: 260, ease: 'outCubic' }, 540)
-    .add(st, { label: 1, duration: 280, ease: 'outSine' }, 580)
-    // the whole assembly turns: yaw left, swing right, settle
-    .add(st, { yaw: -14, elev: -5, duration: 340, ease: 'inOutSine' }, 0)
-    .add(st, { yaw: 9, elev: 2, duration: 340, ease: 'inOutSine' }, 340)
-    .add(st, { yaw: 0, elev: 0, duration: 240, ease: 'inOutSine' }, 680);
+  // camera: swing left and down, orbit right and up, spring past and settle in the last 10%
+  tl.add(st, { yaw: -22, elev: -6, duration: 300, ease: 'inOutSine' }, 0)
+    .add(st, { yaw: 12, duration: 600, ease: 'inSine' }, 300)
+    .add(st, { yaw: 16, duration: 100, ease: 'outBack(2.2)' }, 900)
+    .add(st, { elev: 6, duration: 600, ease: 'inOutSine' }, 300)
+    .add(st, { elev: 5, duration: 100, ease: 'outBack(2.2)' }, 900)
+    .add(st, { zoom: 0.76, panY: -15, panX: 40, duration: 600, ease: 'inOutSine' }, 40)
+    // 1. the cardboard lid swings open and the lid assembly (lid + phone + stepper) lifts and tips
+    .add(st, { boxUp: 1, duration: 200, ease: 'outCubic' }, 0)
+    .add(st, { lid: 1, duration: 360, ease: 'inOutQuart' }, 60)
+    .add(st, { lidTilt: 1, duration: 260, ease: 'outCubic' }, 80)
+    // 2. the phone slides off the tipped lid; the box recedes and its lid settles shut
+    .add(st, { phone: 1, duration: 340, ease: 'inOutQuart' }, 280)
+    .add(st, { boxlid: 1, box: 1, duration: 420 }, 280)
+    .add(st, { boxUp: 0, duration: 260, ease: 'inOutSine' }, 300)
+    .add(st, { guide: 1, duration: 500, ease: 'inOutSine' }, 250)
+    // 3. the stepper rises off the lid, the chamber drops and leans, the lid levels out
+    .add(st, { stepper: 1, duration: 360, ease: 'inOutQuart' }, 400)
+    .add(st, { container: 1, duration: 380, ease: 'inOutQuart' }, 360)
+    .add(st, { lidTilt: 0.3, duration: 300, ease: 'inOutSine' }, 520)
+    .add(st, { thermistor: 1, duration: 360 }, 430)
+    // 4. ESP32 lifts out of the box; optics fan out; the Pi slides over and its board lifts off
+    .add(st, { esp32: 1, duration: 400, ease: 'inOutQuart' }, 380)
+    .add(st, { led: 1, duration: 360, ease: 'inOutQuart' }, 470)
+    .add(st, { ldr: 1, duration: 360, ease: 'inOutQuart' }, 500)
+    .add(st, { ldr90: 1, duration: 360, ease: 'inOutQuart' }, 530)
+    .add(st, { spin: 1, duration: 360, ease: 'inOutSine' }, 520)
+    .add(st, { pi: 1, duration: 380 }, 420)
+    .add(st, { piBoard: 1, duration: 340, ease: 'inOutQuart' }, 560)
+    // 5. data starts streaming, the screen curve draws in
+    .add(st, { stream: 1, duration: 220, ease: 'outSine' }, 700)
+    .add(st, { piCurve: 1, duration: 140, ease: 'inOutSine' }, 860);
+  // 6. labels 01 → 06: leader draws in, number lands, title types; reversed they leave first
+  LABELS.forEach((_, i) => {
+    tl.add(st, { ['ld' + i]: 1, duration: 100, ease: 'outCubic' }, 720 + i * 24)
+      .add(st, { ['ty' + i]: 1, duration: 120, ease: 'linear' }, 760 + i * 24);
+  });
 
   const total = tl.duration;
   let current = 0;
   function seekTo(p) {
-    current = Math.min(1, Math.max(0, p));
+    current = clamp01(p);
     tl.seek(current * total);
     render();
+    wake();
   }
+
+  // ambient loop: spins the paddle and runs the fx while exploded and on screen
+  let amb = 0, ambLast = 0, onScreen = false, destroyed = false;
+  function ambient(now) {
+    amb = 0;
+    if (destroyed || !onScreen || current <= AMBIENT_FROM) {
+      ambLast = 0;
+      if (!destroyed) renderFx();
+      return;
+    }
+    const dt = ambLast ? Math.min(64, now - ambLast) : 16;
+    ambLast = now;
+    ambT += dt;
+    st.paddle = (st.paddle + dt * 0.0042 * clamp01((current - AMBIENT_FROM) / 0.1)) % TAU;
+    drawPart('stepper');
+    renderFx();
+    amb = requestAnimationFrame(ambient);
+  }
+  function wake() {
+    if (!amb && !reduced && !destroyed && onScreen && current > AMBIENT_FROM) amb = requestAnimationFrame(ambient);
+  }
+  const io = typeof IntersectionObserver === 'function'
+    ? new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; wake(); })
+    : null;
+  if (io && !reduced) io.observe(host);
 
   const handle = {
     el: host,
@@ -588,6 +751,10 @@ export function mountStation(host, opts = {}) {
     _seek(p) { if (!reduced) seekTo(p); },
     destroy() {
       if (handle._stopDemo) handle._stopDemo();
+      if (handle._stopScroll) handle._stopScroll();
+      destroyed = true;
+      if (amb) cancelAnimationFrame(amb);
+      if (io) io.disconnect();
       tl.pause();
       svg.remove();
       host.classList.remove('station', 'station--static');
@@ -605,30 +772,43 @@ export function mountStation(host, opts = {}) {
   return handle;
 }
 
-/* ───────────────────────── auto demo ───────────────────────── */
+/* ───────────────────────── idle loop + scroll ───────────────────────── */
 
-const DEMO = { hold: 900, ramp: 3600 }; // 0 hold → up → 1 hold → down ≈ 9 s
+// assemble → hold 1.2 s → explode 3.5 s → hold 2.5 s → assemble 3 s → …
+const LOOP = { hold0: 1200, up: 3500, hold1: 2500, down: 3000 };
+const LOOP_MS = LOOP.hold0 + LOOP.up + LOOP.hold1 + LOOP.down;
+const easeIO = (t) => 0.5 - 0.5 * Math.cos(Math.PI * t);
+const easeIOInv = (p) => Math.acos(1 - 2 * clamp01(p)) / Math.PI;
 
-export function autoDemo(handle) {
-  if (!handle || handle.reduced) return () => {};
-  const cycle = 2 * (DEMO.hold + DEMO.ramp);
-  const ease = (t) => 0.5 - 0.5 * Math.cos(Math.PI * t);
-  let raf = 0, last = 0, t = 0, visible = false, stopped = false;
+function loopProgress(ms) {
+  let m = ms % LOOP_MS;
+  if (m < LOOP.hold0) return 0;
+  m -= LOOP.hold0;
+  if (m < LOOP.up) return easeIO(m / LOOP.up);
+  m -= LOOP.up;
+  if (m < LOOP.hold1) return 1;
+  m -= LOOP.hold1;
+  return 1 - easeIO(m / LOOP.down);
+}
 
-  function progressAt(ms) {
-    const m = ms % cycle;
-    if (m < DEMO.hold) return 0;
-    if (m < DEMO.hold + DEMO.ramp) return ease((m - DEMO.hold) / DEMO.ramp);
-    if (m < 2 * DEMO.hold + DEMO.ramp) return 1;
-    return 1 - ease((m - 2 * DEMO.hold - DEMO.ramp) / DEMO.ramp);
-  }
+// Loop time to resume from progress p. A resume follows an idle pause, so a fully exploded drawing starts
+// assembling right away; anything in between assembles from where it is.
+function loopTimeFor(p) {
+  if (p <= 0.001) return 0;
+  return LOOP.hold0 + LOOP.up + LOOP.hold1 + LOOP.down * easeIOInv(1 - p);
+}
+
+function runLoop(handle, until) {
+  let raf = 0, last = 0, visible = false, stopped = false;
+  let t = loopTimeFor(handle.progress);
   function frame(now) {
     raf = 0;
-    if (stopped || handle.driven) return stop();
+    if (stopped) return;
+    if (until && until()) return stop();
     if (!visible) return;
     if (last) t += Math.min(64, now - last);
     last = now;
-    handle._seek(progressAt(t));
+    handle._seek(loopProgress(t));
     raf = requestAnimationFrame(frame);
   }
   const io = new IntersectionObserver(([entry]) => {
@@ -643,8 +823,82 @@ export function autoDemo(handle) {
     raf = 0;
     io.disconnect();
   }
+  return stop;
+}
+
+export function autoDemo(handle) {
+  if (!handle || handle.reduced) return () => {};
+  if (handle._stopDemo) handle._stopDemo();
+  const stop = runLoop(handle, () => handle.driven);
   handle._stopDemo = stop;
   return stop;
+}
+
+// Scroll drives progress (anime onScroll, smoothed with sync). After idleAfterMs without scrolling while the
+// stage is on screen, the idle loop resumes from the current progress; the next scroll takes over again.
+export function attachScroll(handle, { stage, idleAfterMs = 2500, enter = 'bottom top+=10%', leave = 'top bottom-=90%', sync = 0.25 } = {}) {
+  if (!handle || handle.reduced) return { stop() {} };
+  if (handle._stopDemo) handle._stopDemo();
+  if (handle._stopScroll) handle._stopScroll();
+  const target = stage || handle.el;
+  let loopStop = null, timer = 0, lastY = null, onScreen = false, stopped = false;
+  const proxy = { p: 0 };
+  const follow = animate(proxy, {
+    p: [0, 1],
+    duration: 1000,
+    ease: 'linear',
+    autoplay: false,
+    onUpdate: () => { if (!loopStop && !stopped) handle._seek(proxy.p); },
+  });
+  function idle() {
+    timer = 0;
+    if (stopped || loopStop || !onScreen) return; // off screen: re-armed when the stage returns
+    loopStop = runLoop(handle);
+  }
+  function arm() {
+    clearTimeout(timer);
+    timer = setTimeout(idle, idleAfterMs);
+  }
+  function takeOver() {
+    if (loopStop) {
+      loopStop();
+      loopStop = null;
+      // smoothing continues from where the loop left the drawing, not from the old scroll value
+      follow.seek(handle.progress * follow.duration, true);
+    }
+    arm();
+  }
+  // progress: the observer's smoothed sync seeks `follow`, whose onUpdate drives the drawing
+  const obs = onScroll({ target, enter, leave, sync });
+  obs.link(follow);
+  // takeover: any scroll, including past either end of the observer's range where it stops updating
+  const onUserScroll = () => {
+    const y = obs.scroll;
+    if (y === lastY) return;
+    lastY = y;
+    takeOver();
+  };
+  addEventListener('scroll', onUserScroll, { passive: true });
+  const io = new IntersectionObserver(([e]) => {
+    onScreen = e.isIntersecting;
+    if (onScreen && !loopStop && !timer && !stopped) arm();
+  });
+  io.observe(target);
+  arm();
+  function stop() {
+    if (stopped) return;
+    stopped = true;
+    clearTimeout(timer);
+    if (loopStop) loopStop();
+    loopStop = null;
+    io.disconnect();
+    removeEventListener('scroll', onUserScroll);
+    obs.revert();
+    follow.pause();
+    if (handle._stopScroll === stop) handle._stopScroll = null;
+  }
+  handle._stopScroll = stop;
+  return { stop };
 }
 
 /* ───────────────────────── standalone FIG part drawings ───────────────────────── */
@@ -660,8 +914,9 @@ const FIG_STYLE = {
   ok: 'style="fill:var(--pass,#1B8A5A)" stroke="none"',
 };
 
+// Every path carries data-draw="<order>" so the page can stroke-draw the figure in.
 function figSvg(items) {
-  const body = items.map((it) => `<path ${FIG_STYLE[it.c]} stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" d="${it.d}"/>`).join('');
+  const body = items.map((it, i) => `<path ${FIG_STYLE[it.c]} data-draw="${i}" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" d="${it.d}"/>`).join('');
   return `<svg xmlns="${NS}" viewBox="0 0 300 300" fill="none" aria-hidden="true">${body}</svg>`;
 }
 
@@ -814,6 +1069,15 @@ function figContainer() {
   return figSvg(items);
 }
 
+function figPi() {
+  // Raspberry Pi 3 lifted off the back of the 7" touchscreen, settling curve on screen
+  const k = figKit(9, [5.1, -31.2, 7.2], 150);
+  const { x, y0, y1 } = PI_BASE;
+  const items = [k.multi([[[x - 7, y0 + 2, 0], [x + 2, y0 + 2, 0]], [[x - 7, y1 - 2, 0], [x + 2, y1 - 2, 0]]], 'g')];
+  items.push(...partPi(k, { piBoard: 1, piCurve: 1, fx: {} }, false));
+  return figSvg(items);
+}
+
 export const partFigures = {
   esp32: figEsp32(),
   ldr: figLdr(),
@@ -821,4 +1085,5 @@ export const partFigures = {
   thermistor: figThermistor(),
   stepper: figStepper(),
   container: figContainer(),
+  pi: figPi(),
 };

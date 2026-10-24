@@ -10,23 +10,33 @@
   body { margin: 0; background: #0B0C0E; color: #E9E7E2; }
   .wrap { width: 1200px; margin: 0 auto; }
   .ctl { display: flex; gap: 12px; align-items: center; padding: 10px 0; font: 12px var(--mono); }
-  .figs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px; background: rgba(255,255,255,.12); }
+  .figs { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: rgba(255,255,255,.12); }
   .figs div { background: #0B0C0E; }
+  .spacer { height: 120vh; }
+  body.scroll .ctl, body.scroll .figs { display: none; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="ctl"><input id="p" type="range" min="0" max="1" step="0.001" value="0" style="width:400px" /><span id="pv">0</span></div>
-  <div id="st"></div>
+  <div class="spacer" id="sp1" hidden></div>
+  <section id="stage"><div id="st"></div></section>
+  <div class="spacer" id="sp2" hidden></div>
   <div class="figs" id="figs"></div>
 </div>
 <script type="module">
-  import { mountStation, autoDemo, partFigures } from '/src/station.js';
+  import { mountStation, autoDemo, attachScroll, partFigures } from '/src/station.js';
   const h = mountStation(document.getElementById('st'));
   window.__station = h;
   const r = document.getElementById('p');
   r.addEventListener('input', () => { h.setProgress(+r.value); document.getElementById('pv').textContent = r.value; });
   if (location.hash === '#demo') autoDemo(h);
+  if (location.hash === '#scroll') {
+    document.body.classList.add('scroll');
+    document.getElementById('sp1').hidden = false;
+    document.getElementById('sp2').hidden = false;
+    window.__scroll = attachScroll(h, { stage: document.getElementById('stage') });
+  }
   document.getElementById('figs').innerHTML = Object.values(partFigures).map((s) => `<div>${s}</div>`).join('');
 </script>
 </body>

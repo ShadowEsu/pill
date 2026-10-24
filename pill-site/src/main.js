@@ -2,7 +2,7 @@ import { animate, stagger, onScroll, createTimeline, utils } from 'animejs';
 import { artFor } from './art.js';
 import * as stationMod from './station.js';
 const { mountStation, autoDemo, partFigures } = stationMod;
-import { mountPhone } from './phone.js';
+import { mountPhone, PHONE_SEQUENCES } from './phone.js';
 import { mountBinaryPill } from './pill.js';
 import './station.css';
 
@@ -188,9 +188,9 @@ if (!reduced) {
 /* ---------- phone mock ---------- */
 {
   const loops = {
-    'phone-mount': { sequence: [['scan', 6000], ['pass', 3200], ['scan', 4000], ['needslab', 4200], ['unable', 2800], ['calibration', 5000]], still: 'pass' },
-    'phone-clinic': { sequence: [['bottle', 5200], ['scan', 4000], ['pass', 2600], ['delivery', 3800], ['released', 4200], ['recall', 4200]], still: 'delivery', caption: true },
-    'phone-personal': { sequence: [['bottle', 5200], ['scan', 4000], ['pass', 2600], ['medicines', 5200], ['calibration', 4800]], still: 'medicines', caption: true },
+    'phone-mount': { sequence: [...PHONE_SEQUENCES.verdict, ['calibration', 6000]], still: 'pass' },
+    'phone-clinic': { sequence: PHONE_SEQUENCES.clinic, still: 'delivery', caption: true },
+    'phone-personal': { sequence: PHONE_SEQUENCES.personal, still: 'medicines', caption: true },
   };
   Object.entries(loops).forEach(([id, cfg]) => {
     const mount = document.getElementById(id);

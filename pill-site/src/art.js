@@ -52,8 +52,8 @@ const art = {
 
   curve: wrap(`
     <g ${G}><line x1="60" y1="240" x2="360" y2="240"/><line x1="60" y1="40" x2="60" y2="240"/><rect x="60" y="96" width="300" height="44" fill="currentColor" stroke="none" opacity=".07"/></g>
-    <path d="M60 238 C 120 236, 150 150, 200 122 S 300 112, 360 110" ${S} stroke="var(--blue)" stroke-width="2.2" data-draw/>
-    <path d="M60 238 C 120 236, 150 230, 200 226 S 300 222, 360 222" ${S} stroke="var(--lab)" stroke-width="2.2" data-draw/>
+    <path d="M60 238 C 120 236, 150 150, 200 122 S 300 112, 360 110" fill="none" stroke="var(--blue)" stroke-width="2.2" stroke-linecap="round" data-draw/>
+    <path d="M60 238 C 120 236, 150 230, 200 226 S 300 222, 360 222" fill="none" stroke="var(--lab)" stroke-width="2.2" stroke-linecap="round" data-draw/>
     <text x="66" y="92" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">reference band · 10 runs</text>
     <text x="250" y="104" font-family="var(--mono)" font-size="10" fill="var(--blue-ink)">PASS · P1</text>
     <text x="250" y="258" font-family="var(--mono)" font-size="10" fill="var(--lab)">NEEDS LAB · N1</text>
@@ -135,9 +135,9 @@ const partFallback = (label) => `<svg viewBox="0 0 300 300" width="100%" role="i
 // Calibration: ten reference runs make the band
 art.calibration = wrap(`
   <g ${G}><line x1="60" y1="240" x2="360" y2="240"/><line x1="60" y1="40" x2="60" y2="240"/><rect x="60" y="104" width="300" height="34" fill="currentColor" stroke="none" opacity=".07"/></g>
-  ${Array.from({ length: 10 }, (_, i) => `<path d="M60 238 C 120 ${236 - i * 0.8}, 150 ${152 + (i % 5) * 3}, 200 ${126 + (i % 4) * 2.5} S 300 ${116 + (i % 3) * 3}, 360 ${114 + (i % 5) * 2}" ${S} stroke="var(--blue)" stroke-width="1.3" opacity="${0.35 + (i % 4) * 0.12}" data-draw/>`).join('')}
+  ${Array.from({ length: 10 }, (_, i) => `<path d="M60 238 C 120 ${236 - i * 0.8}, 150 ${152 + (i % 5) * 3}, 200 ${126 + (i % 4) * 2.5} S 300 ${116 + (i % 3) * 3}, 360 ${114 + (i % 5) * 2}" fill="none" stroke="var(--blue)" stroke-width="1.3" stroke-linecap="round" opacity="${0.35 + (i % 4) * 0.12}" data-draw/>`).join('')}
   <text x="66" y="98" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">band = mean ± 3 SD of 10 runs</text>
-  <text x="200" y="258" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">leave-one-out 10/10 · CV ≤ 15% · else no demo</text>
+  <text x="210" y="258" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">leave-one-out 10/10 · CV ≤ 15% or no demo</text>
 `, 'Ten riboflavin reference curves overlapping into a narrow band');
 
 export function artFor(key) { return art[key] || ''; }
