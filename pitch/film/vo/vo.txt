@@ -1,0 +1,13 @@
+# Voice-over: say -v Samantha -r 175; id, start in the film, duration, text
+01	@0.6s	11.06s	This bottle says vitamin B2. Inside is chalk. Watch the blue line: the water clouds, the light drops, right into the reference band. A one-sensor tester would call that a pass.
+02	@12.2s	9.69s	But the green line never moves. Pill says NEEDS LAB, and the supplier's four hundred and eighty dollars stays held, sandbox money, with a lab referral already drafted.
+03	@23.0s	15.09s	WHO estimates 1 in 10 medical products in low- and middle-income countries is substandard or falsified. A new lab dissolution tester costs twenty to a hundred thousand dollars, and lab results take seven to ten business days. A clinic pharmacist has neither.
+04	@40.0s	10.33s	Pill is a forty-dollar box. One quarter tablet, about three minutes, two channels that must agree. Riboflavin absorbs blue and glows green. Chalk only blocks light.
+05	@52.0s	9.96s	It says three things only: PASS, NEEDS LAB, UNABLE TO VERIFY. Never a fourth. Seven fixed rules set the verdict; Claude only writes the two-sentence why.
+06	@63.6s	8.73s	Here is the app, replaying the chalk run. The pill fills against the reference, the glow bar stays dark, and the card stamps NEEDS LAB, rule N2.
+07	@74.6s	10.27s	A riboflavin lot passes, rule P1. The policy agent proposes release, and only the pharmacist's press and hold moves the money. Every decision is one log line.
+08	@87.6s	12.95s	In clinic mode, the invoice waits in escrow. NEEDS LAB holds it and drafts a lab referral. UNABLE TO VERIFY escalates to a person. A PASS and a pharmacist's tap release it. It's all sandbox and testnet money today.
+09	@102.6s	18.92s	Every station sells its verdict over x402. Ask without paying, and you get a 402 with the price: five cents of test USDC on Base Sepolia. Pay it, and you get the verdict; our paid call is waiting on a test USDC key. Our agent buys verdicts too, under a one-dollar daily cap.
+10	@123.6s	16.17s	Live today: Gemini reading the label, Claude's sentences and escrow clerk, the seven rules, and the real 402. Simulated or pending: the escrow transfers, the paid 200, the station hardware, and these replayed curves. Every screen says which.
+11	@141.6s	8.80s	Our workflow runs from code: the repo writes one deck dot JSON, and our Figma plugin turns it into Slides. Each stage is in our Figma stage log.
+12	@151.8s	2.60s	Pill. Try to make it say PASS on the chalk.

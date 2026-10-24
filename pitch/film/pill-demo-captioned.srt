@@ -1,0 +1,187 @@
+1
+00:00:00,600 --> 00:00:03,952
+This bottle says vitamin B2. Inside is chalk.
+
+2
+00:00:03,972 --> 00:00:07,564
+Watch the blue line: the water clouds, the light drops,
+
+3
+00:00:07,584 --> 00:00:09,229
+right into the reference band.
+
+4
+00:00:09,249 --> 00:00:12,013
+A one-sensor tester would call that a pass.
+
+5
+00:00:12,200 --> 00:00:14,002
+But the green line never moves.
+
+6
+00:00:14,022 --> 00:00:18,567
+Pill says NEEDS LAB, and the supplier’s $480 stays held,
+
+7
+00:00:18,587 --> 00:00:22,237
+sandbox money, with a lab referral already drafted.
+
+8
+00:00:23,000 --> 00:00:27,837
+WHO estimates 1 in 10 medical products in low- and middle-income countries
+
+9
+00:00:27,857 --> 00:00:29,250
+is substandard or falsified.
+
+10
+00:00:29,270 --> 00:00:33,378
+A new lab dissolution tester costs $20,000 to $100,000,
+
+11
+00:00:33,398 --> 00:00:36,299
+and lab results take 7 to 10 business days.
+
+12
+00:00:36,319 --> 00:00:38,437
+A clinic pharmacist has neither.
+
+13
+00:00:40,000 --> 00:00:41,840
+Pill is a $40 box.
+
+14
+00:00:41,860 --> 00:00:46,304
+One quarter tablet, about three minutes, two channels that must agree.
+
+15
+00:00:46,324 --> 00:00:48,929
+Riboflavin absorbs blue and glows green.
+
+16
+00:00:48,949 --> 00:00:50,680
+Chalk only blocks light.
+
+17
+00:00:52,000 --> 00:00:53,565
+It says three things only:
+
+18
+00:00:53,585 --> 00:00:56,579
+PASS, NEEDS LAB, UNABLE TO VERIFY.
+
+19
+00:00:56,599 --> 00:00:57,678
+Never a fourth.
+
+20
+00:00:57,698 --> 00:01:02,308
+Seven fixed rules set the verdict; Claude only writes the two-sentence why.
+
+21
+00:01:03,600 --> 00:01:06,143
+Here is the app, replaying the chalk run.
+
+22
+00:01:06,163 --> 00:01:09,784
+The pill fills against the reference, the glow bar stays dark,
+
+23
+00:01:09,804 --> 00:01:12,677
+and the card stamps NEEDS LAB, rule N2.
+
+24
+00:01:14,600 --> 00:01:17,595
+A riboflavin lot passes, rule P1.
+
+25
+00:01:17,615 --> 00:01:19,979
+The policy agent proposes release,
+
+26
+00:01:19,999 --> 00:01:22,977
+and only the pharmacist’s press-and-hold moves the money.
+
+27
+00:01:22,997 --> 00:01:25,222
+Every decision is one log line.
+
+28
+00:01:27,600 --> 00:01:30,422
+In clinic mode, the invoice waits in escrow.
+
+29
+00:01:30,442 --> 00:01:32,946
+NEEDS LAB holds it and drafts a lab referral.
+
+30
+00:01:32,966 --> 00:01:35,655
+UNABLE TO VERIFY escalates to a person.
+
+31
+00:01:35,675 --> 00:01:38,090
+A PASS and a pharmacist’s tap release it.
+
+32
+00:01:38,110 --> 00:01:40,903
+It’s all sandbox and testnet money today.
+
+33
+00:01:42,600 --> 00:01:46,004
+Every station sells its verdict over x402.
+
+34
+00:01:46,024 --> 00:01:49,775
+Ask without paying, and you get a 402 with the price:
+
+35
+00:01:49,795 --> 00:01:52,993
+5 cents of test USDC on Base Sepolia.
+
+36
+00:01:53,013 --> 00:01:54,888
+Pay it, and you get the verdict;
+
+37
+00:01:54,908 --> 00:01:58,075
+our paid call is waiting on a test-USDC key.
+
+38
+00:01:58,095 --> 00:02:01,871
+Our agent buys verdicts too, under a $1 daily cap.
+
+39
+00:02:03,600 --> 00:02:08,331
+Live today: Gemini reading the label, Claude’s sentences and escrow clerk,
+
+40
+00:02:08,351 --> 00:02:11,170
+the seven rules, and the real 402.
+
+41
+00:02:11,190 --> 00:02:15,441
+Simulated or pending: the escrow transfers, the paid 200,
+
+42
+00:02:15,461 --> 00:02:18,388
+the station hardware, and these replayed curves.
+
+43
+00:02:18,408 --> 00:02:20,115
+Every screen says which.
+
+44
+00:02:21,600 --> 00:02:25,636
+Our workflow runs from code: the repo writes one deck.json,
+
+45
+00:02:25,656 --> 00:02:28,223
+and our Figma plugin turns it into Slides.
+
+46
+00:02:28,243 --> 00:02:30,747
+Each stage is in our Figma stage log.
+
+47
+00:02:31,800 --> 00:02:34,748
+Pill. Try to make it say PASS on the chalk.
