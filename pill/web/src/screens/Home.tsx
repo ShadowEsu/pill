@@ -1,8 +1,12 @@
-// Home. Medical: the deliveries desk. Personal: my medicines, big and short. Both end with the same settings row.
+// Home. Medical: the deliveries desk (no longer at "/", kept for /home). Personal: Today — next dose, a mini timetable, my bottles.
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Screen } from '../components/Shell';
+import Timetable from '../components/Timetable';
+import NextUp from '../components/NextUp';
 import { actions, useStore } from '../lib/store';
+import { doseItems, myBottles, nextUp, takenToday } from '../lib/doses';
+import { dateLong, hm, useNow } from '../lib/when';
 import type { Bottle, Delivery, Run } from '../lib/types';
 
 const OUTCOME: Record<Delivery['outcome'], [string, string]> = {
@@ -26,15 +30,6 @@ function RecallChip({ b }: { b: Bottle }) {
   if (b.recall === 'no_record') return <span className="chip ok"><span className="dot" />no recall</span>;
   if (b.recall === 'unreachable') return <span className="chip warn"><span className="dot" />recall check failed</span>;
   return <span className="chip"><span className="dot" />recall not checked</span>;
-}
-
-/** Earliest reminder still ahead today, else the earliest tomorrow. */
-function nextReminder(bottles: Bottle[]) {
-  const withTime = bottles.filter((b) => b.reminder).sort((a, b) => a.reminder!.localeCompare(b.reminder!));
-  if (!withTime.length) return null;
-  const d = new Date();
-  const now = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-  return withTime.find((b) => b.reminder! >= now) ?? withTime[0];
 }
 
 function Settings() {
@@ -95,40 +90,50 @@ function Medical() {
 
 function Personal() {
   const bottles = useStore((s) => s.bottles);
+  const deliveries = useStore((s) => s.deliveries);
   const runs = useStore((s) => s.runs);
-  const next = nextReminder(bottles);
+  const now = useNow();
+  const mine = myBottles(bottles, deliveries);
+  const planned = mine.filter((b) => b.reminder || b.takenAt.length);
+  const items = doseItems(planned, now, false).map((it) => ({ ...it, lane: 0 }));
+  const hour = new Date(now).getHours();
+  const greet = hour < 5 ? 'Good night' : hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
   return (
     <main className="screen rise" style={{ gap: 14 }}>
-      <h1 style={{ fontSize: '2.2rem', letterSpacing: '-0.03em', minHeight: 44, display: 'flex', alignItems: 'center' }}>My medicines</h1>
-      <Link to="/bottle" className="btn" style={{ textDecoration: 'none' }}>Scan a new bottle</Link>
-      {next && (
-        <div className="card" style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span aria-hidden="true" style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--sky)', boxShadow: '0 0 0 4px var(--sky-tint)', flex: 'none' }} />
-          <p style={{ fontSize: '1.15rem' }}>Next: <b>{next.drug}</b> at <span className="mono">{next.reminder}</span></p>
-        </div>
+      <header>
+        <p className="eyebrow">{dateLong(now)}</p>
+        <h1 style={{ fontSize: '2.2rem', letterSpacing: '-0.03em', marginTop: 4 }}>{greet}</h1>
+      </header>
+      <NextUp next={nextUp(planned, now)} now={now} />
+      {planned.length > 0 && (
+        <section className="card panel" style={{ padding: '12px 14px', gap: 6 }} aria-label="Today">
+          <div className="panel-head"><h2>Today</h2><Link to="/schedule" className="eyebrow" style={{ textDecoration: 'none', color: 'var(--sky-ink)' }}>Schedule <span className="pointer">→</span></Link></div>
+          <Timetable label="Today's doses" items={items} start={6} end={22} nowLine horizontal rowPx={28} minSpan={3} now={now} />
+        </section>
       )}
-      <section className="card" style={{ padding: '4px 18px' }} aria-label="My bottles">
-        {bottles.length === 0 && (
-          <p style={{ padding: '16px 0', fontSize: '1.05rem', color: 'var(--ink-2)' }}>No bottles yet. Photograph a label to add one.</p>
-        )}
-        {bottles.slice(0, 3).map((b, i) => (
-          <Link key={b.id} to="/medicines" style={{ display: 'block', textDecoration: 'none', padding: '12px 0', borderTop: i ? '1px solid var(--line)' : 0 }}>
-            <span style={{ display: 'block', fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              <b>{b.drug}</b> <span style={{ color: 'var(--ink-2)' }}>{b.strength}</span>
-            </span>
-            <span style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6, marginTop: 6 }}>
-              <span className="mono" style={{ fontSize: 12.5, color: 'var(--ink-2)', marginRight: 'auto' }}>lot {b.lot}</span>
-              <VerdictChip run={runs.find((r) => r.id === b.runId)} />
-              <RecallChip b={b} />
-            </span>
-          </Link>
-        ))}
-        {bottles.length > 3 && (
-          <Link to="/medicines" className="footnote" style={{ display: 'block', padding: '10px 0 12px', borderTop: '1px solid var(--line)', textDecoration: 'none' }}>
-            All {bottles.length} bottles →
-          </Link>
-        )}
+      <section className="stack" style={{ gap: 10 }} aria-label="My bottles">
+        {mine.length === 0 && <p className="card" style={{ fontSize: '1.05rem', color: 'var(--ink-2)' }}>No bottles yet. Photograph a label to add one.</p>}
+        {mine.slice(0, 4).map((b) => {
+          const taken = takenToday(b, now);
+          return (
+            <div key={b.id} className="card" style={{ padding: '12px 14px 12px 16px', display: 'grid', gridTemplateColumns: '1fr auto', gap: '8px 12px', alignItems: 'center', borderLeft: `4px solid ${taken.length ? 'var(--mint)' : b.reminder ? 'var(--sky)' : 'var(--line-2)'}` }}>
+              <Link to="/medicines" style={{ textDecoration: 'none', minWidth: 0 }}>
+                <span style={{ display: 'block', fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><b style={{ textTransform: 'capitalize' }}>{b.drug}</b> <span style={{ color: 'var(--ink-2)' }}>{b.strength}</span></span>
+                <span className="mono" style={{ display: 'block', fontSize: 12.5, color: 'var(--ink-2)' }}>lot {b.lot}{b.reminder ? ` · ${b.reminder}` : ' · as needed'}</span>
+              </Link>
+              {taken.length
+                ? <span className="chip ok"><span className="dot" />taken {hm(taken[0])}</span>
+                : <button type="button" className="btn mint" style={{ width: 'auto', minHeight: 48, padding: '0 18px' }} onClick={() => actions.markTaken(b.id)} aria-label={`Taken ${b.drug}`}>Taken</button>}
+              <span style={{ gridColumn: '1 / -1', display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                <VerdictChip run={runs.find((r) => r.id === b.runId)} />
+                <RecallChip b={b} />
+              </span>
+            </div>
+          );
+        })}
+        {mine.length > 4 && <Link to="/medicines" className="footnote" style={{ textDecoration: 'none' }}>All {mine.length} bottles <span className="pointer">→</span></Link>}
       </section>
+      <Link to="/bottle" className="btn" style={{ textDecoration: 'none' }}>Scan a new bottle</Link>
       <Link to="/ask" className="btn ghost" style={{ textDecoration: 'none' }}>Ask Pill</Link>
       <div style={{ marginTop: 'auto' }}><Settings /></div>
     </main>

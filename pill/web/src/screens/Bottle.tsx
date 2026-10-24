@@ -30,9 +30,10 @@ const TYPE_TOTAL = TYPE_GAP * (KEYS.length - 1) + TYPE_MS;
 type Step = 'photo' | 'reading' | 'fields' | 'attach';
 
 function Viewfinder({ preview, reading, onFile }: { preview: string | null; reading: boolean; onFile: (f: File) => void }) {
-  const corner = (pos: React.CSSProperties): React.CSSProperties => ({ position: 'absolute', width: 26, height: 26, borderColor: preview ? '#fff' : 'var(--ink-2)', borderStyle: 'solid', borderWidth: 0, ...pos });
+  // corners breathe outward (--dx/--dy) while waiting for a photo; a scan line sweeps once when reading starts
+  const corner = (dx: number, dy: number, pos: React.CSSProperties): React.CSSProperties => ({ borderColor: preview ? '#fff' : 'var(--ink-2)', '--dx': dx, '--dy': dy, ...pos } as React.CSSProperties);
   return (
-    <label className="card" style={{ position: 'relative', display: 'block', aspectRatio: '4 / 3', padding: 0, overflow: 'hidden', cursor: reading ? 'default' : 'pointer' }}>
+    <label className={'card' + (!preview && !reading ? ' bot-breathe' : '')} style={{ position: 'relative', display: 'block', aspectRatio: '4 / 3', padding: 0, overflow: 'hidden', cursor: reading ? 'default' : 'pointer' }}>
       <input type="file" accept="image/*" capture="environment" disabled={reading} aria-label="Photograph the label"
         style={{ position: 'absolute', width: 1, height: 1, opacity: 0 }}
         onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); }} />
@@ -44,10 +45,11 @@ function Viewfinder({ preview, reading, onFile }: { preview: string | null; read
               <span className="footnote">Tap to open the camera</span>
             </span>
           </span>}
-      <span aria-hidden="true" style={corner({ top: 16, left: 16, borderTopWidth: 2, borderLeftWidth: 2, borderTopLeftRadius: 8 })} />
-      <span aria-hidden="true" style={corner({ top: 16, right: 16, borderTopWidth: 2, borderRightWidth: 2, borderTopRightRadius: 8 })} />
-      <span aria-hidden="true" style={corner({ bottom: 16, left: 16, borderBottomWidth: 2, borderLeftWidth: 2, borderBottomLeftRadius: 8 })} />
-      <span aria-hidden="true" style={corner({ bottom: 16, right: 16, borderBottomWidth: 2, borderRightWidth: 2, borderBottomRightRadius: 8 })} />
+      <span aria-hidden="true" className="bot-corner" style={corner(-1, -1, { top: 16, left: 16, borderTopWidth: 2, borderLeftWidth: 2, borderTopLeftRadius: 8 })} />
+      <span aria-hidden="true" className="bot-corner" style={corner(1, -1, { top: 16, right: 16, borderTopWidth: 2, borderRightWidth: 2, borderTopRightRadius: 8 })} />
+      <span aria-hidden="true" className="bot-corner" style={corner(-1, 1, { bottom: 16, left: 16, borderBottomWidth: 2, borderLeftWidth: 2, borderBottomLeftRadius: 8 })} />
+      <span aria-hidden="true" className="bot-corner" style={corner(1, 1, { bottom: 16, right: 16, borderBottomWidth: 2, borderRightWidth: 2, borderBottomRightRadius: 8 })} />
+      {reading && <span aria-hidden="true" className="bot-scan" />}
       {reading && (
         <span style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: '12px 16px 0', background: 'var(--glass)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }} role="status">
           <span style={{ display: 'block', fontWeight: 500, paddingBottom: 10 }}>Reading the label…</span>
@@ -62,8 +64,8 @@ function Viewfinder({ preview, reading, onFile }: { preview: string | null; read
 
 function RecallLine({ checking, status }: { checking: boolean; status: RecallStatus | null }) {
   if (checking || !status) return <span className="chip" role="status"><span className="bottle-spin" aria-hidden="true" />checking openFDA…</span>;
-  if (status === 'recall') return <span className="chip bad" role="status"><span className="dot" />RECALL · openFDA {RECALL_ID}</span>;
-  return <span className="chip ok" role="status"><span className="dot" />no openFDA record · checked just now</span>;
+  if (status === 'recall') return <span key="recall" className="chip bad pop-in" role="status"><span className="dot" />RECALL · openFDA {RECALL_ID}</span>;
+  return <span key="clear" className="chip ok pop-in" role="status"><span className="dot" />no openFDA record · checked just now</span>;
 }
 
 export default function Bottle() {
@@ -107,6 +109,8 @@ export default function Bottle() {
     const p = Math.max(0, Math.min(1, (typedMs - i * TYPE_GAP) / TYPE_MS));
     return values[k].slice(0, Math.ceil(p * values[k].length));
   };
+  // the caret sits in the field that started typing most recently
+  const caretAt = typing ? Math.min(KEYS.length - 1, Math.floor(typedMs / TYPE_GAP)) : -1;
 
   // openFDA lookup (demo: one known recalled lot). Re-runs, debounced, whenever the lot changes.
   const lot = values.lot.trim().toUpperCase();
@@ -175,10 +179,17 @@ export default function Bottle() {
             {KEYS.map((k, i) => (
               <label key={k} style={{ display: 'grid', gap: 6, gridColumn: `span ${SPAN[k]}`, minWidth: 0 }}>
                 <span className="eyebrow">{LABELS[k]}</span>
-                <input type="text" value={shown(k, i)} readOnly={typing} spellCheck={false}
-                  style={k === 'lot' || k === 'expiry' ? { fontFamily: 'var(--mono)', fontSize: 16 } : undefined}
-                  placeholder={k === 'expiry' ? 'YYYY-MM' : undefined}
-                  onChange={(e) => setValues((v) => ({ ...v, [k]: e.target.value }))} />
+                <span className="bot-field">
+                  <input type="text" value={shown(k, i)} readOnly={typing} spellCheck={false}
+                    style={k === 'lot' || k === 'expiry' ? { fontFamily: 'var(--mono)', fontSize: 16 } : undefined}
+                    placeholder={k === 'expiry' ? 'YYYY-MM' : undefined}
+                    onChange={(e) => setValues((v) => ({ ...v, [k]: e.target.value }))} />
+                  {caretAt === i && (
+                    <span className="bot-mirror" aria-hidden="true" style={k === 'lot' || k === 'expiry' ? { fontFamily: 'var(--mono)', fontSize: 16 } : undefined}>
+                      {shown(k, i)}<span className="caret" />
+                    </span>
+                  )}
+                </span>
               </label>
             ))}
             <p className="footnote" style={{ gridColumn: '1 / -1' }}>Fields stay editable. The photo is deleted after reading.</p>

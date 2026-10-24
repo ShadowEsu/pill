@@ -1,13 +1,20 @@
 // Medical mode: every delivery, one row each, with the verdict of its tested tablet and the ship decision.
+// Top: the pipeline as arrows (Logged → Tested → Policy → Released) with counts; each row's left rule is coloured by outcome.
 import { Link } from 'react-router-dom';
 import { Screen } from '../components/Shell';
 import VerdictChip from '../components/VerdictChip';
 import OutcomeChip from '../components/OutcomeChip';
+import FlowArrows from '../components/FlowArrows';
 import { useStore } from '../lib/store';
 import { DRUGS } from '../data/reference';
 import type { Delivery } from '../lib/types';
+import '../components/viz.css';
 
 const ORDER: Record<Delivery['outcome'], number> = { pending: 0, escalate: 1, hold: 2, release: 3, released: 4 };
+/** Left rule by outcome. Warm only for a held payment. */
+const RULE: Record<Delivery['outcome'], string> = { pending: 'var(--sky)', release: 'var(--mint)', released: 'var(--mint-ink)', hold: 'var(--warm)', escalate: 'var(--amber)' };
+/** ↗ money is leaving escrow (or about to, on a tap); → it is still in the pipeline. */
+const POINTER: Record<Delivery['outcome'], string> = { pending: '→', release: '↗', released: '↗', hold: '→', escalate: '→' };
 
 export default function Deliveries() {
   const deliveries = useStore((s) => s.deliveries);
@@ -25,9 +32,31 @@ export default function Deliveries() {
     { n: counts.unable, label: 'UNABLE', color: 'var(--grey)' },
     { n: counts.none, label: 'Untested', color: 'transparent' },
   ];
+  const flow = {
+    logged: deliveries.length,
+    tested: deliveries.filter((d) => runs.find((r) => r.id === d.runId)?.evaluation).length,
+    policy: deliveries.filter((d) => d.clause).length,
+    released: deliveries.filter((d) => d.outcome === 'released').length,
+    needsTap: deliveries.filter((d) => d.outcome === 'release').length,
+  };
 
   return (
     <Screen title="Deliveries" eyebrow="Medical · incoming lots" back="/" right={<Link to="/log" className="chip" style={{ textDecoration: 'none' }}>Log</Link>}>
+      <section className="card panel" aria-label="Pipeline">
+        <div className="panel-head"><h2>Pipeline</h2><span className="eyebrow">{deliveries.length} lots · SANDBOX</span></div>
+        <FlowArrows label="Delivery pipeline"
+          nodes={[
+            { id: 'logged', label: 'Logged', value: String(flow.logged), sub: 'into escrow', accent: 'var(--cb)' },
+            { id: 'tested', label: 'Tested', value: String(flow.tested), sub: 'one tablet each', accent: 'var(--sky)' },
+            { id: 'policy', label: 'Policy', value: String(flow.policy), sub: 'P1–P6 decided', accent: 'var(--c4)' },
+            { id: 'released', label: 'Released', value: String(flow.released), sub: 'pharmacist tap', accent: 'var(--mint)' },
+          ]}
+          edges={[
+            { from: 'logged', to: 'tested', label: `${flow.logged - flow.tested} to test`, live: flow.logged > flow.tested },
+            { from: 'tested', to: 'policy', label: `${flow.tested - flow.policy} waiting`, live: flow.tested > flow.policy },
+            { from: 'policy', to: 'released', label: `${flow.needsTap} to tap`, live: flow.needsTap > 0, color: 'var(--cb)' },
+          ]} />
+      </section>
       <div className="card" style={{ padding: 0, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)' }} aria-label="Verdict counts">
         {strip.map((s, i) => (
           <div key={s.label} style={{ padding: '14px 12px', borderLeft: i ? '1px solid var(--line)' : 0, minWidth: 0 }}>
@@ -46,19 +75,19 @@ export default function Deliveries() {
           <p className="muted" style={{ fontSize: 15 }}>When a supplier's delivery is logged, it appears here with its payment held in the SANDBOX escrow until a pharmacist releases it.</p>
         </div>
       ) : (
-        <ul className="stack" style={{ listStyle: 'none', margin: 0, padding: 0, gap: 12 }}>
+        <ul className="wide-2" style={{ listStyle: 'none', margin: 0, padding: 0, gap: 12 }}>
           {rows.map((d, i) => {
             const ev = runs.find((r) => r.id === d.runId)?.evaluation ?? null;
             const drug = DRUGS[d.drug];
             return (
-              <li key={d.id} className="rise" style={{ animationDelay: `${Math.min(i, 6) * 50}ms` }}>
-                <Link to={`/delivery/${d.id}`} className="card" style={{ display: 'flex', flexDirection: 'column', gap: 10, textDecoration: 'none' }} aria-label={`${d.supplier}, lot ${d.lot}`}>
+              <li key={d.id} className="rise" style={{ animationDelay: `${Math.min(i, 6) * 50}ms`, contain: 'inline-size' }}>
+                <Link to={`/delivery/${d.id}`} className="card" style={{ display: 'flex', flexDirection: 'column', gap: 10, textDecoration: 'none', borderLeft: `4px solid ${RULE[d.outcome]}` }} aria-label={`${d.supplier}, lot ${d.lot}`}>
                   <div className="row between" style={{ alignItems: 'flex-start' }}>
                     <div style={{ minWidth: 0 }}>
                       <p style={{ fontWeight: 600 }}>{d.supplier}</p>
                       <p style={{ fontSize: 15, color: 'var(--ink-2)' }}>{drug?.name ?? d.drug} · <span className="mono" style={{ fontSize: 13, whiteSpace: 'nowrap' }}>lot {d.lot}</span></p>
                     </div>
-                    <OutcomeChip outcome={d.outcome} />
+                    <span className="row" style={{ gap: 8, flex: 'none' }}><OutcomeChip outcome={d.outcome} /><span className={'pointer' + (POINTER[d.outcome] === '↗' ? ' up' : '')} aria-hidden="true" style={{ color: RULE[d.outcome] }}>{POINTER[d.outcome]}</span></span>
                   </div>
                   <p className="muted" style={{ fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{drug?.usedFor ?? 'No drug table entry.'}</p>
                   <hr className="hr" />

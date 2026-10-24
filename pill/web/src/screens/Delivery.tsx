@@ -7,10 +7,27 @@ import VerdictChip from '../components/VerdictChip';
 import OutcomeChip from '../components/OutcomeChip';
 import { actions, useStore } from '../lib/store';
 import { DRUGS, REFERENCES } from '../data/reference';
+import { PEOPLE } from '../data/history';
 import type { Delivery as D, LogLine } from '../lib/types';
+import CalendarButton from '../components/CalendarButton';
 
 const usd = (n: number) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const CAP = 2000;
+const PAY_URL = (import.meta.env.VITE_PAY_URL as string | undefined)?.replace(/\/$/, '') || null;
+
+/** After the tap: ask the pill-pay service to move escrow → supplier on Base Sepolia, and log exactly what it reports. */
+async function releaseOnChain(url: string, d: D) {
+  const ref = { kind: 'delivery' as const, id: d.id };
+  try {
+    const res = await fetch(`${url}/escrow/release`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ deliveryId: d.id, amount: d.amountUsd }) });
+    const r = (await res.json()) as { mode?: string; tx?: string; explorer?: string; amount_usdc?: string; moved?: boolean; confirmation?: string; note?: string; error?: string };
+    if (!res.ok || !r.tx) actions.activity(PEOPLE.cdp, `escrow service refused the release for lot ${d.lot}: ${r.error ?? res.statusText} · nothing moved`, 'info', ref);
+    else if (r.mode === 'cdp') actions.activity(PEOPLE.cdp, `released ${r.amount_usdc} USDC escrow → ${d.supplier} on Base Sepolia (TESTNET) · ${r.confirmation} · tx ${r.tx} · ${r.explorer}`, 'money', ref);
+    else actions.activity(PEOPLE.cdp, `escrow service is SIMULATED: ${r.note ?? 'no CDP credentials; nothing moved'} · ref ${r.tx} · no explorer link`, 'info', ref);
+  } catch (e) {
+    actions.activity(PEOPLE.cdp, `escrow service at ${url} did not answer (${(e as Error).message}) · nothing moved`, 'info', ref);
+  }
+}
 
 /** Policy clauses, verbatim (policy.md P1–P6). */
 const CLAUSES: Record<string, string> = {
@@ -155,6 +172,9 @@ export default function Delivery() {
             <span className="mono" style={{ fontSize: 13, marginRight: 8 }}>{d.clause}</span>
             <span>{CLAUSES[d.clause]}</span>
           </blockquote>
+          {d.clause === 'P2' && (
+            <CalendarButton compact summary={`Lab referral · lot ${d.lot} (${d.supplier})`} description={`NEEDS LAB on one tablet from this delivery. Curve and raw trace attached in Pill. Payment held in escrow (SANDBOX / TESTNET).`} start={`${new Date(Date.now() + 86400e3).toISOString().slice(0, 10)}T10:00:00`} minutes={30} label="Book the lab drop-off in Google Calendar" />
+          )}
         </section>
       )}
 
@@ -183,7 +203,7 @@ export default function Delivery() {
         {run && !proposed && <button type="button" className="btn" disabled={!ev} onClick={() => actions.propose(d.id)}>Run policy</button>}
         {proposed && !released && (
           <>
-            <button type="button" className="btn mint" disabled={d.outcome !== 'release'} onClick={() => actions.approve(d.id)} aria-describedby="release-why">
+            <button type="button" className="btn mint" disabled={d.outcome !== 'release'} onClick={() => { actions.approve(d.id); if (PAY_URL) void releaseOnChain(PAY_URL, d); }} aria-describedby="release-why">
               Release ${usd(d.amountUsd)}
             </button>
             <p id="release-why" className="footnote" style={{ textAlign: 'center' }}>{d.outcome === 'release' ? 'Your tap moves TESTNET USDC to the supplier.' : `Release is off: ${d.clause} decided ${d.outcome}.`}</p>

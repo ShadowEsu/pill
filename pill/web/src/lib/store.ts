@@ -60,7 +60,7 @@ export const actions = {
   markTaken(id: string) { set((s) => ({ bottles: s.bottles.map((b) => (b.id === id ? { ...b, takenAt: [Date.now(), ...b.takenAt] } : b)) })); const b = state.bottles.find((x) => x.id === id); if (b) activity(PEOPLE.you, `took ${b.drug} ${b.strength}`, 'ok', { kind: 'bottle', id }); },
 
   startRun(r: { drug: string; lot: string; src: Source; bottleId?: string | null; deliveryId?: string | null }): Run {
-    const run: Run = { id: 'r-' + String(1000 + state.runs.length + 1), src: r.src, drug: r.drug, lot: r.lot, startedAt: Date.now(), samples: [], evaluation: null, mode: state.mode ?? 'personal' };
+    const run: Run = { id: 'r-' + Date.now().toString(36).slice(-5), src: r.src, drug: r.drug, lot: r.lot, startedAt: Date.now(), samples: [], evaluation: null, mode: state.mode ?? 'personal' };
     set((s) => ({
       runs: [run, ...s.runs],
       bottles: r.bottleId ? s.bottles.map((b) => (b.id === r.bottleId ? { ...b, runId: run.id } : b)) : s.bottles,
@@ -99,19 +99,20 @@ export const actions = {
   },
   /** The pharmacist tap. Only legal when the proposed outcome is release. */
   approve(deliveryId: string, who = PEOPLE.pharmacist) {
-    const tx = '0x' + Math.random().toString(16).slice(2, 6) + '…' + Math.random().toString(16).slice(2, 6);
+    const wired = Boolean(import.meta.env.VITE_PAY_URL);
+    const tx = wired ? null : '0xsim' + Math.random().toString(16).slice(2, 6) + '…' + Math.random().toString(16).slice(2, 6);
     let moved: Delivery | null = null;
     set((s) => ({
       deliveries: s.deliveries.map((d) => {
         if (d.id !== deliveryId || d.outcome !== 'release') return d;
         moved = d;
-        return { ...d, outcome: 'released', log: [...d.log, { at: Date.now(), text: `${who} tapped RELEASE`, kind: 'ok' }, { at: Date.now(), text: `USDC ${d.amountUsd.toLocaleString('en-US', { minimumFractionDigits: 2 })} escrow → supplier · Base Sepolia tx ${tx} (TESTNET) · Nessie SANDBOX mirror ok`, kind: 'money' }] };
+        return { ...d, outcome: 'released', log: [...d.log, { at: Date.now(), text: `${who} tapped RELEASE`, kind: 'ok' }, ...(tx ? [{ at: Date.now(), text: `USDC ${d.amountUsd.toLocaleString('en-US', { minimumFractionDigits: 2 })} escrow → supplier · SIMULATED tx ${tx} · no CDP credentials, nothing moved · Nessie SANDBOX mirror`, kind: 'money' as const }] : [])] };
       }),
     }));
     if (moved) {
       const d = moved as Delivery;
       activity(who, `tapped RELEASE for lot ${d.lot}`, 'ok', { kind: 'delivery', id: deliveryId });
-      activity(PEOPLE.cdp, `moved USDC ${d.amountUsd.toLocaleString('en-US')} escrow → ${d.supplier} · tx ${tx} (TESTNET)`, 'money', { kind: 'delivery', id: deliveryId });
+      if (tx) activity(PEOPLE.cdp, `SIMULATED: would move USDC ${d.amountUsd.toLocaleString('en-US')} escrow → ${d.supplier} · tx ${tx} · no credentials, nothing moved`, 'money', { kind: 'delivery', id: deliveryId });
     }
   },
   attachBottle(deliveryId: string, bottleId: string) { set((s) => ({ deliveries: s.deliveries.map((d) => (d.id === deliveryId ? { ...d, bottleId } : d)) })); },

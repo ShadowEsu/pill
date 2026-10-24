@@ -8,9 +8,10 @@ import type { Reference, Sample } from '../lib/types';
 const T_MAX = 180, A_MAX = 0.6;
 const PAD = { l: 28, r: 8, t: 22, b: 20 };
 
-export default function Curve({ samples, band, width = 320, height = 180, live = false, overlays, stagger = 120, onDrawn }: {
+export default function Curve({ samples, band, width = 320, height = 180, live = false, overlays, overlayColors, stagger = 120, onDrawn }: {
   samples: Sample[]; band: Reference | null; width?: number; height?: number; live?: boolean;
-  overlays?: Sample[][]; stagger?: number; onDrawn?: () => void;
+  /** One colour per overlay run (cycled); default sky for A(t), mint for glow. */
+  overlays?: Sample[][]; overlayColors?: string[]; stagger?: number; onDrawn?: () => void;
 }) {
   const x = (t: number) => PAD.l + (Math.min(T_MAX, Math.max(0, t)) / T_MAX) * (width - PAD.l - PAD.r);
   const y = (a: number) => height - PAD.b - (Math.min(A_MAX + 0.02, Math.max(0, a)) / A_MAX) * (height - PAD.t - PAD.b);
@@ -72,8 +73,8 @@ export default function Curve({ samples, band, width = 320, height = 180, live =
           {overlays.flatMap((s, i) => {
             const oc = curve(s);
             return [
-              <path key={`g${i}`} data-i={i} d={line(oc.map((p) => ({ t: p.t, v: p.g })))} stroke="var(--mint)" strokeOpacity="0.5" strokeWidth="1.25" pathLength={1} strokeDasharray="1" strokeDashoffset="1" />,
-              <path key={`a${i}`} data-i={i} d={line(oc.map((p) => ({ t: p.t, v: p.a })))} stroke="var(--sky)" strokeOpacity="0.6" strokeWidth="1.25" pathLength={1} strokeDasharray="1" strokeDashoffset="1" />,
+              <path key={`g${i}`} data-i={i} d={line(oc.map((p) => ({ t: p.t, v: p.g })))} stroke={overlayColors ? overlayColors[i % overlayColors.length] : 'var(--mint)'} strokeOpacity={overlayColors ? 0.35 : 0.5} strokeWidth="1.25" pathLength={1} strokeDasharray="1" strokeDashoffset="1" />,
+              <path key={`a${i}`} data-i={i} d={line(oc.map((p) => ({ t: p.t, v: p.a })))} stroke={overlayColors ? overlayColors[i % overlayColors.length] : 'var(--sky)'} strokeOpacity={overlayColors ? 0.9 : 0.6} strokeWidth={overlayColors ? 1.5 : 1.25} pathLength={1} strokeDasharray="1" strokeDashoffset="1" />,
             ];
           })}
         </g>

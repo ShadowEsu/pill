@@ -1,17 +1,25 @@
-// The run: the capsule fills as the tablet dissolves, the curve draws, the station checks stay visible. Ends on the evaluation.
-import { useEffect, useRef, useState } from 'react';
+// The run: the capsule fills as the tablet dissolves, the timetable walks fill → dissolve → settle → hold, the curve draws,
+// the light path shows which channel is moving, the station checks stay visible. Ends on the evaluation.
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Action, Screen, SrcBadge } from '../components/Shell';
 import PillFill from '../components/PillFill';
 import Curve, { RunReadout } from '../components/Curve';
+import RunPhases, { clock, phaseAt } from '../components/RunPhases';
+import SensorPath, { GLOW_FULL } from '../components/SensorPath';
 import { actions, getState, useStore } from '../lib/store';
 import { replayStream } from '../lib/stream';
-import { evaluate, progressPct } from '../lib/rules';
+import { absorbance, evaluate, progressPct } from '../lib/rules';
 import { DRUGS, REFERENCES, REPLAYS } from '../data/reference';
 import type { Sample, Source } from '../lib/types';
 
 const FAULT_WORDS: Record<string, string> = { lid_open: 'lid opened', led_fail: 'LED failed', temp_out: 'water temperature out of range', no_blank: 'no clear-water reading' };
-const clock = (t: number) => `${Math.floor(t / 60)}:${String(Math.round(t % 60)).padStart(2, '0')}`;
+const WIDE = '(min-width: 900px)';
+function onWideChange(l: () => void) {
+  const m = window.matchMedia(WIDE);
+  m.addEventListener('change', l);
+  return () => m.removeEventListener('change', l);
+}
 
 export default function Run() {
   const { id = '' } = useParams();
@@ -22,6 +30,7 @@ export default function Run() {
   const speed = Number(q.get('speed')) || 7.5;
   const run = useStore((s) => s.runs.find((r) => r.id === id));
   const personal = useStore((s) => s.mode) === 'personal';
+  const wide = useSyncExternalStore(onWideChange, () => window.matchMedia(WIDE).matches);
   const [src, setSrc] = useState<Source | null>(null);
   const [finishedHere, setFinishedHere] = useState(false);
   const [showCurve, setShowCurve] = useState(false);
@@ -66,12 +75,23 @@ export default function Run() {
 
   const samples = run.samples;
   const last = samples.at(-1);
+  const t = last?.t ?? 0;
   const faultIdx = samples.findIndex((s) => s.fault);
   const fault = faultIdx >= 0 ? samples[faultIdx] : null;
-  const pctNow = ref ? progressPct(fault ? samples.slice(0, Math.max(1, faultIdx)) : samples, ref) : Math.round(((last?.t ?? 0) / 180) * 100);
-  const status = !ref ? `No reference for ${DRUGS[run.drug]?.name.toLowerCase() ?? run.drug}. Recording anyway.`
-    : pctNow < 5 ? 'filling the chamber' : pctNow < 60 ? 'dissolving' : pctNow < 95 ? 'settling' : 'holding';
+  const pctNow = ref ? progressPct(fault ? samples.slice(0, Math.max(1, faultIdx)) : samples, ref) : Math.round((t / 180) * 100);
+  const phase = phaseAt(t);
+  const running = !run.evaluation && !fault;
+  const glowNow = last ? absorbance(last.blank, last.adc90) : 0;
+  const glowFlat = phase.key === 'dissolve' && t > 40 && glowNow < 0.05;
+  const happening = phase.key === 'dissolve' && glowFlat ? 'something is dissolving; the glow channel is staying flat'
+    : phase.key === 'settle' && !ref ? 'the reading is settling; there is no band to compare against'
+    : phase.doing;
   const faultText = fault ? `${FAULT_WORDS[fault.fault ?? ''] ?? (fault.fault ?? '').replace('_', ' ')} at ${clock(fault.t)}` : null;
+  const statusWord = faultText ? 'stopped' : run.evaluation ? 'finished' : phase.status;
+  const statusLine = faultText ? `Stopped: ${faultText}.`
+    : run.evaluation ? `Finished: ${run.evaluation.verdict}, rule ${run.evaluation.rule}.`
+    : !ref ? `No reference for ${DRUGS[run.drug]?.name.toLowerCase() ?? run.drug}. Recording anyway; ${happening}.`
+    : `${happening[0].toUpperCase()}${happening.slice(1)}.`;
 
   const retest = () => {
     const s = getState();
@@ -81,40 +101,57 @@ export default function Run() {
     nav(`/run/${r.id}?${next.toString()}`, { replace: true });
   };
 
-  const details = (
-    <div className="card rise stack" style={{ gap: 14 }}>
-      <Curve samples={samples} band={ref} live={!run.evaluation && !fault} />
-      <RunReadout samples={samples} checks={false} />
+  const curveCard = (
+    <div className="card tile rise stack" style={{ '--tile-accent': 'var(--c1)', gap: 10 } as React.CSSProperties}>
+      <div className="row between"><span className="eyebrow">absorbance · live</span><span className="mono muted" style={{ fontSize: 12 }}>{samples.length} samples</span></div>
+      <Curve samples={samples} band={ref} live={running} />
+    </div>
+  );
+  const sensorCard = (
+    <div className="card tile rise stack" style={{ '--tile-accent': 'var(--c2)', gap: 10, animationDelay: '60ms' } as React.CSSProperties}>
+      <div className="row between"><span className="eyebrow">light path</span><span className="mono muted" style={{ fontSize: 12 }}>{running ? 'reading once a second' : 'idle'}</span></div>
+      <SensorPath led={last?.led ?? true} inline={last ? last.adc0 / last.blank : 1} glow={glowNow / GLOW_FULL} running={running} />
     </div>
   );
 
   return (
     <Screen title={run.evaluation ? 'Done' : fault ? 'Stopped' : 'Dissolving…'} eyebrow={`run ${run.id} · ${run.drug} · lot ${run.lot}`} back="/" right={<SrcBadge src={src ?? run.src} />}>
-      <section className="stack" style={{ alignItems: 'center', gap: 8, padding: '4px 0 2px' }}>
-        <PillFill pct={pctNow} verdict={run.evaluation?.verdict ?? null} fault={!!fault} size={personal ? 290 : 260} label={!!ref} />
-        <p style={{ fontSize: personal ? 20 : 17, fontWeight: 500 }} aria-live="polite">{faultText ? `Stopped: ${faultText}.` : run.evaluation ? 'Finished.' : status}</p>
-        <p className="mono muted" style={{ fontSize: 13 }}>{clock(last?.t ?? 0)} / 3:00{ref ? ` · ${pctNow} % of reference` : ''}</p>
-      </section>
-
-      {fault && (
-        <div className="card rise stack" style={{ gap: 6, borderColor: 'rgba(154,160,166,.6)' }}>
-          <p className="eyebrow">station fault</p>
-          <p>The {FAULT_WORDS[fault.fault ?? ''] ?? 'station faulted'} at {clock(fault.t)}. {personal ? 'This reading cannot be used. Start again with a new piece of tablet.' : 'The curve after this point cannot be trusted; this run will end as UNABLE TO VERIFY (U2). Retest with a new tablet and the lid closed.'}</p>
+      <div className="wide-2">
+        <div className="stack" style={{ gap: 14, minWidth: 0 }}>
+          <section className="card glass decor-dots stack" style={{ alignItems: 'center', gap: 6, padding: '18px 12px 16px' }}>
+            <PillFill pct={pctNow} verdict={run.evaluation?.verdict ?? null} fault={!!fault} size={wide ? 340 : personal ? 300 : 290} label={!!ref} running={running} />
+            <p className="serif" style={{ fontSize: personal ? 38 : 34, lineHeight: 1, marginTop: 6 }}>{statusWord}</p>
+            <p style={{ fontSize: personal ? 19 : 16, color: 'var(--ink-2)', textAlign: 'center', maxWidth: 420, minHeight: '2.9em' }} aria-live="polite">{statusLine}</p>
+            <p className="mono muted" style={{ fontSize: 13 }}>{clock(t)} / 3:00{ref ? ` · ${pctNow} % of reference` : ''}</p>
+          </section>
+          <section className="card stack" style={{ gap: 6 }}>
+            <div className="row between"><span className="eyebrow">timetable</span><span className="mono muted" style={{ fontSize: 12 }}>{speed}× replay</span></div>
+            <RunPhases t={t} fault={fault ? fault.t : null} big={personal} />
+          </section>
+          {fault && (
+            <div className="card rise stack" style={{ gap: 6, borderColor: 'rgba(154,160,166,.6)' }}>
+              <p className="eyebrow">station fault</p>
+              <p>The {FAULT_WORDS[fault.fault ?? ''] ?? 'station faulted'} at {clock(fault.t)}. {personal ? 'This reading cannot be used. Start again with a new piece of tablet.' : 'The curve after this point cannot be trusted; this run will end as UNABLE TO VERIFY (U2). Retest with a new tablet and the lid closed.'}</p>
+            </div>
+          )}
         </div>
-      )}
 
-      {personal ? (
-        <>
-          <RunReadout samples={samples} strip={false} />
-          <button type="button" className="btn ghost" aria-expanded={showCurve} onClick={() => setShowCurve((v) => !v)}>{showCurve ? 'Hide the curve' : 'Show the curve'}</button>
-          {showCurve && details}
-        </>
-      ) : (
-        <>
-          {details}
-          <RunReadout samples={samples} strip={false} />
-        </>
-      )}
+        <div className="stack" style={{ gap: 14, minWidth: 0 }}>
+          {personal ? (
+            <>
+              <RunReadout samples={samples} strip={false} />
+              <button type="button" className="btn ghost" aria-expanded={showCurve} onClick={() => setShowCurve((v) => !v)}>{showCurve ? 'Hide the curve' : 'Show the curve'}</button>
+              {showCurve && <>{curveCard}{sensorCard}<RunReadout samples={samples} checks={false} /></>}
+            </>
+          ) : (
+            <>
+              {curveCard}
+              {sensorCard}
+              <RunReadout samples={samples} />
+            </>
+          )}
+        </div>
+      </div>
 
       {(fault || (run.evaluation && !finishedHere)) && (
         <Action>

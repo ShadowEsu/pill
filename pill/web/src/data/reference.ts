@@ -2,7 +2,7 @@
 import type { Reference, Sample } from '../lib/types';
 
 export const REFERENCES: Record<string, Reference> = {
-  riboflavin: { drug: 'riboflavin', label: 'Riboflavin 100 mg (¼ tablet)', bandLow: 0.36, bandHigh: 0.47, bandMean: 0.415, glowMin: 0.12, scatterMax: 0.03, runs: 10, cv: 7 },
+  riboflavin: { drug: 'riboflavin', label: 'Riboflavin 100 mg (quarter tablet)', bandLow: 0.36, bandHigh: 0.47, bandMean: 0.415, glowMin: 0.12, scatterMax: 0.03, runs: 10, cv: 7 },
 };
 
 /** What the drug is used for, in plain words (grandparent-readable). Only drugs we might see this weekend. */

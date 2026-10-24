@@ -1,0 +1,155 @@
+/* Dashboard visuals: KPI tiles, heat maps, timetables, flow arrows, avatars. Tokens come from index.css; colour stays in fills and lines. */
+
+/* ---------- KPI ---------- */
+.kpi { display: flex; flex-direction: column; gap: 6px; padding: 18px 16px 14px; min-width: 0; contain: inline-size; }
+.kpi-label { font-size: 13px; color: var(--ink-2); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kpi-value { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 30px; line-height: 1; letter-spacing: -0.03em; white-space: nowrap; }
+.kpi-unit { font-size: 14px; color: var(--muted); margin-left: 4px; letter-spacing: 0; }
+.kpi-trend { font-family: var(--mono); font-size: 11.5px; display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; }
+.kpi-trend .arrow { font-size: 14px; line-height: 1; display: inline-block; animation: nudge 1.8s var(--ease) infinite; }
+.kpi-trend .note { color: var(--muted); overflow: hidden; text-overflow: ellipsis; }
+.kpi-tag { position: absolute; top: 12px; right: 12px; font-family: var(--mono); font-size: 9.5px; letter-spacing: .08em; color: var(--muted); }
+@keyframes nudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+.kpi-trend .arrow.down { animation-name: nudge-down; }
+@keyframes nudge-down { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(2px); } }
+.kpi-trend .arrow.flat { animation-name: nudge-right; }
+@keyframes nudge-right { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(2px); } }
+@media (max-width: 899px) { .kpi-value { font-size: 24px; } .kpi { padding: 16px 12px 12px; } }
+
+/* ---------- panel header used by every dashboard card ---------- */
+/* contain: inline-size keeps long nowrap lines from widening the phone column (the frame sizes to content) */
+.panel { display: flex; flex-direction: column; gap: 12px; min-width: 0; contain: inline-size; }
+.panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.panel-head h2 { font-size: 17px; letter-spacing: -0.01em; }
+.panel-head .eyebrow { text-align: right; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 12px; font-family: var(--mono); font-size: 11px; color: var(--ink-2); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+
+/* ---------- Heatmap ---------- */
+.heat { display: grid; gap: 3px; align-items: center; }
+.heat-cell { height: 22px; border-radius: 4px; border: 0; padding: 0; cursor: pointer; background: var(--heat-0); animation: heat-in .45s var(--ease) both; transition: transform .15s var(--ease), box-shadow .15s; }
+.heat-cell:hover, .heat-cell.on { transform: scale(1.12); box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px var(--ink); position: relative; z-index: 1; }
+.heat-cell.empty { background: repeating-linear-gradient(135deg, transparent 0 3px, rgba(22,24,27,.08) 3px 4px); box-shadow: inset 0 0 0 1px var(--line); }
+.heat-cell.v0 { background: var(--heat-0); } .heat-cell.v1 { background: var(--heat-1); } .heat-cell.v2 { background: var(--heat-2); } .heat-cell.v3 { background: var(--heat-3); } .heat-cell.v4 { background: var(--heat-4); }
+.heat-row { font-family: var(--mono); font-size: 11px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 6px; text-transform: capitalize; }
+.heat-col { font-family: var(--mono); font-size: 10px; color: var(--muted); text-align: center; white-space: nowrap; overflow: hidden; }
+.heat-caption { font-family: var(--mono); font-size: 11.5px; color: var(--ink-2); min-height: 18px; display: flex; gap: 6px; align-items: center; }
+.heat-caption::before { content: "▸"; color: var(--sky-ink); }
+@keyframes heat-in { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
+
+/* ---------- Timetable ---------- */
+.tt { position: relative; display: grid; font-size: 12px; }
+.tt-axis { position: relative; }
+.tt-hour { position: absolute; left: 0; right: 6px; font-family: var(--mono); font-size: 10.5px; color: var(--muted); transform: translateY(-50%); text-align: right; }
+.tt-lanes { position: relative; display: grid; gap: 6px; }
+.tt-lane { position: relative; border-radius: 10px; background: rgba(255,255,255,.55); }
+.tt-lane-head { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); text-align: center; padding-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tt-line { position: absolute; left: 0; right: 0; height: 1px; background: var(--line); }
+.tt-block { position: absolute; display: flex; flex-direction: column; justify-content: center; gap: 1px; padding: 2px 7px; border-radius: 7px; text-decoration: none; color: var(--ink); overflow: hidden; border-left: 3px solid var(--k); background: var(--kt); line-height: 1.15; animation: rise .45s var(--ease) both; transition: transform .15s var(--ease), box-shadow .15s; min-width: 0; }
+a.tt-block:hover { transform: translateY(-1px); box-shadow: 0 6px 16px -10px rgba(22,24,27,.5); z-index: 2; }
+.tt-block b { font-weight: 600; font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tt-block span { font-family: var(--mono); font-size: 10px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tt-block.k-run { --k: var(--sky); --kt: var(--sky-tint); }
+.tt-block.k-delivery { --k: var(--cb); --kt: var(--cb-tint); }
+.tt-block.k-release { --k: var(--cb); --kt: rgba(0,82,255,.2); }
+.tt-block.k-dose { --k: var(--mint); --kt: var(--mint-tint); }
+.tt-block.k-hold { --k: var(--warm); --kt: var(--warm-tint); }
+.tt-block.k-ask { --k: var(--amber); --kt: var(--amber-tint); }
+.tt-block.k-calibration { --k: var(--c4); --kt: rgba(180,140,255,.16); }
+.tt-block.k-planned { --k: var(--sky); --kt: transparent; border: 1.5px dashed var(--sky); border-left-width: 3px; border-left-style: solid; }
+.tt-block.k-missed { --k: var(--amber); --kt: var(--amber-tint); border: 1.5px solid var(--amber); border-left-width: 3px; }
+.tt-now { position: absolute; left: 0; right: 0; border-top: 1.5px dashed var(--ink); z-index: 3; pointer-events: none; }
+.tt-now::before { content: "▶"; position: absolute; left: -9px; top: -8px; font-size: 10px; color: var(--ink); animation: nudge-right 1.6s var(--ease) infinite; }
+.tt-now-label { position: absolute; left: -50px; top: -9px; font-family: var(--mono); font-size: 10px; line-height: 16px; background: var(--ink); color: #fff; padding: 0 5px; border-radius: 999px; }
+/* horizontal variant: hours across, lanes down */
+.tt.h .tt-hour { transform: translateX(-50%); text-align: center; right: auto; top: 0; }
+.tt.h .tt-line { top: 0; bottom: 0; left: auto; right: auto; width: 1px; height: auto; }
+.tt.h .tt-lane-head { text-align: left; padding: 0 8px 0 0; display: flex; align-items: center; text-transform: capitalize; letter-spacing: 0; font-size: 12px; color: var(--ink-2); }
+.tt.h .tt-now { top: 0; bottom: 0; left: auto; right: auto; width: 0; border-top: 0; border-left: 1.5px dashed var(--ink); }
+.tt.h .tt-now::before { content: "▼"; left: -6px; top: -12px; animation-name: nudge-down; }
+.tt.h .tt-now-label { left: -22px; top: auto; bottom: -18px; }
+.tt.h .tt-block { padding: 2px 6px; }
+
+/* ---------- FlowArrows ---------- */
+.flow-wrap { container-type: inline-size; }
+.flow { list-style: none; margin: 0; padding: 0; display: flex; align-items: stretch; }
+.flow-node { flex: 1 1 0; min-width: 0; position: relative; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); padding: 12px 12px 10px; display: flex; flex-direction: column; gap: 3px; overflow: hidden; }
+.flow-node::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent, var(--sky)); }
+.flow-node .txt { display: contents; }
+.flow-node .lbl { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; order: 0; }
+.flow-node .val { font-family: var(--mono); font-size: 20px; line-height: 1.1; letter-spacing: -0.02em; white-space: nowrap; order: 1; }
+.flow-node .sub { font-family: var(--mono); font-size: 10.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; order: 2; }
+.flow-edge { flex: 0 0 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--line-2); padding: 0 2px; min-width: 0; }
+.flow-edge .elabel { font-family: var(--mono); font-size: 10px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.flow-edge svg { overflow: visible; display: block; }
+.flow-edge .ev { display: none; }
+.flow-edge path.shaft { stroke: currentColor; stroke-width: 1.6; fill: none; stroke-dasharray: 5 4; }
+.flow-edge path.head { fill: currentColor; }
+.flow-edge.live { color: var(--edge, var(--sky-ink)); }
+.flow-edge.live path.shaft { animation: flowdash .9s linear infinite; stroke-width: 2; }
+.flow-edge.live .head { animation: headpulse 1.8s var(--ease) infinite; }
+@keyframes flowdash { from { stroke-dashoffset: 18; } to { stroke-dashoffset: 0; } }
+@keyframes headpulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+@container (max-width: 460px) {
+  .flow { flex-direction: column; }
+  .flow-node { flex: none; flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px 10px 14px; }
+  .flow-node .txt { min-width: 0; display: flex; flex-direction: column; }
+  .flow-node .val { font-size: 17px; }
+  .flow-edge { flex: none; flex-direction: row; justify-content: flex-start; height: 30px; padding: 0 0 0 22px; gap: 10px; }
+  .flow-edge .eh { display: none; }
+  .flow-edge .ev { display: block; }
+}
+
+/* ---------- ActorAvatar ---------- */
+.avatar { width: 28px; height: 28px; border-radius: 50%; flex: none; display: inline-flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 10.5px; font-weight: 400; color: var(--ink); background: color-mix(in srgb, var(--av) 24%, #fff); box-shadow: inset 0 0 0 1.5px var(--av); letter-spacing: 0; }
+
+/* ---------- feed lines (Dashboard "who did what", Activity) ---------- */
+.feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.feed-line { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: start; padding: 9px 0 9px 10px; border-top: 1px solid var(--line); text-decoration: none; color: inherit; position: relative; }
+.feed li:first-child .feed-line { border-top: 0; }
+.feed-line::before { content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px; border-radius: 2px; background: var(--kc, var(--line-2)); }
+.feed-line.k-money { --kc: var(--cb); } .feed-line.k-hold { --kc: var(--warm); } .feed-line.k-ok { --kc: var(--mint); } .feed-line.k-info { --kc: var(--line-2); }
+a.feed-line:hover { background: rgba(79,179,255,.06); }
+.feed-text { font-size: 14px; line-height: 1.35; min-width: 0; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
+.feed-text b { font-weight: 600; }
+.feed-time { font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap; padding-top: 2px; }
+.feed-go { color: var(--sky-ink); margin-left: 4px; }
+html.big .feed-text { font-size: 16px; }
+html.big .feed-time { font-size: 12.5px; }
+html.big .avatar { width: 32px; height: 32px; font-size: 11.5px; }
+html.big .feed-line { grid-template-columns: 32px 1fr auto; }
+
+/* ---------- chips used as filters ---------- */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; contain: inline-size; }
+.filters .chip { cursor: pointer; min-height: 36px; padding: 6px 12px; font-size: 12px; }
+.filters .chip[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.filters .chip[aria-pressed="true"] .dot { box-shadow: 0 0 0 2px rgba(255,255,255,.6); }
+
+/* ---------- Runs rows ---------- */
+.run-row { display: grid; grid-template-columns: 150px 1fr 70px 64px 92px auto; align-items: center; gap: 14px; padding: 12px 16px; text-decoration: none; color: inherit; contain: inline-size; }
+.run-row .lot { font-weight: 600; white-space: nowrap; }
+.run-row .drug { font-size: 13px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 899px) {
+  .run-row { grid-template-columns: 1fr auto; grid-template-areas: "main spark" "chip time"; gap: 8px 12px; }
+  .run-row .c-main { grid-area: main; } .run-row .c-spark { grid-area: spark; justify-self: end; }
+  .run-row .c-chip { grid-area: chip; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .run-row .c-time { grid-area: time; justify-self: end; }
+  .run-row .c-pct, .run-row .c-src { display: none; }
+}
+@media (min-width: 900px) { .run-row .c-pct-inline { display: none; } }
+
+/* ---------- supplier bars ---------- */
+.bar { display: flex; height: 10px; border-radius: 999px; overflow: hidden; background: var(--grey-tint); }
+.bar > span { height: 100%; transform-origin: left; animation: grow .8s var(--ease) both; }
+@keyframes grow { from { transform: scaleX(0); } to { transform: none; } }
+
+/* ---------- small pointer arrows ---------- */
+.pointer { font-family: var(--mono); color: var(--sky-ink); display: inline-block; animation: nudge-right 1.6s var(--ease) infinite; }
+@media (min-width: 900px) { .btn.cta-fit { width: auto; align-self: flex-start; } }
+.pointer.up { animation-name: nudge-diag; }
+@keyframes nudge-diag { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(2px, -2px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .heat-cell, .tt-block, .bar > span { animation: none; }
+  .flow-edge.live path.shaft, .flow-edge.live .head, .kpi-trend .arrow, .pointer, .tt-now::before { animation: none; }
+}

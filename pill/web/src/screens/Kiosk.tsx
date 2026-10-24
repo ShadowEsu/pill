@@ -1,18 +1,38 @@
-// The station's own 7-inch screen (1024 × 600, landscape). One button; the run plays inline; the verdict holds for 20 s, then the station is ready again.
-import { useEffect, useState } from 'react';
+// The station's own 7-inch screen (1024 × 600, landscape). One button; the run plays inline with the capsule, the curve,
+// the light path and the timetable; the verdict holds for 20 s under a countdown ring, then the station is ready again.
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Action, Screen, SrcBadge } from '../components/Shell';
-import PillFill from '../components/PillFill';
+import { Screen, SrcBadge } from '../components/Shell';
+import PillFill, { VERDICT_FILL } from '../components/PillFill';
 import Curve, { RunReadout } from '../components/Curve';
-import { VERDICT_FILL } from '../components/PillFill';
+import RunPhases, { clock, phaseAt } from '../components/RunPhases';
+import SensorPath, { GLOW_FULL } from '../components/SensorPath';
 import { actions, useStore } from '../lib/store';
 import { replayStream } from '../lib/stream';
-import { evaluate, progressPct } from '../lib/rules';
+import { absorbance, evaluate, progressPct } from '../lib/rules';
 import { REFERENCES } from '../data/reference';
 import type { Sample, Source } from '../lib/types';
 
 const REF = REFERENCES.riboflavin;
 const HOLD_S = 20;
+const SHORT = '(max-height: 700px)';
+function onShortChange(l: () => void) {
+  const m = window.matchMedia(SHORT);
+  m.addEventListener('change', l);
+  return () => m.removeEventListener('change', l);
+}
+
+/** Countdown ring for the verdict hold: the arc empties once a second, the seconds sit inside. */
+function HoldRing({ left, colour }: { left: number; colour: string }) {
+  return (
+    <svg viewBox="0 0 56 56" width="56" height="56" role="img" aria-label={`Ready again in ${left} seconds`}>
+      <circle cx="28" cy="28" r="23" fill="none" stroke="var(--line)" strokeWidth="4" />
+      <circle cx="28" cy="28" r="23" fill="none" stroke={colour} strokeWidth="4" strokeLinecap="round" pathLength={HOLD_S} strokeDasharray={HOLD_S}
+        transform="rotate(-90 28 28)" style={{ strokeDashoffset: HOLD_S - left, transition: 'stroke-dashoffset 1s linear' }} />
+      <text x="28" y="32.5" textAnchor="middle" style={{ fontFamily: 'var(--mono)', fontSize: 14, fill: 'var(--ink)' }}>{left}</text>
+    </svg>
+  );
+}
 
 export default function Kiosk() {
   const [q] = useSearchParams();
@@ -21,6 +41,8 @@ export default function Kiosk() {
   const [src, setSrc] = useState<Source | null>(null);
   const [left, setLeft] = useState<number | null>(null);
   const run = useStore((s) => (runId ? s.runs.find((r) => r.id === runId) : undefined));
+  // The 7-inch panel is 600 px tall: the capsule shrinks there so the whole station fits one screen.
+  const short = useSyncExternalStore(onShortChange, () => window.matchMedia(SHORT).matches);
 
   useEffect(() => {
     if (!runId) return;
@@ -50,47 +72,60 @@ export default function Kiosk() {
 
   const samples = run?.samples ?? [];
   const last = samples.at(-1);
+  const t = last?.t ?? 0;
   const ev = run?.evaluation ?? null;
   const pct = progressPct(samples, REF);
-  const status = !run ? 'Place a quarter tablet, close the lid, press Start.'
-    : pct < 5 ? 'filling the chamber' : pct < 60 ? 'dissolving' : pct < 95 ? 'settling' : 'holding';
-  const clock = (t: number) => `${Math.floor(t / 60)}:${String(Math.round(t % 60)).padStart(2, '0')}`;
+  const phase = phaseAt(t);
+  const running = !!run && !ev;
+  const status = !run ? 'ready' : phase.status;
+  const doing = !run ? 'Place a quarter tablet, close the lid, press Start.' : `${phase.doing[0].toUpperCase()}${phase.doing.slice(1)}.`;
 
   return (
     <Screen title="Pill" eyebrow={`STATION 01 · ${REF.label}`} right={src ? <SrcBadge src={src} /> : <span className="chip ok"><span className="dot" />ready</span>}>
-      <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-        <section style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 28, minWidth: 0 }}>
+      <div className="wide-2" style={{ flex: 1, minHeight: 0, alignItems: 'center' }}>
+        <section className="card glass decor-dots" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 20, minWidth: 0, padding: '22px 16px' }}>
           {ev ? (
             <>
-              <div className="rise" style={{ flex: 'none' }}><PillFill pct={100} verdict={ev.verdict} size={320} grid={false} /></div>
-              <div className="rise stack" style={{ gap: 10, minWidth: 0, animationDelay: '80ms' }}>
+              <div className="rise" style={{ flex: 'none' }}><PillFill pct={100} verdict={ev.verdict} size={short ? 180 : 230} /></div>
+              <div className="rise stack" style={{ gap: 10, minWidth: 0, flex: '1 1 200px', animationDelay: '80ms' }}>
                 <p className="eyebrow">rule {ev.rule} · run {run?.id}</p>
-                <h2 className="serif" data-verdict={ev.verdict} style={{ fontSize: ev.verdict === 'PASS' ? 96 : 64, lineHeight: 0.95, fontWeight: 400, letterSpacing: '-0.01em' }}>{ev.verdict}</h2>
+                <h2 className="serif" data-verdict={ev.verdict} style={{ fontSize: ev.verdict === 'PASS' ? 88 : 56, lineHeight: 0.95, fontWeight: 400, letterSpacing: '-0.01em' }}>{ev.verdict}</h2>
                 <div style={{ width: 56, height: 3, borderRadius: 2, background: VERDICT_FILL[ev.verdict] }} />
                 <p className="mono" style={{ fontSize: 15 }}>{ev.pct} % of reference</p>
                 <p style={{ color: 'var(--ink-2)' }}>Next: {ev.nextStep}.</p>
                 <p className="footnote">Screening result, not a pharmacopeial test.</p>
-                <p className="mono muted" style={{ fontSize: 13 }}>ready again in {left ?? 0} s</p>
+                <div className="row" style={{ gap: 10 }}>
+                  <HoldRing left={left ?? 0} colour={VERDICT_FILL[ev.verdict]} />
+                  <span className="mono muted" style={{ fontSize: 13 }}>ready again in {left ?? 0} s</span>
+                </div>
               </div>
             </>
           ) : (
             <div className="stack" style={{ alignItems: 'center', gap: 8 }}>
-              <PillFill pct={pct} size={320} />
-              <p style={{ fontSize: 20, fontWeight: 500, textAlign: 'center' }} aria-live="polite">{status}</p>
-              <p className="mono muted" style={{ fontSize: 14 }}>{clock(last?.t ?? 0)} / 3:00</p>
+              <PillFill pct={pct} size={short ? 220 : 320} running={running} />
+              <p className="serif" style={{ fontSize: 36, lineHeight: 1 }}>{status}</p>
+              <p style={{ fontSize: 18, textAlign: 'center', color: 'var(--ink-2)', maxWidth: 420 }} aria-live="polite">{doing}</p>
+              <p className="mono muted" style={{ fontSize: 14 }}>{clock(t)} / 3:00{run ? ` · ${pct} % of reference` : ''}</p>
             </div>
           )}
         </section>
-        <section className="card stack" style={{ gap: 14, alignSelf: 'center', minWidth: 0 }}>
-          <Curve samples={samples} band={REF} width={460} height={210} live={!!run && !ev} />
-          <RunReadout samples={samples} />
+        <section className="card stack" style={{ gap: 8, minWidth: 0 }}>
+          <div className="row between"><span className="eyebrow">absorbance</span><span className="mono muted" style={{ fontSize: 12 }}>{last ? `${last.temp.toFixed(1)} °C` : '—'}</span></div>
+          <Curve samples={samples} band={REF} width={460} height={160} live={running} />
+          <hr className="hr" />
+          <div className="row between"><span className="eyebrow">light path</span><span className="mono muted" style={{ fontSize: 12 }}>{running ? 'reading once a second' : 'idle'}</span></div>
+          <div style={{ maxWidth: short ? 280 : 330, width: '100%', margin: '0 auto' }}>
+            <SensorPath led={last?.led ?? !!run} inline={last ? last.adc0 / last.blank : 1} glow={last ? absorbance(last.blank, last.adc90) / GLOW_FULL : 0} running={running} />
+          </div>
+          <RunReadout samples={samples} strip={false} />
         </section>
       </div>
-      <Action>
-        <button type="button" className="btn" disabled={!!run && !ev} onClick={() => { setLeft(null); setRunId(actions.startRun({ drug: 'riboflavin', lot: 'B2-07', src: 'replay' }).id); }}>
-          {run && !ev ? `Running · ${clock(last?.t ?? 0)} / 3:00` : ev ? 'Start again (replay B2-07)' : 'Start (replay B2-07)'}
+      <section className="card" style={{ padding: '12px 18px 14px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px 24px' }}>
+        <div style={{ flex: '1 1 420px', minWidth: 0 }}><RunPhases t={t} legend={false} big /></div>
+        <button type="button" className="btn" style={{ flex: '1 0 280px', width: 'auto' }} disabled={running} onClick={() => { setLeft(null); setRunId(actions.startRun({ drug: 'riboflavin', lot: 'B2-07', src: 'replay' }).id); }}>
+          {running ? `Running · ${clock(t)} / 3:00` : ev ? 'Start again (replay B2-07)' : 'Start (replay B2-07)'}
         </button>
-      </Action>
+      </section>
     </Screen>
   );
 }

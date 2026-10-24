@@ -47,7 +47,36 @@ Demo: bottle photo → recall clear → B2 tablet → bar fills → PASS → pay
 Attacks and answers: see `final-2026-10-23.md` §"Attacks you will get". Short form: (1) "Peel exists" → cite it, show the gate; (2) "real antimalarial?" → unable to verify, by design; (3) "open the lid" → interlock; (4) "Tums: fail or unsure?" → fail by cloudiness, rule named; (5) "why a chain?" → there isn't one; (6) "who lets a bot hold money?" → it never releases without the pharmacist's tap.
 
 ## 7. Tracks to enter and what each needs
-Hyphenate ($8K; video opens with the moment, live demo, real-vs-simulated slide) · Best Hardware · Anthropic (named community: clinic/NGO pharmacists; one real conversation this weekend) · Microsoft Built for the Real World · Best People-First · **Coinbase x402 Payment Agents** (Preston, Sat 01:0x: USDC on Base Sepolia via a CDP agent wallet for escrow/release, x402 pay-per-verdict on `/verify`; submission = summary + working example + architecture note + builder feedback; eligibility gate in Research's prize sheet §1, check before the pitch) · Capital One Nessie (fiat mirror) · Bright Data or Apify (one live recall lookup with a visible empty/blocked case) · Elastic (if criteria appear) · MLH Tiger Data (curves as time series) · MLH Gen AI · Figma Best Design (stage log + Slides) if time. Not entering: Solana, Presage, SpacetimeDB.
+Source: Hive live prizes feed read Sat 09:3x PDT (`hive.hackberkeley.org/api/live/prizes`, 48 rows). Preston (Sat 09:2x): "go for a lot of tracks, one by one; maybe Figma, maybe security." Each is an opt-in box on Devpost; the extra artifact is listed.
+
+**Tier A, already built or building (enter all):**
+1. **Best Hardware Hack** (Cal Hacks, Bambu A1 Mini): the station. Needs: the box working on stage.
+2. **Hyphenate: Autonomous Systems for Finance** ($8K / $5K / $3K + interviews): the policy agent *is* the autonomous finance system: limited access (proposes only), clean record (decision log), knows when to ask (escalate). Needs: a demo video that **opens with the moment** (chalk tablet → payment held), a live demo they can steer, one line on the "seats" it fills, a real-vs-simulated slide.
+3. **Coinbase: Best Use of x402, Payment Agents** ($500 USDC + recruiter call per eligible member): see COINBASE-TRACK.md. Needs: CDP key, summary + working example + architecture + builder feedback; per-member eligibility.
+4. **Capital One: Best Use of Nessie** ($300/person; "Completeness, Creativity, Complexity"): the fiat mirror. Needs: Nessie key (GitHub login), hold/release/refund calls live.
+5. **Microsoft: Built for the Real World** (Surface per member) + Customer Impact: production-minded healthcare agent; judged on customer understanding, measurable usefulness, path to production, responsible design, end-to-end. Needs: a one-page "path to production" + the pharmacist conversation.
+6. **Anthropic**: named community (clinic pharmacists in low-income settings), real problem, "works on Monday", thoughtful Claude (label read + two-sentence why, clause filter) and where it could go wrong. Needs: one real conversation with a pharmacist this weekend; the failure-modes paragraph.
+7. **Best People-First Hack** (Apple Watch SE): grandparent mode + clinics. Needs: the personal mode demo.
+8. **Most Technically Complex** (NuPhy): two-channel optics + deterministic rules + payment agent + x402.
+9. **MLH Best Use of Gen AI**: Claude. Free to tick.
+10. **MLH Best Use of Tiger Data** (Stream Deck): every run's samples as a hypertable + continuous aggregate for the dashboard. Needs: Tiger Cloud account (free), 30 lines of SQL, one chart served from it.
+
+**Tier B, one afternoon each, pick by remaining time:**
+11. **Figma** (gift cards + recruiting): "idea to demo", not judged on scope. Needs: Figma Slides deck for the pitch, a stage log (≤200 words per stage: tool, minutes, 1–5 rating, how output carried forward), an embedded Make/prototype, ≤3-min video, files shared to "Anyone". We already have the design; the deck doubles as the pitch deck.
+12. **Atlassian: Best Agent / Best Security Solution for Agents** (AirPods Max): our agent containment story: proposes only, caps in policy.md, model can only downgrade, human tap, clause filter, full log. Needs: read their Google doc for the exact ask; a one-page "agent security model".
+13. **Armadin: Best Security Hack** (criteria "coming soon"): same material as 12; check the booth Saturday.
+14. **Apify** ($2,000 / $1,000 / $800 / $400 / $400 + Best Actor $400): build an Actor `fda-recall-by-lot` that reads public FDA/WHO recall pages and returns a clean record; use it live for the recall chip with a visible empty/blocked case. Five prizes, decent odds. Needs: Apify account, one Actor, used in the demo.
+15. **Bright Data** ($1,500 credits + $500 Amazon): same recall lookup through Bright Data instead; disqualified if mocked or behind a login. Pick Apify *or* Bright Data, not both for the same feature.
+16. **MLH Best Use of Gemini API**: Gemini reads the bottle label (vision) as the second model; Claude keeps the "why". Needs: the app Gemini key (allowed for apps), 40 lines.
+17. **MLH Best Use of ElevenLabs** (earbuds): read the verdict and the plain sentence aloud in personal mode (grandparents). Needs: ElevenLabs key, one TTS call, a speaker button. (Cartesia offers Meta glasses but wants voice as the core; ours is not.)
+18. **MLH Best Use of Auth0** (headphones): the pharmacist tap becomes a real login (who tapped); Auth0 for AI agents for the agent's token. Needs: Auth0 tenant, 1 hour.
+19. **MLH Commit Fellowship**: free to enter; supplemental form.
+20. **Fetch.ai** ($1,500 / $1,000 / $500): station-to-station verdict buying as uAgents. Needs: uAgents SDK, half a day; only if the x402 buyer is done.
+21. **Elastic** (Quest 3S; criteria "coming soon"): index runs + log for search. Needs: Elastic Cloud trial; medium lift.
+22. **MLH .Tech domain / GoDaddy Registry**: register a domain for the site. Needs Preston's yes (domains are his call).
+23. **Hacker's Choice**: booth theatre: the box, the chalk tablet, the glow.
+
+**Not entering:** Trading Agents, SpaceXAI/Cursor raffle (Cursor is off), Solana, Presage, Spacetime, Visa shopping, CRS Credit, Notability, Meta (human connection), Moss, Bitdeer, Mana, Convex (backend swap too big), Creao (criteria unclear), Vultr/DigitalOcean/Snowflake/MongoDB/Backboard (would need a stack change; revisit only if hosting the pay service on a droplet is free and quick).
 
 ## 8. References (post each in Discord #references)
 - Peel: https://plume.hackmit.org/project/qxodw-wgjqk-lidau-dxrpe · code https://github.com/viktorinkov/HackMIT-2026 · video https://youtu.be/Yiu2wGKJ6AM
