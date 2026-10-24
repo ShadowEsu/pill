@@ -1,7 +1,10 @@
-// Semicircle gauge, 0–120 % of the reference plateau. The band (what passes) is the sky-tinted arc; the needle swings in once.
+// Semicircle gauge, 0–120 % of the reference plateau. The band (what passes) is the sky-tinted arc. On mount the value
+// arc sweeps from 0 while the needle swings and the reading counts up; on arrival a soft ring ticks out at the tip.
 import { useEffect, useState } from 'react';
 import type { Verdict } from '../lib/types';
+import { useCountUp } from '../lib/count';
 import { VERDICT_FILL } from './PillFill';
+import './viz.css';
 
 const MAX = 120, CX = 110, CY = 112, R = 84;
 const polar = (v: number, r: number) => {
@@ -21,6 +24,9 @@ export default function Gauge({ pct, low = 87, high = 113, verdict = null, width
   useEffect(() => { const r = requestAnimationFrame(() => setOn(true)); return () => cancelAnimationFrame(r); }, []);
   const v = pct ?? 0;
   const deg = on ? (Math.max(0, Math.min(MAX, v)) / MAX) * 180 : 0;
+  const counted = useCountUp(on ? v : 0, 900);
+  const shown = on && Math.abs(counted - v) < 0.01 ? pct : Math.round(counted);
+  const tipAt = polar(v, R - 14);
   const colour = verdict ? VERDICT_FILL[verdict] : 'var(--sky)';
   const mono = { fontFamily: 'var(--mono)', fontSize: 10, fill: 'var(--muted)' } as const;
   return (
@@ -49,8 +55,10 @@ export default function Gauge({ pct, low = 87, high = 113, verdict = null, width
           <line x1={CX} y1={CY} x2={CX - R + 4} y2={CY} stroke="var(--ink)" strokeWidth="2" strokeLinecap="round" />
         </g>
       )}
+      {pct != null && on && <circle className="gauge-tick" cx={tipAt.x} cy={tipAt.y} r="5" fill="none" stroke={colour} strokeWidth="2" />}
+      {pct != null && on && <circle className="gauge-dot" cx={tipAt.x} cy={tipAt.y} r="3.5" fill={colour} stroke="var(--surface)" strokeWidth="1.5" />}
       <circle cx={CX} cy={CY} r="6" fill="var(--surface)" stroke="var(--ink)" strokeWidth="1.5" />
-      <text x={CX} y={CY + 22} textAnchor="middle" style={{ fontFamily: 'var(--mono)', fontSize: 12, fill: 'var(--ink)' }}>{pct == null ? empty : `${pct} % · band ${low}–${high}`}</text>
+      <text x={CX} y={CY + 22} textAnchor="middle" style={{ fontFamily: 'var(--mono)', fontSize: 12, fill: 'var(--ink)' }}>{pct == null ? empty : `${shown} % · band ${low}–${high}`}</text>
     </svg>
   );
 }

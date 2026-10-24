@@ -155,7 +155,7 @@ function MoneyStrip() {
     <div className="money-strip" role="img" aria-label="Money path: clinic pays into escrow; escrow pays the supplier on a tap">
       {MONEY.map((n, k) => (
         <Fragment key={n.label}>
-          {k > 0 && <svg className="ms-arrow" viewBox="0 0 28 12" aria-hidden="true"><path className="shaft" d="M0 6 H19" /><path d="M18 1 L28 6 L18 11 Z" fill="var(--cb)" /></svg>}
+          {k > 0 && <svg className="ms-arrow" viewBox="0 0 28 12" aria-hidden="true"><path className="shaft" d="M0 6 H19" /><path d="M18 1 L28 6 L18 11 Z" fill="var(--cb)" /><circle className="ms-token" cx="0" cy="6" r="3" style={{ '--k': k } as React.CSSProperties} /></svg>}
           <span className="ms-node" style={{ '--accent': n.accent } as React.CSSProperties}><b>{n.label}</b><span>{n.sub}</span></span>
         </Fragment>
       ))}
@@ -168,7 +168,7 @@ function Payment({ play, wide }: ArtProps) {
     <div className={'stack' + (play ? ' stagger' : '')} style={{ gap: 16, width: '100%', maxWidth: 480 }}>
       <div style={{ '--i': 0 } as React.CSSProperties}>
         {wide ? (
-          <FlowArrows label="Money path: clinic to escrow to supplier"
+          <FlowArrows label="Money path: clinic to escrow to supplier" token
             nodes={MONEY.map((n) => ({ id: n.label, ...n }))}
             edges={[{ from: 'Clinic', to: 'Escrow', label: 'held', live: true, color: 'var(--cb)' }, { from: 'Escrow', to: 'Supplier', label: 'tap', live: true, color: 'var(--cb)' }]} />
         ) : <MoneyStrip />}
@@ -274,9 +274,10 @@ function ChapterView({ idx, dir, seen, wide }: { idx: number; dir: number; seen:
   return (
     <article ref={ref} className="story-ch" role="group" aria-roledescription="chapter" aria-label={`${idx + 1} of ${N}: ${c.name}`}>
       <div className={'story-art' + (c.dots ? ' dots' : '')} data-enter>
-        <Art play={play} wide={wide} text={`${c.line} ${c.body}`} />
+        <div className="story-par"><Art play={play} wide={wide} text={`${c.line} ${c.body}`} /></div>
       </div>
       <div className="story-copy">
+        <span className="story-ghost" aria-hidden="true">{pad(idx + 1)}</span>
         <p className="story-num" data-enter><b>{pad(idx + 1)}</b> / {pad(N)} · {c.name}</p>
         <h2 className="story-line" data-enter>{c.line}</h2>
         <p className="story-body" data-enter>{c.body}</p>
@@ -295,6 +296,25 @@ export default function Story() {
   const [dir, setDir] = useState(1);
   const [seen] = useState(() => new Set<number>());
   const swipe = useRef<{ x: number; y: number } | null>(null);
+  const stage = useRef<HTMLElement>(null);
+  const reduce = useReducedMotion();
+  /** Parallax: the art leans toward the pointer (mouse) or follows a swipe (touch); the ghosted number drifts the other way. */
+  const lean = (px: number, py: number, drag: number) => {
+    const el = stage.current;
+    if (!el || reduce) return;
+    el.style.setProperty('--px', px.toFixed(3));
+    el.style.setProperty('--py', py.toFixed(3));
+    el.style.setProperty('--drag', `${Math.round(drag)}px`);
+  };
+  // On a phone the chapter can scroll under the controls: the art slides a little slower than the words.
+  useEffect(() => {
+    const el = stage.current;
+    if (!el || reduce) return;
+    let raf = 0;
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; el.style.setProperty('--sy', String(Math.round(window.scrollY))); }); };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => { window.removeEventListener('scroll', onScroll); cancelAnimationFrame(raf); };
+  }, [reduce]);
   const last = i === N - 1;
 
   const go = useCallback((k: number) => {
@@ -327,12 +347,20 @@ export default function Story() {
         <p className="eyebrow">How Pill works</p>
         <Link to={mode ? '/' : '/welcome'}>Close ✕</Link>
       </header>
-      <section className="story-stage" aria-roledescription="story" aria-label="How Pill works, seven chapters" aria-live="polite"
+      <section ref={stage} className="story-stage" aria-roledescription="story" aria-label="How Pill works, seven chapters" aria-live="polite"
         onPointerDown={(e) => { swipe.current = { x: e.clientX, y: e.clientY }; }}
-        onPointerCancel={() => { swipe.current = null; }}
+        onPointerMove={(e) => {
+          const s = swipe.current;
+          if (s && e.pointerType !== 'mouse') { lean(0, 0, (e.clientX - s.x) * 0.35); return; }
+          const r = e.currentTarget.getBoundingClientRect();
+          lean(((e.clientX - r.left) / r.width) * 2 - 1, ((e.clientY - r.top) / r.height) * 2 - 1, 0);
+        }}
+        onPointerLeave={() => lean(0, 0, 0)}
+        onPointerCancel={() => { swipe.current = null; lean(0, 0, 0); }}
         onPointerUp={(e) => {
           const s = swipe.current;
           swipe.current = null;
+          lean(0, 0, 0);
           if (!s) return;
           const dx = e.clientX - s.x, dy = e.clientY - s.y;
           if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) go(i + (dx < 0 ? 1 : -1));

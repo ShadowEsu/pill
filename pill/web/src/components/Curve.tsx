@@ -1,9 +1,13 @@
 // The run curve: inline absorbance A(t) in sky, 90° glow in mint, the reference band as a dotted sky rectangle.
 // Re-rendered as samples arrive (180 points). `overlays` draws extra runs (calibration) one after another.
-import { useEffect, useRef } from 'react';
+// Motion: a finished curve draws itself in once with a glowing head dot riding the tip; a live curve keeps a pulsing
+// head, and its band fades up as the tip nears the band floor. The band shimmers softly. Reduced motion: drawn, still.
+import { useEffect, useId, useLayoutEffect, useRef } from 'react';
 import { animate } from 'animejs';
+import { prefersReducedMotion } from '../lib/motion';
 import { curve, features } from '../lib/rules';
 import type { Reference, Sample } from '../lib/types';
+import './viz.css';
 
 const T_MAX = 180, A_MAX = 0.6;
 const PAD = { l: 28, r: 8, t: 22, b: 20 };
@@ -21,15 +25,40 @@ export default function Curve({ samples, band, width = 320, height = 180, live =
   const aPath = line(c.map((p) => ({ t: p.t, v: p.a })));
   const gPath = line(c.map((p) => ({ t: p.t, v: p.g })));
   const tip = c.at(-1);
+  const aArea = c.length > 1 ? `${aPath} L${x(c.at(-1)!.t).toFixed(1)} ${y(0).toFixed(1)} L${x(c[0].t).toFixed(1)} ${y(0).toFixed(1)} Z` : '';
+  const uid = 'cv' + useId().replace(/[^a-zA-Z0-9_-]/g, '');
 
   const group = useRef<SVGGElement>(null);
   const done = useRef(onDrawn);
   useEffect(() => { done.current = onDrawn; });
+
+  // one-time draw-in of a finished curve, head dot riding the sky line
+  const aRef = useRef<SVGPathElement>(null), gRef = useRef<SVGPathElement>(null), headRef = useRef<SVGGElement>(null), areaRef = useRef<SVGPathElement>(null);
+  const drawn = useRef(false);
+  const hasCurve = c.length > 1;
+  useLayoutEffect(() => {
+    if (drawn.current || !hasCurve) return;
+    drawn.current = true;
+    const a = aRef.current, g = gRef.current, head = headRef.current, area = areaRef.current;
+    if (live || !a || !g || prefersReducedMotion()) return;
+    const len = a.getTotalLength();
+    const set = (p: number) => {
+      a.style.strokeDashoffset = String(1 - p); g.style.strokeDashoffset = String(1 - p);
+      if (area) area.style.opacity = String(p);
+      if (head && len) { const pt = a.getPointAtLength(len * p); head.setAttribute('transform', `translate(${pt.x.toFixed(1)} ${pt.y.toFixed(1)})`); }
+    };
+    set(0);
+    const o = { p: 0 };
+    const anim = animate(o, { p: 1, duration: 1100, ease: 'outCubic', onUpdate: () => set(o.p), onComplete: () => set(1) });
+    return () => { anim.cancel(); set(1); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasCurve]);
+  const reduce = prefersReducedMotion();
   const overlayCount = overlays?.length ?? 0;
   useEffect(() => {
     const paths = group.current ? Array.from(group.current.querySelectorAll<SVGPathElement>('path')) : [];
     if (!paths.length) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (reduce) {
       paths.forEach((p) => { p.style.strokeDashoffset = '0'; });
       done.current?.();
       return;
@@ -39,7 +68,11 @@ export default function Curve({ samples, band, width = 320, height = 180, live =
       onComplete: () => { if (p === paths.at(-1)) done.current?.(); },
     }));
     return () => anims.forEach((a) => a.cancel());
-  }, [overlayCount, stagger]);
+  }, [overlayCount, stagger, reduce]);
+
+  // live: the band wakes up as the tip approaches its floor (0.15 → 1 over the last 0.1 A)
+  const bandOpacity = band && live && tip ? Math.max(0.15, Math.min(1, 0.15 + 0.85 * (tip.a - (band.bandLow - 0.1)) / 0.1)) : 1;
+  const headAt = tip ? `translate(${x(tip.t).toFixed(1)} ${y(tip.a).toFixed(1)})` : undefined;
 
   const mono = { fontFamily: 'var(--mono)', fontSize: 10, fill: 'var(--muted)' } as const;
   return (
@@ -54,9 +87,28 @@ export default function Curve({ samples, band, width = 320, height = 180, live =
       {[0, 60, 120, 180].map((t) => (
         <text key={t} x={x(t)} y={height - 5} textAnchor={t === 0 ? 'start' : t === 180 ? 'end' : 'middle'} style={mono}>{t === 0 || t === 180 ? `${t} s` : t}</text>
       ))}
+      <defs>
+        <linearGradient id={uid + 'a'} x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stopColor="#4FB3FF" stopOpacity="0.22" />
+          <stop offset="1" stopColor="#4FB3FF" stopOpacity="0" />
+        </linearGradient>
+        <radialGradient id={uid + 'h'}>
+          <stop offset="0" stopColor="#4FB3FF" stopOpacity="0.55" />
+          <stop offset="1" stopColor="#4FB3FF" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id={uid + 's'} x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0" stopColor="#fff" stopOpacity="0" />
+          <stop offset=".5" stopColor="#fff" stopOpacity=".7" />
+          <stop offset="1" stopColor="#fff" stopOpacity="0" />
+        </linearGradient>
+        {band && <clipPath id={uid + 'b'}><rect x={PAD.l} width={width - PAD.l - PAD.r} y={y(band.bandHigh)} height={y(band.bandLow) - y(band.bandHigh)} /></clipPath>}
+      </defs>
       {band && (
-        <rect x={PAD.l} width={width - PAD.l - PAD.r} y={y(band.bandHigh)} height={y(band.bandLow) - y(band.bandHigh)}
-          fill="var(--sky-tint)" stroke="var(--sky)" strokeWidth="1" strokeDasharray="2 3" />
+        <g className="cv-band" style={{ opacity: bandOpacity, transition: 'opacity .5s var(--ease)' }}>
+          <rect x={PAD.l} width={width - PAD.l - PAD.r} y={y(band.bandHigh)} height={y(band.bandLow) - y(band.bandHigh)}
+            fill="var(--sky-tint)" stroke="var(--sky)" strokeWidth="1" strokeDasharray="2 3" />
+          {!reduce && <g clipPath={`url(#${uid}b)`}><rect className="cv-shimmer" style={{ ['--cvw' as string]: `${width - PAD.l - PAD.r + 70}px` }} x={PAD.l - 70} y={y(band.bandHigh)} width={70} height={y(band.bandLow) - y(band.bandHigh)} fill={`url(#${uid}s)`} /></g>}
+        </g>
       )}
       <g style={mono}>
         <line x1={PAD.l} x2={PAD.l + 14} y1={9} y2={9} stroke="var(--sky)" strokeWidth="2" strokeLinecap="round" />
@@ -79,14 +131,18 @@ export default function Curve({ samples, band, width = 320, height = 180, live =
           })}
         </g>
       )}
-      {c.length > 1 && <>
-        <path d={gPath} fill="none" stroke="var(--mint)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
-        <path d={aPath} fill="none" stroke="var(--sky)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+      {hasCurve && <>
+        <path ref={areaRef} d={aArea} fill={`url(#${uid}a)`} stroke="none" className="cv-area" />
+        <path ref={gRef} d={gPath} fill="none" stroke="var(--mint)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" pathLength={1} strokeDasharray="1" />
+        <path ref={aRef} d={aPath} fill="none" stroke="var(--sky)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" pathLength={1} strokeDasharray="1" />
       </>}
-      {live && tip && <>
-        <circle cx={x(tip.t)} cy={y(tip.a)} r="6" fill="var(--sky-tint)" />
-        <circle cx={x(tip.t)} cy={y(tip.a)} r="3" fill="var(--sky)" />
-      </>}
+      {tip && hasCurve && (live || !reduce) && (
+        <g ref={headRef} transform={headAt} className={'cv-head' + (live ? ' live' : '')}>
+          <circle r="14" fill={`url(#${uid}h)`} className="cv-halo" />
+          <circle r="6" fill="var(--sky-tint)" />
+          <circle r="3.2" fill="var(--sky)" stroke="#fff" strokeWidth="1.2" />
+        </g>
+      )}
     </svg>
   );
 }

@@ -1,8 +1,11 @@
 // Routes. Each screen lives in src/screens/<Name>.tsx and exports default. Onboarding gates everything until a mode is chosen.
 // Frame: <Nav/> (tab bar on phones, sidebar ≥ 900 px) + the screen column.
+import { useLayoutEffect, useRef } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { useStore } from './lib/store';
+import { EASE_CSS, prefersReducedMotion } from './lib/motion';
 import Nav from './components/Nav';
+import Ambient from './components/Ambient';
 import Onboarding from './screens/Onboarding';
 import Home from './screens/Home';
 import Dashboard from './screens/Dashboard';
@@ -25,16 +28,34 @@ import Story from './screens/Story';
 import Settings from './screens/Settings';
 import AgentRecord from './screens/AgentRecord';
 import Demo, { DemoDriver } from './screens/Demo';
+import Pay from './screens/Pay';
+
+/** Shared route enter: on mount and every path change the screen column fades in and rises 8 px (260 ms). Reduced motion: static. */
+function useRouteEnter() {
+  const { pathname } = useLocation();
+  const ref = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el || prefersReducedMotion() || typeof el.animate !== 'function') return;
+    const a = el.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: EASE_CSS });
+    return () => a.cancel();
+  }, [pathname]);
+  return ref;
+}
 
 function Frame({ children }: { children: React.ReactNode }) {
   const { pathname } = useLocation();
   const kiosk = pathname.startsWith('/kiosk');
+  const ref = useRouteEnter();
   return (
-    <div className="frame">
-      {!kiosk && <Nav />}
-      <div className={'app' + (kiosk ? ' kiosk' : '')}>{children}</div>
-      <DemoDriver />
-    </div>
+    <>
+      {!kiosk && <Ambient />}
+      <div className="frame">
+        {!kiosk && <Nav />}
+        <div ref={ref} className={'app' + (kiosk ? ' kiosk' : '')}>{children}</div>
+        <DemoDriver />
+      </div>
+    </>
   );
 }
 
@@ -78,6 +99,7 @@ export default function App() {
           <Route path="/settings" element={<Gate><Settings /></Gate>} />
           <Route path="/agent" element={<Gate><AgentRecord /></Gate>} />
           <Route path="/demo" element={<Demo />} />
+          <Route path="/pay" element={<Gate><Pay /></Gate>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Frame>

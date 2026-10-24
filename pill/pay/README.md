@@ -71,8 +71,33 @@ When no `X402_PAY_TO` is set, the service writes a throwaway key to `.local-wall
 | `GET /tiger/status` | free | | `{mode:'live', rows, runs, last}` or `{mode:'unavailable', reason}` (no `TIGER_URL`, or the database refused) |
 | `POST /tiger/samples` | free | `{run_id, station?, started_at? (ms epoch), samples:[{t, abs, glow, temp}]}` (≤ 2,000 samples) | one batched `INSERT … SELECT FROM unnest(…)`: `{mode:'live', inserted}` or `{mode:'unavailable', reason}` |
 | `GET /tiger/plateau/:run_id` | free | | the run's curve in `time_bucket('10 seconds')` buckets: `{mode:'live', run_id, buckets:[{bucket, abs, glow, temp, n}]}` or `{mode:'unavailable', reason}` |
+| `POST /checkout` | free | `{purpose:'verify'\|'escrow-release'\|'donation', runId?, amountUsdc?}` (default 0.05, at most 1) | `201` order: `{id, purpose, runId, source:'qr', payTo, asset, chainId:84532, amount:'50000', amountUsdc:'0.05', createdBlock, scannedBlock, status:'awaiting', uri, basescan, expiresAt, paid:null, agentTx, lastError, label:'TESTNET'}`. `503 {mode:'unavailable'}` if the RPC cannot give the current block (no order is made). |
+| `GET /checkout` / `GET /checkout/:id` | free | | the last 20 orders / one order. `status` is `awaiting`, `paid` (with `paid:{txHash, from, blockNumber, value, valueUsdc, seenAt, explorer}`) or `expired`. |
+| `GET /checkout/:id/stream` | free | | Server-Sent Events: the order now, then the order again on every change (status, `lastError`, `agentTx`). |
+| `POST /checkout/:id/pay-with-agent` | free | | With CDP keys: the agent wallet (`pill-clinic`) sends the USDC transfer, `{mode:'cdp', sent:true, tx, from, explorer}`; the watcher still decides `paid`. Without: `{mode:'unavailable', why:'no CDP key (missing …)', sent:false}`. `409` if the order is not awaiting or the agent already sent. |
 
 A malformed body gets a `400` before the payment gate, so nobody pays for a bad request. CORS allows the app origins in `CORS_ORIGINS` and exposes `PAYMENT-REQUIRED`, `PAYMENT-RESPONSE`, `X-PILL-MODE` and `X-PILL-VOICE`.
+
+## Checkout (Base Sepolia, TESTNET)
+
+A checkout order asks for an amount of **test USDC** (default 0.05) at the station's address (`payTo`, the same address as the x402 route) and gives a QR / wallet link to pay it. The order turns `paid` only when the transfer is on chain.
+
+**What is real today (no Coinbase key needed)**
+- **Detection is real.** While any order is awaiting, a watcher polls every 6 s. It reads the USDC contract's `Transfer(from, to, value)` logs with `to == payTo` from the order's `createdBlock` to the latest block, through `BASE_SEPOLIA_RPC` (default `https://sepolia.base.org`). A transfer of at least the amount, in or after an order's `createdBlock`, marks the newest such order `paid` and stores the tx hash, sender, block and value. One tx hash pays one order. Block ranges start at 2,000 per call and shrink to the RPC's own limit (`sepolia.base.org` allows 200). On an RPC error the order stays `awaiting` with `lastError`, and the watcher backs off (×2 per failure, at most 60 s). An order expires after 30 min, but only once the chain has been read up to the present, so a slow scan never hides a payment.
+- **The proof:** `npm run test:checkout` takes a recent real USDC transfer on Base Sepolia (any sender, any recipient), opens an order for that recipient one block before it, runs the watcher, and checks the receipt. The order flips to `paid` with that tx hash and block. No funds are needed.
+- **x402 settlements land in the same list.** In `cdp` and `public-facilitator` modes, the resource server's `onAfterSettle` hook records each settled `/verify` payment as a `paid` order (`source:'x402'`). The settlement claims its tx hash, so the watcher can't also credit that transfer to a QR order. `simulated` mode never settles, so it records nothing.
+- Orders are kept in memory and in `data/checkouts.json` (git-ignored, last 200 orders). After a restart, awaiting orders carry on from their `scannedBlock`.
+
+**What is pending**
+- **The agent wallet paying by itself** needs `CDP_API_KEY_ID`, `CDP_API_KEY_SECRET` and `CDP_WALLET_SECRET`. Once they are in `.env`, `POST /checkout/:id/pay-with-agent` sends the transfer from the CDP account `pill-clinic` (fund it first with `npm run faucet`), and the same watcher marks the order paid. Until then it answers `mode:'unavailable'` and sends nothing.
+- **Test USDC in your wallet.** Get it from https://faucet.circle.com (pick Base Sepolia).
+
+**Paying from a phone or browser wallet (Coinbase Wallet, MetaMask)**
+1. Switch the wallet to **Base Sepolia** (chain id 84532). Turn on testnets if the wallet hides them.
+2. Scan the QR on the app's `/pay` screen, or tap "Open in wallet". The EIP-681 link `ethereum:0x036CbD53842c5426634e7929541eC2318f3dCF7e@84532/transfer?address=<payTo>&uint256=50000` pre-fills the transfer. If your wallet does not read the link, send **0.05 USDC** (token `0x036CbD53842c5426634e7929541eC2318f3dCF7e`) to the address shown, by hand.
+3. The status chip turns `paid` within a few seconds of the transfer being mined, with a link to the tx on sepolia.basescan.org.
+
+Any transfer of at least the amount to `payTo` pays the newest order opened before it. The chain can't tell which order a plain transfer was meant for, so open one order at a time when you demo.
 
 ## Models, speech and the Nessie mirror
 
@@ -168,7 +193,7 @@ Every action writes one log line with the rule id, the clause and the tx hash. T
 
 - **Testnet only** (Base Sepolia). The amounts are labelled TESTNET everywhere.
 - **Escrow amounts are scaled.** An escrow move transfers `invoice dollars × ESCROW_SCALE` (default 0.0001, so a $1,240 invoice moves 0.124 USDC), because the CDP faucet gives 1 USDC per claim. The invoice amount and the moved amount are both in the response.
-- **The browser holds no wallet.** The app's Verify screen shows the real `402` and tells you to run `npm run buy` to pay.
+- **The browser holds no wallet.** The app's Verify screen shows the real `402` and tells you to run `npm run buy` to pay. For a phone or browser wallet, its "Pay 5¢ by QR instead" link opens the `/pay` checkout (see "Checkout").
 - **The settled tx is only in the header.** Settlement runs after the handler builds its body, so `/verify` cannot put the tx in its JSON. Read it from `PAYMENT-RESPONSE`, which `npm run buy` decodes and prints.
 - **Limited coverage.** There is one reference drug (riboflavin). Label reading (Gemini) reads what is printed; the person checks every field before saving.
 - **Facilitator availability is a dependency.** If the public facilitator is down at start, the service falls back to `simulated` and says so.

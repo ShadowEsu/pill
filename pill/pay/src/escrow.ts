@@ -66,6 +66,14 @@ export async function move(kind: Move, deliveryId: string, amountUsd: number) {
   };
 }
 
+/** The station's agent wallet (CDP account `pill-clinic`) sends test USDC to `to`. No CDP credentials → unavailable, nothing sent. */
+export async function agentPay(to: `0x${string}`, atomic: bigint) {
+  if (escrowMode() === 'simulated') return { mode: 'unavailable' as const, why: `no CDP key (missing ${escrowMissing().join(', ')})` };
+  const from = await account('clinic');
+  const { transactionHash } = await from.transfer({ to, amount: atomic, token: 'usdc', network: CDP_NETWORK });
+  return { mode: 'cdp' as const, from: from.address, tx: transactionHash, explorer: EXPLORER_TX + transactionHash };
+}
+
 export async function faucet(role: Role = 'clinic', token: 'usdc' | 'eth' = 'usdc') {
   const a = await account(role);
   const { transactionHash } = await client().evm.requestFaucet({ address: a.address, network: CDP_NETWORK, token });

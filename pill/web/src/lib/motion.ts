@@ -1,10 +1,11 @@
 // Motion helpers. One easing (cubic-bezier(.2,.7,.2,1)), ≤ 600 ms except idle loops, nothing bounces.
 // Every helper honours prefers-reduced-motion by jumping to the end state.
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 import { useNavigate, type NavigateOptions, type To } from 'react-router-dom';
 import { animate, cubicBezier, stagger, type JSAnimation } from 'animejs';
 
 export const EASE = cubicBezier(0.2, 0.7, 0.2, 1);
+export const EASE_CSS = 'cubic-bezier(.2,.7,.2,1)';
 const REDUCE_Q = '(prefers-reduced-motion: reduce)';
 
 export const prefersReducedMotion = () => typeof window !== 'undefined' && window.matchMedia(REDUCE_Q).matches;
@@ -19,30 +20,6 @@ export function useMediaQuery(q: string): boolean {
 }
 
 export const useReducedMotion = () => useMediaQuery(REDUCE_Q);
-
-/**
- * Animates a number toward `value` over `ms`. Counts from `from` on mount, from the shown value on change.
- * Reduced motion returns `value` straight away.
- */
-export function useCountUp(value: number, ms = 600, from = 0): number {
-  const reduce = useReducedMotion();
-  const [shown, setShown] = useState(reduce ? value : from);
-  const cur = useRef(shown);
-  useEffect(() => {
-    if (reduce || ms <= 0) { cur.current = value; const id = requestAnimationFrame(() => setShown(value)); return () => cancelAnimationFrame(id); }
-    const start = cur.current, t0 = performance.now();
-    let raf = 0;
-    const tick = (t: number) => {
-      const p = Math.min(1, (t - t0) / ms);
-      cur.current = start + (value - start) * EASE(p);
-      setShown(cur.current);
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [value, ms, reduce]);
-  return shown;
-}
 
 type Targets = string | Element | Element[] | NodeListOf<Element>;
 export interface StaggerOpts { root?: ParentNode; y?: number; x?: number; step?: number; delay?: number; duration?: number }

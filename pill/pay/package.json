@@ -12,7 +12,8 @@
     "buy": "tsx src/buy-verdict.ts",
     "faucet": "tsx src/faucet.ts",
     "typecheck": "tsc --noEmit",
-    "test:policy": "tsx src/test-policy.ts"
+    "test:policy": "tsx src/test-policy.ts",
+    "test:checkout": "tsx src/test-checkout.ts"
   },
   "license": "MIT",
   "dependencies": {

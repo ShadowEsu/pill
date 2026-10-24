@@ -12,7 +12,10 @@ import type { PaymentRequired } from '@x402/core/types';
 import { ExactEvmScheme } from '@x402/evm/exact/server';
 import { NETWORK, PORT, PRICE, PUBLIC_FACILITATOR, has, localWallet, missing, type Mode } from './env.ts';
 import { REFERENCES, evaluate, parseCurve, type CurveInput } from './rules.ts';
-import { accounts, escrowMode, move, type Move } from './escrow.ts';
+import { accounts, agentPay, escrowMode, move, type Move } from './escrow.ts';
+import { CheckoutBook, RPC_URL, checkoutRouter } from './checkout.ts';
+import type { SettleResultContext } from '@x402/core/server';
+import { getAddress, isHash } from 'viem';
 import { calendarStatus, createEvent, type CalendarEventInput } from './calendar.ts';
 import { CLAUDE_MODEL, GEMINI_MODEL, aiHas, ask, escrowLog, explainWhy, parseAsk, parseEscrow, parseWhy, readLabel } from './ai.ts';
 import { nessieAccounts, nessieMode, nessieTransfer, setupNessie } from './nessie.ts';
@@ -21,7 +24,7 @@ import { initTiger, insertSamples, parseSamples, plateauCurve, tigerMode, tigerS
 
 const DESCRIPTION = 'Pill dissolution verdict for a curve';
 const ROUTE = 'POST /verify';
-const ORIGINS = new Set((process.env.CORS_ORIGINS || 'http://127.0.0.1:5183,http://localhost:5183,http://127.0.0.1:5186,http://localhost:5186,http://127.0.0.1:5189,http://localhost:5189,http://127.0.0.1:5191,http://localhost:5191,http://localhost:5173').split(',').map((s) => s.trim()).filter(Boolean));
+const ORIGINS = new Set((process.env.CORS_ORIGINS || 'http://127.0.0.1:5183,http://localhost:5183,http://127.0.0.1:5186,http://localhost:5186,http://127.0.0.1:5189,http://localhost:5189,http://127.0.0.1:5191,http://localhost:5191,http://127.0.0.1:5195,http://localhost:5195,http://localhost:5173').split(',').map((s) => s.trim()).filter(Boolean));
 
 const app = express();
 
@@ -42,6 +45,14 @@ app.use((req, res, next) => {
 // Parse every body as JSON regardless of content type (`curl -d` sends form-urlencoded by default). 1 MB cap (a label photo is downscaled in the app first).
 app.use(express.json({ type: () => true, limit: '1mb' }));
 
+// Every real x402 settlement (cdp and public-facilitator modes; simulated never settles) also lands in the checkout list
+// as a paid order, and claims its tx hash so the chain watcher never credits that transfer to a QR order.
+async function onSettled(ctx: SettleResultContext) {
+  const tx = ctx.result.transaction;
+  if (!ctx.result.success || !isHash(tx) || ctx.requirements.network !== NETWORK) return;
+  book.recordSettlement({ txHash: tx, payer: ctx.result.payer ?? null, amount: ctx.result.amount ?? ctx.requirements.amount, payTo: getAddress(ctx.requirements.payTo), purpose: 'verify' });
+}
+
 // ---- choose the mode ----
 async function pickMode(): Promise<{ mode: Mode; facilitator: string; payTo: string; why: string; gate: express.RequestHandler }> {
   const forced = process.env.MODE as Mode | undefined;
@@ -53,6 +64,7 @@ async function pickMode(): Promise<{ mode: Mode; facilitator: string; payTo: str
       payToConfig: { type: 'address', evm: process.env.X402_PAY_TO as `0x${string}` },
       routes: { [ROUTE]: { price: PRICE, networks: [NETWORK], description: DESCRIPTION } },
     });
+    server.resourceServer.onAfterSettle(onSettled);
     return { mode: 'cdp', facilitator: CDP_FACILITATOR_URL, payTo: server.payToEvmAddress ?? process.env.X402_PAY_TO!, why: 'CDP key and X402_PAY_TO present', gate: paymentMiddlewareFromHTTPServer(server) };
   }
   if (forced === 'cdp') throw new Error(`MODE=cdp but missing ${cdpMissing.join(', ')}`);
@@ -61,7 +73,7 @@ async function pickMode(): Promise<{ mode: Mode; facilitator: string; payTo: str
   const cdpWhy = `no CDP facilitator: missing ${cdpMissing.join(', ')}`;
 
   if (forced !== 'simulated') {
-    const resourceServer = new x402ResourceServer(new HTTPFacilitatorClient({ url: PUBLIC_FACILITATOR })).register(NETWORK, new ExactEvmScheme());
+    const resourceServer = new x402ResourceServer(new HTTPFacilitatorClient({ url: PUBLIC_FACILITATOR })).register(NETWORK, new ExactEvmScheme()).onAfterSettle(onSettled);
     try {
       const timeout = Promise.withResolvers<never>();
       const timer = setTimeout(() => timeout.reject(new Error('timeout after 8 s')), 8000);
@@ -92,6 +104,7 @@ async function pickMode(): Promise<{ mode: Mode; facilitator: string; payTo: str
 
 const picked = await pickMode();
 const { mode, facilitator, payTo } = picked;
+const book = new CheckoutBook();
 
 app.use((_req, res, next) => { res.setHeader('X-PILL-MODE', mode); next(); });
 
@@ -188,6 +201,9 @@ for (const kind of ['hold', 'release', 'refund'] as Move[]) {
   });
 }
 
+// ---- checkout (Base Sepolia, TESTNET): pay by QR / wallet link; a chain watcher marks orders paid ----
+app.use(checkoutRouter(book, { payTo: getAddress(payTo), agentPay }));
+
 // ---- paid route ----
 // Validate before the payment gate so nobody pays for a malformed body.
 app.post('/verify', (req, res, next) => {
@@ -231,6 +247,7 @@ app.listen(PORT, () => {
   console.log(`  POST /verify  ${PRICE} USDC on ${NETWORK} (Base Sepolia, TESTNET) → payTo ${payTo}`);
   console.log(`  facilitator   ${facilitator}`);
   console.log(`  escrow        ${escrowMode()}${escrowMode() === 'simulated' ? ' (no CDP credentials; /escrow/* moves nothing)' : ''}`);
+  console.log(`  checkout      ${PRICE} USDC orders → ${payTo}; watcher reads USDC Transfer logs from ${RPC_URL}; agent pay ${escrowMode() === 'cdp' ? 'cdp' : 'unavailable (no CDP key)'}`);
   console.log(`  models        claude ${aiHas().claude ? CLAUDE_MODEL : 'unavailable'} · gemini ${aiHas().gemini ? GEMINI_MODEL : 'unavailable'} · speech ${speechMode()}`);
   void setupNessie().then((r) => console.log(`  nessie        ${r ? `SANDBOX customer ${r.customer}` : nessieMode()}`));
   void initTiger().then((r) => console.log(`  tiger         ${r.mode === 'live' ? 'live (samples hypertable ready)' : `unavailable (${r.reason})`}`));

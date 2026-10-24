@@ -153,3 +153,68 @@ html.big .feed-line { grid-template-columns: 32px 1fr auto; }
   .heat-cell, .tt-block, .bar > span { animation: none; }
   .flow-edge.live path.shaft, .flow-edge.live .head, .kpi-trend .arrow, .pointer, .tt-now::before { animation: none; }
 }
+
+/* ---------- v3 motion (AppLook) ---------- */
+/* Curve: shimmer across the band, pulsing head on live curves */
+.cv-shimmer { animation: cv-shimmer 3.6s var(--ease) infinite; }
+@keyframes cv-shimmer { from { transform: translateX(0); } to { transform: translateX(var(--cvw, 300px)); } }
+.cv-head .cv-halo { transform-box: fill-box; transform-origin: center; }
+.cv-head.live .cv-halo { animation: cv-halo 1.6s ease-in-out infinite; }
+@keyframes cv-halo { 0%, 100% { transform: scale(.7); opacity: .9; } 50% { transform: scale(1.25); opacity: .35; } }
+/* Sparkline: wipe in, then the end dot pops and breathes */
+.spk-line { animation: spk-wipe 900ms var(--ease) 120ms backwards; }
+@keyframes spk-wipe { from { clip-path: inset(-20% 100% -20% 0); } to { clip-path: inset(-20% 0 -20% 0); } }
+.spk-area { animation: spk-fade 900ms var(--ease) 300ms backwards; }
+@keyframes spk-fade { from { opacity: 0; } }
+.spk-dot { animation: spk-fade 300ms var(--ease) 900ms backwards; }
+.spk-halo { opacity: .18; animation: spk-fade 300ms var(--ease) 900ms backwards, spk-breathe 2.4s ease-in-out 1.2s infinite; }
+@keyframes spk-breathe { 50% { opacity: .04; } }
+/* KPI: the trend arrow draws itself, then nudges */
+.kpi-trend svg.arrow { flex: none; overflow: visible; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.kpi-trend svg.arrow path { stroke-dasharray: 1; animation: stroke-draw 600ms var(--ease) 500ms backwards; }
+.kpi-trend svg.arrow { animation: nudge 1.8s var(--ease) 1.2s infinite; }
+.kpi-trend svg.arrow.down { animation-name: nudge-down; }
+.kpi-trend svg.arrow.flat { animation-name: nudge-right; }
+.kpi-value { position: relative; }
+/* Heatmap: springy pop-in, hover tooltip */
+.heat { position: relative; }
+.heat-cell { animation: heat-pop .5s var(--spring) backwards; }
+@keyframes heat-pop { from { opacity: 0; transform: scale(.4); } }
+.heat-tip { position: absolute; z-index: 5; pointer-events: none; transform: translate(-50%, calc(-100% - 8px)); max-width: 220px; width: max-content; padding: 6px 10px; border-radius: 10px;
+  background: var(--ink); color: #fff; font-family: var(--mono); font-size: 11px; line-height: 1.35; box-shadow: 0 10px 24px -12px rgba(22,24,27,.6); animation: tip-in .18s var(--ease) backwards; }
+.heat-tip.l { transform: translate(-14px, calc(-100% - 8px)); }
+.heat-tip.r { transform: translate(calc(-100% + 14px), calc(-100% - 8px)); }
+@keyframes tip-in { from { opacity: 0; margin-top: 4px; } }
+/* Timetable: blocks slide in along the time axis; the now line breathes and its label rings */
+.tt-block { animation: tt-in-y .5s var(--ease) backwards; box-shadow: inset 0 1px 0 rgba(255,255,255,.6); }
+.tt.h .tt-block { animation-name: tt-in-x; }
+@keyframes tt-in-y { from { opacity: 0; transform: translateY(8px) scale(.97); } }
+@keyframes tt-in-x { from { opacity: 0; transform: translateX(-12px); } }
+.tt-now { animation: tt-now-breathe 2.4s ease-in-out infinite; }
+@keyframes tt-now-breathe { 50% { opacity: .55; } }
+.tt-now-label { animation: tt-now-ring 2.4s ease-out infinite; }
+@keyframes tt-now-ring { 0% { box-shadow: 0 0 0 0 rgba(22,24,27,.35); } 70%, 100% { box-shadow: 0 0 0 6px rgba(22,24,27,0); } }
+/* FlowArrows: the shaft wipes in from its tail, the head pops, an optional token rides the edge */
+.flow-edge .eh path.shaft { transform-box: view-box; transform-origin: 0 50%; animation: flow-x .5s var(--ease) var(--d, 120ms) backwards; }
+.flow-edge .ev path.shaft { transform-box: view-box; transform-origin: 50% 0; animation: flow-y .5s var(--ease) var(--d, 120ms) backwards; }
+.flow-edge path.head { transform-box: fill-box; transform-origin: center; animation: flow-head .35s var(--spring) calc(var(--d, 120ms) + 380ms) backwards; }
+.flow-edge.live path.shaft { animation: flow-x .5s var(--ease) var(--d, 120ms) backwards, flowdash .9s linear calc(var(--d, 120ms) + 500ms) infinite; }
+.flow-edge.live .ev path.shaft { animation: flow-y .5s var(--ease) var(--d, 120ms) backwards, flowdash .9s linear calc(var(--d, 120ms) + 500ms) infinite; }
+.flow-edge.live path.head { animation: flow-head .35s var(--spring) calc(var(--d, 120ms) + 380ms) backwards, headpulse 1.8s var(--ease) calc(var(--d, 120ms) + 800ms) infinite; }
+@keyframes flow-x { from { transform: scaleX(0); } }
+@keyframes flow-y { from { transform: scaleY(0); } }
+@keyframes flow-head { from { opacity: 0; transform: scale(.3); } }
+.flow-edge .token { fill: var(--edge, var(--sky)); stroke: var(--surface); stroke-width: 1.5; opacity: 0; }
+.flow-edge.tok .eh .token { animation: tok-x 1.8s var(--ease) calc(var(--d, 120ms) + 700ms) infinite; }
+.flow-edge.tok .ev .token { animation: tok-y 1.8s var(--ease) calc(var(--d, 120ms) + 700ms) infinite; }
+.flow-edge.tok { color: var(--edge, var(--sky-ink)); }
+@keyframes tok-x { 0% { opacity: 0; transform: translateX(0); } 12% { opacity: 1; } 78% { opacity: 1; } 100% { opacity: 0; transform: translateX(44px); } }
+@keyframes tok-y { 0% { opacity: 0; transform: translateY(0); } 12% { opacity: 1; } 78% { opacity: 1; } 100% { opacity: 0; transform: translateY(14px); } }
+/* Gauge: the tip dot lands after the sweep and a soft ring ticks out once */
+.gauge-dot { transform-box: fill-box; transform-origin: center; animation: flow-head .35s var(--spring) .85s backwards; }
+.gauge-tick { transform-box: fill-box; transform-origin: center; opacity: 0; animation: gauge-tick .9s var(--ease) .9s; }
+@keyframes gauge-tick { 0% { opacity: .9; transform: scale(.6); } 100% { opacity: 0; transform: scale(3); } }
+@media (prefers-reduced-motion: reduce) {
+  .cv-shimmer, .cv-head .cv-halo, .spk-line, .spk-area, .spk-dot, .spk-halo, .kpi-trend svg.arrow, .kpi-trend svg.arrow path, .heat-cell, .heat-tip,
+  .tt-block, .tt-now, .tt-now-label, .flow-edge path.shaft, .flow-edge path.head, .flow-edge .token, .gauge-dot, .gauge-tick { animation: none !important; }
+}

@@ -1,5 +1,6 @@
-// The capsule that fills as the tablet dissolves. One rAF loop moves the level, the wave, the number, the ring gauge and the
-// running effects (bubbles, glass highlight, shimmer, dissolving particles, pulse rings); no React re-render per frame.
+// The capsule that fills as the tablet dissolves. One rAF loop moves the level, the liquid surface (two offset sine waves
+// summed, with a bright meniscus line), the number, the ring gauge and the running effects (bubbles that rise faster as
+// the fill climbs, light caustics, glass highlight, shimmer, dissolving particles, pulse rings); no React re-render per frame.
 // Reduced motion: the loop never starts; the static end state is painted once and every effect node stays hidden.
 import { useEffect, useId, useRef } from 'react';
 import type { Verdict } from '../lib/types';
@@ -16,18 +17,21 @@ const AMP = 3;
 const CX = 70, CY = 150, RING_R = 158;
 const TICKS = [25, 50, 75];
 const PULSE_AT = [25, 50, 75, 100];
-const N_BUBBLES = 9, N_PARTS = 6, N_PULSES = 3;
+const N_BUBBLES = 9, N_PARTS = 6, N_PULSES = 3, N_CAUSTICS = 4;
 const PULSE_MS = 1200;
 
 interface Bubble { x: number; y: number; r: number; vy: number; ph: number; y0: number }
 interface Part { x: number; y: number; vy: number; s: number; rot: number; vr: number; wait: number; melt: number }
 interface Pulse { t0: number; color: string }
 
-function wave(level: number, amp: number, phase: number) {
-  let d = `M0 ${level + amp * Math.sin(phase)}`;
-  for (let x = 5; x <= 140; x += 5) d += ` L${x} ${(level + amp * Math.sin((x / 70) * 2 * Math.PI + phase)).toFixed(2)}`;
-  return d + ' L140 300 L0 300 Z';
+/** The liquid's top edge: two sines at different frequencies and speeds, so the surface never looks like one rigid wave. */
+function surface(level: number, amp: number, phase: number) {
+  const yAt = (x: number) => level + amp * (0.65 * Math.sin((x / 70) * 2 * Math.PI + phase) + 0.35 * Math.sin((x / 70) * 4.6 * Math.PI - phase * 1.6 + 1));
+  let d = `M0 ${yAt(0).toFixed(2)}`;
+  for (let x = 5; x <= 140; x += 5) d += ` L${x} ${yAt(x).toFixed(2)}`;
+  return d;
 }
+const wave = (level: number, amp: number, phase: number) => surface(level, amp, phase) + ' L140 300 L0 300 Z';
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 /** Sky at 0 %, drifting toward a sky/mint blend near 100 %. */
 function liquidColor(v: number) {
@@ -51,6 +55,8 @@ export default function PillFill({ pct, verdict = null, fault = false, size = 30
   const head = useRef<SVGGElement>(null);
   const hl = useRef<SVGEllipseElement>(null);
   const shimmer = useRef<SVGRectElement>(null);
+  const surf = useRef<SVGPathElement>(null);
+  const causticsG = useRef<SVGGElement>(null);
   const bubblesG = useRef<SVGGElement>(null);
   const partsG = useRef<SVGGElement>(null);
   const pulsesG = useRef<SVGGElement>(null);
@@ -73,6 +79,18 @@ export default function PillFill({ pct, verdict = null, fault = false, size = 30
       front.current?.setAttribute('d', d);
       liq.current?.setAttribute('d', d || 'M0 0');
       back.current?.setAttribute('d', visible ? wave(y - 2, L.amp, L.phase + Math.PI * 0.8) : '');
+      surf.current?.setAttribute('d', visible && v < 99.5 ? surface(y, L.amp, L.phase) : '');
+      const cs = causticsG.current?.children;
+      if (cs) for (let i = 0; i < cs.length; i++) {
+        const el = cs[i] as SVGEllipseElement;
+        const t = L.time * (0.5 + i * 0.13) + i * 1.7;
+        const cy = y + 18 + ((i * 37 + 20) % Math.max(20, BOTTOM - y - 30));
+        el.setAttribute('cx', (70 + 34 * Math.sin(t) * (i % 2 ? 1 : -1)).toFixed(1));
+        el.setAttribute('cy', cy.toFixed(1));
+        el.setAttribute('rx', (10 + 5 * Math.sin(t * 1.7)).toFixed(1));
+        el.setAttribute('ry', (3 + 1.5 * Math.cos(t * 1.3)).toFixed(1));
+        el.style.opacity = visible ? String(0.35 * L.fx * (0.6 + 0.4 * Math.sin(t * 2.1))) : '0';
+      }
       const fill = color ?? liquidColor(v);
       for (const el of [front.current, back.current]) if (el) { el.style.fill = fill; el.style.transition = color ? 'fill .6s var(--ease)' : 'none'; }
       if (num.current) num.current.textContent = String(Math.round(v));
@@ -174,7 +192,7 @@ export default function PillFill({ pct, verdict = null, fault = false, size = 30
         for (let i = 0; i < N_BUBBLES; i++) {
           let b = L.bubbles[i];
           if (!b || b.y < level + 3) b = L.bubbles[i] = respawnBubble(b, level);
-          b.y -= b.vy * dt;
+          b.y -= b.vy * dt * (0.6 + 1.6 * L.shown / 100); // the fizz picks up as the fill climbs
         }
         for (let i = 0; i < N_PARTS; i++) {
           let p = L.parts[i];
@@ -236,7 +254,11 @@ export default function PillFill({ pct, verdict = null, fault = false, size = 30
       <g clipPath={`url(#clip${id})`}>
         <path ref={back} style={{ fill: color ?? 'var(--sky)', opacity: 0.35 }} />
         <path ref={front} style={{ fill: color ?? 'var(--sky)', opacity: 0.9 }} />
+        <path ref={surf} fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" opacity="0.75" />
         <g clipPath={`url(#liq${id})`}>
+          <g ref={causticsG} fill={`url(#hl${id})`}>
+            {Array.from({ length: N_CAUSTICS }, (_, i) => <ellipse key={i} cx="70" cy="250" rx="10" ry="3" style={{ opacity: 0 }} />)}
+          </g>
           <rect ref={shimmer} x="0" y="0" width="44" height="300" fill={`url(#sh${id})`} style={{ opacity: 0 }} />
           <g ref={bubblesG} fill="#fff" stroke="rgba(255,255,255,.9)" strokeWidth="0.6">
             {Array.from({ length: N_BUBBLES }, (_, i) => <circle key={i} cx="70" cy="280" r="2" fillOpacity="0.7" style={{ opacity: 0 }} />)}

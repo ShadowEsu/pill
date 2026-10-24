@@ -1,13 +1,17 @@
 // Calibration: ten reference tablets, overlaid, one colour each. The band is only worth something if they agree:
-// the heat strip shows how far each plateau sits from the mean, the leave-one-out row ticks each run held out.
+// the band diagram grows the band and drops each run's plateau into it, the heat strip shows how far each plateau sits
+// from the mean, the leave-one-out row ticks each run held out. Recalibrate saves the band again (actions.calibrate).
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Action, Screen, SrcBadge } from '../components/Shell';
 import Curve from '../components/Curve';
+import Glyph from '../components/Glyph';
 import { CountUp } from '../components/VerdictCard';
 import { actions, useStore } from '../lib/store';
 import { evaluate, features } from '../lib/rules';
 import { makeCurve, REFERENCES } from '../data/reference';
+import { dayLabel, hm } from '../lib/when';
+import '../story.css';
 
 const REF = REFERENCES.riboflavin;
 const SERIES = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)', 'var(--c5)', 'var(--c6)'];
@@ -26,6 +30,30 @@ const MAX_DEV = Math.max(...PLATEAUS.map((p) => Math.abs(p - MEAN))) || 1;
 const HELD_OUT = RUNS.map((s) => evaluate(s, REF).verdict === 'PASS');
 const LOO = HELD_OUT.filter(Boolean).length;
 
+// Band diagram scale: plateau absorbance from LO to HI across the width.
+const LO = 0.3, HI = 0.54, BW = 600, BH = 150, BX = 24;
+const bx = (a: number) => BX + ((a - LO) / (HI - LO)) * (BW - BX * 2);
+
+/** The reference band as a rect that grows out from the mean, the ten plateaus dropping in as dots, the mean as a dashed rule. */
+function BandDiagram() {
+  const sorted = PLATEAUS.map((p, i) => ({ p, i })).sort((a, b) => a.p - b.p);
+  return (
+    <svg className="band-dia" viewBox={`0 0 ${BW} ${BH}`} role="img" aria-label={`Reference band ${REF.bandLow} to ${REF.bandHigh}; ten plateaus from ${Math.min(...PLATEAUS).toFixed(3)} to ${Math.max(...PLATEAUS).toFixed(3)}, mean ${MEAN.toFixed(3)}`}>
+      <line x1={BX} x2={BW - BX} y1={112} y2={112} className="axis" />
+      {[0.3, 0.35, 0.4, 0.45, 0.5].map((a) => <g key={a}><line x1={bx(a)} x2={bx(a)} y1={108} y2={116} className="axis" /><text x={bx(a)} y={134} textAnchor="middle" className="lbl">{a.toFixed(2)}</text></g>)}
+      <rect className="band" x={bx(REF.bandLow)} width={bx(REF.bandHigh) - bx(REF.bandLow)} y={26} height={78} rx={10} style={{ transformOrigin: `${bx(MEAN)}px 65px` }} />
+      <text x={bx(REF.bandLow) + 8} y={20} className="lbl">band {REF.bandLow}–{REF.bandHigh}</text>
+      <line className="mean" x1={bx(MEAN)} x2={bx(MEAN)} y1={14} y2={108} />
+      <text x={bx(MEAN) + 6} y={20} className="lbl">mean {MEAN.toFixed(3)}</text>
+      {sorted.map(({ p, i }, k) => (
+        <circle key={i} className="run-dot" cx={bx(p)} cy={40 + (k % 5) * 13} r={6.5} style={{ fill: SERIES[i % SERIES.length], '--k': k } as React.CSSProperties}>
+          <title>Run {String(i + 1).padStart(2, '0')}: plateau {p.toFixed(3)}</title>
+        </circle>
+      ))}
+    </svg>
+  );
+}
+
 export default function Calibration() {
   const nav = useNavigate();
   const [drawn, setDrawn] = useState(false);
@@ -34,8 +62,17 @@ export default function Calibration() {
   const at = calibratedAt ? new Date(calibratedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : null;
 
   return (
-    <Screen title="Calibration" eyebrow={`${REF.label} · station 01`} back="/" right={<SrcBadge src="sim" />}>
-      <p style={{ color: 'var(--ink-2)', maxWidth: 680 }}>Ten reference tablets, dissolved one by one. Their plateaus set the band every later run is held against.</p>
+    <Screen title="Calibration" tone="violet" eyebrow={`${REF.label} · station 01`} back="/" art={<Glyph name="station" size={58} />} right={<SrcBadge src="sim" />}>
+      <div className="row" style={{ flexWrap: 'wrap', gap: '8px 12px' }}>
+        <span className={'chip ' + (calibratedAt ? 'ok beat' : 'warn')}><span className="dot" />{calibratedAt ? `last calibrated ${dayLabel(calibratedAt).toLowerCase()} ${hm(calibratedAt)}` : 'not calibrated'}</span>
+        <p style={{ color: 'var(--ink-2)', maxWidth: 680, flex: '1 1 260px' }}>Ten reference tablets, dissolved one by one. Their plateaus set the band every later run is held against.</p>
+      </div>
+
+      <section className="card panel band-card" aria-label="The band and its ten runs">
+        <div className="panel-head"><h2 className="row" style={{ gap: 10 }}><Glyph name="quarter" size={30} />The band, from ten runs</h2><span className="eyebrow">plateau A · demo data</span></div>
+        <BandDiagram />
+        <p className="footnote">Each dot is one reference tablet's plateau. Every later run is held against the shaded band.</p>
+      </section>
 
       <div className="wide-2">
         <section className="card tile stack" style={{ gap: 14, '--tile-accent': 'var(--c1)' } as React.CSSProperties}>
@@ -116,7 +153,7 @@ export default function Calibration() {
       <Action note={saved ? `Saved at ${at}. Band ${REF.bandLow}–${REF.bandHigh} is the one this station checks against.` : !drawn ? 'Drawing the ten runs…' : at ? `Last saved at ${at}.` : undefined}>
         {saved
           ? <button type="button" className="btn" onClick={() => nav('/')}>Done</button>
-          : <button type="button" className="btn" disabled={!drawn} onClick={() => { actions.calibrate('riboflavin'); setSaved(true); }}>Save reference</button>}
+          : <button type="button" className="btn" disabled={!drawn} onClick={() => { actions.calibrate('riboflavin'); setSaved(true); }}>{calibratedAt ? 'Recalibrate' : 'Save reference'}</button>}
       </Action>
     </Screen>
   );

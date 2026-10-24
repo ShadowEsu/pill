@@ -1,6 +1,8 @@
 // A tiny line: 1.5 px stroke, soft area under it, a dot on the last point. Optional faint band (the reference band on run curves).
 // `fluid` stretches to the container width; strokes and the dot keep their size (non-scaling stroke, dot = round cap).
+// Motion: the line wipes in left to right (clip), the area fades up, the end dot pops and keeps a soft halo. Reduced motion: still.
 import { useId } from 'react';
+import './viz.css';
 
 export default function Sparkline({ values, color = 'var(--sky)', width = 120, height = 28, band, domain, label, fluid = false }: {
   values: number[]; color?: string; width?: number; height?: number;
@@ -25,9 +27,10 @@ export default function Sparkline({ values, color = 'var(--sky)', width = 120, h
         </linearGradient>
       </defs>
       {band && <rect x={0} width={width} y={y(band[1])} height={Math.max(1, y(band[0]) - y(band[1]))} style={{ fill: color, opacity: 0.22 }} rx={2} />}
-      <path d={area} fill={`url(#${gid})`} stroke="none" />
-      <path d={line} style={{ fill: 'none', stroke: color }} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-      <path d={`M${x(last).toFixed(1)} ${y(values[last]).toFixed(1)} l0 0`} style={{ stroke: color }} strokeWidth={6} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+      <path className="spk-area" d={area} fill={`url(#${gid})`} stroke="none" />
+      <path className="spk-line" d={line} style={{ fill: 'none', stroke: color }} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+      <path className="spk-halo" d={`M${x(last).toFixed(1)} ${y(values[last]).toFixed(1)} l0 0`} style={{ stroke: color }} strokeWidth={12} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+      <path className="spk-dot" d={`M${x(last).toFixed(1)} ${y(values[last]).toFixed(1)} l0 0`} style={{ stroke: color }} strokeWidth={6} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
     </svg>
   );
 }

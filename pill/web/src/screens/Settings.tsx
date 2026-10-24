@@ -1,8 +1,11 @@
 // Settings (/settings): who I am, big text, sound, the Google Calendar bridge status (live from pill-pay), the station,
-// reset the demo data, the build, and credits & sources.
+// reset the demo data, the build, and credits & sources (the website first, so the site and the app read as one product).
+// Groups carry a hand-drawn glyph each; switches spring their thumb.
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Screen } from '../components/Shell';
+import Glyph, { type GlyphName } from '../components/Glyph';
+import BinaryPill from '../components/BinaryPill';
 import { actions, useStore } from '../lib/store';
 import { useSound } from '../lib/sound';
 import { dayLabel, hm } from '../lib/when';
@@ -12,7 +15,9 @@ import '../story.css';
 const PAY_URL = import.meta.env.VITE_PAY_URL as string | undefined;
 const SHA: string = import.meta.env.VITE_SHA || 'dev';
 
+const SITE = 'https://pill-site.vercel.app';
 const CREDITS = [
+  { t: 'Pill · the website', d: 'pill-site.vercel.app · how the station works, the story, the demo', href: SITE },
   { t: 'WHO fact sheet: substandard and falsified medical products', d: 'World Health Organization', href: 'https://www.who.int/news-room/fact-sheets/detail/substandard-and-falsified-medical-products' },
   { t: 'openFDA drug enforcement (recalls)', d: 'U.S. Food and Drug Administration', href: 'https://open.fda.gov/apis/drug/enforcement/' },
   { t: 'Nessie sandbox API', d: 'Capital One · SANDBOX', href: 'http://api.nessieisreal.com/' },
@@ -24,6 +29,10 @@ type Cal = { state: 'checking' } | { state: 'connected'; account: string; calend
 
 function Switch({ on, label, onToggle }: { on: boolean; label: string; onToggle: () => void }) {
   return <button type="button" role="switch" aria-checked={on} aria-label={label} className="switch" onClick={onToggle} />;
+}
+
+function GroupHead({ glyph, title, i }: { glyph: GlyphName; title: string; i: number }) {
+  return <h2 className="set-head"><span className="set-glyph" aria-hidden="true"><Glyph name={glyph} size={30} delay={i * 150} /></span>{title}</h2>;
 }
 
 export default function Settings() {
@@ -62,10 +71,11 @@ export default function Settings() {
   };
 
   return (
-    <Screen title="Settings" back eyebrow="Pill">
+    <Screen title="Settings" back eyebrow="Pill" tone="violet" art={<Glyph name="led" size={54} />}>
       <div className="wide-2">
-        <div className="stack" style={{ gap: 16 }}>
-          <section className="card set-group" aria-label="You">
+        <div className="stack cascade" style={{ gap: 16 }}>
+          <section className="card set-group" aria-label="You" style={{ '--i': 0 } as React.CSSProperties}>
+            <GroupHead glyph={mode === 'personal' ? 'tablet' : 'clinic'} title="You" i={0} />
             <div className="set-row">
               <span><span className="lbl">Who I am</span>
                 <span className="sub">{mode === 'medical' ? 'Medical · a hospital, clinic or medical center' : mode === 'personal' ? 'Personal · for myself or my family' : 'Not chosen yet'}</span></span>
@@ -88,7 +98,8 @@ export default function Settings() {
             </div>
           </section>
 
-          <section className="card set-group" aria-label="Connections">
+          <section className="card set-group" aria-label="Connections" style={{ '--i': 1 } as React.CSSProperties}>
+            <GroupHead glyph="calendar" title="Connections" i={1} />
             <div className="set-row" aria-live="polite">
               <span><span className="lbl">Google Calendar</span>
                 <span className="sub mono">{cal.state === 'checking' ? 'checking…' : cal.state === 'connected' ? `connected as ${cal.account}${cal.calendars != null ? ` · ${cal.calendars} calendars` : ''}` : `not connected · ${cal.why}`}</span></span>
@@ -102,7 +113,8 @@ export default function Settings() {
             </div>
           </section>
 
-          <section className="card set-group" aria-label="Demo data">
+          <section className="card set-group" aria-label="Demo data" style={{ '--i': 2 } as React.CSSProperties}>
+            <GroupHead glyph="station" title="Demo data" i={2} />
             <div className="set-row">
               <span><span className="lbl">Reset demo data</span>
                 <span className="sub">{resetAt ? `Reset at ${hm(resetAt)}. The seeded week is back.` : 'Puts the seeded week of runs, bottles and deliveries back. Your mode stays.'}</span></span>
@@ -120,9 +132,17 @@ export default function Settings() {
           </section>
         </div>
 
-        <div className="stack" style={{ gap: 16 }}>
-          <section className="card" aria-label="Credits and sources" style={{ display: 'grid', gap: 4, padding: '16px 20px' }}>
-            <h2 style={{ fontSize: 17 }}>Credits &amp; sources</h2>
+        <div className="stack cascade" style={{ gap: 16, '--cascade-start': '200ms' } as React.CSSProperties}>
+          <a href={SITE} target="_blank" rel="noopener noreferrer" className="card set-site" style={{ '--i': 0 } as React.CSSProperties}>
+            <BinaryPill dark width={200} height={120} scale={2.2} className="set-site-pill" label="Pill, printed in ones and zeros" />
+            <span className="set-site-copy">
+              <span className="eyebrow" style={{ color: 'rgba(255,255,255,.6)' }}>About Pill</span>
+              <span className="serif" style={{ fontSize: 28, lineHeight: 1.05 }}>The box measures. Pill explains.</span>
+              <span className="mono" style={{ fontSize: 12, color: 'rgba(255,255,255,.7)' }}>pill-site.vercel.app ↗</span>
+            </span>
+          </a>
+          <section className="card set-group" aria-label="Credits and sources" style={{ '--i': 1 } as React.CSSProperties}>
+            <GroupHead glyph="lab" title="Credits & sources" i={3} />
             <ul className="credits">
               {CREDITS.map((c) => (
                 <li key={c.href}><a href={c.href} target="_blank" rel="noopener noreferrer"><span><span className="t">{c.t}</span><span className="d">{c.d}</span></span><span className="pointer" aria-hidden="true">↗</span></a></li>

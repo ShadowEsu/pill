@@ -2,9 +2,7 @@
    Entry animations use fill-mode `backwards` so hover/active transforms own the element once they finish.
    prefers-reduced-motion: every animation here is switched off at the bottom of this file (static end states). */
 
-/* ---------- route enter: every screen fades in and rises 8 px ---------- */
-.screen { animation: screen-in 320ms var(--ease) backwards; }
-@keyframes screen-in { from { opacity: 0; transform: translateY(8px); } }
+/* ---------- route enter: App.tsx animates the screen column (fade + 8 px rise, 260 ms) on every path change ---------- */
 /* View Transitions (useViewNavigate): the old page fades out quickly; the new page's .screen does its own rise. */
 ::view-transition-old(root) { animation: vt-out 180ms var(--ease) both; }
 ::view-transition-new(root) { animation: vt-in 180ms var(--ease) both; }
@@ -39,18 +37,29 @@
 .chip.live .dot { animation: live-pulse 1.8s ease-out infinite; }
 @keyframes live-pulse { 0% { box-shadow: 0 0 0 0 rgba(79, 179, 255, .55); } 70%, 100% { box-shadow: 0 0 0 7px rgba(79, 179, 255, 0); } }
 
-/* ---------- nav: the active tint slides between items (anchor positioning), else it grows in place ---------- */
+/* ---------- nav: a measured highlight (.nav-ind, Nav.tsx) slides between items on a spring; icons nudge on activation ---------- */
 .nav-list { position: relative; }
-.nav-item { position: relative; z-index: 1; }
-.nav-item::after { content: ""; position: absolute; left: 50%; bottom: 4px; width: 16px; height: 2px; margin-left: -8px; border-radius: 2px; background: var(--sky-ink); transform: scaleX(0); transition: transform .32s var(--ease); }
-.nav-item.on::after { transform: scaleX(1); }
-@media (min-width: 900px) { .nav-item::after { left: 0; bottom: auto; top: 50%; width: 2px; height: 18px; margin: -9px 0 0; transform: scaleY(0); } .nav-item.on::after { transform: scaleY(1); } }
-@supports (anchor-name: --a) {
-  .nav-item.on { anchor-name: --nav-on; background: transparent; }
-  .nav-list::before { content: ""; position: absolute; position-anchor: --nav-on; top: anchor(top); left: anchor(left); width: anchor-size(width); height: anchor-size(height); border-radius: 14px; background: var(--sky-tint); opacity: 0; pointer-events: none;
-    transition: top .32s var(--ease), left .32s var(--ease), width .32s var(--ease), height .32s var(--ease), opacity .2s; }
-  .nav-list:has(.nav-item.on)::before { opacity: 1; }
+.nav-list > li { position: relative; z-index: 1; }
+.nav-list > .nav-ind { position: absolute; left: 0; top: 0; z-index: 0; opacity: 0; pointer-events: none; border-radius: 16px; will-change: transform;
+  background: linear-gradient(180deg, rgba(79, 179, 255, .20), rgba(79, 179, 255, .12)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7), inset 0 0 0 1px rgba(79, 179, 255, .22);
+  transition: transform .55s var(--spring), width .4s var(--ease), height .4s var(--ease), opacity .2s; }
+.nav-item .nav-icon { transition: transform .3s var(--ease); }
+.nav-item.on .nav-icon { animation: icon-nudge 560ms var(--spring); }
+@keyframes icon-nudge { 0% { transform: none; } 35% { transform: translateY(-3px) scale(1.08); } 100% { transform: none; } }
+@media (min-width: 900px) {
+  .nav-list > .nav-ind { border-radius: 12px; background: linear-gradient(90deg, rgba(79, 179, 255, .18), rgba(79, 179, 255, .06)); box-shadow: 0 10px 26px -18px rgba(79, 179, 255, .9), inset 0 0 0 1px rgba(79, 179, 255, .16); }
+  .nav-list > .nav-ind::before { content: ""; position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px; border-radius: 0 3px 3px 0; background: var(--sky); box-shadow: 0 0 10px 1px rgba(79, 179, 255, .6); }
+  .nav-item.on .nav-icon { animation-name: icon-nudge-x; }
+  @keyframes icon-nudge-x { 0% { transform: none; } 35% { transform: translateX(3px) scale(1.08); } 100% { transform: none; } }
 }
+/* personal mode: the highlight is mint */
+.nav-personal .nav-list > .nav-ind { background: linear-gradient(180deg, rgba(95, 211, 154, .22), rgba(95, 211, 154, .12)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7), inset 0 0 0 1px rgba(95, 211, 154, .26); }
+@media (min-width: 900px) {
+  .nav-personal .nav-list > .nav-ind { background: linear-gradient(90deg, rgba(95, 211, 154, .2), rgba(95, 211, 154, .06)); box-shadow: 0 10px 26px -18px rgba(95, 211, 154, .9), inset 0 0 0 1px rgba(95, 211, 154, .18); }
+  .nav-personal .nav-list > .nav-ind::before { background: var(--mint); box-shadow: 0 0 10px 1px rgba(95, 211, 154, .6); }
+}
+@media (hover: hover) { .nav-item:not(.on):hover { background: rgba(22, 24, 27, .04); color: var(--ink); } .nav-item:not(.on):hover .nav-icon { transform: translateY(-1px); } }
+@media (hover: hover) and (min-width: 900px) { .nav-item:not(.on):hover .nav-icon { transform: translateX(2px); } }
 
 /* ---------- caret, typing dots, spin pill ---------- */
 .caret { display: inline-block; width: 2px; height: 1.05em; margin-left: 2px; vertical-align: -0.16em; background: var(--ink); border-radius: 1px; animation: caret-blink 1s steps(1) infinite; }
@@ -134,8 +143,8 @@
 
 /* ---------- reduced motion: static end states ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .screen, .reveal-in, .stagger > *, .pop-in, .skeleton::after, .chip.live .dot, .caret, .typing-dots i, .ask-row, .bot-breathe .bot-corner,
-  .med-check.draw path, .med-check.draw circle, .med-saved-0, .med-saved-1, .log-row, .log-row.draw::before, .log-empty { animation: none !important; }
+  .reveal-in, .stagger > *, .pop-in, .skeleton::after, .chip.live .dot, .caret, .typing-dots i, .ask-row, .bot-breathe .bot-corner,
+  .med-check.draw path, .med-check.draw circle, .med-saved-0, .med-saved-1, .log-row, .log-row.draw::before, .log-empty, .nav-item.on .nav-icon { animation: none !important; }
   .reveal-wait { opacity: 1; }
   .caret.gone, .bot-scan { display: none; }
   ::view-transition-old(root), ::view-transition-new(root) { animation: none; }

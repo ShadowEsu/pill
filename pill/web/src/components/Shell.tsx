@@ -1,5 +1,8 @@
-// Shared chrome. Every screen: <Screen title back>…<Action/></Screen>. Keep it boring; the screens carry the design.
+// Shared chrome. Every screen: <Screen title back eyebrow art tone>…<Action/></Screen>.
+// Header: eyebrow with a live dot, a serif title whose words rise in one by one (40 ms apart, like the site),
+// an optional art slot on the right and an optional soft colour wash (tone) behind the header.
 import { Link, useNavigate } from 'react-router-dom';
+import { Fragment, type CSSProperties } from 'react';
 import type { Source } from '../lib/types';
 
 export function SrcBadge({ src }: { src: Source | null }) {
@@ -8,19 +11,32 @@ export function SrcBadge({ src }: { src: Source | null }) {
   return <span className={'chip ' + (src === 'real' ? 'live' : '')} aria-label={'Data source: ' + text}><span className="dot" />{text}</span>;
 }
 
-export function Screen({ title, back, right, children, eyebrow }: { title?: string; back?: string | true; right?: React.ReactNode; children: React.ReactNode; eyebrow?: string }) {
+export type Tone = 'sky' | 'mint' | 'amber' | 'violet' | 'none';
+
+/** Splits a title into words that rise in with a 40 ms stagger (CSS, `.title .tw`). Screen readers get the whole string. */
+export function SplitTitle({ text, className = 'screen-title title', as: Tag = 'h1' }: { text: string; className?: string; as?: 'h1' | 'h2' }) {
+  const words = text.split(/\s+/).filter(Boolean);
+  return (
+    <Tag className={className} aria-label={text}>
+      {words.map((w, i) => <Fragment key={i}>{i > 0 && ' '}<span aria-hidden="true" className="tw" style={{ '--w': i } as CSSProperties}>{w}</span></Fragment>)}
+    </Tag>
+  );
+}
+
+export function Screen({ title, back, right, children, eyebrow, art, tone = 'none' }: { title?: string; back?: string | true; right?: React.ReactNode; children: React.ReactNode; eyebrow?: string; art?: React.ReactNode; tone?: Tone }) {
   const nav = useNavigate();
   return (
-    <main className="screen rise">
+    <main className={'screen' + (tone !== 'none' ? ' tone-' + tone : '')}>
+      {tone !== 'none' && <div className="screen-wash" aria-hidden="true" />}
       <div className="screen-head">
-        <div className="row" style={{ gap: 14 }}>
-          {back && <button type="button" className="btn ghost" style={{ width: 44, minHeight: 44, padding: 0, borderRadius: 14 }} aria-label="Back" onClick={() => (back === true ? nav(-1) : nav(back))}>←</button>}
-          <div>
-            {eyebrow && <p className="eyebrow">{eyebrow}</p>}
-            {title && <h1 className="screen-title">{title}</h1>}
+        <div className="row head-main" style={{ gap: 14 }}>
+          {back && <button type="button" className="btn ghost back-btn" aria-label="Back" onClick={() => (back === true ? nav(-1) : nav(back))}>←</button>}
+          <div className="head-text">
+            {eyebrow && <p className="eyebrow"><span className="eb-dot" aria-hidden="true" />{eyebrow}</p>}
+            {title && <SplitTitle key={title} text={title} />}
           </div>
         </div>
-        <div className="row">{right}</div>
+        {(right || art) && <div className="row head-side">{right}{art && <div className="head-art">{art}</div>}</div>}
       </div>
       {children}
     </main>

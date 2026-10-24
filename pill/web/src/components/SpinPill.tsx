@@ -7,7 +7,8 @@ import { useEffect, useRef } from 'react';
 import type { Verdict } from '../lib/types';
 import { prefersReducedMotion } from '../lib/motion';
 
-export interface SpinPillProps { size?: number; speed?: number; glyphs?: boolean; verdict?: Verdict | null; className?: string; label?: string }
+export interface SpinPillProps { size?: number; speed?: number; glyphs?: boolean; verdict?: Verdict | null; className?: string; label?: string;
+  /** A soft breathing halo behind the pill (verdict colour, sky without one), painted in the same canvas. */ glow?: boolean }
 
 const R = 0.36, HALF = 0.82;           // capsule radius and half segment length (world units)
 const CAM = 5, FOCAL = 0.27;           // perspective camera at z = 5; half view ≈ 1.35 world units
@@ -113,7 +114,15 @@ function getGL(): GL | null {
   return shared;
 }
 
-function drawShaded(r: GL, ctx: CanvasRenderingContext2D, px: number, t: number, glow: [number, number, number], focal: number) {
+/** Breathing halo behind the pill: one radial gradient, radius pulses gently with the pose clock. */
+function drawHalo(ctx: CanvasRenderingContext2D, S: number, t: number, rgb: [number, number, number]) {
+  const r = S * 0.46 * (0.9 + 0.1 * Math.sin(t * 2.2));
+  const g = ctx.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, r);
+  g.addColorStop(0, `rgba(${rgb.join(',')},0.34)`); g.addColorStop(0.55, `rgba(${rgb.join(',')},0.14)`); g.addColorStop(1, `rgba(${rgb.join(',')},0)`);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, S, S);
+}
+
+function drawShaded(r: GL, ctx: CanvasRenderingContext2D, px: number, t: number, glow: [number, number, number], focal: number, halo: [number, number, number] | null) {
   const { gl, canvas } = r;
   if (canvas.width < px || canvas.height < px) { canvas.width = Math.max(canvas.width, px); canvas.height = Math.max(canvas.height, px); }
   gl.viewport(0, 0, px, px);
@@ -124,6 +133,7 @@ function drawShaded(r: GL, ctx: CanvasRenderingContext2D, px: number, t: number,
   gl.uniform1f(r.uFocal, focal);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
   ctx.clearRect(0, 0, px, px);
+  if (halo) drawHalo(ctx, px, t, halo);
   ctx.drawImage(canvas, 0, canvas.height - px, px, px, 0, 0, px, px);   // GL viewport sits at the bottom-left
 }
 
@@ -154,7 +164,7 @@ function makeGlyphs(size: number, dpr: number): Glyphs {
   return { cols, rows, cw, ch, atlas, bits };
 }
 
-function drawGlyphs(g: Glyphs, ctx: CanvasRenderingContext2D, size: number, dpr: number, t: number, flicker: boolean, glow: [number, number, number]) {
+function drawGlyphs(g: Glyphs, ctx: CanvasRenderingContext2D, size: number, dpr: number, t: number, flicker: boolean, glow: [number, number, number], halo: [number, number, number] | null) {
   const [ax, ay, az] = axisAt(t);
   const { cols, rows, cw, ch, atlas, bits } = g;
   const tw = Math.ceil(cw * dpr), th = Math.ceil(ch * dpr);
@@ -162,6 +172,7 @@ function drawGlyphs(g: Glyphs, ctx: CanvasRenderingContext2D, size: number, dpr:
   if (flicker) bits[(Math.random() * bits.length) | 0] ^= 1;
   const S = size * dpr;
   ctx.clearRect(0, 0, S, S);
+  if (halo) drawHalo(ctx, S, t, halo);
   // contact shadow, as wide as the projected pill, tinted by the verdict
   const w = Math.max(0.2, ((Math.abs(ax) * HALF + R) / (CAM * FOCAL)) * 0.9) * S / 2;
   ctx.save();
@@ -207,7 +218,7 @@ function drawGlyphs(g: Glyphs, ctx: CanvasRenderingContext2D, size: number, dpr:
 
 type Debug = HTMLCanvasElement & { __spin?: { frames: number; cost: number } };
 
-export default function SpinPill({ size = 120, speed = 1, glyphs = false, verdict = null, className, label }: SpinPillProps) {
+export default function SpinPill({ size = 120, speed = 1, glyphs = false, verdict = null, className, label, glow: haloOn = false }: SpinPillProps) {
   const ref = useRef<HTMLCanvasElement>(null);
   const speedRef = useRef(speed);
   useEffect(() => { speedRef.current = speed; }, [speed]);
@@ -220,6 +231,7 @@ export default function SpinPill({ size = 120, speed = 1, glyphs = false, verdic
     cv.width = px; cv.height = px;
     const ctx = cv.getContext('2d')!;
     const glow = GLOW[verdict ?? 'none'];
+    const halo: [number, number, number] | null = haloOn ? (verdict ? GLOW[verdict] : [79, 179, 255]) : null;
     const gl = glyphs ? null : getGL();
     let g: Glyphs | null = gl ? null : makeGlyphs(size, dpr);
     const reduce = prefersReducedMotion();
@@ -228,8 +240,8 @@ export default function SpinPill({ size = 120, speed = 1, glyphs = false, verdic
 
     const draw = (t: number) => {
       const c0 = performance.now();
-      if (gl) drawShaded(gl, ctx, px, t, glow, size < 100 ? 0.22 : FOCAL);   // avatars frame the pill tighter
-      else drawGlyphs(g!, ctx, size, dpr, t, !reduce, glow);
+      if (gl) drawShaded(gl, ctx, px, t, glow, size < 100 ? 0.22 : FOCAL, halo);   // avatars frame the pill tighter
+      else drawGlyphs(g!, ctx, size, dpr, t, !reduce, glow, halo);
       debug.cost += (performance.now() - c0 - debug.cost) * 0.1;
       debug.frames++;
     };
@@ -256,7 +268,7 @@ export default function SpinPill({ size = 120, speed = 1, glyphs = false, verdic
     document.addEventListener('visibilitychange', sync);
     sync();
     return () => { io.disconnect(); document.removeEventListener('visibilitychange', sync); cancelAnimationFrame(raf); g = null; };
-  }, [size, glyphs, verdict]);
+  }, [size, glyphs, verdict, haloOn]);
 
   return (
     <canvas ref={ref} className={'spin-pill' + (className ? ' ' + className : '')} width={size} height={size}
