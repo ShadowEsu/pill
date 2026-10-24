@@ -21,6 +21,8 @@ import Calibration from './screens/Calibration';
 import Verify from './screens/Verify';
 import Ask from './screens/Ask';
 import Kiosk from './screens/Kiosk';
+import Story from './screens/Story';
+import Settings from './screens/Settings';
 
 function Frame({ children }: { children: React.ReactNode }) {
   const { pathname } = useLocation();
@@ -69,6 +71,8 @@ export default function App() {
           <Route path="/calibration" element={<Gate><Calibration /></Gate>} />
           <Route path="/verify" element={<Gate><Verify /></Gate>} />
           <Route path="/ask" element={<Gate><Ask /></Gate>} />
+          <Route path="/story" element={<Story />} />
+          <Route path="/settings" element={<Gate><Settings /></Gate>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Frame>
