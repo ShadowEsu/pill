@@ -14,7 +14,7 @@ A $40 box that tests one tablet before the supplier is paid
 ## Links
 - Website: https://pill-site.vercel.app
 - App: `[pending: app deploy URL]` (local: http://127.0.0.1:5183)
-- Repo: `[pending: public GitHub repo URL]`
+- Repo: https://github.com/ShadowEsu/pill `[pending: Preston makes it public]`
 - Demo video (≤ 3 min): `[pending: YouTube URL]`
 - Figma stage log + Slides + prototype: `[pending: Figma links, shared to "Anyone"]`
 
@@ -140,8 +140,7 @@ Two models, two contained jobs: Gemini reads the bottle label from a photo into 
 
 ### MLH: Best Use of Gemini API
 
-**Built (Sat):** an agentic checker (`/check`): Gemini reads the label from the camera, looks at frames of the cup (clarity, colour, tablet state), queries openFDA for a recall through a function-call tool, cross-checks expiry/drug/lot, compares with the sensor and writes a plain summary through the clause filter; the step log shows which Gemini model answered. Plus a docked follower assistant on every screen (streams, voice input, big text, 'Not medical advice' footer). Gemini explains the sensor verdict and can never change it. Keys stay server-side (Vercel functions + the booth service).
-`POST /label` sends the bottle photo to `gemini-3.5-flash` and gets back `{drug, strength, lot, maker, expiry, confidence}`. A field Gemini cannot read comes back `null`; any failure returns `mode: unavailable` and the app's Bottle screen says `demo` instead of inventing fields. The image stays in memory and is never written to disk, and the person checks every field before saving. Gemini's lot number feeds the recall check and the delivery match.
+Gemini does two jobs, both server-side (Vercel functions for the phone, the booth service at the table; the key never ships in the app). **The agentic checker** (`/check`, also from Run and Evaluation): Gemini reads the label from a camera photo, looks at up to three frames of the cup (clarity, colour, tablet state), calls code tools by function-calling (openFDA recall lookup, expiry/drug/lot cross-check, compare-with-sensor) and writes a plain summary that passes the clause filter; the animated step log shows each step's timing and which Gemini model answered. **The follower assistant** sits bottom-right on every screen: it knows what is on the screen, streams clause by clause, takes voice input, has a big-text mode and ends with "Not medical advice. A pharmacist or doctor decides." The rule that never bends: Gemini explains the sensor's verdict and can never change it (a summary that tries is rejected and the template is used). Label reading: `POST /api/label` returns `{drug, strength, lot, maker, expiry, confidence}`; unreadable fields are `null`, failures are `mode: unavailable` and the Bottle screen says `demo` instead of inventing fields. Images stay in memory and are never written to disk.
 
 ### MLH: Best Use of Tiger Data (enter only if built)
 `[pending: enter only if the mirror ships; otherwise untick and delete this paragraph]` Every run's per-second samples (inline, 90°, temperature, dark, blank) land in a Tiger Cloud hypertable keyed by run id, and a continuous aggregate computes per-lot plateau and glow rise for the clinic dashboard's heat map; SQLite stays the offline source of truth and Tiger Data is an async mirror. `[pending: Tiger Cloud account, the SQL, one dashboard chart served from it]`
