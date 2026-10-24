@@ -25,6 +25,7 @@
       <a href="#how">How it works</a>
       <a href="#verdicts">Verdicts</a>
       <a href="#clinic">Clinic mode</a>
+      <a href="#payments">Payments</a>
       <a href="#limits">Limits</a>
       <a href="#team">Team</a>
     </nav>
@@ -232,6 +233,34 @@
           </div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- 9b. Payments: Coinbase x402 track -->
+  <section class="section pay" id="payments">
+    <div class="wrap">
+      <div class="cb-badge reveal"><span class="sq" aria-hidden="true"></span>Coinbase · x402 · payment agents</div>
+      <p class="eyebrow reveal" style="margin-top:22px">Payments</p>
+      <h2 class="h2">The verdict is the invoice.</h2>
+      <p class="lead reveal" style="margin-top:20px">Money in Pill is boring on purpose. The clinic pays a delivery into escrow when it is logged. The box tests one tablet. The policy agent reads the verdict, the recall check and the spend cap, and proposes <b>release</b>, <b>hold</b> or <b>escalate</b>. A pharmacist taps. Only then does USDC move from escrow to the supplier, on Base, signed by the agent's own CDP wallet. The same agent can buy a verdict from someone else's box with x402, a few cents at a time.</p>
+      <div class="pay-grid">
+        <div class="rail reveal" id="rail-mount"></div>
+        <div class="x402 reveal" id="x402-mount"></div>
+      </div>
+      <div class="facts reveal" style="margin-top:40px">
+        <div><b>Two rails, one ledger</b><span>USDC on Base Sepolia through a CDP agent wallet, mirrored in the Capital One Nessie sandbox for the fiat story. One log line per decision, same fields on both.</span></div>
+        <div><b>What the agent can do</b><span>Propose, draft a referral, buy a verdict under $1. It cannot release: release is a human tap, every time, and the model can only downgrade a decision.</span></div>
+        <div><b>What the agent cannot do</b><span>Hold more than one delivery's value, pay anyone not on the delivery, or move anything on a NEEDS LAB or UNABLE TO VERIFY. The caps live in policy.md, in plain text.</span></div>
+      </div>
+
+      <p class="eyebrow reveal" style="margin-top:72px">Pricing · proposed</p>
+      <h2 class="h2">Twenty dollars a station.</h2>
+      <div class="plans">
+        <div class="plan free reveal"><div class="name">Personal</div><div class="price">$0</div><ul><li>Phone-only: label read, recall check, dose log</li><li>No verdicts without a station</li><li>Photos deleted after the fields are read</li></ul></div>
+        <div class="plan cb reveal"><div class="name">Clinic</div><div class="price">$20<small>per station per month</small></div><ul><li>Verdicts, reference bands, calibration tracking</li><li>Escrow and release on Base, Nessie mirror</li><li>Decision log with the rule and clause on every line</li><li>Station hardware at parts cost, about $40</li></ul></div>
+        <div class="plan sky reveal"><div class="name">Verify API</div><div class="price">5¢<small>per verdict, x402</small></div><ul><li>Send a curve, get PASS / NEEDS LAB / UNABLE TO VERIFY</li><li>No account; the request pays for itself</li><li>Same seven rules, same rule id on the answer</li></ul></div>
+      </div>
+      <div class="calc reveal" id="calc-mount"></div>
     </div>
   </section>
 

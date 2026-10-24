@@ -5,6 +5,8 @@ const { mountStation, autoDemo, partFigures } = stationMod;
 import { mountPhone, PHONE_SEQUENCES } from './phone.js';
 import { mountBinaryPill } from './pill.js';
 import './station.css';
+import './pay.css';
+import { mountRail, mountX402, mountCalc } from './pay.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (reduced) document.documentElement.classList.add('reduced');
@@ -255,4 +257,14 @@ if (!reduced) {
     entries.forEach((e) => { const a = map.get(e.target.id); if (a) a.style.color = e.isIntersecting ? 'var(--ink)' : ''; });
   }, { rootMargin: '-40% 0px -55% 0px' });
   map.forEach((_, id) => { const s = document.getElementById(id); if (s) io.observe(s); });
+}
+
+/* ---------- payments: rail, x402 call, calculator ---------- */
+{
+  const rail = document.getElementById('rail-mount');
+  const x402 = document.getElementById('x402-mount');
+  const calc = document.getElementById('calc-mount');
+  if (rail) mountRail(rail);
+  if (x402) mountX402(x402);
+  if (calc) mountCalc(calc);
 }
