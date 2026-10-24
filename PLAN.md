@@ -78,6 +78,29 @@ Source: Hive live prizes feed read Sat 09:3x PDT (`hive.hackberkeley.org/api/liv
 
 **Not entering:** Trading Agents, SpaceXAI/Cursor raffle (Cursor is off), Solana, Presage, Spacetime, Visa shopping, CRS Credit, Notability, Meta (human connection), Moss, Bitdeer, Mana, Convex (backend swap too big), Creao (criteria unclear), Vultr/DigitalOcean/Snowflake/MongoDB/Backboard (would need a stack change; revisit only if hosting the pay service on a droplet is free and quick).
 
+**Status at hand-over (Sat 10:4x PDT; Preston asked for everything finished within 2 h):**
+
+| Track | Built | Still needs |
+|---|---|---|
+| Best Hardware | station plan, FIG grid, data path | the physical box (Preston, Saturday) |
+| Hyphenate finance | policy agent (propose/hold/escalate), `/agent` record page, downgrade-only clerk + 6-case test, `/demo` opens on the moment, draft footage | the ≤3-min video with voice |
+| Coinbase x402 | real 402 + facilitator signature check, buyer CLI with cap, escrow routes, Coinbase section on the site, builder feedback | CDP key → paid 200 + faucet USDC; per-member eligibility |
+| Capital One Nessie | client + mirror on hold/release/refund, SANDBOX card on Delivery | `NESSIE_KEY` |
+| Microsoft Built for the Real World | Limits section, real-vs-simulated table, path-to-production paragraph in DEVPOST | nothing |
+| Anthropic | Claude why (filtered), Ask Pill (refusals tested), escrow clerk, "where it could go wrong" cards | one pharmacist conversation (Preston) |
+| Best People-First | personal mode, big text, read aloud, reminders, grandparent chapter | nothing |
+| Most Technically Complex | two-channel optics, 7 rules, x402, Gemini + Claude, Composio calendar | nothing |
+| MLH Gen AI / Gemini | Gemini label reading live (`/label`), Claude why/Ask | nothing |
+| MLH Tiger Data | hypertable code + SQL in README, `/tiger/*` routes, demo posts samples | `TIGER_URL` account |
+| MLH ElevenLabs | `/speak` + ReadAloud (browser-voice fallback) | `ELEVENLABS_API_KEY` |
+| MLH Auth0 | not built | skip unless time |
+| Figma | plugin (Slides/Design/FigJam), deck.json, 16-slide preview, STAGE-LOG, COMPOSIO steps | Preston runs the plugin in Figma desktop (`figma/RUN.md`), shares 3 links |
+| Apify / Bright Data | not built (recall check is a demo lot) | skip unless time |
+| Armadin security | containment story in DEVPOST + `/agent` limits | their criteria ("coming soon") |
+| Commit Fellowship | DEVPOST paragraph | the form |
+| .Tech domain | shortlist in 🗺️-plan | Preston's pick |
+| Atlassian | needs a Forge app | not entering |
+
 ## 8. References (post each in Discord #references)
 - Peel: https://plume.hackmit.org/project/qxodw-wgjqk-lidau-dxrpe · code https://github.com/viktorinkov/HackMIT-2026 · video https://youtu.be/Yiu2wGKJ6AM
 - WHO substandard/falsified medicines fact sheet (Dec 2024): https://www.who.int/news-room/fact-sheets/detail/substandard-and-falsified-medical-products
