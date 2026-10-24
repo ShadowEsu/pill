@@ -13,7 +13,8 @@
     "faucet": "tsx src/faucet.ts",
     "typecheck": "tsc --noEmit",
     "test:policy": "tsx src/test-policy.ts",
-    "test:checkout": "tsx src/test-checkout.ts"
+    "test:checkout": "tsx src/test-checkout.ts",
+    "test:security": "tsx test/security.test.mts"
   },
   "license": "MIT",
   "dependencies": {
