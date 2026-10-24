@@ -15,6 +15,7 @@ import type { Evaluation as Ev, Mode, Run, Verdict } from '../lib/types';
 import { PAY_URL, fetchWhy, type Unavailable, type WhyLive, type WhyTemplate } from '../lib/api';
 import { playSound, verdictSound } from '../lib/sound';
 import ReadAloud from '../components/ReadAloud';
+import { ShareSheet } from '../components/ShareCard';
 
 const HERO_TINT: Record<Verdict, string> = { PASS: 'var(--mint-tint)', 'NEEDS LAB': 'var(--amber-tint)', 'UNABLE TO VERIFY': 'var(--grey-tint)' };
 
@@ -152,6 +153,7 @@ export default function Evaluation() {
     new Date(run.startedAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }),
     `run ${run.id} (${SRC_TEXT[run.src]})`,
   ].join(' · ') + '. Screening result, not a pharmacopeial test.';
+  const [sharing, setSharing] = useState(false);
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(summary);
@@ -243,7 +245,11 @@ export default function Evaluation() {
               <span className="mono muted" style={{ fontSize: 12 }} aria-live="polite">{copied === 'copied' ? 'copied ✓' : copied === 'failed' ? 'select and copy below' : ''}</span>
             </div>
             <p className="mono" style={{ fontSize: 12, color: 'var(--ink-2)', background: 'rgba(22,24,27,.035)', borderRadius: 10, padding: '10px 12px', userSelect: 'all', overflowWrap: 'anywhere' }}>{summary}</p>
-            <button type="button" className="btn ghost" style={{ minHeight: 44 }} onClick={copy}>Copy summary</button>
+            <div className="row" style={{ gap: 10, flexWrap: 'wrap' }}>
+              <button type="button" className="btn ghost" style={{ minHeight: 44 }} onClick={copy}>Copy summary</button>
+              <button type="button" className="btn ghost" style={{ minHeight: 44 }} onClick={() => setSharing(true)}>Share card</button>
+            </div>
+            {sharing && <ShareSheet run={run} onClose={() => setSharing(false)} />}
           </section>
         </div>
       </div>

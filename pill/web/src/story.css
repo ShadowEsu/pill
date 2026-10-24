@@ -2,7 +2,12 @@
    Spacing steps: 12 / 16 / 20. Every animation here stops under prefers-reduced-motion (bottom of file). */
 
 /* ---------- story deck ---------- */
-.story { gap: 12px; min-height: calc(100dvh - 64px); }
+.story { gap: 12px; }
+/* phone: the deck is exactly one screen tall; with the tab bar (mode chosen) it stops above it */
+@media (max-width: 899px) {
+  .app .screen.story { flex: none; min-height: 100dvh; }
+  .frame:has(> .nav) .app .screen.story { min-height: calc(100dvh - 68px); }
+}
 @media (min-width: 900px) { .story { min-height: 100dvh; } .app .screen.story { padding-bottom: 32px; } }
 .story-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; }
 .story-head a { font-family: var(--mono); font-size: 12px; color: var(--muted); text-decoration: none; padding: 12px 4px; }
@@ -34,7 +39,19 @@
   .story-body { font-size: 1.15rem; }
   .story-art { min-height: 460px; padding: 28px; }
 }
-@media (max-width: 899px) { .story-art { max-height: 46dvh; } }
+/* phone: compact enough to fit above the tab bar; if big text still overflows, the chapter scrolls under controls that stay put */
+@media (max-width: 899px) {
+  .story-ch { gap: 16px; }
+  .story-art { padding: 12px; }
+  .story-line { font-size: 1.95rem; }
+  .story-body { font-size: 1rem; }
+  .story .verdict-rows { gap: 8px; }
+  .story .verdict-row { padding: 8px 12px; }
+  .story .verdict-row .w { font-size: 1.45rem; }
+  .tap-row { display: none !important; }
+  .story-foot { position: sticky; bottom: 0; z-index: 3; padding: 12px 0 4px; background: linear-gradient(180deg, transparent, var(--bg) 40%); }
+  .frame:has(> .nav) .story-foot { bottom: 64px; }
+}
 
 /* chapter illustrations */
 .one-in-ten { width: 100%; max-width: 420px; height: auto; }

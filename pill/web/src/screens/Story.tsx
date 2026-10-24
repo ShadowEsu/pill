@@ -178,7 +178,7 @@ function Payment({ play, wide }: ArtProps) {
         <li><VerdictChip verdict="NEEDS LAB" /><span><b>HOLD</b> · lab referral drafted</span></li>
         <li><VerdictChip verdict="UNABLE TO VERIFY" /><span><b>ESCALATE</b> · a person decides</span></li>
       </ul>
-      <div className="row" style={{ justifyContent: 'center', gap: 12, flexWrap: 'wrap', '--i': 2 } as React.CSSProperties}>
+      <div className="row tap-row" style={{ justifyContent: 'center', gap: 12, flexWrap: 'wrap', '--i': 2 } as React.CSSProperties}>
         <span className="tap-mock" aria-hidden="true"><span>Release</span><span className="mono" style={{ fontSize: 11, opacity: .7 }}>TESTNET</span></span>
         <span className="mono muted" style={{ fontSize: 12 }}>only a person can do this</span>
       </div>
