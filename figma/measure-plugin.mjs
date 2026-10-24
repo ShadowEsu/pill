@@ -10,7 +10,7 @@ const FONTS = { Inter: ['Regular', 'Italic', 'Medium', 'Medium Italic', 'Semi Bo
 function makeStub(editorType) {
   const loaded = new Set();
   const key = (f) => `${f.family}/${f.style}`;
-  const stats = { nodes: 0, images: 0, texts: 0, slides: 0, notes: 0, styles: 0, variables: 0, stickies: 0, error: null, done: null };
+  const stats = { nodes: 0, images: 0, texts: 0, vectors: 0, slides: 0, notes: 0, styles: 0, variables: 0, stickies: 0, error: null, done: null };
   let ids = 0;
   const assert = (ok, msg) => { if (!ok) throw new Error(msg); };
   class Node {
@@ -58,6 +58,20 @@ function makeStub(editorType) {
     createRectangle: () => new Node('RECTANGLE'),
     createEllipse: () => new Node('ELLIPSE'),
     createFrame: () => new Node('FRAME'),
+    createVector() {
+      const n = new Node('VECTOR');
+      stats.vectors++;
+      let paths = [];
+      Object.defineProperty(n, 'vectorPaths', {
+        get: () => paths,
+        set(v) {
+          // Figma's path grammar: absolute M/L/Q/C/Z commands and numbers, space-separated
+          for (const p of v) assert(['NONE', 'NONZERO', 'EVENODD'].includes(p.windingRule) && /^M( -?\d+(\.\d+)?)+( [MLQCZ]( -?\d+(\.\d+)?)*)*$/.test(p.data), `vector path rejected: ${p.data.slice(0, 60)}`);
+          paths = v;
+        },
+      });
+      return n;
+    },
     createPage() { const p = new Node('PAGE'); root.appendChild(p); return p; },
     async setCurrentPageAsync(p) { figma.currentPage = p; },
     viewport: { scrollAndZoomIntoView() {}, slidesMode: 'single-slide' },

@@ -1,45 +1,45 @@
 {
-  "slides": 16,
+  "slides": 18,
   "perSlideMin": 20,
   "perShotMin": 1,
   "perTokenMin": 1,
-  "screens": 279,
-  "appShots": 173,
-  "siteShots": 106,
-  "tokenCount": 39,
+  "screens": 360,
+  "appShots": 252,
+  "siteShots": 108,
+  "tokenCount": 43,
   "drift": {
     "identical": 8,
     "changed": 7,
     "missing": 12,
     "siteTotal": 27
   },
-  "imagesConverted": 0,
+  "imagesConverted": 1,
   "realFigmaSec": null,
-  "buildCold": 14.6,
+  "buildCold": 38.1,
   "pluginStubMs": {
-    "slides": 12,
-    "figma": 21,
-    "figjam": 1
+    "slides": 33,
+    "figma": 30,
+    "figjam": 2
   },
-  "buildSec": 0.5,
-  "at": "2026-10-24T17:10:25.930Z",
-  "deckBytes": 7737038,
+  "buildSec": 1.2,
+  "at": "2026-10-24T19:03:08.139Z",
+  "deckBytes": 8112697,
   "stageWords": [
     {
       "stage": "Ideation",
-      "words": 190
-    },
-    {
-      "stage": "Prototyping",
       "words": 177
     },
     {
+      "stage": "Prototyping",
+      "words": 157
+    },
+    {
       "stage": "Handoff",
-      "words": 175
+      "words": 164
     },
     {
       "stage": "Code generation",
-      "words": 192
+      "words": 187
     }
   ]
 }

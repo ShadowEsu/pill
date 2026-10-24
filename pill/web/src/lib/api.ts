@@ -4,6 +4,9 @@ import type { Run, RuleId, Verdict } from './types';
 import { absorbance } from './rules';
 
 export const PAY_URL = (import.meta.env.VITE_PAY_URL as string | undefined)?.replace(/\/$/, '') || null;
+/** Gemini routes (/api/label, /api/check, /api/assist): the local service when VITE_PAY_URL is set, else the app's own
+ *  Vercel functions on the same origin. Payments never go through the functions. */
+export const AI_BASE = PAY_URL ?? '';
 
 export type Unavailable = { mode: 'unavailable'; error: string };
 

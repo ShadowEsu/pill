@@ -139,10 +139,15 @@ async function makeText(e) {
   node.textAutoResize = 'HEIGHT';
   return node;
 }
+/** First point of an SVG path ("M x y ..."). */
+function firstPoint(d) {
+  var m = String(d).match(/M\s*(-?[\d.]+)[\s,]+(-?[\d.]+)/);
+  return m ? { x: +m[1], y: +m[2] } : { x: 0, y: 0 };
+}
 async function render(parent, els, ox, oy) {
   ox = ox || 0; oy = oy || 0;
   for (var i = 0; i < els.length; i++) {
-    var e = els[i], node;
+    var e = els[i], node, dx = 0, dy = 0;
     if (e.t === 'text') {
       node = await makeText(e);
       node.name = (Array.isArray(e.text) ? e.text.map(function (g) { return g.s; }).join('') : String(e.text)).slice(0, 40);
@@ -172,10 +177,26 @@ async function render(parent, els, ox, oy) {
       lvl.name = 'level';
       if (vert) { lvl.resize(e.w, Math.max(1, e.h * e.level)); place(node, lvl, 0, e.h - e.h * e.level); }
       else { lvl.resize(Math.max(1, e.w * e.level), e.h); place(node, lvl, 0, 0); }
+    } else if (e.t === 'path') {
+      // lines, arrows and chart curves: one vector, stroke only (or filled when e.fill is set)
+      node = figma.createVector();
+      node.name = 'line';
+      node.vectorPaths = [{ windingRule: e.fill ? 'NONZERO' : 'NONE', data: e.d }];
+      node.fills = e.fill ? [solid(e.fill)] : [];
+      node.strokes = [solid(e.stroke)];
+      node.strokeWeight = e.strokeW || 2;
+      node.strokeCap = 'ROUND';
+      node.strokeJoin = 'ROUND';
+      if (e.dash) node.dashPattern = e.dash;
+      // Figma may normalise the path to its bounding box, moving the node or the points; undo either so the
+      // vector lands where deck.html draws it (path coordinates are relative to e.x, e.y).
+      var a = firstPoint(e.d), b = firstPoint(node.vectorPaths[0].data);
+      dx = node.x !== 0 ? node.x : a.x - b.x;
+      dy = node.y !== 0 ? node.y : a.y - b.y;
     } else {
       continue;
     }
-    place(parent, node, ox + e.x, oy + e.y);
+    place(parent, node, ox + e.x + dx, oy + e.y + dy);
   }
 }
 

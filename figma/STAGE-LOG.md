@@ -4,31 +4,31 @@ Four stages, ≤ 200 words each. Minutes come from commit times in `figma/git-ti
 
 ## Stage 1 · Ideation
 
-**Tools:** AI persona panels (one LLM role-playing 16–18 judges, a Kenyan clinic pharmacist, VCs, an ethicist), web research on past winners and reference sites. FigJam: the ideation board, generated after the fact by our plugin from the debate files.
+**Tools:** AI persona panels (one LLM role-playing 16–18 judges, a Kenyan clinic pharmacist, VCs, an ethicist); web research on past winners and reference sites. FigJam: the ideation board, generated afterwards by our plugin from the debate files.
 
 **Minutes:** ≈255 wall-clock (Fri 19:40 shortlist → 23:55 website decision); panels ran unattended. FigJam board: [fill after running].
 
 **Rating:** 4/5 (fast, cheap kills; agreement is inflated because one model played every persona)
 
-**What we did:** Nine ideas were considered and six went through scored panels. FloodToll, DripGuard and Payout died on buildability or business. Lot beat Bill and Streets 13 votes of 16 and was renamed Pill. A second panel scored a plain, honest website 8.0 against a copied storytelling site at 3.7.
+**What we did:** Nine ideas considered, six through scored panels. FloodToll, DripGuard and Payout died on buildability or business. Lot beat Bill and Streets 13 votes of 16 and became Pill. A second panel scored a plain, honest website 8.0 against a copied storytelling site at 3.7.
 
-**What broke:** Plain-page scores had a standard deviation of 0: sixteen voices, one opinion, and the docs say so. Two persona replies failed to parse. Nothing visual existed; the FigJam board was built afterwards from the JSON, not used live.
+**What broke:** Plain-page scores had a standard deviation of 0: sixteen voices, one opinion. Two persona replies failed to parse. Nothing visual existed; the FigJam board was built from the JSON afterwards, not used live.
 
-**Into the project:** the PLAN.md decision table; the scope (one reference drug, three verdict words, money held on NEEDS LAB); the site's eight-section outline.
+**Into the project:** the PLAN.md decision table; the scope (one reference drug, three verdict words, money held on NEEDS LAB); the site's outline.
 
 ## Stage 2 · Prototyping
 
-**Tools:** Code: `web-proto/binary-pill.html` (one HTML file) and a phone mock written in the site's own JavaScript (Vite + anime.js). Figma Make: the Run → Evaluation prompt in Appendix A.
+**Tools:** Code: `web-proto/binary-pill.html` and a phone mock in the site's own JavaScript (Vite + anime.js). Figma Make: the Run → Evaluation prompt in Appendix A.
 
 **Minutes:** ≈65 (Fri 23:31–23:42 binary pill; Sat 00:10–01:03 site v1 → v4 with the phone mock). Figma Make: [fill after running].
 
 **Rating:** 3/5 for code-first; Figma Make [fill after running]
 
-**What we did:** The prototype was the product. The phone mock on the site loops calibration, bottle, recall, run, verdict and release, and those loops became APP-PLAN's twelve screens. The binary-pill hero was tried as a standalone HTML file before it went on the site.
+**What we did:** The prototype was the product. The site's phone mock loops calibration, bottle, recall, run, verdict and release; those loops became APP-PLAN's twelve screens. The binary pill was tried as one HTML file before it went on the site.
 
-**What broke:** Nobody without a code editor could change the prototype or click through it, which is the gap the Figma Make prompt fills. The site went through four versions in 53 minutes; v3 dropped a section and recoloured, v4 moved colour off the words.
+**What broke:** Nobody without a code editor could change or click through the prototype; the Figma Make prompt is written to fill that gap. The site went through four versions in 53 minutes; v4 moved colour off the words.
 
-**Into the project:** APP-PLAN.md's screen list and flows; the pill fill as the run's main visual; the live site at pill-site.vercel.app.
+**Into the project:** APP-PLAN.md's screens and flows; the pill fill as the run's main visual; pill-site.vercel.app.
 
 ## Stage 3 · Handoff
 
@@ -38,30 +38,44 @@ Four stages, ≤ 200 words each. Minutes come from commit times in `figma/git-ti
 
 **Rating:** 2/5 by hand; Composio path [fill after running]
 
-**What we did:** The site's 27 tokens seeded the app's 44. The plugin now puts the app's colour tokens into Figma as styles and variables, and the script reads them back as CSS, so a change made in Figma can land in code.
+**What we did:** The site's 27 tokens seeded the app's palette. The plugin puts the app's colour tokens into Figma as styles and variables, and the script reads them back as CSS, so a change made in Figma can land in code.
 
-**What broke:** By hand, 8 of 27 tokens arrived identical, 7 changed value (some on purpose: the verdict colours were re-pointed at mint, amber and grey) and 12 were renamed or not needed (blue → sky, paper → bg). Nothing recorded which changes were intended. Composio's Figma tools read, comment and set variables but cannot draw a layer.
+**What broke:** By hand, 8 of 27 tokens arrived identical, 7 changed value (some on purpose: verdict colours re-pointed at mint, amber, grey) and 12 were renamed or dropped. Nothing recorded which changes were intended. Composio's Figma tools read, comment and set variables but cannot draw a layer.
 
 **Into the project:** the app's `:root`; the Tokens page; `tokens-from-figma.mjs`.
 
 ## Stage 4 · Code generation
 
-**Tools:** Claude Code as lead agent with three parallel builder agents (screens, dashboards and motion, payments backend). The Pill → Figma plugin as the "design from code" step.
+**Tools:** Claude Code as lead agent with three parallel builders (screens, dashboards and motion, payments backend). The Pill → Figma plugin as the "design from code" step.
 
-**Minutes:** ≈92 committed (app v1 01:26–01:45; v2 and backend 08:32–09:45; no commits 01:45–08:32). Plugin and deck generator: ≈30 (09:45–10:15, one agent). Real plugin run: [fill after running].
+**Minutes:** ≈92 committed (app v1 01:26–01:45; v2 and backend 08:32–09:45). Plugin and deck generator: ≈30 (09:45–10:15). Real plugin run: [fill after running].
 
 **Rating:** 4/5
 
-**What we did:** The app (20 routes), the x402/Nessie payment service and the Claude and Gemini wiring were generated against written plans. Then the repo generated its Figma: `build-deck.mjs` turns screenshots, CSS tokens, debate JSON and this log into `deck.json`; the plugin draws the Slides deck, the Design pages and the FigJam board.
+**What we did:** The app (20 routes), the x402/Nessie payment service and the Claude and Gemini wiring were generated against written plans. Then the repo generated its Figma: `build-deck.mjs` turns screenshots, site art, CSS tokens, debate JSON and this log into `deck.json`; the plugin draws the Slides deck, the Design pages and the FigJam board.
 
 **What broke:** The scaffold's P6 rule held money only when the recall lookup was unreachable, so a delivery with no bottle attached could be proposed for release; a builder's end-to-end test caught it. A `tail -6` cut off Vercel's output, the deploy was re-run, and we got two identical production deploys. The REST API cannot create nodes, hence a plugin.
 
-**Into the project:** the working app and payment service; `deck.json`; this deck and the Design file.
+**Into the project:** the app and payment service; `deck.json`; this deck and the Design file.
+
+## Reproduce in 10 minutes
+
+> **Box · from a clean clone to three Figma files**
+>
+> 1. `node figma/build-deck.mjs` (Node 22+, ffmpeg optional). Prints slide count and `deck.json` size. ~1 min warm, longer cold.
+> 2. Optional, to refresh the site art: in a headless Chromium tab, run `figma/capture-art.mjs` against `https://pill-site.vercel.app` (usage in the file header), then step 1 again. ~1 min.
+> 3. Figma desktop → any file → Plugins → Development → Import plugin from manifest → `figma/plugin/manifest.json`. ~1 min.
+> 4. New Slides file → run **Pill → Figma** → pick `figma/deck.json` → Build. 18 slides with speaker notes. ~2 min.
+> 5. New Design file → same plugin → pages Deck, App screens, Website, Tokens, Stage log. ~3 min.
+> 6. New FigJam board → same plugin → the ideation board. ~1 min.
+> 7. Write the three links and the "Done in N s" times into `figma/LINKS.md`.
+>
+> No Figma? `node figma/measure-plugin.mjs` runs the same plugin code against a stub Figma API and prints node counts per editor. Minute estimates above are ours; the real run time is `[fill after running]`.
 
 ## Reusable recipe: code-first teams, generate your Figma from the repo
 
 1. Keep the repo as the source of truth: screenshots in `dev-shots/`, tokens in one `:root`, decisions in markdown or JSON.
-2. Write one generator (`build-deck.mjs`) that emits a single JSON: slides as absolutely positioned elements (text, rect, image, capsule), screenshot galleries, tokens, the log. The same JSON renders to `deck.html` for review and video.
+2. Write one generator (`build-deck.mjs`) that emits a single JSON: slides as absolutely positioned elements (text, rect, ellipse, image, capsule, vector path), screenshot galleries, tokens, the log. The same JSON renders to `deck.html` for review and video.
 3. Run one plugin (`plugin/`) in each editor: Slides gets the deck, Design gets screens + tokens as styles/variables + the log table, FigJam gets the decision board. Re-running replaces only its own nodes.
 4. Close the loop with Composio: comment the build time, attach dev resources from each screen frame to its source file, download thumbnails, read tokens back as CSS.
 5. Log honestly: every Figma step that was generated after the fact says so.
@@ -70,17 +84,17 @@ Nothing in the recipe is Pill-specific except the slide content in `build-deck.m
 
 ## Before / after (adoptability)
 
-Measured numbers live in `figma/metrics.json` (rewritten on every build) and on slide 13. Before = estimate (slides × 20 min, screenshots × 1 min, tokens × 1 min; our assumption, not a measurement). After = measured on this machine: the build time, the plugin's own work against a stub Figma API in Node, and the real Figma run time the plugin prints ([fill after running]).
+Measured numbers live in `figma/metrics.json` (rewritten on every build) and on slide 15. Before = estimate (slides × 20 min, screenshots × 1 min, tokens × 1 min; our assumption, not a measurement). After = measured on this machine: the cold build, the plugin's own work against a stub Figma API in Node, and the real Figma run time the plugin prints ([fill after running]).
 
 ## Appendix A · Figma Make prompt (Prototyping, not yet run)
 
-Paste into Figma Make, then share the result to "Anyone" and put the link in `figma/LINKS.md`:
+Paste exactly this into Figma Make, then share the result to "Anyone" and put the link in `figma/LINKS.md`:
 
-> Build a clickable mobile prototype (390 × 844) of "Pill", an app that runs a tablet dissolution screen and shows one of three verdicts. Light theme: paper #F7F8F7 background, white cards with 20 px radius and a hairline border rgba(22,24,27,0.10), ink #16181B text, sky #4FB3FF for the run, mint #5FD39A for PASS, amber #E09A3A for NEEDS LAB, grey #9AA0A6 for UNABLE TO VERIFY. Headings in Instrument Serif, body in Inter, small labels in JetBrains Mono uppercase.
+> Build a clickable mobile prototype (390 × 844) of "Pill", an app that runs a tablet dissolution screen and shows one of three verdicts. Light theme: paper #F7F8F7 background, white cards with 20 px radius and a hairline border rgba(22,24,27,0.10), ink #16181B text, sky #4FB3FF for the run, mint #5FD39A for PASS, amber #E09A3A for NEEDS LAB, grey #9AA0A6 for UNABLE TO VERIFY. Text is always ink; colour goes only on backgrounds, lines, fills and chips. Headings in Instrument Serif, body in Inter, small labels in JetBrains Mono uppercase.
 > Screens and flow:
 > 1. Place: "Drop one quarter tablet. Close the lid." A big button "Start run".
 > 2. Run: a vertical capsule (pill shape) that fills with sky blue from 0 to 100 % over about 8 seconds, a large percentage inside it, the word "dissolving" under it, a timer "0:29 / 3:00", and a four-segment timetable: fill, dissolve, settle, hold. When it reaches 100 % go to Evaluation automatically.
 > 3. Evaluation: a verdict chip and big serif word. Default PASS (mint) with "Rule P1 · 100 % of reference plateau", two bars (inline channel, 90° glow) inside a dotted reference band, and a "Why" paragraph: "The plateau is inside the reference band and the glow rose with it. This is a screening result, not a lab test."
-> 4. A three-way switch at the top of Evaluation flips the verdict to NEEDS LAB (amber, "Rule N1 · light dropped but no green glow") or UNABLE TO VERIFY (grey, "Rule U1 · no reference for this drug on this box").
+> 4. A three-way switch at the top of Evaluation flips the verdict to NEEDS LAB (amber, "Rule N2 · inline moved, glow did not rise") or UNABLE TO VERIFY (grey, "Rule U1 · no reference for this drug on this box").
 > 5. Clinic decision: "Delivery D-0412 · $1,240.00 · SANDBOX". PASS shows "Policy proposes: release" and a button "Release payment" that changes to "Released · SANDBOX". NEEDS LAB shows "Held · lab referral drafted". UNABLE TO VERIFY shows "Escalated to a person · no money moves".
-> Words: never write safe, verified, authentic, certified, guaranteed, fake, genuine or counterfeit. Money is always labelled SANDBOX.
+> Words: results use only PASS, NEEDS LAB and UNABLE TO VERIFY; describe PASS as "consistent with the reference", never as a judgement on the medicine. Money is always labelled SANDBOX.

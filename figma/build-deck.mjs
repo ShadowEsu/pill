@@ -39,8 +39,8 @@ const FONTS = {
 const IMAGES = {}; // id -> { w, h, mime, file, b64, cropped }
 let converted = 0;
 const HAS_FFMPEG = (() => { try { execFileSync('ffmpeg', ['-version'], { stdio: 'ignore' }); return true; } catch { return false; } })();
-const PHONE = { w: 390, cap: 2.2, q: 9 };      // gallery + slide phones: 390 wide, at most 390×858
-const DESK = { w: 720, cap: 0.75, q: 9 };      // gallery desktops: 720 wide, at most 720×540
+const PHONE = { w: 390, cap: 2.2, q: 12 };     // gallery + slide phones: 390 wide, at most 390×858
+const DESK = { w: 640, cap: 0.75, q: 12 };     // gallery desktops: 640 wide, at most 640×480 (keeps deck.json under 9 MB)
 const BIG = (w) => ({ w, cap: 0, q: 5 });      // slide hero images, uncropped
 const srcDims = new Map();
 function dimsOf(files) {
@@ -66,17 +66,17 @@ function jpegSize(buf) {
   }
   throw new Error('no SOF');
 }
-/** Register a screenshot; returns its image id. spec = { w: max width, cap: max height/width (0 = none), q: ffmpeg -q:v }. */
+/** Register a screenshot; returns its image id. spec = { w: max width, cap: max height/width (0 = none), q: ffmpeg -q:v, box: [x, y, w, h] fractions to crop to (ffmpeg only) }. */
 function img(src, spec = PHONE) {
   const abs = path.isAbsolute(src) ? src : path.join(ROOT, src);
-  const id = rel(abs).replace(/^pill\/web\/dev-shots\//, 'app/').replace(/^pill-site\/dev-shots\//, 'site/').replace(/\.[a-z]+$/, '').replace(/[^a-zA-Z0-9]+/g, '-') + '-' + spec.w + (spec.cap ? 'c' : '');
+  const id = rel(abs).replace(/^pill\/web\/dev-shots\//, 'app/').replace(/^pill-site\/dev-shots\//, 'site/').replace(/\.[a-z]+$/, '').replace(/[^a-zA-Z0-9]+/g, '-') + '-' + spec.w + (spec.cap ? 'c' : '') + (spec.box ? 'k' : '');
   if (IMAGES[id]) return id;
-  const out = path.join(ASSETS, id + '.jpg');
+  const out = path.join(ASSETS, `${id}-q${spec.q}.jpg`);
   const [d] = dimsOf([abs]);
   const cropped = HAS_FFMPEG && spec.cap > 0 && d.h / d.w > spec.cap + 0.02;
   if (!fs.existsSync(out) || fs.statSync(out).mtimeMs < fs.statSync(abs).mtimeMs) {
     if (HAS_FFMPEG) {
-      const crop = spec.cap ? `crop=iw:'min(ih,trunc(iw*${spec.cap}))':0:0,` : '';
+      const crop = spec.box ? `crop=iw*${spec.box[2]}:ih*${spec.box[3]}:iw*${spec.box[0]}:ih*${spec.box[1]},` : spec.cap ? `crop=iw:'min(ih,trunc(iw*${spec.cap}))':0:0,` : '';
       execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', abs, '-vf', `${crop}scale='min(${spec.w},iw)':-2`, '-q:v', String(spec.q), out]);
     } else {
       const args = ['-s', 'format', 'jpeg', '-s', 'formatOptions', '55'];
@@ -199,7 +199,8 @@ const hhmm = (ms) => new Date(ms).toLocaleTimeString('en-US', { weekday: 'short'
 const GROUP_NAME = {
   flowsa: 'App v1 · flow A', flowsb: 'App v1 · flow B', e2e: 'App v1 · end-to-end run', payreal: 'Payments (x402 / Nessie)', dashviz: 'App v2 · dashboards',
   motion: 'App v2 · motion', pillmotion: 'App v2 · pill fill motion', runeval: 'Run + evaluation pass', appbackend: 'Backend wiring (Claude, Gemini)',
-  appstory: 'Story + settings', v2: 'App v2 · every route',
+  appstory: 'Story + settings', v2: 'App v2 · every route', v3: 'App v3 · first polish', live: 'App · live deploy', round3: 'Round 3 · agent + ask',
+  upgrade: 'App v3 · upgrade pass (newest)',
 };
 function screenGroups(dir, isSite) {
   const files = listShots(dir).filter((f) => !/peel|\/full\.webp$/.test(f));
@@ -212,7 +213,7 @@ function screenGroups(dir, isSite) {
     const base = path.basename(f).replace(/\.[a-z]+$/i, '');
     const key = isSite ? (d.w <= 700 ? 'Phone' : 'Desktop') : (relDir || base.split('-')[0]);
     const phone = d.w <= 700;
-    if (!groups.has(key)) groups.set(key, { key, items: [], t: Infinity });
+    if (!groups.has(key)) groups.set(key, { key, items: [], t: Infinity, dir: !!relDir && !isSite });
     const g = groups.get(key);
     const t = fs.statSync(f).mtimeMs;
     g.t = Math.min(g.t, t);
@@ -223,7 +224,7 @@ function screenGroups(dir, isSite) {
   });
   return [...groups.values()].sort((a, b) => a.t - b.t).map((g) => ({
     title: isSite ? `Website · ${g.key.toLowerCase()} screenshots` : (GROUP_NAME[g.key] || g.key),
-    sub: `${g.items.length} screenshot${g.items.length === 1 ? '' : 's'} · first taken ${hhmm(g.t)} PDT · ${isSite ? 'pill-site/dev-shots' : 'pill/web/dev-shots/' + (['e2e', 'v2'].includes(g.key) ? g.key : g.key + '-*')}`,
+    sub: `${g.items.length} screenshot${g.items.length === 1 ? '' : 's'} · first taken ${hhmm(g.t)} PDT · ${isSite ? 'pill-site/dev-shots' : 'pill/web/dev-shots/' + (g.dir ? g.key : g.key + '-*')}`,
     items: g.items.sort((a, b) => (a.kind === b.kind ? a.t - b.t : a.kind === 'phone' ? -1 : 1)).map(({ t, ...it }) => it),
   }));
 }
@@ -233,314 +234,448 @@ const count = (gs, kind) => gs.reduce((n, g) => n + g.items.filter((i) => !kind 
 const appShotCount = count(appGroups), siteShotCount = count(siteGroups), appPhoneCount = count(appGroups, 'phone');
 
 // ───────────────────────────── element helpers ─────────────────────────────
-const W = 1920, H = 1080, X = 120;
+// Element types (deck.html and plugin/code.js render exactly these): text, rect, ellipse, image, capsule, path.
+// House rule: words are ink (white on dark panels); colour lives only in fills, lines, chips and art.
+const W = 1920, H = 1080, X = 120, TOTAL = 18;
 const text = (x, y, w, t, o = {}) => ({ t: 'text', x, y, w, text: t, size: 30, font: 'sans', weight: 400, color: C.ink, lh: 140, ls: 0, align: 'left', ...o });
-const eyebrow = (x, y, t, color = C.muted, w = 1200) => text(x, y, w, t.toUpperCase(), { font: 'mono', size: 22, weight: 500, ls: 14, color, lh: 120 });
+const eyebrow = (x, y, t, w = 1200, o = {}) => text(x, y, w, t.toUpperCase(), { font: 'mono', size: 20, weight: 500, ls: 14, color: C.muted, lh: 120, ...o });
 const head = (x, y, w, t, size = 104, o = {}) => text(x, y, w, t, { font: 'serif', size, lh: 100, ls: -1.5, ...o });
 const body = (x, y, w, t, o = {}) => text(x, y, w, t, { size: 30, color: C.ink2, lh: 145, ...o });
+const mono = (x, y, w, t, o = {}) => text(x, y, w, t, { font: 'mono', size: 17, color: C.muted, lh: 140, ...o });
 const rect = (x, y, w, h, o = {}) => ({ t: 'rect', x, y, w, h, fill: C.surface, radius: 0, ...o });
 const card = (x, y, w, h, o = {}) => rect(x, y, w, h, { fill: C.surface, radius: 28, stroke: C.line, strokeW: 2, ...o });
 const image = (x, y, w, h, id, o = {}) => ({ t: 'image', x, y, w, h, img: id, radius: 0, fit: 'top', ...o });
 const capsule = (x, y, w, h, level, o = {}) => ({ t: 'capsule', x, y, w, h, level, fill: C.sky, track: C.surface, stroke: C.sky, strokeW: 4, ...o });
-function chip(x, y, label, fg, bg, o = {}) {
-  const size = o.size || 22;
-  const w = o.w || Math.round(label.length * size * 0.66 + size * 2.2);
-  const h = Math.round(size * 2);
-  return [rect(x, y, w, h, { fill: bg, radius: h / 2, ...(o.stroke ? { stroke: o.stroke, strokeW: 2 } : {}) }),
-    text(x, y + (h - size * 1.2) / 2, w, label, { font: o.font || 'mono', size, weight: 600, color: fg, align: 'center', lh: 120, ls: o.ls ?? 6 })];
+const r1 = (n) => Math.round(n * 10) / 10;
+/** Raw vector: SVG path data (M/L/C/Z, absolute, space-separated) in a w×h box at x,y. */
+const curve = (x, y, w, h, d, stroke, o = {}) => ({ t: 'path', x, y, w, h, d, stroke, strokeW: o.w ?? 3, dash: o.dash || null, fill: null });
+/** Polyline through slide-coordinate points, with an arrow head at the end unless o.head === false. */
+function line(pts, stroke, o = {}) {
+  const sw = o.w ?? 3, hl = o.head === false ? 0 : (o.headLen ?? 14);
+  const all = [...pts];
+  let tips = [];
+  if (hl) {
+    const [ax, ay] = pts[pts.length - 2], [bx, by] = pts[pts.length - 1], a = Math.atan2(by - ay, bx - ax);
+    tips = [-0.5, 0.5].map((da) => [bx - hl * Math.cos(a + da), by - hl * Math.sin(a + da)]);
+    all.push(...tips);
+  }
+  const x0 = Math.floor(Math.min(...all.map((p) => p[0])) - sw), y0 = Math.floor(Math.min(...all.map((p) => p[1])) - sw);
+  const x1 = Math.ceil(Math.max(...all.map((p) => p[0])) + sw), y1 = Math.ceil(Math.max(...all.map((p) => p[1])) + sw);
+  const P = ([x, y]) => `${r1(x - x0)} ${r1(y - y0)}`;
+  let d = `M ${P(pts[0])}` + pts.slice(1).map((p) => ` L ${P(p)}`).join('');
+  if (hl) d += ` M ${P(tips[0])} L ${P(pts[pts.length - 1])} L ${P(tips[1])}`;
+  return curve(x0, y0, x1 - x0, y1 - y0, d, stroke, { w: sw, dash: o.dash });
 }
+/** Chip: tinted pill, ink label (o.fg only for white-on-dark), optional coloured dot. Width from JetBrains Mono's 0.6 em advance. */
+const chipW = (label, o = {}) => { const s = o.size || 20; return o.w || Math.round(label.length * s * 0.66 + s * 2.2 + (o.dot ? s : 0)); };
+function chip(x, y, label, bg, o = {}) {
+  const s = o.size || 20, h = Math.round(s * 2), w = chipW(label, o), dot = o.dot ? Math.round(s * 0.5) : 0;
+  const els = [rect(x, y, w, h, { fill: bg, radius: h / 2, ...(o.stroke ? { stroke: o.stroke, strokeW: 2 } : {}) })];
+  if (dot) els.push({ t: 'ellipse', x: Math.round(x + s), y: Math.round(y + (h - dot) / 2), w: dot, h: dot, fill: o.dot });
+  const tx = dot ? Math.round(x + s + dot + s * 0.4) : x;
+  els.push(text(tx, y + (h - s * 1.2) / 2, dot ? w - (tx - x) - Math.round(s * 0.6) : w, label, { font: 'mono', size: s, weight: 600, color: o.fg || C.ink, align: dot ? 'left' : 'center', lh: 120, ls: 6 }));
+  return els;
+}
+/** Chips left to right; items = [label, bg, opts]. */
+function chipRow(x, y, items, gap = 14) {
+  let cx = x;
+  return items.flatMap(([label, bg, o = {}]) => { const els = chip(cx, y, label, bg, o); cx += chipW(label, o) + gap; return els; });
+}
+const VERDICT = { PASS: [C.mintTint, C.mint], 'NEEDS LAB': [C.amberTint, C.amber], 'UNABLE TO VERIFY': [C.greyTint, C.grey] };
+const vchip = (word, o = {}) => [word, VERDICT[word][0], { dot: VERDICT[word][1], ...o }];
 /** Phone mock: rounded white bezel + screenshot cropped from the top. */
 function phone(x, y, w, id, h = Math.round(w * 2.05)) {
   const pad = Math.round(w * 0.028);
   return [rect(x, y, w, h, { fill: C.surface, radius: Math.round(w * 0.13), stroke: C.line2, strokeW: 2, shadow: true }),
     image(x + pad, y + pad, w - 2 * pad, h - 2 * pad, id, { radius: Math.round(w * 0.11) })];
 }
-function browserShot(x, y, w, id, h) {
+function browserShot(x, y, w, id, h, fit = 'top') {
   const meta = IMAGES[id];
   const ih = h ?? Math.round((w * meta.h) / meta.w);
   return [rect(x, y, w, ih + 44, { fill: C.surface, radius: 22, stroke: C.line2, strokeW: 2, shadow: true }),
     ...[0, 1, 2].map((i) => ({ t: 'ellipse', x: x + 22 + i * 24, y: y + 15, w: 14, h: 14, fill: ['#FF6159', '#FFBD2E', '#28C941'][i] })),
-    image(x + 2, y + 44, w - 4, ih - 2, id, { radius: 0, fit: 'top' })];
+    image(x + 2, y + 44, w - 4, ih - 2, id, { radius: 0, fit })];
 }
 function logo(x, y, s = 1) {
   return [capsule(x, y, 64 * s, 28 * s, 0.5, { fill: C.mint, stroke: C.ink, strokeW: 2, track: C.surface }),
     text(x + 78 * s, y - 3 * s, 200, 'Pill', { font: 'serif', size: 34 * s, lh: 100 })];
 }
-function frameChrome(n, total, label) {
-  return [...logo(X, 56, 0.8), text(X + 260, 56, 1000, label.toUpperCase(), { font: 'mono', size: 18, weight: 500, ls: 14, color: C.muted, lh: 130 }),
-    text(W - X - 400, 56, 400, `${String(n).padStart(2, '0')} / ${total}`, { font: 'mono', size: 18, weight: 500, ls: 10, color: C.muted, align: 'right', lh: 130 }),
-    rect(X, H - 70, W - 2 * X, 2, { fill: C.line }),
-    text(X, H - 54, 1200, 'Pill · Cal Hacks 13.0 · pill-site.vercel.app', { font: 'mono', size: 18, color: C.muted, ls: 6, lh: 130 })];
+/** Header (logo, section, n / total) and footer rule; n defaults to the slide being built. */
+function chrome(label, o = {}) {
+  const n = o.n || slides.length + 1;
+  return [...logo(X, 56, 0.8), mono(X + 260, 58, 1000, label.toUpperCase(), { size: 18, weight: 500, ls: 14, lh: 130 }),
+    mono(W - X - 400, 58, 400, `${String(n).padStart(2, '0')} / ${TOTAL}`, { size: 18, weight: 500, ls: 10, align: 'right', lh: 130 }),
+    ...(o.footer === false ? [] : [rect(X, H - 70, W - 2 * X, 2, { fill: C.line }), mono(X, H - 54, 1200, 'Pill · Cal Hacks 13.0 · pill-site.vercel.app', { size: 18, ls: 6, lh: 130 })])];
 }
 
-// ───────────────────────────── slides ─────────────────────────────
-const IM = {
-  runMid: img('pill/web/dev-shots/pillmotion-run-mid-phone.webp'),
-  pass: img('pill/web/dev-shots/runeval-eval-pass.webp'),
-  needsLab: img('pill/web/dev-shots/pillmotion-eval-needslab-phone.webp'),
-  unable: img('pill/web/dev-shots/pillmotion-eval-u1-phone.webp'),
-  release: img('pill/web/dev-shots/payreal-delivery-release-live-phone.webp'),
-  hold: img('pill/web/dev-shots/flowsb-delivery-hold.webp'),
-  verify: img('pill/web/dev-shots/payreal-verify-real402-phone.webp'),
-  siteCoinbase: img('pill-site/dev-shots/sitestory-coinbase.webp', BIG(720)),
-  siteHero: img('pill-site/dev-shots/sitestory-hero.webp', BIG(1024)),
-  station: img('pill-site/dev-shots/station2-60.png', BIG(1200)),
+// ───────────────────────────── slide images ─────────────────────────────
+// App phones: the newest build pass (dev-shots/upgrade) when a shot exists there, else the older pass named next.
+const SHOTS = 'pill/web/dev-shots';
+function newest(...cands) {
+  for (const c of cands) if (fs.existsSync(path.join(ROOT, SHOTS, c))) return img(`${SHOTS}/${c}`);
+  throw new Error(`no screenshot among ${cands.join(', ')}`);
+}
+const APP = {
+  welcome: newest('upgrade/a-onboarding-390.webp', 'v2/welcome-phone.webp'),
+  bottle: newest('upgrade/b-bottle-390.webp', 'e2e/03-bottle.webp'),
+  place: newest('upgrade/b-place-390.webp', 'v2/place-phone.webp'),
+  run: newest('upgrade/b-run-390.webp', 'pillmotion-run-mid-phone.webp'),
+  pass: newest('upgrade/b-evaluation-pass-390.webp', 'runeval-eval-pass.webp'),
+  needsLab: newest('upgrade/b-evaluation-needslab-390.webp', 'pillmotion-eval-needslab-phone.webp'),
+  unable: newest('upgrade/b-evaluation-unable-390.webp', 'upgrade/b-evaluation-u1-390.webp', 'pillmotion-eval-u1-phone.webp'),
+  held: newest('upgrade/b-delivery-held-policy-390.webp', 'flowsb-delivery-hold.webp'),
+  heldTop: newest('upgrade/b-delivery-held-390.webp', 'flowsb-delivery-hold.webp'),
+  released: newest('upgrade/b-delivery-released-390.webp', 'payreal-delivery-release-live-phone.webp'),
+  verify: newest('upgrade/b-verify-390.webp', 'payreal-verify-real402-phone.webp'),
+  home: newest('upgrade/a-home-390.webp', 'v3/dashboard.webp'),
+  medicines: newest('upgrade/a-medicines-390.webp', 'v2/medicines-phone.webp'),
+  ask: newest('upgrade/b-ask-390.webp', 'round3-ask-phone.webp'),
 };
-const gridPhones = ['v2/welcome-phone', 'e2e/03-bottle', 'v2/place-phone', 'pillmotion-run-mid-phone', 'runeval-eval-pass', 'e2e/10-delivery-policy', 'v2/medicines-phone', 'v2/calibration-phone']
-  .map((n) => img(`pill/web/dev-shots/${n}.webp`));
-const sitePhones = ['m-problem', 'm-verdicts', 'm-pay'].map((n) => img(`pill-site/dev-shots/${n}.webp`));
+// Art captured from the live site by capture-art.mjs (figma/art/*.png)
+const ART = {
+  pill: img('figma/art/binary-pill.png', BIG(1000)),
+  station: img('figma/art/station.png', { ...BIG(1400), box: [0.05, 0.09, 0.77, 0.84] }),
+  siteHero: img('figma/art/site-hero.png', BIG(1100)),
+  siteVerdicts: img('figma/art/site-verdicts.png', BIG(900)),
+  siteMoney: img('figma/art/site-payments.png', BIG(900)),
+};
 
+// ───────────────────────────── slides ─────────────────────────────
 const slides = [];
 const S = (name, els, notes, bg = C.paper) => slides.push({ id: `s${String(slides.length + 1).padStart(2, '0')}`, name, bg, els, notes });
 
 // 1 · title
 S('Title', [
   ...logo(X, 64, 1.1),
-  eyebrow(X, 230, 'Cal Hacks 13.0 · Idea to Demo · Figma'),
-  head(X, 290, 1100, [{ s: 'The box measures.\n' }, { s: 'Pill explains.', italic: true }], 150, { lh: 96 }),
-  body(X, 640, 900, 'A $40 lab-in-a-box. Drop one tablet in water, close the lid, and three minutes later it says PASS, NEEDS LAB or UNABLE TO VERIFY. In a clinic, that answer decides whether the supplier gets paid.', { size: 32 }),
-  ...chip(X, 900, 'PASS', C.mintInk, C.mintTint), ...chip(X + 150, 900, 'NEEDS LAB', C.amberInk, C.amberTint), ...chip(X + 380, 900, 'UNABLE TO VERIFY', '#5F656B', C.greyTint),
-  capsule(1010, 150, 280, 780, 0.53, { fill: C.sky, stroke: C.sky, strokeW: 6 }),
-  text(1010, 640, 280, '53%', { font: 'serif', size: 96, align: 'center', color: C.ink, lh: 100 }),
-  ...phone(1430, 250, 360, IM.runMid),
-], 'Open on the object. One tablet, about three minutes, one of three words. In clinic mode that word holds or releases a supplier\'s payment. Everything in this deck was generated from our repo by the Pill → Figma plugin.');
+  eyebrow(X, 250, 'Cal Hacks 13.0 · Idea to Demo · Figma'),
+  head(X, 300, 870, [{ s: 'The box measures.\n' }, { s: 'Pill explains.', italic: true }], 140, { lh: 96 }),
+  body(X, 620, 780, 'A $40 lab-in-a-box. One tablet, about three minutes, one of three answers. In a clinic, that answer decides whether the supplier gets paid.', { size: 32 }),
+  ...chipRow(X, 860, ['PASS', 'NEEDS LAB', 'UNABLE TO VERIFY'].map((v) => vchip(v))),
+  image(1000, 170, 800, 657, ART.pill, { radius: 40, fit: 'cover' }),
+  mono(1000, 850, 800, 'Art · the site\u2019s binary pill (pill.js), captured from pill-site.vercel.app'),
+], 'Pill is a forty-dollar box. One quarter tablet, about three minutes, two channels that must agree. It says three things only: PASS, NEEDS LAB, UNABLE TO VERIFY.');
 
-// 2 · problem
+// 2 · the moment
+const MX = X + 50, MY = 390; // chart origin; coordinates below are the pitch deck's 960×560 chart
+S('The moment', [
+  ...chrome('The moment · delivery d-1042 · replay TM-02'),
+  head(X, 150, 1500, [{ s: 'Same label. ' }, { s: 'Chalk inside.', italic: true }], 104),
+  body(X, 280, 1300, 'The bottle says vitamin B2. The blue line drops into the reference band, so a one-sensor tester would call it a pass. The green glow never moves.', { size: 28 }),
+  card(X, 400, 1060, 560),
+  rect(MX + 80, MY + 170, 840, 76, { fill: C.skyTint }),
+  line([[MX + 80, MY + 170], [MX + 920, MY + 170]], C.sky, { w: 2, head: false, dash: [8, 8] }),
+  line([[MX + 80, MY + 246], [MX + 920, MY + 246]], C.sky, { w: 2, head: false, dash: [8, 8] }),
+  line([[MX + 80, MY + 60], [MX + 80, MY + 490], [MX + 920, MY + 490]], C.ink, { w: 2, head: false }),
+  curve(MX, MY, 960, 560, 'M 80 490 C 200 420 300 300 420 250 C 540 200 700 222 920 220', C.sky, { w: 7 }),
+  curve(MX, MY, 960, 560, 'M 80 486 C 300 485 600 484 920 483', C.mint, { w: 7 }),
+  mono(MX + 520, MY + 132, 400, 'reference band 0.36–0.47', { size: 19, color: C.ink, align: 'right' }),
+  text(MX + 560, MY + 262, 380, 'blue inline: in the band', { size: 24, weight: 600 }),
+  text(MX + 560, MY + 420, 380, 'green 90° glow: flat', { size: 24, weight: 600 }),
+  mono(MX + 80, MY + 504, 200, '0 s'), mono(MX + 720, MY + 504, 200, '180 s', { align: 'right' }),
+  mono(X, 972, 1060, 'Illustration · the shape of replay TM-02, redrawn; not live sensor data.', { size: 16 }),
+  card(1240, 400, 560, 560, { fill: C.amberTint, stroke: 'rgba(224,154,58,0.40)' }),
+  eyebrow(1280, 440, 'Rule N2 · inline moved, glow did not rise', 480, { color: C.ink2, size: 15, ls: 6 }),
+  head(1280, 488, 480, 'NEEDS LAB', 96),
+  body(1280, 608, 480, 'A one-sensor tester would have passed it.', { size: 26, color: C.ink }),
+  rect(1280, 708, 480, 2, { fill: C.amber }),
+  eyebrow(1280, 736, 'Policy P2 · hold, draft the lab referral', 480, { color: C.ink2, size: 17, ls: 10 }),
+  text(1280, 780, 480, '$480.00 held', { font: 'mono', size: 52, weight: 500, lh: 110 }),
+  ...chip(1280, 876, 'SANDBOX · REPLAY', C.greyTint),
+], 'This bottle says vitamin B2. Inside is chalk. The blue line drops right into the reference band, so a one-sensor tester would call that a pass, but the green line never moves. Pill says NEEDS LAB and the supplier\'s four hundred and eighty dollars stays held, lab referral drafted. Sandbox money; this is a replay, and we say so.');
+
+// 3 · one in ten
 const stats = [
-  ['1 in 10', 'medical products in low- and middle-income countries estimated substandard or falsified', 'WHO, 2017'],
-  ['116,000', 'extra malaria deaths a year in sub-Saharan Africa, modelled, from substandard and falsified antimalarials (range 64,000–158,000)', 'LSHTM model, cited by WHO, 2017'],
-  ['>300', "children's deaths linked to contaminated cough syrups in three countries, 2022–23, most under five", 'WHO, Jan 2023'],
-  ['$30.5B', "spent each year on substandard and falsified medical products, by WHO's estimate", 'WHO fact sheet, 2024'],
+  ['116,000', 'extra malaria deaths a year in sub-Saharan Africa, modelled central estimate, from substandard and falsified antimalarials (range 64,000–158,000)', 'LSHTM model, cited by WHO, 2017', C.amber],
+  ['>300', "children's deaths linked to contaminated cough syrups in three countries, 2022–23, most under five", 'WHO, Jan 2023', C.amber],
+  ['$30.5B', "spent each year on substandard and falsified medical products, by WHO's estimate", 'WHO fact sheet, 2024', C.sky],
 ];
 S('The problem', [
-  ...frameChrome(2, 16, 'The problem'),
-  head(X, 170, 1000, 'One in ten.', 140),
-  body(X, 345, 1500, 'The instrument that catches a bad tablet in a lab costs $20,000 to $100,000 and sits far from the clinics that need it.', { size: 32 }),
-  ...stats.flatMap(([big, what, src], i) => {
-    const x = X + i * 425, y = 520, w = 395;
-    return [card(x, y, w, 420), rect(x + 32, y + 32, 56, 6, { fill: [C.sky, C.amber, C.amber, C.sky][i], radius: 3 }),
-      text(x + 32, y + 62, w - 64, big, { font: 'serif', size: 88, lh: 100 }),
-      text(x + 32, y + 176, w - 64, what, { size: 24, color: C.ink2, lh: 140 }),
-      text(x + 32, y + 370, w - 64, src, { font: 'mono', size: 17, color: C.muted, lh: 130 })];
+  ...chrome('The problem'),
+  head(X, 150, 1000, 'One in ten.', 150),
+  body(X, 330, 1400, 'WHO estimates 1 in 10 medical products in low- and middle-income countries is substandard or falsified. The lab instrument that catches one costs $20,000 to $100,000.', { size: 30 }),
+  ...Array.from({ length: 10 }, (_, i) => i === 6).map((bad, i) => capsule(X + 43 + i * 166, 466, 100, 230, 0.5, bad
+    ? { fill: C.amber, track: C.amberTint, stroke: C.amber, strokeW: 4 }
+    : { fill: '#D9DDE1', track: C.surface, stroke: 'rgba(22,24,27,0.22)', strokeW: 3 })),
+  mono(X + 43, 716, 1600, 'Illustration · one tablet in ten. WHO, 2017: substandard and falsified products counted together.'),
+  ...stats.flatMap(([big, what, src, c], i) => {
+    const x = X + i * 580;
+    return [rect(x, 780, 56, 6, { fill: c, radius: 3 }), text(x, 802, 520, big, { font: 'serif', size: 64, lh: 100 }),
+      text(x, 876, 520, what, { size: 18, color: C.ink2, lh: 140 }), mono(x, 960, 520, src, { size: 15 })];
   }),
-], 'Numbers exactly as on our site, each with its source. 116,000 is the central estimate of a modelled range, 64,000 to 158,000. We do not animate these.');
+], 'WHO estimates 1 in 10 medical products in low- and middle-income countries is substandard or falsified. A new lab dissolution tester costs twenty to a hundred thousand dollars, and lab results take seven to ten business days. A clinic pharmacist has neither; what they have is an invoice to pay this afternoon.');
 
-// 3 · idea + two channels
+// 4 · the idea
+const channels = [
+  ['Channel A · inline', 'Blue light fades', 'A 465–475 nm LED shines across the cup. Riboflavin absorbs it as the tablet dissolves.', C.sky],
+  ['Channel B · 90°', 'Green glow rises', 'A second sensor behind green plastic sees riboflavin glow. Chalk clouds the water; it does not glow.', C.mint],
+];
 S('The idea', [
-  ...frameChrome(3, 16, 'The idea'),
-  head(X, 170, 900, 'Lot numbers can be copied. Dissolution cannot.', 92),
-  body(X, 400, 820, 'A recall lookup trusts the label. Pill measures the tablet itself: one tablet in 900 mL of water, a paddle at the same speed every run, two light sensors watching it dissolve.', { size: 29 }),
-  card(X, 640, 400, 300, { fill: C.skyTint, stroke: 'rgba(79,179,255,0.35)' }),
-  eyebrow(X + 32, 672, 'Channel A · inline', C.skyInk, 340),
-  text(X + 32, 716, 340, 'Blue light fades', { font: 'serif', size: 44, lh: 105 }),
-  text(X + 32, 780, 340, 'A 465–475 nm LED shines across the cup. Riboflavin absorbs it as the tablet dissolves.', { size: 22, color: C.ink2, lh: 140 }),
-  card(X + 420, 640, 400, 300, { fill: C.mintTint, stroke: 'rgba(95,211,154,0.45)' }),
-  eyebrow(X + 452, 672, 'Channel B · 90°', C.mintInk, 340),
-  text(X + 452, 716, 340, 'Green glow rises', { font: 'serif', size: 44, lh: 105 }),
-  text(X + 452, 780, 340, 'A second sensor behind green plastic sees the riboflavin glow. Chalk clouds the water; it does not glow.', { size: 22, color: C.ink2, lh: 140 }),
-  rect(1000, 170, 800, 770, { fill: '#0B0C0E', radius: 28 }),
-  image(1000, 230, 800, 533, IM.station, { fit: 'cover', radius: 0 }),
-  text(1040, 800, 720, 'Fig 1 · The station, drawn in code for the website: cup, blue LED, two sensors, thermistor, stepper paddle, ESP32, Pi touchscreen.', { font: 'mono', size: 19, color: '#8E9AA6', lh: 140 }),
-], 'Why measurement beats lookup: the FDA found falsified product carrying a real lot number. Two channels: inline absorbance and 90° glow. The ESP32 measures; it decides nothing.');
+  ...chrome('The idea'),
+  head(X, 150, 760, 'Lot numbers can be copied. Dissolution cannot.', 84),
+  body(X, 370, 730, 'A recall lookup trusts the label. Pill measures the tablet itself: one tablet in 900 mL of water, a paddle at the same speed every run, two light sensors watching it dissolve.', { size: 26 }),
+  ...channels.flatMap(([k, t, d, c], i) => {
+    const y = 600 + i * 170;
+    return [rect(X, y, 6, 132, { fill: c, radius: 3 }), eyebrow(X + 30, y, k, 700, { size: 17 }),
+      text(X + 30, y + 30, 700, t, { size: 30, weight: 600, lh: 130 }), text(X + 30, y + 76, 700, d, { size: 21, color: C.ink2, lh: 140 })];
+  }),
+  rect(920, 150, 880, 800, { fill: C.dark, radius: 28 }),
+  image(950, 180, 820, 596, ART.station, { fit: 'contain' }),
+  mono(970, 850, 800, 'Fig 1 · the station, drawn in code for the site (station.js) and captured from pill-site.vercel.app: box, cup, paddle, blue LED, two sensors, ESP32, touchscreen.', { color: '#A3A9AF' }),
+], 'Riboflavin absorbs blue and glows green. Chalk only blocks light. Two channels must agree, so a cloudy cup cannot pass on its own; the ESP32 measures and decides nothing.');
 
-// 4 · how a run works
-const steps = [['Night before', 'Ten reference runs make the band.'], ['0:00', 'Photograph the bottle. Lot checked against the FDA recall list.'], ['0:20', 'Dark, then blank. Lid open? The run does not start.'], ['0:40', 'Drop one tablet. The paddle turns. The pill fills.'], ['3:00', 'The curve flattens. Seven rules, in order. The rule that fired is printed.']];
+// 5 · how a run works
+const fills = [[0, 'blank', '0:20 · dark, then blank. Lid open? No run.'], [0.22, 'dissolving', '0:40 · one tablet in. The paddle turns.'], [0.53, 'dissolving', 'Blue light fades as the tablet dissolves.'], [0.86, 'settling', 'The curve starts to flatten.'], [1, 'plateau', '3:00 · seven rules, in order. The rule that fired is printed.']];
 S('How a run works', [
-  ...frameChrome(4, 16, 'How a run works'),
-  head(X, 160, 1500, 'Three minutes, start to verdict.', 96),
-  ...steps.flatMap(([t, d], i) => {
-    const y = 330 + i * 120;
-    return [{ t: 'ellipse', x: X, y: y + 6, w: 26, h: 26, fill: i === 3 ? C.sky : C.surface, stroke: C.sky, strokeW: 4 },
-      ...(i < steps.length - 1 ? [rect(X + 11, y + 40, 4, 84, { fill: C.skyTint })] : []),
-      text(X + 50, y, 200, t, { font: 'mono', size: 23, weight: 500, color: C.skyInk, lh: 130 }),
-      text(X + 250, y - 2, 560, d, { size: 26, color: C.ink, lh: 135 })];
+  ...chrome('How a run works'),
+  head(X, 150, 1500, 'Three minutes, start to verdict.', 96),
+  body(X, 270, 1500, 'The app draws the run as a pill filling to last night\u2019s reference plateau (ten reference runs make the band). At 100% the curve has flattened and the seven rules run.', { size: 26 }),
+  ...fills.flatMap(([lvl, word, d], i) => {
+    const cx = X + i * 336, px = cx + 93, done = lvl === 1;
+    return [capsule(px, 360, 150, 370, lvl, { fill: done ? C.mint : C.sky, stroke: done ? C.mint : C.sky, strokeW: 5 }),
+      ...(i < fills.length - 1 ? [line([[px + 172, 545], [px + 314, 545]], C.line2, { w: 3 })] : []),
+      text(cx, 752, 336, `${Math.round(lvl * 100)}%`, { font: 'serif', size: 56, align: 'center', lh: 100 }),
+      mono(cx, 816, 336, word, { align: 'center' }),
+      text(cx + 18, 852, 300, d, { size: 20, color: C.ink2, lh: 140, align: 'center' })];
   }),
-  text(1040, 320, 760, 'The pill fill: how far this tablet has dissolved, as a % of the reference plateau.', { size: 24, color: C.ink2, lh: 140 }),
-  ...[[0, 'blank'], [0.22, 'dissolving'], [0.53, 'dissolving'], [0.86, 'settling'], [1, 'plateau']].flatMap(([lvl, word], i) => {
-    const x = 1060 + i * 150;
-    return [capsule(x, 420, 96, 360, lvl, { fill: lvl === 1 ? C.mint : C.sky, stroke: lvl === 1 ? C.mint : C.sky, strokeW: 4 }),
-      text(x - 27, 800, 150, `${Math.round(lvl * 100)}%`, { font: 'serif', size: 52, align: 'center', lh: 100 }),
-      text(x - 27, 866, 150, word, { font: 'mono', size: 17, color: C.muted, align: 'center', lh: 130 })];
-  }),
-  text(1040, 925, 760, 'Levels shown are an illustration; the app draws them live from the sensor stream.', { size: 19, color: C.muted, lh: 140 }),
-], 'The app shows the run as a pill filling to the reference plateau. At 100% the curve has flattened and the seven rules run. The verdict comes from deterministic rules, not from a model.');
+  mono(X, 966, 1680, 'Illustration · example levels; the app draws them live from the sensor stream.', { size: 16 }),
+], 'One quarter tablet, about three minutes. The pill fills to last night\'s reference plateau; at 100% the seven rules run in order and the rule that fired is printed. Claude explains the result in plain English but never sets a verdict.');
 
-// 5 · three answers
-const verdicts = [
-  ['PASS', C.mintInk, C.mintTint, IM.pass, 'Plateau in the reference band and the glow rose with it (P1).'],
-  ['NEEDS LAB', C.amberInk, C.amberTint, IM.needsLab, 'Light dropped with no glow, no plateau, or a plateau outside the band (N1–N3).'],
-  ['UNABLE TO VERIFY', '#5F656B', C.greyTint, IM.unable, 'No reference for this drug, a fault, or too little data (U1–U3).'],
+// 6 · three answers
+const answers = [
+  ['PASS', APP.pass, 'Plateau in the reference band and the glow rose with it (P1).'],
+  ['NEEDS LAB', APP.needsLab, 'Light dropped with no glow, no plateau, or a plateau outside the band (N1–N3).'],
+  ['UNABLE TO VERIFY', APP.unable, 'No reference for this drug, a fault, or too little data (U1–U3).'],
 ];
 S('Three answers', [
-  ...frameChrome(5, 16, 'Three answers'),
-  head(X, 160, 1300, [{ s: 'Three answers. ' }, { s: 'Never a guess.', italic: true }], 96),
-  ...verdicts.flatMap(([word, fg, bg, id, why], i) => {
+  ...chrome('Three answers'),
+  head(X, 140, 1500, [{ s: 'Three answers. ' }, { s: 'Never a guess.', italic: true }], 84),
+  body(X, 240, 1500, 'Seven rules, checked in order. A model writes the plain-English \u201cwhy\u201d; it never sets the verdict.', { size: 24 }),
+  ...answers.flatMap(([word, id, why], i) => {
     const x = X + i * 570;
-    return [...chip(x, 300, word, fg, bg, { size: 24 }),
-      text(x, 370, 500, why, { size: 23, color: C.ink2, lh: 140 }),
-      ...phone(x + 30, 460, 290, id, 530)];
+    return [...chip(x, 304, word, VERDICT[word][0], { dot: VERDICT[word][1], size: 22 }),
+      text(x, 366, 500, why, { size: 21, color: C.ink2, lh: 140 }),
+      ...phone(x, 452, 320, id, 512)];
   }),
-  text(X + 1440, 460, 240, 'Seven rules, checked in order. A model writes the plain-English "why"; it never sets the verdict.', { size: 22, color: C.ink2, lh: 145 }),
-], 'Three words only. PASS means this tablet\'s curve matched last night\'s riboflavin references on this box. It does not mean right drug, right dose or contaminant-free.');
+], 'It says three things only: PASS, NEEDS LAB, UNABLE TO VERIFY. Never a fourth. PASS means this tablet\'s curve matched last night\'s riboflavin references on this box; it does not mean right drug, right dose or contaminant-free.');
 
-// 6 · clinic mode
-const clauses = [['P1', 'A release needs PASS, no recall record for the lot, amount within the spend cap, and the pharmacist\u2019s tap.'], ['P2', 'NEEDS LAB: hold, and draft the lab referral with the curve attached.'], ['P3', 'UNABLE TO VERIFY: escalate to a person; no money moves.'], ['P4', 'A recall hit holds the payment regardless of the verdict.'], ['P5', 'Amount above the cap: escalate.'], ['P6', 'Recall lookup unreachable: hold until a lookup succeeds or a human overrides.']];
+// 7 · clinic mode: the money rail
+const rail = [['Clinic', 'wallet · USDC on Base', 'pays into escrow when the delivery is logged', X, 320, C.surface, C.line], ['Escrow', 'Pill escrow', 'holds it until a PASS and a pharmacist\u2019s tap', X + 450, 340, C.skyTint, 'rgba(79,179,255,0.40)'], ['Supplier', 'wallet · USDC on Base', 'paid only on release', X + 920, 320, C.surface, C.line]];
+const outcomes = [['PASS', '+ the pharmacist\u2019s tap \u2192 escrow pays the supplier (P1)'], ['NEEDS LAB', 'held; the lab referral is drafted with the curve (P2)'], ['UNABLE TO VERIFY', 'escalated to a person; no money moves (P3)']];
 S('Clinic mode', [
-  ...frameChrome(6, 16, 'Clinic mode · the payment gate'),
-  head(X, 160, 900, 'The verdict holds the payment.', 84),
-  ...chip(X, 290, 'SANDBOX MONEY', C.ink, C.amberTint),
-  body(X, 360, 900, 'A clinic samples one tablet from each delivery. The policy agent reads the verdict, the recall check and the spend cap, and proposes release, hold or escalate. A pharmacist taps.', { size: 27 }),
-  ...clauses.flatMap(([id, c], i) => [text(X, 530 + i * 72, 70, id, { font: 'mono', size: 22, weight: 600, color: C.skyInk, lh: 130 }), text(X + 80, 530 + i * 72, 800, c, { size: 22, color: C.ink, lh: 130 })]),
-  ...phone(1090, 170, 330, IM.hold, 740), ...phone(1460, 170, 330, IM.release, 740),
-  text(1090, 930, 330, 'NEEDS LAB → held', { font: 'mono', size: 18, color: C.muted, align: 'center', lh: 130 }),
-  text(1460, 930, 330, 'PASS + tap → released', { font: 'mono', size: 18, color: C.muted, align: 'center', lh: 130 }),
-], 'policy.md, six clauses, quoted verbatim in the app. The model can only downgrade an outcome. Release always needs a person\'s tap. All money here is SANDBOX.');
+  ...chrome('Clinic mode · the payment gate'),
+  head(X, 150, 1250, 'The verdict holds the payment.', 92),
+  ...chipRow(X, 270, [['SANDBOX · NESSIE', C.amberTint, { dot: C.amber }], ['TESTNET · BASE SEPOLIA', C.violetTint, { dot: C.violet }]]),
+  body(X, 340, 1180, 'A clinic samples one tablet from each delivery. The policy agent reads the verdict, the recall check and the spend cap, and proposes. Only a pharmacist\u2019s tap releases money.', { size: 26 }),
+  ...rail.flatMap(([k, sub, d, x, w, fill, stroke]) => [card(x, 490, w, 190, { fill, stroke, radius: 24 }),
+    text(x + 28, 514, w - 56, k, { size: 30, weight: 600, lh: 120 }), mono(x + 28, 558, w - 56, sub),
+    text(x + 28, 596, w - 56, d, { size: 21, color: C.ink2, lh: 140 })]),
+  line([[X + 332, 585], [X + 438, 585]], C.sky, { w: 3, dash: [8, 7] }),
+  line([[X + 802, 585], [X + 908, 585]], C.sky, { w: 3 }),
+  ...outcomes.flatMap(([v, d], i) => {
+    const y = 730 + i * 74;
+    return [...chip(X, y, v, VERDICT[v][0], { dot: VERDICT[v][1], w: 300 }), line([[X + 316, y + 20], [X + 390, y + 20]], C.line2, { w: 2, headLen: 10 }),
+      text(X + 408, y + 4, 840, d, { size: 24, lh: 130 })];
+  }),
+  ...phone(1440, 150, 360, APP.heldTop, 800),
+  mono(1440, 962, 360, 'app · delivery held under P2', { align: 'center', size: 16 }),
+], 'And it decides the money. A policy agent holds the payment in escrow and proposes release only on a PASS; a pharmacist taps to approve. Claude explains the result and keeps the log, but never sets a verdict and never moves money. Sandbox and testnet money today.');
 
-// 7 · coinbase
+// 8 · coinbase
+const x402 = [['402', 'The server answers \u201cPayment Required\u201d: 0.05 USDC on Base Sepolia.'], ['sign', 'The buyer\u2019s wallet signs that exact payment; over its spend cap, it refuses.'], ['settle', 'The facilitator settles it on Base Sepolia. TESTNET USDC only.'], ['200', 'The server answers with the verdict and the rule id that fired.']];
+const roles = [['Pay', 'Escrow \u2192 supplier in USDC, only after PASS and a pharmacist\u2019s tap.'], ['Buy', 'No local reference? Buy a verdict from another station over x402, capped per day.'], ['Earn', 'Every station can sell /verify to other clinics.']];
 S('Coinbase', [
   rect(0, 0, W, H, { fill: C.violetTint }),
-  ...frameChrome(7, 16, 'Coinbase · x402 · payment agents'),
-  head(X, 160, 900, 'The verdict is the invoice.', 96, { color: C.ink }),
-  ...chip(X, 300, 'TESTNET · BASE SEPOLIA', C.violetInk, 'rgba(122,92,255,0.16)'),
-  ...[['01 · Pay', 'Escrow → supplier in USDC on Base, only after PASS and a pharmacist\u2019s tap.'], ['02 · Buy', 'No local reference? The agent pays another station\u2019s /verify over x402, capped per day.'], ['03 · Earn', 'Every station can sell /verify: 402 → sign → settle → 200 with the verdict and the rule id.']]
-    .flatMap(([k, d], i) => [card(X, 390 + i * 170, 800, 150, { stroke: 'rgba(122,92,255,0.30)' }), rect(X + 22, 412 + i * 170, 6, 106, { fill: C.violet, radius: 3 }),
-      text(X + 52, 414 + i * 170, 300, k, { font: 'mono', size: 22, weight: 600, color: C.violetInk, lh: 130 }),
-      text(X + 52, 452 + i * 170, 720, d, { size: 25, color: C.ink, lh: 140 })]),
-  ...phone(960, 170, 300, IM.verify, 720),
-  ...browserShot(1290, 170, 510, IM.siteCoinbase),
-  text(960, 910, 300, 'app · /verify over x402', { font: 'mono', size: 17, color: C.muted, align: 'center', lh: 130 }),
-  text(1290, 910, 510, 'site · what Coinbase is for here', { font: 'mono', size: 17, color: C.muted, align: 'center', lh: 130 }),
-], 'Coinbase moves only the money the verdict decides. Testnet USDC on Base Sepolia; nothing here is real money. Spend caps live in a text file the judge can read.', '#FFFFFF');
+  ...chrome('Coinbase · x402 · payment agents'),
+  head(X, 150, 1250, 'The verdict is the invoice.', 96),
+  ...chipRow(X, 282, [['TESTNET · BASE SEPOLIA', 'rgba(122,92,255,0.16)', { dot: C.violet }], ['0.05 USDC PER VERDICT', C.surface, { stroke: C.line2 }]]),
+  ...x402.flatMap(([k, d], i) => {
+    const x = X + i * 320;
+    return [card(x, 380, 270, 290, { stroke: 'rgba(122,92,255,0.30)', radius: 24 }), rect(x + 28, 408, 48, 6, { fill: C.violet, radius: 3 }),
+      text(x + 28, 430, 214, k, { font: 'mono', size: 54, weight: 600, lh: 110 }), text(x + 28, 512, 214, d, { size: 19, color: C.ink2, lh: 140 }),
+      ...(i < x402.length - 1 ? [line([[x + 278, 525], [x + 312, 525]], C.violet, { w: 3, headLen: 10 })] : [])];
+  }),
+  ...roles.flatMap(([k, d], i) => {
+    const x = X + i * 430;
+    return [rect(x, 726, 6, 150, { fill: C.violet, radius: 3 }), mono(x + 28, 726, 360, `0${i + 1}`, { size: 18, color: C.ink2 }),
+      text(x + 28, 756, 360, k, { size: 30, weight: 600, lh: 120 }), text(x + 28, 800, 370, d, { size: 21, color: C.ink2, lh: 140 })];
+  }),
+  ...phone(1450, 150, 350, APP.verify, 800),
+  mono(1450, 962, 350, 'app · /verify over x402', { align: 'center', size: 16 }),
+], 'Other clinics can buy a verdict for five cents over x402: the server answers 402, the wallet signs, the facilitator settles, and the server answers 200 with the verdict and the rule id. Testnet USDC on Base Sepolia; nothing here is real money.', '#FFFFFF');
 
-// 8 · app screens grid
+// 9 · app screens, 6 × 2
+const grid = [['welcome', APP.welcome], ['bottle', APP.bottle], ['place', APP.place], ['run', APP.run], ['PASS', APP.pass], ['NEEDS LAB', APP.needsLab],
+  ['held · P2', APP.held], ['released', APP.released], ['/verify · x402', APP.verify], ['home', APP.home], ['medicines', APP.medicines], ['ask', APP.ask]];
 S('App screens', [
-  ...frameChrome(8, 16, 'The app'),
-  head(X, 160, 1300, 'One app, the Pi touchscreen and the phone.', 84),
-  body(X, 270, 1500, `20 routes in React. All ${appShotCount} app screenshots from our build passes (${appPhoneCount} phone, ${appShotCount - appPhoneCount} desktop) were imported into the Figma file automatically, one frame each, labelled with their route.`, { size: 26 }),
-  ...gridPhones.flatMap((id, i) => phone(X + i * 212, 390, 196, id, 470)),
-  ...['welcome', 'bottle', 'place', 'run', 'evaluation', 'delivery', 'medicines', 'calibration'].map((r, i) => text(X + i * 212, 880, 196, r, { font: 'mono', size: 17, color: C.muted, align: 'center', lh: 130 })),
-], 'Same web app on the station\'s touchscreen and on any phone. The Design file has every screenshot on the "App screens" page, grouped by build pass, each frame linked to its route.');
+  ...chrome('The app', { footer: false }),
+  head(X, 128, 1100, 'One app: the touchscreen and the phone.', 64),
+  body(X + 1130, 128, 550, `20 routes in React. All ${appShotCount} app screenshots go into the Design file, one frame each, labelled with their route. These twelve are the newest pass.`, { size: 19, lh: 140 }),
+  ...grid.flatMap(([label, id], i) => {
+    const x = X + (i % 6) * 285, y = 236 + Math.floor(i / 6) * 410;
+    return [...phone(x, y, 254, id, 352), mono(x, y + 362, 254, label, { align: 'center', size: 16, color: C.ink2 })];
+  }),
+], 'One web app on the station\'s touchscreen and on any phone. These are the newest build pass; the Design file has every screenshot, grouped by pass and linked to its route.');
 
-// 9 · website
+// 10 · website
 S('Website', [
-  ...frameChrome(9, 16, 'The website'),
-  head(X, 160, 700, 'pill-site.vercel.app', 76),
-  body(X, 260, 640, 'Built code-first (Vite + anime.js) after a 16-persona panel scored a plain, honest page 8.0 against a copied storytelling site at 3.7. First live at 00:52 Saturday.', { size: 25 }),
-  ...sitePhones.flatMap((id, i) => phone(X + i * 215, 520, 195, id, 400)),
-  ...browserShot(820, 170, 980, IM.siteHero),
-  text(820, 870, 980, 'Hero: the binary pill, drawn in characters. Words stay ink; colour lives in backgrounds and lines.', { font: 'mono', size: 18, color: C.muted, lh: 140 }),
-], 'The website came first and set the tokens the app inherited.');
+  ...chrome('The website'),
+  head(X, 150, 1000, 'pill-site.vercel.app', 80),
+  body(X, 256, 1600, 'Built code-first (Vite + anime.js) after a 16-persona panel scored a plain, honest page 8.0 against a copied storytelling site at 3.7. Words stay ink; colour lives in backgrounds and lines.', { size: 25 }),
+  ...browserShot(X, 360, 860, ART.siteHero, 512),
+  mono(X, 926, 860, 'Hero · the binary pill, drawn in characters by pill.js'),
+  ...browserShot(1010, 360, 790, ART.siteVerdicts, 222, 'cover'),
+  mono(1010, 636, 790, 'Fig 3 · three answers, the same screen as the app'),
+  ...browserShot(1010, 676, 790, ART.siteMoney, 196, 'cover'),
+  mono(1010, 926, 790, 'Payments · the verdict is the invoice'),
+], 'The website came first and set the tokens the app inherited. A 16-persona panel picked a plain, honest page over a copied storytelling site. All three crops are the live site today, captured headless.');
 
-// 10 · workflow
-const toolsShort = [
-  ['Ideation', 'AI persona panels + reference study', 'FigJam board (generated after)'],
-  ['Prototyping', 'Code-first phone mock + binary-pill HTML', 'Figma Make: Run → Evaluation'],
-  ['Handoff', 'CSS tokens: site → app', 'Figma styles + variables ↔ CSS via Composio'],
-  ['Code generation', 'Claude Code + 3 parallel builders', 'Pill → Figma plugin: design from code'],
+// 11 · workflow
+const flow = [
+  ['Ideation', ['AI persona panels', 'Web research'], ['FigJam board']],
+  ['Prototyping', ['binary-pill.html', 'Phone mock (Vite)'], ['Figma Make prompt']],
+  ['Handoff', ['CSS :root, by hand'], ['Styles + variables', 'Composio \u2192 CSS']],
+  ['Code generation', ['Claude Code + 3 builders'], ['Pill \u2192 Figma plugin']],
 ];
 // numbers on the slides come from STAGE-LOG.md; the short phrases are a summary of the same sections
 const minShort = (s) => (s.minutes.match(/≈\d+/) || ['?'])[0] + ' min';
 const rateShort = (s) => (s.rating.match(/\d\/5/) || ['?'])[0];
 const pending = (s) => /\[fill after running\]/.test(s.minutes + s.rating);
 S('Workflow', [
-  ...frameChrome(10, 16, 'Workflow · idea to demo'),
-  head(X, 160, 1500, 'Code first, then Figma from the code.', 92),
-  ...toolsShort.flatMap(([stage, a, b], i) => {
-    const x = X + i * 425, y = 330, w = 395, s = stages[i];
-    return [card(x, y, w, 560), text(x + 32, y + 32, 200, `0${i + 1}`, { font: 'mono', size: 22, color: C.skyInk, weight: 600, lh: 120 }),
-      text(x + 32, y + 72, w - 64, stage, { font: 'serif', size: 52, lh: 100 }),
-      eyebrow(x + 32, y + 170, 'What we used', C.muted, w - 64), text(x + 32, y + 206, w - 64, a, { size: 25, lh: 135 }),
-      rect(x + 32, y + 320, w - 64, 2, { fill: C.line }),
-      eyebrow(x + 32, y + 346, 'Figma step', C.violetInk, w - 64), text(x + 32, y + 382, w - 64, b, { size: 25, lh: 135 }),
-      text(x + 32, y + 500, w - 64, `${minShort(s)} · ${rateShort(s)}${pending(s) ? ' · Figma step pending' : ''}`, { font: 'mono', size: 18, color: C.muted, lh: 130 }),
-      ...(i < 3 ? [text(x + w - 4, y + 240, 40, '→', { size: 40, color: C.sky, align: 'center', lh: 100 })] : [])];
+  ...chrome('Workflow · idea to demo'),
+  head(X, 150, 1500, 'Code first, then Figma from the code.', 88),
+  line([[X + 26, 376], [X + 1660, 376]], C.sky, { w: 3 }),
+  mono(X + 1500, 330, 160, 'demo', { align: 'right', color: C.ink2 }),
+  ...flow.flatMap(([name, code, fig], i) => {
+    const x = X + i * 440, s = stages[i];
+    const figY = 544 + code.length * 50 + 40, endY = figY + 30 + fig.length * 50 + 14;
+    return [{ t: 'ellipse', x, y: 350, w: 52, h: 52, fill: i === 3 ? C.sky : C.surface, stroke: C.sky, strokeW: 4 },
+      mono(x, 424, 300, `0${i + 1}`, { size: 18, color: C.ink2 }),
+      text(x, 452, 400, name, { font: 'serif', size: 48, lh: 100 }),
+      eyebrow(x, 518, 'Code', 300, { size: 15 }), ...code.flatMap((c, j) => chip(x, 544 + j * 50, c, C.surface, { size: 17, stroke: C.line2 })),
+      eyebrow(x, figY, 'Figma', 300, { size: 15 }), ...fig.flatMap((c, j) => chip(x, figY + 30 + j * 50, c, C.violetTint, { size: 17, dot: C.violet })),
+      mono(x, endY, 400, `${minShort(s)} · ${rateShort(s)}`, { size: 18, color: C.ink }),
+      ...(pending(s) ? chip(x, endY + 32, 'FIGMA STEP PENDING', C.greyTint, { size: 15 }) : [])];
   }),
-  text(X, 925, 1680, 'Honest order: no Figma was used Friday or Saturday morning. The Figma files were generated from the repo afterwards, and the log says so.', { size: 24, color: C.ink2, lh: 140 }),
-], 'We are a code-first team. Ideation and prototyping happened in markdown, AI panels and HTML. Figma enters as the place the repo is published to: slides, screens, tokens, ideation board.');
+  text(X, 958, 1680, 'Honest order: no Figma was used Friday or Saturday morning. The Figma files are generated from the repo, and the log says so.', { size: 22, color: C.ink2, lh: 140 }),
+], 'We are a code-first team. Ideation and prototyping happened in markdown, AI panels and HTML. Figma enters as the place the repo is published to: slides, screens, tokens and the ideation board.');
 
-// 11 · stage log table
+// 12 · design from code
+const node = (x, y, w, h, k, d, o = {}) => [card(x, y, w, h, { radius: 22, ...o }), text(x + 24, y + 22, w - 48, k, { font: 'mono', size: 21, weight: 600, lh: 130 }), text(x + 24, y + 58, w - 48, d, { size: 17, color: C.ink2, lh: 140 })];
+const fan = [['Slides', 'deck + speaker notes'], ['Design', 'pages + styles'], ['FigJam', 'the ideation board']];
+S('Design from code', [
+  ...chrome('The Figma step'),
+  head(X, 150, 1500, [{ s: 'This deck was ' }, { s: 'generated from the repo.', italic: true }], 88),
+  ...node(X, 395, 230, 150, 'repo', 'screenshots · CSS :root · debate JSON · stage log'),
+  ...node(X + 290, 395, 250, 150, 'build-deck.mjs', 'Node, no npm deps; ffmpeg for images'),
+  ...node(X + 600, 395, 230, 150, 'deck.json', 'slides, pages and board in one file'),
+  ...node(X + 890, 395, 250, 150, 'Pill \u2192 Figma', 'one-file plugin that draws deck.json', { fill: C.violetTint, stroke: 'rgba(122,92,255,0.35)' }),
+  line([[X + 234, 470], [X + 284, 470]], C.sky), line([[X + 544, 470], [X + 594, 470]], C.sky), line([[X + 834, 470], [X + 884, 470]], C.sky),
+  ...fan.flatMap(([k, d], i) => {
+    const y = 318 + i * 110;
+    return [card(1330, y, 220, 84, { radius: 18 }), text(1352, y + 12, 180, k, { size: 24, weight: 600, lh: 120 }), mono(1352, y + 48, 190, d, { size: 14, color: C.ink2 }),
+      line([[X + 1144, 470], [1324, y + 42]], C.violet, { w: 2, headLen: 10 }), line([[1554, y + 42], [1594, 470]], C.line2, { w: 2, headLen: 10 })];
+  }),
+  ...node(1600, 395, 200, 150, 'Composio', 'comments, thumbnails, tokens'),
+  ...node(1600, 640, 200, 110, 'CSS', 'tokens-from-figma.mjs'),
+  line([[1700, 549], [1700, 634]], C.mint),
+  line([[1594, 695], [X + 115, 695], [X + 115, 551]], C.mint, { dash: [10, 8] }),
+  mono(X + 160, 708, 1300, 'the loop: Figma styles and variables \u2192 Composio \u2192 CSS back in the repo', { color: C.ink2 }),
+  text(X, 790, 1680, 'Recipe for code-first teams: keep the repo as the source of truth, emit one JSON, let a plugin draw it. One run gives designers editable layers, every screen, the tokens as styles, and a board of how you decided.', { size: 27, lh: 145 }),
+  text(X, 912, 1680, 'Why a plugin: the Figma REST API and our Composio connector can read, comment and set variables, but cannot create layers or slides. The Plugin API can.', { size: 21, color: C.ink2, lh: 145 }),
+], 'The REST API cannot draw, so the repo emits deck.json and a one-file plugin draws it in Slides, Design or FigJam. Composio closes the loop: comments, dev resources back to the code, thumbnails, and tokens back to CSS. Nobody has run it in real Figma yet; that step is marked pending.');
+
+// 13 · stage log table
 const stageShort = [
   ['16 AI personas per panel, reference study; FigJam board generated after', 'One model played all 16: agreement inflated (SD 0)', 'PLAN.md decisions, scope, site outline'],
-  ['binary-pill.html, phone mock in the site’s JS; Figma Make prompt written', 'Nobody could click it without a code editor', 'APP-PLAN’s 12 screens, the pill fill'],
-  ['CSS :root copied site → app; Figma styles + variables; Composio → CSS', '8 of 27 tokens arrived identical; no record of intent', 'App :root, Tokens page, tokens-from-figma.mjs'],
-  ['Claude Code + 3 parallel builders; Pill → Figma plugin', 'P6 hold rule bug; double deploy; REST API can’t draw', 'App, payment service, this deck'],
+  ['binary-pill.html, phone mock in the site\u2019s JS; Figma Make prompt written', 'Nobody could click it without a code editor', 'APP-PLAN\u2019s 12 screens, the pill fill'],
+  ['CSS :root copied site \u2192 app; Figma styles + variables; Composio \u2192 CSS', `${drift.identical} of ${siteVars.length} tokens arrived identical; no record of intent`, 'App :root, Tokens page, tokens-from-figma.mjs'],
+  ['Claude Code + 3 parallel builders; Pill \u2192 Figma plugin', 'P6 hold rule bug; double deploy; REST API can\u2019t draw', 'App, payment service, this deck'],
 ];
 const COLS = [[0, 'Stage', 250], [260, 'Tools', 470], [760, 'Minutes', 150], [920, 'Rating', 130], [1060, 'What broke', 330], [1410, 'Into the project', 270]];
 S('Stage log', [
-  ...frameChrome(11, 16, 'Stage log'),
+  ...chrome('Stage log'),
   head(X, 150, 1500, 'Four stages, timed from git.', 84),
-  ...COLS.map(([x, h, w]) => eyebrow(X + x, 290, h, C.muted, w)),
+  ...COLS.map(([x, h, w]) => eyebrow(X + x, 290, h, w, { size: 18 })),
   ...stages.flatMap((s, i) => {
-    const y = 340 + i * 150, [tools, broke, into] = stageShort[i];
+    const y = 330 + i * 150, [tools, broke, into] = stageShort[i];
     return [rect(X, y, W - 2 * X, 2, { fill: C.line }),
       text(X, y + 24, 250, s.name, { font: 'serif', size: 40, lh: 105 }),
-      ...[tools, minShort(s), null, broke, into].map((v, j) => {
-        const [x, , w] = COLS[j + 1];
-        if (j === 2) return text(X + x, y + 24, w, rateShort(s) + (pending(s) ? '\n+ pending' : ''), { font: 'mono', size: 22, weight: 600, color: C.skyInk, lh: 130 });
-        return text(X + x, y + 24, w, v, { size: 21, color: j === 0 ? C.ink : C.ink2, lh: 135, font: j === 1 ? 'mono' : 'sans' });
-      })];
+      text(X + 260, y + 24, 470, tools, { size: 21, lh: 135 }),
+      mono(X + 760, y + 26, 150, minShort(s), { size: 21, color: C.ink }),
+      mono(X + 920, y + 26, 130, rateShort(s), { size: 22, weight: 600, color: C.ink }),
+      ...(pending(s) ? chip(X + 920, y + 66, 'PENDING', C.greyTint, { size: 14 }) : []),
+      text(X + 1060, y + 24, 330, broke, { size: 21, color: C.ink2, lh: 135 }),
+      text(X + 1410, y + 24, 270, into, { size: 21, color: C.ink2, lh: 135 })];
   }),
-  text(X, 950, 1680, '"Pending" = the Figma step is written but not yet run; its minutes and rating are left blank in the log, not estimated.', { size: 19, color: C.muted, lh: 140 }),
-], 'Full log with what broke in STAGE-LOG.md. Minutes come from commit timestamps. Steps not yet run say so.');
+  rect(X, 930, W - 2 * X, 2, { fill: C.line }),
+  mono(X, 954, 1680, 'PENDING = the Figma step is written but not yet run; its minutes and rating stay blank in the log, not estimated.', { size: 17 }),
+], 'Four stages, timed from git commit times. Steps not yet run in real Figma say pending; we do not estimate them. The full log, with the Figma Make prompt and a ten-minute reproduce box, is STAGE-LOG.md.');
 
-// 12 · design from code
-const pipe = [['Repo', 'screenshots · CSS :root · debate JSON · STAGE-LOG.md'], ['build-deck.mjs', 'Node, no npm deps; ffmpeg or sips for images'], ['deck.json', 'slides + pages + board, one file'], ['Pill → Figma plugin', 'Slides · Design · FigJam'], ['Composio', 'comment · dev resources · thumbnails · tokens → CSS']];
-S('Design from code', [
-  ...frameChrome(12, 16, 'The Figma step'),
-  head(X, 160, 1400, [{ s: 'This deck was ' }, { s: 'generated from the repo.', italic: true }], 92),
-  ...pipe.flatMap(([k, d], i) => {
-    const x = X + i * 345, y = 380, w = 300;
-    return [card(x, y, w, 240, { fill: i === 3 ? C.violetTint : C.surface, stroke: i === 3 ? 'rgba(122,92,255,0.35)' : C.line }),
-      text(x + 28, y + 30, w - 56, k, { font: 'mono', size: 23, weight: 600, color: i === 3 ? C.violetInk : C.ink, lh: 130 }),
-      text(x + 28, y + 100, w - 56, d, { size: 22, color: C.ink2, lh: 140 }),
-      ...(i < 4 ? [text(x + w, y + 90, 40, '→', { size: 36, color: C.sky, align: 'center', lh: 100 })] : [])];
+// 14 · what broke
+const brokeCards = [
+  ['The P6 hold rule', 'The scaffold held money only when the recall lookup was unreachable, so a delivery with no bottle attached could be proposed for release.', 'Caught by a builder\u2019s end-to-end test.'],
+  ['A double deploy', 'A `tail -6` cut off Vercel\u2019s output, the deploy looked unfinished and was re-run: two identical production deploys.', 'Read the whole log before re-running.'],
+  ['The REST API can\u2019t draw', 'The Figma REST API and our Composio connector read, comment and set variables. Neither can create a layer or a slide.', 'So the repo emits deck.json and a plugin draws it.'],
+  [`${drift.identical} of ${siteVars.length} tokens survived the hand copy`, `Site \u2192 app by hand: ${drift.identical} identical, ${drift.changed.length} changed value, ${drift.missing.length} renamed or dropped. Nothing recorded which changes were meant.`, 'Tokens now go to Figma as variables and back as CSS.'],
+];
+S('What broke', [
+  ...chrome('What broke'),
+  head(X, 150, 1500, [{ s: 'What broke, ' }, { s: 'and what it changed.', italic: true }], 92),
+  ...brokeCards.flatMap(([k, d, f], i) => {
+    const x = X + (i % 2) * 860, y = 300 + Math.floor(i / 2) * 340;
+    return [card(x, y, 820, 310, { radius: 24 }), rect(x + 36, y + 36, 56, 6, { fill: C.amber, radius: 3 }),
+      text(x + 36, y + 64, 748, k, { size: 32, weight: 600, lh: 125 }), text(x + 36, y + 118, 748, d, { size: 23, color: C.ink2, lh: 145 }),
+      rect(x + 36, y + 236, 748, 2, { fill: C.line }), mono(x + 36, y + 254, 748, f, { size: 18, color: C.ink })];
   }),
-  text(X, 690, 1680, 'Recipe for code-first teams: keep the repo as the source of truth, emit one JSON, let a plugin draw it. One run gives designers editable layers, every screen, the tokens as styles, and a board of how you decided.', { size: 28, color: C.ink, lh: 145 }),
-  text(X, 860, 1680, 'Why a plugin: the Figma REST API and our Composio connector can read, comment and set variables, but cannot create layers or slides. The Plugin API can.', { size: 24, color: C.ink2, lh: 145 }),
-], 'The REST API cannot draw. So the repo emits deck.json and a 1-file plugin draws it in whichever editor it is opened in. Composio then closes the loop: comments, dev resources back to the code, thumbnails, and tokens back to CSS.');
+], 'What broke, honestly. A rule bug the tests caught, a deploy we ran twice because the output was cut off, an API that cannot draw, and a hand-copied palette where most tokens drifted. Each one changed how we work.');
 
-// 13 · before / after (filled after measurement)
-S('Before and after', [{ t: 'metrics' }], 'Before numbers are estimates and say so. After numbers are measured on this machine; the real Figma run time is printed by the plugin.');
+// 15 · before / after (filled after measurement)
+S('Before and after', [{ t: 'metrics' }], 'Before numbers are estimates and say so. After numbers are measured on this machine; the real Figma run time is printed by the plugin and goes into LINKS.md.');
 
-// 14 · limits
+// 16 · limits
 S('What PASS does not mean', [
-  ...frameChrome(14, 16, 'What PASS does not mean'),
-  head(X, 160, 1400, 'Pill screens tablets. It does not certify them.', 92),
-  card(X, 400, 810, 400, { fill: C.mintTint, stroke: 'rgba(95,211,154,0.45)' }),
-  eyebrow(X + 40, 440, 'PASS means', C.mintInk, 700),
-  text(X + 40, 490, 730, "The dissolution curve of this one tablet, on this box, was consistent with last night's riboflavin reference runs. No red flags found.", { size: 28, lh: 145 }),
-  card(X + 870, 400, 810, 400, { fill: C.amberTint, stroke: 'rgba(224,154,58,0.40)' }),
-  eyebrow(X + 910, 440, 'PASS does not mean', C.amberInk, 700),
-  text(X + 910, 490, 730, 'That the tablet is the right drug, the right dose, or free of contaminants. Pill has one reference drug today. Anything it cannot compare goes to a lab, by design.', { size: 28, lh: 145 }),
-  text(X, 860, 1680, 'Results charts on our site are marked as an illustration until the calibration runs are on the page.', { size: 24, color: C.ink2, lh: 140 }),
-], 'Say the limits before a judge asks. One reference drug (riboflavin). Charts marked illustration until real runs land.');
+  ...chrome('What PASS does not mean'),
+  head(X, 150, 1500, [{ s: 'Pill screens tablets. ' }, { s: 'It does not grade them.', italic: true }], 92),
+  card(X, 380, 810, 340, { fill: C.mintTint, stroke: 'rgba(95,211,154,0.45)' }),
+  ...chip(X + 40, 420, 'PASS MEANS', C.surface, { dot: C.mint, size: 18 }),
+  text(X + 40, 500, 730, "The dissolution curve of this one tablet, on this box, was consistent with last night's riboflavin reference runs. No red flags found.", { size: 29, lh: 145 }),
+  card(X + 870, 380, 810, 340, { fill: C.amberTint, stroke: 'rgba(224,154,58,0.40)' }),
+  ...chip(X + 910, 420, 'PASS DOES NOT MEAN', C.surface, { dot: C.amber, size: 18 }),
+  text(X + 910, 500, 730, 'That the tablet is the right drug, the right dose, or free of contaminants. Pill has one reference drug today. Anything it cannot compare goes to a lab, by design.', { size: 29, lh: 145 }),
+  text(X, 780, 1680, 'Results charts on our site are marked as an illustration until the calibration runs are on the page.', { size: 24, color: C.ink2, lh: 140 }),
+], 'Say the limits before a judge asks. One reference drug, riboflavin; anything else is UNABLE TO VERIFY, by design. We never call a medicine good or bad.');
 
-// 15 · tracks
+// 17 · tracks
 const tracks = [
   ['Figma · Idea to Demo', C.violet, 'this deck, the plugin, the stage log'], ['Hardware Hack', C.sky, 'the station, on the table'], ['Hyphenate · finance agents', C.sky, 'policy agent: proposes, holds, escalates'],
-  ['Coinbase · x402 payment agents', C.violet, '/verify over x402, USDC escrow (TESTNET)'], ['Capital One · Nessie', C.amber, 'hold / release / refund (SANDBOX)'], ['Microsoft · Built for the Real World', C.sky, 'a clinic pharmacist’s delivery check'],
+  ['Coinbase · x402 payment agents', C.violet, '/verify over x402, USDC escrow (TESTNET)'], ['Capital One · Nessie', C.amber, 'hold / release / refund (SANDBOX)'], ['Microsoft · Built for the Real World', C.sky, 'a clinic pharmacist\u2019s delivery check'],
   ['Anthropic · Claude', C.mint, 'the plain-English why; can only downgrade'], ['People-First', C.mint, 'personal mode, read aloud'], ['Most Technically Complex', C.sky, 'two-channel optics + rules + payments'],
   ['MLH · Gemini API', C.mint, 'reads the bottle label'], ['MLH · ElevenLabs', C.mint, 'reads the verdict aloud'], ['MLH · Gen AI', C.mint, 'models explain; rules decide'],
 ];
 S('Tracks', [
-  ...frameChrome(15, 16, 'Tracks'),
-  head(X, 160, 1400, 'One build, many judges.', 96),
+  ...chrome('Tracks'),
+  head(X, 150, 1400, 'One build, many judges.', 96),
   ...tracks.flatMap(([t, c, sub], i) => {
-    const col = i % 3, row = Math.floor(i / 3), x = X + col * 570, y = 320 + row * 158;
-    return [card(x, y, 540, 136, { radius: 20 }), rect(x + 22, y + 26, 6, 84, { fill: c, radius: 3 }),
+    const col = i % 3, row = Math.floor(i / 3), x = X + col * 570, y = 310 + row * 162;
+    return [card(x, y, 540, 140, { radius: 20 }), rect(x + 22, y + 26, 6, 88, { fill: c, radius: 3 }),
       text(x + 50, y + 26, 470, t, { size: 27, weight: 600, lh: 130 }), text(x + 50, y + 70, 470, sub, { size: 21, color: C.ink2, lh: 135 })];
   }),
-], 'Each track gets the same product; only the emphasis changes.');
+], 'One build, many judges; only the emphasis changes. Money is SANDBOX or TESTNET on every track.');
 
-// 16 · ask / next
+// 18 · ask / next
+const next = [['1', 'Calibration on the real box', 'Ten riboflavin reference runs and chalk runs, plotted on the site in place of the illustration.'], ['2', 'A second reference drug', 'Each new drug needs its own band. Until then it is UNABLE TO VERIFY, on purpose.'], ['3', 'One pharmacy, one week', 'A procurement officer samples one tablet per delivery; we log every decision and every override.']];
 S('Ask and next', [
-  ...frameChrome(16, 16, 'Next'),
-  head(X, 160, 1500, [{ s: 'Next: ' }, { s: 'real runs, one clinic.', italic: true }], 104),
-  ...[['1', 'Calibration on the real box', 'Ten riboflavin reference runs and chalk runs, plotted on the site in place of the illustration.'], ['2', 'A second reference drug', 'Each new drug needs its own band. Until then it is UNABLE TO VERIFY, on purpose.'], ['3', 'One pharmacy, one week', 'A procurement officer samples one tablet per delivery; we log every decision and every override.']]
-    .flatMap(([n, k, d], i) => [text(X, 360 + i * 170, 80, n, { font: 'serif', size: 80, color: C.sky, lh: 100 }), text(X + 110, 370 + i * 170, 1400, k, { size: 34, weight: 600, lh: 130 }), text(X + 110, 422 + i * 170, 1400, d, { size: 27, color: C.ink2, lh: 140 })]),
-  card(X, 860, 1680, 110, { fill: C.skyTint, stroke: 'rgba(79,179,255,0.35)', radius: 20 }),
-  text(X + 40, 894, 1600, 'Ask: tell us which tablet to calibrate next, and introduce us to one clinic pharmacist.', { size: 30, weight: 500, lh: 130 }),
-], 'Close on what is still not done and what we need.');
+  ...chrome('Next'),
+  head(X, 150, 1500, [{ s: 'Next: ' }, { s: 'real runs, one clinic.', italic: true }], 104),
+  ...next.flatMap(([n, k, d], i) => {
+    const y = 340 + i * 160;
+    return [{ t: 'ellipse', x: X, y, w: 76, h: 76, fill: C.skyTint, stroke: C.sky, strokeW: 3 }, text(X, y + 12, 76, n, { font: 'serif', size: 48, align: 'center', lh: 100 }),
+      text(X + 116, y + 2, 1400, k, { size: 34, weight: 600, lh: 130 }), text(X + 116, y + 52, 1400, d, { size: 27, color: C.ink2, lh: 140 })];
+  }),
+  card(X, 850, 1680, 120, { fill: C.skyTint, stroke: 'rgba(79,179,255,0.35)', radius: 22 }),
+  text(X + 40, 874, 1600, 'Ask: try to make it say PASS on the chalk. Then tell us which tablet to calibrate next, and introduce us to one clinic pharmacist.', { size: 28, weight: 500, lh: 135 }),
+], 'Our ask: try to make it say PASS on the chalk. Then tell us which tablet to calibrate next, and introduce us to one clinic pharmacist. Everything still pending is marked pending in the repo.');
+if (slides.length !== TOTAL) throw new Error(`TOTAL is ${TOTAL} but ${slides.length} slides were built`);
 
 // ───────────────────────────── design pages + board ─────────────────────────────
 const design = {
@@ -579,29 +714,26 @@ const figjam = {
 
 // ───────────────────────────── assemble, measure, write ─────────────────────────────
 function metricsSlide(m) {
-  const before = [
-    [`${m.slides} slides by hand`, `${m.slides} × ${m.perSlideMin} min = ${m.slides * m.perSlideMin} min`],
-    [`${m.screens} screenshots placed + labelled`, `${m.screens} × ${m.perShotMin} min = ${m.screens * m.perShotMin} min`],
-    [`${m.tokenCount} tokens as styles`, `${m.tokenCount} × ${m.perTokenMin} min = ${m.tokenCount * m.perTokenMin} min`],
-  ];
-  const after = [
-    ['repo → deck.json + deck.html', `${m.buildCold ?? m.buildSec} s cold · ${m.buildSec} s this run`],
-    ['plugin logic, stub Figma API', `${m.pluginStubMs.slides} ms Slides · ${m.pluginStubMs.figma} ms Design`],
-    ['plugin in real Figma', m.realFigmaSec ? `${m.realFigmaSec} s` : '[fill after running]'],
-  ];
+  const beforeMin = m.slides * m.perSlideMin + m.screens * m.perShotMin + m.tokenCount * m.perTokenMin;
+  const BW = W - 2 * X, cold = typeof m.buildCold === 'number' ? m.buildCold : null;
+  const afterW = cold == null ? 0 : Math.max(12, Math.round((BW * cold) / (beforeMin * 60)));
   return [
-    ...frameChrome(13, 16, 'Before and after'),
+    ...chrome('Before and after', { n: mIdx + 1 }),
     head(X, 150, 1500, 'From hours to one click.', 92),
-    eyebrow(X, 300, 'Before · by hand · ESTIMATE', C.amberInk, 800),
-    ...before.flatMap(([k, v], i) => [text(X, 350 + i * 96, 760, k, { size: 28, lh: 130 }), text(X, 390 + i * 96, 760, v, { font: 'mono', size: 21, color: C.muted, lh: 130 })]),
-    text(X, 650, 760, `≈ ${Math.round((m.slides * m.perSlideMin + m.screens * m.perShotMin + m.tokenCount * m.perTokenMin) / 60 * 10) / 10} h`, { font: 'serif', size: 120, color: C.amberInk, lh: 100 }),
-    text(X, 790, 760, `Per-unit figures are our assumption (${m.perSlideMin} min/slide, ${m.perShotMin} min/screenshot, ${m.perTokenMin} min/token), not a measurement.`, { size: 20, color: C.ink2, lh: 140 }),
-    rect(960, 300, 2, 600, { fill: C.line }),
-    eyebrow(1020, 300, 'After · the plugin · MEASURED', C.mintInk, 800),
-    ...after.flatMap(([k, v], i) => [text(1020, 350 + i * 96, 780, k, { size: 28, lh: 130 }), text(1020, 390 + i * 96, 780, v, { font: 'mono', size: 21, color: C.muted, lh: 130 })]),
-    text(1020, 650, 780, `${m.screens}`, { font: 'serif', size: 120, color: C.mintInk, lh: 100 }),
-    text(1260, 666, 540, `screenshots placed per run, no hand work (${m.appShots} app, ${m.siteShots} site); ${m.tokenCount} CSS variables become Figma styles + variables. Counted on the stub run.`, { size: 22, color: C.ink, lh: 140 }),
-    text(1020, 790, 780, `Hand handoff drift: ${m.drift.identical} of ${m.drift.siteTotal} site tokens reached the app unchanged, ${m.drift.changed} changed value, ${m.drift.missing} renamed or dropped.`, { size: 20, color: C.ink2, lh: 140 }),
+    ...chipRow(X, 296, [['BEFORE · BY HAND', C.surface, { stroke: C.line2, size: 17 }], ['ESTIMATE', C.amberTint, { dot: C.amber, size: 17 }]]),
+    text(X, 356, 500, `≈ ${Math.round((beforeMin / 60) * 10) / 10} h`, { font: 'serif', size: 104, lh: 100 }),
+    mono(X + 520, 374, 1160, `${m.slides} slides × ${m.perSlideMin} min + ${m.screens} screenshots × ${m.perShotMin} min + ${m.tokenCount} tokens × ${m.perTokenMin} min = ${beforeMin} min`, { size: 20, color: C.ink }),
+    mono(X + 520, 412, 1160, 'Per-unit minutes are our assumption, not a measurement.', { size: 18 }),
+    rect(X, 486, BW, 40, { fill: C.amber, radius: 20 }),
+    ...chipRow(X, 576, [['AFTER · THE PLUGIN', C.surface, { stroke: C.line2, size: 17 }], ['MEASURED', C.mintTint, { dot: C.mint, size: 17 }]]),
+    text(X, 636, 500, cold == null ? '[fill after running]' : `${cold} s`, { font: 'serif', size: 104, lh: 100 }),
+    mono(X + 520, 654, 1160, `repo → deck.json + deck.html, cold build on this machine (${m.buildSec} s this run). Plugin logic on a stub Figma API: ${m.pluginStubMs.slides} ms Slides · ${m.pluginStubMs.figma} ms Design · ${m.pluginStubMs.figjam} ms FigJam.`, { size: 20, color: C.ink }),
+    mono(X + 520, 720, 1160, `Plugin run in real Figma: ${m.realFigmaSec ? m.realFigmaSec + ' s' : '[fill after running]'}`, { size: 18 }),
+    rect(X, 766, BW, 40, { fill: 'rgba(22,24,27,0.05)', radius: 20 }),
+    ...(afterW ? [rect(X, 766, afterW, 40, { fill: C.mint, radius: 20 })] : []),
+    mono(X + Math.max(afterW, 0) + 20, 776, 900, 'bars to scale · after = cold build time', { size: 16 }),
+    rect(X, 860, BW, 2, { fill: C.line }),
+    text(X, 884, BW, `Every run places ${m.screens} screenshots (${m.appShots} app, ${m.siteShots} site) and turns ${m.tokenCount} CSS variables into Figma styles and variables, with no hand work. By hand, ${m.drift.identical} of ${m.drift.siteTotal} site tokens reached the app unchanged.`, { size: 23, color: C.ink2, lh: 145 }),
   ];
 }
 
@@ -621,7 +753,7 @@ const stripB64 = () => Object.fromEntries(Object.entries(IMAGES).map(([k, v]) =>
 deck.images = stripB64();
 const mIdx = slides.findIndex((s) => s.els[0]?.t === 'metrics');
 
-// measure the plugin's own logic against a stub figma API (Node), then fill slide 13
+// measure the plugin's own logic against a stub figma API (Node), then fill the before/after slide
 m.pluginStubMs = { slides: 0, figma: 0, figjam: 0 };
 slides[mIdx].els = metricsSlide({ ...m, buildSec: '…' });
 m.pluginStubMs = await measurePlugin(deck);
@@ -659,6 +791,10 @@ function elHtml(e) {
     const vert = e.h >= e.w, r = Math.min(e.w, e.h) / 2;
     const fill = vert ? `left:0;right:0;bottom:0;height:${e.level * 100}%` : `left:0;top:0;bottom:0;width:${e.level * 100}%`;
     return `<div style="${box}height:${e.h}px;border-radius:${r}px;background:${e.track};overflow:hidden;box-shadow:inset 0 0 0 ${e.strokeW}px ${e.stroke}"><div style="position:absolute;${fill};background:${e.fill}"></div></div>`;
+  }
+  if (e.t === 'path') {
+    const dash = e.dash ? ` stroke-dasharray="${e.dash.join(' ')}"` : '';
+    return `<div style="${box}height:${e.h}px"><svg width="${e.w}" height="${e.h}" viewBox="0 0 ${e.w} ${e.h}" overflow="visible"><path d="${e.d}" fill="${e.fill || 'none'}" stroke="${e.stroke}" stroke-width="${e.strokeW}"${dash} stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
   }
   return '';
 }
@@ -703,4 +839,4 @@ console.log(`FigJam     ${figjam.sections.length} sections · ${figjam.sections.
 console.log(`plugin     stub run: ${m.pluginStubMs.slides} ms slides · ${m.pluginStubMs.figma} ms design · ${m.pluginStubMs.figjam} ms figjam`);
 console.log(`deck.html  ${mb(html.length)} · build ${m.buildSec} s`);
 console.log(`stage log  ${stages.map((s) => `${s.name} ${s.words}w`).join(' · ')}`);
-if (json.length > 8 * 1048576) console.warn('WARNING: deck.json is over 8 MB');
+if (json.length > 9 * 1048576) console.warn('WARNING: deck.json is over 9 MB; lower PHONE/DESK quality or width');
