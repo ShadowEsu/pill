@@ -31,3 +31,9 @@ Plateau drifts with water temperature, paddle speed, LED warm-up and light leaki
 
 ## Tracks
 Hyphenate · Best Hardware · Anthropic · Microsoft · People-First · Capital One Nessie · Bright Data (one live recall lookup with a visible empty/blocked case) · Elastic if criteria appear · Tiger Data (curves) · Gen AI · Figma Best Design (stage log + Slides) if time.
+
+## Preston's direction, Fri ~22:35 (name: Pill; both modes; still planning, no build yet)
+- **Station (clinic or home):** 3D-printed dark chamber (or taped box until the print exists) with a cup holder that fixes the LEDs and the sensors at 0° and 90°, plus a **phone window on top**: the phone films the dissolve live and the app shows the video next to the curve; the ESP32 sensors do the measuring (the phone camera's auto-exposure makes it a viewer, not the instrument). The video clip goes into the report.
+- **Portable (phone only):** photograph the bottle and the pill → drug, lot, imprint → recall check → add to My medicines → log doses. It says plainly that a dose measurement needs the station.
+- **Modes:** Clinic (sample one tablet per delivery → payment hold/release/escalate, audit log) and Personal/Nurse (test one tablet per new bottle → My medicines, recall alerts, tap to log "taken"). The 16 personas preferred clinic only; Preston keeps both; build clinic first.
+- Light sensor: kit chart lists 2 photoresistors; if missing, use an LED as the sensor (green/yellow LED reads the blue LED; Dietz et al., MERL 2003) or rent a TCS34725 / TEMT6000 at the hardware booth.
