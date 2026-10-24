@@ -94,6 +94,50 @@ const art = {
 
 // fallbacks for the FIG grid until the station module provides real drawings
 const partFallback = (label) => `<svg viewBox="0 0 300 300" width="100%" role="img" aria-label="${label}"><rect x="40" y="40" width="220" height="220" rx="18" fill="none" stroke="rgba(255,255,255,.3)" stroke-dasharray="4 5"/></svg>`;
-['container', 'led', 'ldr', 'thermistor', 'stepper', 'esp32'].forEach((k) => { art[k] = partFallback(k); });
+['container', 'led', 'ldr', 'thermistor', 'stepper', 'esp32', 'pi'].forEach((k) => { art[k] = partFallback(k); });
+
+// Fig 0.8: the data path, drawn in the dark-section line style
+{
+  const W = 'fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.25"';
+  const D = 'fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1" stroke-dasharray="3 4"';
+  const F = 'rgba(255,255,255,0.8)';
+  const M = 'rgba(139,144,151,1)';
+  const node = (x, y, w, h, title, sub, accent) => `
+    <g data-draw-group>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" ${W} ${accent ? `stroke="${accent}"` : ''} data-draw/>
+      <text x="${x + 14}" y="${y + 26}" font-family="var(--sans)" font-size="13" font-weight="600" fill="${F}">${title}</text>
+      ${sub.map((s, i) => `<text x="${x + 14}" y="${y + 46 + i * 15}" font-family="var(--mono)" font-size="10.5" fill="${M}">${s}</text>`).join('')}
+    </g>`;
+  const arrow = (x1, y, x2) => `<path d="M${x1} ${y} H${x2 - 8}" ${W} class="flow" data-draw/><path d="M${x2 - 8} ${y - 4} l8 4 l-8 4" ${W}/>`;
+  art.pipeline = `<svg viewBox="0 0 980 260" width="100%" role="img" aria-label="Data path: station to backend to verdict to policy to sandbox bank and pharmacist">
+    ${node(10, 70, 160, 96, 'Station', ['ESP32 · 1 JSON line/s', 'adc0 · adc90 · temp · dark', 'blank · fault'])}
+    ${arrow(170, 118, 210)}
+    ${node(210, 70, 190, 96, 'Backend', ['absorbance = log(blank/now)', 'plateau · t80 · scatter', '7 rules, in order'])}
+    ${arrow(400, 118, 440)}
+    ${node(440, 70, 150, 96, 'Verdict', ['PASS · NEEDS LAB ·', 'UNABLE TO VERIFY', 'rule id on the card'])}
+    ${arrow(590, 118, 630)}
+    ${node(630, 70, 170, 96, 'Policy', ['policy.md P1–P6', 'release · hold · escalate', 'spend cap · log line'])}
+    ${arrow(800, 118, 840)}
+    ${node(840, 70, 130, 96, 'Money', ['Nessie SANDBOX', 'clinic → escrow →', 'supplier'], 'rgba(47,107,255,0.9)')}
+    ${node(230, 190, 170, 56, 'Claude', ['"why" text · log line · bottle fields'])}
+    <path d="M315 190 V166" ${D}/>
+    ${node(640, 190, 150, 56, 'openFDA', ['recall by lot · cached'])}
+    <path d="M715 190 V166" ${D}/>
+    ${node(840, 190, 130, 56, 'Pharmacist', ['taps every release'])}
+    <path d="M905 190 V166" ${D}/>
+    <text x="10" y="30" font-family="var(--mono)" font-size="11" fill="${M}">MEASURES</text>
+    <text x="210" y="30" font-family="var(--mono)" font-size="11" fill="${M}">DECIDES (deterministic)</text>
+    <text x="630" y="30" font-family="var(--mono)" font-size="11" fill="${M}">HOLDS OR RELEASES</text>
+    <text x="230" y="30" font-family="var(--mono)" font-size="11" fill="${M}" opacity="0"></text>
+  </svg>`;
+}
+
+// Calibration: ten reference runs make the band
+art.calibration = wrap(`
+  <g ${G}><line x1="60" y1="240" x2="360" y2="240"/><line x1="60" y1="40" x2="60" y2="240"/><rect x="60" y="104" width="300" height="34" fill="currentColor" stroke="none" opacity=".07"/></g>
+  ${Array.from({ length: 10 }, (_, i) => `<path d="M60 238 C 120 ${236 - i * 0.8}, 150 ${152 + (i % 5) * 3}, 200 ${126 + (i % 4) * 2.5} S 300 ${116 + (i % 3) * 3}, 360 ${114 + (i % 5) * 2}" ${S} stroke="var(--blue)" stroke-width="1.3" opacity="${0.35 + (i % 4) * 0.12}" data-draw/>`).join('')}
+  <text x="66" y="98" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">band = mean ± 3 SD of 10 runs</text>
+  <text x="200" y="258" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">leave-one-out 10/10 · CV ≤ 15% · else no demo</text>
+`, 'Ten riboflavin reference curves overlapping into a narrow band');
 
 export function artFor(key) { return art[key] || ''; }

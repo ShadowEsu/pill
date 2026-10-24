@@ -1,7 +1,9 @@
 import { animate, stagger, onScroll, createTimeline, utils } from 'animejs';
 import { artFor } from './art.js';
-import { mountStation, autoDemo, partFigures } from './station.js';
+import * as stationMod from './station.js';
+const { mountStation, autoDemo, partFigures } = stationMod;
 import { mountPhone } from './phone.js';
+import { mountBinaryPill } from './pill.js';
 import './station.css';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -20,6 +22,58 @@ if (!reduced) {
   });
 } else {
   utils.set('.reveal', { opacity: 1, translateY: 0 });
+}
+
+/* ---------- hero: binary pill + word-by-word headline ---------- */
+{
+  const cv = document.getElementById('binary-pill');
+  if (cv) mountBinaryPill(cv, { paper: false, scale: 1.45 });
+  const h1 = document.querySelector('[data-split]');
+  if (h1) {
+    const wrapWords = (node) => {
+      [...node.childNodes].forEach((n) => {
+        if (n.nodeType === 3) {
+          const frag = document.createDocumentFragment();
+          n.textContent.split(/(\s+)/).forEach((tok) => {
+            if (!tok) return;
+            if (/^\s+$/.test(tok)) { frag.appendChild(document.createTextNode(tok)); return; }
+            const s = document.createElement('span'); s.className = 'w'; s.textContent = tok; frag.appendChild(s);
+          });
+          n.replaceWith(frag);
+        } else if (n.nodeType === 1 && n.tagName !== 'BR') wrapWords(n);
+      });
+    };
+    wrapWords(h1);
+    if (!reduced) animate(h1.querySelectorAll('.w'), { opacity: [0, 1], translateY: ['0.35em', 0], duration: 900, delay: stagger(90, { start: 150 }), ease: 'outCubic' });
+  }
+}
+
+/* ---------- typing headings (SomniQ): every .h2 types itself in when it scrolls into view ---------- */
+if (!reduced) {
+  document.querySelectorAll('.h2').forEach((h) => {
+    if (h.closest('[data-split]')) return;
+    const lines = h.innerHTML.split(/<br\s*\/?>/i).map((s) => s.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&'));
+    const full = lines.join('\n');
+    h.setAttribute('data-type', '');
+    h.setAttribute('aria-label', full.replace('\n', ' '));
+    h.innerHTML = '<span class="typed"></span><span class="caret" aria-hidden="true"></span>';
+    const typed = h.querySelector('.typed');
+    let started = false;
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting || started) return;
+      started = true; io.disconnect();
+      let n = 0;
+      const tick = () => {
+        n++;
+        const s = full.slice(0, n);
+        typed.innerHTML = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\n/g, '<br>');
+        if (n < full.length) setTimeout(tick, full[n] === ' ' ? 60 : 38);
+        else setTimeout(() => h.classList.add('done'), 900);
+      };
+      tick();
+    }, { threshold: 0.4 });
+    io.observe(h);
+  });
 }
 
 /* ---------- counters (Stripe-style, count once) ---------- */
@@ -84,8 +138,9 @@ document.querySelectorAll('.fig .art[data-part]').forEach((slot) => {
   if (mount) {
     const station = mountStation(mount);
     if (reduced) { station.setProgress(1); }
-    else {
-      // scroll-driven explode: progress 0 -> 1 while the stage scrolls through the viewport
+    else if (stationMod.attachScroll) {
+      stationMod.attachScroll(station, { stage: document.getElementById('station'), idleAfterMs: 2500 });
+    } else {
       const stage = document.getElementById('station');
       let driven = false;
       const stopDemo = autoDemo(station);
@@ -98,6 +153,21 @@ document.querySelectorAll('.fig .art[data-part]').forEach((slot) => {
       });
     }
   }
+}
+
+/* ---------- FIG grid: strokes draw in when each figure scrolls into view ---------- */
+if (!reduced) {
+  document.querySelectorAll('.fig .art svg').forEach((svg) => {
+    const shapes = [...svg.querySelectorAll('path, line, polyline, circle, ellipse, rect')].filter((s) => s.getTotalLength && !s.getAttribute('fill')?.startsWith('rgba(11'));
+    shapes.forEach((s) => { const len = s.getTotalLength(); s.style.strokeDasharray = len; s.style.strokeDashoffset = len; });
+    animate(shapes, {
+      strokeDashoffset: 0,
+      duration: 1400,
+      delay: stagger(18),
+      ease: 'inOutSine',
+      autoplay: onScroll({ target: svg.closest('.fig'), enter: 'bottom-=10% top', repeat: false }),
+    });
+  });
 }
 
 /* ---------- draw-in for the blueprint strokes in paper sections ---------- */
@@ -117,11 +187,17 @@ if (!reduced) {
 }
 /* ---------- phone mock ---------- */
 {
-  const mount = document.getElementById('phone-mount');
-  if (mount) {
-    const phone = mountPhone(mount);
-    if (reduced) phone.setState('pass'); else phone.play();
-  }
+  const loops = {
+    'phone-mount': { sequence: [['scan', 6000], ['pass', 3200], ['scan', 4000], ['needslab', 4200], ['unable', 2800], ['calibration', 5000]], still: 'pass' },
+    'phone-clinic': { sequence: [['bottle', 5200], ['scan', 4000], ['pass', 2600], ['delivery', 3800], ['released', 4200], ['recall', 4200]], still: 'delivery', caption: true },
+    'phone-personal': { sequence: [['bottle', 5200], ['scan', 4000], ['pass', 2600], ['medicines', 5200], ['calibration', 4800]], still: 'medicines', caption: true },
+  };
+  Object.entries(loops).forEach(([id, cfg]) => {
+    const mount = document.getElementById(id);
+    if (!mount) return;
+    const phone = mountPhone(mount, { sequence: cfg.sequence, caption: cfg.caption });
+    if (reduced) phone.setState(cfg.still); else phone.play();
+  });
 }
 
 /* ---------- results chart (illustration until the real CSV lands) ---------- */

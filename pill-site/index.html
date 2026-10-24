@@ -35,19 +35,25 @@
 
   <!-- 1. Hero -->
   <section class="hero">
-    <div class="wrap">
-      <p class="eyebrow reveal">Cal Hacks 13.0 · Berkeley · October 2026</p>
-      <h1 class="display reveal">The box measures.<br><em>Pill</em> explains.</h1>
-      <p class="lead reveal">A $40 lab-in-a-box. Drop one tablet in water, close the lid, and three minutes later it says <b>PASS</b>, <b>NEEDS LAB</b> or <b>UNABLE TO VERIFY</b>. In a clinic, that answer decides whether the supplier gets paid.</p>
-      <div class="cta reveal">
-        <a class="btn" href="#demo">Watch the 90-second demo <span class="arrow" aria-hidden="true">→</span></a>
-        <a class="btn ghost" href="#how">How it works</a>
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow reveal">Cal Hacks 13.0 · Berkeley · October 2026</p>
+        <h1 class="display" data-split>The box measures.<br><em>Pill</em> explains.</h1>
+        <p class="lead reveal">A $40 lab-in-a-box. Drop one tablet in water, close the lid, and three minutes later it says <b>PASS</b>, <b>NEEDS LAB</b> or <b>UNABLE TO VERIFY</b>. In a clinic, that answer decides whether the supplier gets paid.</p>
+        <div class="cta reveal">
+          <a class="btn" href="#demo">Watch the 90-second demo <span class="arrow" aria-hidden="true">→</span></a>
+          <a class="btn ghost" href="#how">How it works</a>
+        </div>
+        <div class="hero-meta reveal">
+          <div><b>$40</b>bill of materials</div>
+          <div><b>1 tablet</b>per test, destroyed</div>
+          <div><b>3 answers</b>never a guess</div>
+          <div><b>Built on Peel</b>HackMIT 2026, cited</div>
+        </div>
       </div>
-      <div class="hero-meta reveal">
-        <div><b>$40</b>bill of materials</div>
-        <div><b>1 tablet</b>per test, destroyed</div>
-        <div><b>3 answers</b>never a guess</div>
-        <div><b>Built on Peel</b>HackMIT 2026, cited</div>
+      <div class="hero-pill reveal">
+        <canvas id="binary-pill" width="900" height="640" aria-label="A capsule drawn out of ones and zeros, slowly turning"></canvas>
+        <p class="caption">one tablet · one curve · one answer</p>
       </div>
     </div>
   </section>
@@ -78,7 +84,7 @@
   <section class="section" id="problem">
     <div class="wrap">
       <p class="eyebrow reveal">The problem</p>
-      <h2 class="h2 reveal">One in ten.</h2>
+      <h2 class="h2">One in ten.</h2>
       <p class="lead reveal" style="margin-top:24px">WHO estimates that 1 in 10 medical products in low- and middle-income countries is substandard or falsified. A model cited by WHO puts the cost at about 116,000 extra malaria deaths a year in sub-Saharan Africa from substandard and falsified antimalarials alone. The instrument that catches this in a lab costs $20,000 to $100,000 and sits far from the clinics that need it.</p>
       <div class="stats">
         <div class="stat reveal"><div class="big num" data-count="10" data-prefix="1 in ">1 in 10</div><p class="what">medical products in low- and middle-income countries estimated substandard or falsified</p><p class="src"><a href="https://www.who.int/news/item/28-11-2017-1-in-10-medical-products-in-developing-countries-is-substandard-or-falsified" target="_blank" rel="noopener">WHO, 2017</a></p></div>
@@ -114,12 +120,14 @@
   <section class="section dark" id="parts" style="padding-top:0">
     <div class="wrap">
       <div class="figs">
-        <div class="fig reveal"><p class="caption">Fig 0.1</p><div class="art" data-part="container"></div><h4>Chamber</h4><p>A clear quart container, 900 mL fill line, light path across one corner.</p></div>
-        <div class="fig reveal"><p class="caption">Fig 0.2</p><div class="art" data-part="led"></div><h4>Blue LED</h4><p>5 mm, 465–475 nm. Riboflavin absorbs here at about 85% of its peak.</p></div>
-        <div class="fig reveal"><p class="caption">Fig 0.3</p><div class="art" data-part="ldr"></div><h4>Two light sensors</h4><p>One inline behind blue plastic, one at 90° behind green plastic.</p></div>
-        <div class="fig reveal"><p class="caption">Fig 0.4</p><div class="art" data-part="thermistor"></div><h4>Thermistor</h4><p>In the water. Every reading carries its temperature.</p></div>
-        <div class="fig reveal"><p class="caption">Fig 0.5</p><div class="art" data-part="stepper"></div><h4>Stepper paddle</h4><p>28BYJ-48 and its driver. The same speed every run.</p></div>
-        <div class="fig reveal"><p class="caption">Fig 0.6</p><div class="art" data-part="esp32"></div><h4>ESP32 Feather</h4><p>Reads the sensors, streams one JSON line a second. It decides nothing.</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.1</p><div class="art" data-part="container"></div><h4>Chamber</h4><p>A clear quart container, 900 mL fill line, light path across one corner.</p><p class="spec">946 mL · fill line 900 mL · path 1.5 cm · USP 〈711〉 volume</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.2</p><div class="art" data-part="led"></div><h4>Blue LED</h4><p>5 mm, 465–475 nm. Riboflavin absorbs here at about 85% of its peak.</p><p class="spec">220 Ω · GPIO 13 · pulsed only while reading</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.3</p><div class="art" data-part="ldr"></div><h4>Two light sensors</h4><p>One inline behind blue plastic, one at 90° behind green plastic.</p><p class="spec">CdS photoresistor · 10 kΩ divider · A2 inline · A3 at 90°</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.4</p><div class="art" data-part="thermistor"></div><h4>Thermistor</h4><p>In the water. Every reading carries its temperature.</p><p class="spec">10 kΩ NTC · Steinhart–Hart · A4 · fault above 40 °C</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.5</p><div class="art" data-part="stepper"></div><h4>Stepper paddle</h4><p>28BYJ-48 and its driver. The same speed every run.</p><p class="spec">ULN2003 · ~12 rpm · fan blade half in the water</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.6</p><div class="art" data-part="esp32"></div><h4>ESP32 Feather</h4><p>Reads the sensors, streams one JSON line a second. It decides nothing.</p><p class="spec">HUZZAH32 V2 · USB serial, Wi-Fi backup · dark reading before every sweep</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.7</p><div class="art" data-part="pi"></div><h4>Raspberry Pi + touchscreen</h4><p>The station face. The same web app also runs on any phone.</p><p class="spec">Pi 3 · 7-inch · Chromium kiosk · hotspot when Wi-Fi is weak</p></div>
+        <div class="fig reveal fig-wide"><p class="caption">Fig 0.8 · Data path</p><div class="art" data-part="pipeline"></div><h4>Sensor → curve → verdict → decision</h4><p>The ESP32 measures. The backend owns the maths, the seven rules and the payment policy. Claude writes the plain-English "why" and the log line; it never sets a verdict or moves money.</p><p class="spec">JSON line/s · absorbance = log(blank/now) · plateau · 7 rules · policy.md · Nessie sandbox</p></div>
       </div>
     </div>
   </section>
@@ -128,10 +136,14 @@
   <section class="section" id="how">
     <div class="wrap">
       <p class="eyebrow reveal">Fig 2 · One run</p>
-      <h2 class="h2 reveal">Three minutes, start to verdict.</h2>
+      <h2 class="h2">Three minutes, start to verdict.</h2>
       <div class="steps" style="margin-top:56px">
-        <div class="t">t = 0:00 → 3:00</div>
+        <div class="t">the night before → t = 3:00</div>
         <div>
+          <div class="step reveal">
+            <div><p class="caption">Night before</p><h3 class="h3">Ten reference runs make the band.</h3><p class="body">Same cup, same fill line, same paddle speed, water at about 25 °C. Ten riboflavin quarter-tablets, three chalk tablets, two unknowns. The pass band is the mean ± 3 SD of the ten plateaus, checked leave-one-out. If the runs disagree by more than 15%, there is no demo, and we say so.</p></div>
+            <div class="art-slot" data-art="calibration"></div>
+          </div>
           <div class="step reveal">
             <div><p class="caption">0:00</p><h3 class="h3">Photograph the bottle.</h3><p class="body">Drug, strength, lot and maker come off the label. The lot is checked against the FDA recall list; the answer is shown as <em>no record for this lot</em>, <em>recall</em>, or <em>lookup unavailable</em>. Never "clear".</p></div>
             <div class="art-slot" data-art="bottle"></div>
@@ -176,7 +188,7 @@
   <section class="section" id="demo">
     <div class="wrap">
       <p class="eyebrow reveal">Fig 4 · Real results</p>
-      <h2 class="h2 reveal">One tablet against a bad one.</h2>
+      <h2 class="h2">One tablet against a bad one.</h2>
       <p class="lead reveal" style="margin-top:24px">Below is the chart this page will carry after Saturday's calibration: ten riboflavin runs that set the grey band, one chalk tablet that fell outside it, and the run id under each curve. Until then the chart is marked as an illustration.</p>
       <div class="chart reveal" id="chart-mount" style="margin-top:48px"></div>
       <div class="split" style="margin-top:56px">
@@ -195,29 +207,57 @@
   </section>
 
   <!-- 9. Clinic mode -->
-  <section class="section" id="clinic" style="padding-top:0">
+  <section class="section dark" id="clinic">
     <div class="wrap">
-      <div class="split">
-        <div class="art-slot reveal" data-art="delivery"></div>
+      <div class="split" style="align-items:start">
+        <div class="phone-slot" id="phone-clinic"></div>
         <div>
           <p class="eyebrow reveal">Clinic mode</p>
-          <h2 class="h2 reveal">The verdict holds the payment.</h2>
+          <h2 class="h2">The verdict holds the payment.</h2>
           <p class="lead reveal">A clinic samples one tablet from each delivery. PASS proposes release; NEEDS LAB holds the money and drafts a lab referral; UNABLE TO VERIFY escalates. Every decision is logged with the lot, the time, the rule that fired and the policy clause it quotes. No money moves without a pharmacist's tap. Payments run on the Capital One Nessie sandbox: simulated money, real workflow.</p>
+          <p class="caption reveal" style="margin-top:28px">policy.md · the six clauses the agent may quote</p>
+          <ul class="list reveal">
+            <li><b>P1</b><span>Release needs PASS, no recall record for the lot, amount within the spend cap, and the pharmacist's tap.</span></li>
+            <li><b>P2</b><span>NEEDS LAB: hold, and draft the lab referral with the curve attached.</span></li>
+            <li><b>P3</b><span>UNABLE TO VERIFY: escalate to a person; no money moves.</span></li>
+            <li><b>P4</b><span>A recall hit on the lot: hold, whatever the curve says.</span></li>
+            <li><b>P5</b><span>Amount above the cap: escalate.</span></li>
+            <li><b>P6</b><span>Recall lookup unreachable: hold until a lookup succeeds or a person overrides.</span></li>
+          </ul>
+          <p class="caption reveal" style="margin-top:28px">the three sandbox accounts</p>
+          <div class="accounts reveal">
+            <div><b>Clinic</b><span>pays into escrow when a delivery is logged</span></div>
+            <div><b>Pill escrow</b><span>holds until the verdict and the tap</span></div>
+            <div><b>Supplier</b><span>receives on release; refund on hold</span></div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- 10. Personal mode -->
-  <section class="section" id="personal" style="padding-top:0">
+  <section class="section" id="personal">
     <div class="wrap">
-      <div class="split">
+      <div class="split" style="align-items:start">
         <div>
           <p class="eyebrow reveal">Personal mode</p>
-          <h2 class="h2 reveal">One tablet per bottle.</h2>
+          <h2 class="h2">One tablet per bottle.</h2>
           <p class="lead reveal">Photograph a new bottle, test one tablet from it, and Pill keeps the result in <em>My medicines</em> with the recall check and a one-tap dose log. It never nags, never tells you to stop a medicine, and says plainly that measuring a dose needs the station.</p>
+          <p class="caption reveal" style="margin-top:28px">what it does</p>
+          <ul class="list reveal">
+            <li><b>01</b><span>Reads the label: drug, strength, lot, maker, expiry. Fields stay editable; the photo is deleted after extraction.</span></li>
+            <li><b>02</b><span>Checks the lot against openFDA recalls, live or from a dated cache, and says which.</span></li>
+            <li><b>03</b><span>Keeps one verdict per bottle, from the one tablet you tested, with its two numbers and rule id.</span></li>
+            <li><b>04</b><span>Logs a dose with one tap. Recall alerts arrive later if the lot is added to the list.</span></li>
+          </ul>
+          <p class="caption reveal" style="margin-top:28px">what it never does</p>
+          <ul class="list reveal">
+            <li><b>—</b><span>Tell you to stop a medicine, or that a tablet is "safe".</span></li>
+            <li><b>—</b><span>Re-test from the list. Measuring a dose destroys a tablet and needs the station.</span></li>
+            <li><b>—</b><span>Send your photos anywhere. Only the five label fields leave the phone.</span></li>
+          </ul>
         </div>
-        <div class="art-slot reveal" data-art="medicines"></div>
+        <div class="phone-slot" id="phone-personal"></div>
       </div>
     </div>
   </section>
@@ -226,7 +266,7 @@
   <section class="section" id="limits" style="padding-top:0">
     <div class="wrap">
       <p class="eyebrow reveal">Fig 5 · What PASS does not mean</p>
-      <h2 class="h2 reveal">Pill screens tablets. It does not certify them.</h2>
+      <h2 class="h2">Pill screens tablets. It does not certify them.</h2>
       <div class="split" style="margin-top:40px; align-items:start">
         <div class="box reveal">
           <h4>PASS means</h4>
@@ -248,6 +288,22 @@
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11b. Questions judges ask -->
+  <section class="section" id="questions" style="padding-top:0">
+    <div class="wrap">
+      <p class="eyebrow reveal">Six questions we expect at the table</p>
+      <h2 class="h2">Ask us the hard ones.</h2>
+      <div class="qa">
+        <div class="reveal"><h4>"Peel already exists."</h4><p>Yes, and it is the first thing we say. Peel measures. Pill adds the second channel, the payment gate, the recall-by-lot check and two modes. Every line here was written this weekend.</p></div>
+        <div class="reveal"><h4>"Would this catch a real antimalarial?"</h4><p>Not today, and it says so: UNABLE TO VERIFY for any drug without a reference on this box. One reference drug, honestly labelled, beats a guess.</p></div>
+        <div class="reveal"><h4>"How do we know the demo isn't rigged?"</h4><p>Run ids and timestamps on every curve, the raw trace saved for every run, and an ugly box you can open. Bring your own tablet.</p></div>
+        <div class="reveal"><h4>"Who lets software hold money?"</h4><p>Nobody. The policy proposes; a pharmacist taps. The model can only downgrade a decision to "escalate", never release.</p></div>
+        <div class="reveal"><h4>"Why not just scan the barcode?"</h4><p>Because lot numbers get copied. The FDA's December 2025 Ozempic case carried a real lot number. Only the tablet itself cannot lie about dissolving.</p></div>
+        <div class="reveal"><h4>"What does it cost, really?"</h4><p>$40 in parts, a quarter tablet per test, three minutes. A lab tester starts at $20,000 and a result takes 7–10 business days.</p></div>
       </div>
     </div>
   </section>

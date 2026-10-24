@@ -1,8 +1,9 @@
 // Pill station — isometric line-art blueprint with an exploded, turning assembly.
 // mountStation(el) renders the scene and returns { setProgress(p), destroy() }.
-// autoDemo(handle) loops 0 → 1 → 0 while on screen until something else drives it.
-// partFigures holds six standalone 300×300 SVG strings for a FIG grid.
-import { createTimeline } from 'animejs';
+// autoDemo(handle) runs the idle loop (assemble → hold → explode → hold → assemble) while on screen.
+// attachScroll(handle, { stage }) drives progress from scroll and falls back to the idle loop when scrolling stops.
+// partFigures holds seven standalone 300×300 SVG strings for a FIG grid; every path carries data-draw="i".
+import { createTimeline, animate, onScroll } from 'animejs';
 
 const NS = 'http://www.w3.org/2000/svg';
 const RAD = Math.PI / 180;
@@ -64,6 +65,18 @@ function makeCam({ yaw = 0, elev = 0, zoom = 1, S = 12.2, ox = 600, oy = 400, pi
 const add3 = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
 const mul3 = (a, k) => [a[0] * k, a[1] * k, a[2] * k];
 const X = [1, 0, 0], Y = [0, 1, 0], Z = [0, 0, 1];
+
+// Rigid tilts about an axis parallel to X (through h, in the y–z plane) or Y (x–z plane).
+function tiltX(theta, h) {
+  const c = Math.cos(theta), s = Math.sin(theta);
+  return ([x, y, z]) => { const dy = y - h[1], dz = z - h[2]; return [x, h[1] + dy * c - dz * s, h[2] + dy * s + dz * c]; };
+}
+function tiltY(phi, h) {
+  const c = Math.cos(phi), s = Math.sin(phi);
+  return ([x, y, z]) => { const dx = x - h[0], dz = z - h[2]; return [h[0] + dx * c - dz * s, y, h[2] + dx * s + dz * c]; };
+}
+const lerp2 = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
 function circ(c, r, e1 = X, e2 = Y, n = 40, t0 = 0, t1 = TAU) {
   const out = [];
