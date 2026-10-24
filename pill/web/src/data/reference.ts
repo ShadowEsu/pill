@@ -36,7 +36,7 @@ export function makeCurve(opts: { plateau: number; tau: number; glow: number; se
 
 export const REPLAYS: Record<string, { label: string; drug: string; lot: string; samples: Sample[] }> = {
   'B2-07': { label: 'Riboflavin ¼ tablet, lot B2-07', drug: 'riboflavin', lot: 'B2-07', samples: makeCurve({ plateau: 0.42, tau: 38, glow: 0.33, seed: 7 }) },
-  'TM-02': { label: 'Chalk antacid ¼ tablet, lot TM-02', drug: 'riboflavin', lot: 'TM-02', samples: makeCurve({ plateau: 0.11, tau: 50, glow: 0.015, seed: 2 }) },
+  'TM-02': { label: 'Chalk antacid ¼ tablet, lot TM-02 (cloudy water reaches the band, no glow)', drug: 'riboflavin', lot: 'TM-02', samples: makeCurve({ plateau: 0.40, tau: 50, glow: 0.015, seed: 2 }) },
   'B2-LID': { label: 'Riboflavin, lid opened at 0:41', drug: 'riboflavin', lot: 'B2-09', samples: makeCurve({ plateau: 0.42, tau: 38, glow: 0.33, seed: 9, fault: { at: 41, code: 'lid_open' } }) },
   'AMX-01': { label: 'Amoxicillin, no reference', drug: 'amoxicillin', lot: 'AMX-01', samples: makeCurve({ plateau: 0.3, tau: 45, glow: 0.05, seed: 11 }) },
 };

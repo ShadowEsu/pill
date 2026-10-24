@@ -28,6 +28,7 @@ const seed = (): State => ({
 
 let state: State = (() => { try { const raw = localStorage.getItem(KEY); return raw ? { ...seed(), ...JSON.parse(raw) } : seed(); } catch { return seed(); } })();
 const listeners = new Set<() => void>();
+document.documentElement.classList.toggle('big', state.bigText);
 function set(patch: Partial<State> | ((s: State) => Partial<State>)) {
   state = { ...state, ...(typeof patch === 'function' ? patch(state) : patch) };
   localStorage.setItem(KEY, JSON.stringify(state));
@@ -44,6 +45,7 @@ export const actions = {
   setMode(mode: Mode) { set({ mode, bigText: mode === 'personal' }); document.documentElement.classList.toggle('big', mode === 'personal'); },
   setBigText(bigText: boolean) { set({ bigText }); document.documentElement.classList.toggle('big', bigText); },
   reset() { localStorage.removeItem(KEY); state = seed(); listeners.forEach((l) => l()); },
+  calibrate(reference: string) { set((s) => ({ station: { ...s.station, calibratedAt: Date.now(), reference } })); },
 
   addBottle(b: Omit<Bottle, 'id' | 'takenAt' | 'reminder' | 'runId' | 'usedFor'> & { usedFor?: string }): Bottle {
     const key = b.drug.toLowerCase();
@@ -77,7 +79,7 @@ export const actions = {
         const line = (text: string, kind: LogLine['kind']): LogLine => ({ at: Date.now(), text, kind });
         if (!ev) return d;
         if (bottle?.recall === 'recall') return { ...d, outcome: 'hold', clause: 'P4', log: [...d.log, line(`P4 recall record for lot ${d.lot} · HOLD regardless of verdict`, 'hold')] };
-        if (bottle?.recall === 'unreachable') return { ...d, outcome: 'hold', clause: 'P6', log: [...d.log, line('P6 recall lookup unreachable · HOLD until a lookup succeeds', 'hold')] };
+        if (!bottle || bottle.recall === 'unreachable' || bottle.recall === 'unchecked') return { ...d, outcome: 'hold', clause: 'P6', log: [...d.log, line(`P6 recall ${bottle ? 'lookup unreachable' : 'not checked (no bottle attached)'} · HOLD until a lookup succeeds`, 'hold')] };
         if (ev.verdict === 'UNABLE TO VERIFY') return { ...d, outcome: 'escalate', clause: 'P3', log: [...d.log, line(`P3 ${ev.verdict} (${ev.rule}) · ESCALATE to a person · no money moves`, 'hold')] };
         if (ev.verdict === 'NEEDS LAB') return { ...d, outcome: 'hold', clause: 'P2', log: [...d.log, line(`P2 NEEDS LAB (${ev.rule}) · HOLD · lab referral drafted with the curve attached`, 'hold')] };
         if (d.amountUsd > 2000) return { ...d, outcome: 'escalate', clause: 'P5', log: [...d.log, line(`P5 amount ${d.amountUsd.toFixed(2)} above the cap 2,000.00 · ESCALATE`, 'hold')] };
