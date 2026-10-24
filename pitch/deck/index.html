@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pill · Cal Hacks 13.0 pitch</title>
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --paper: #F7F8F7; --ink: #16181B; --sky: #4FB3FF; --mint: #5FD39A; --amber: #E09A3A; --violet: #7A5CFF;
+    --muted: #5B6168; --line: #DDE1E0; --card: #FFFFFF; --grey: #9AA1A8;
+    --sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --serif: ui-serif, "New York", "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #E9ECEB; overflow: hidden; font-family: var(--sans); color: var(--ink); }
+  #stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: 0 0; }
+  .slide { position: absolute; inset: 0; background: var(--paper); padding: 96px 120px 110px; display: none; flex-direction: column; overflow: hidden; }
+  .slide.on { display: flex; }
+  .slide::after { content: attr(data-n) " / 14"; position: absolute; right: 120px; bottom: 48px; font: 500 20px var(--mono); color: var(--grey); }
+  .slide::before { content: "PILL · CAL HACKS 13.0"; position: absolute; left: 120px; bottom: 48px; font: 600 18px var(--mono); letter-spacing: .14em; color: var(--grey); }
+  .eyebrow { font: 600 22px var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin: 0 0 28px; }
+  h1 { font: 700 112px/1.02 var(--sans); letter-spacing: -.035em; margin: 0; }
+  h2 { font: 700 76px/1.06 var(--sans); letter-spacing: -.03em; margin: 0 0 40px; max-width: 1560px; }
+  h3 { font: 650 34px/1.2 var(--sans); margin: 0 0 14px; letter-spacing: -.01em; }
+  p, li { font: 400 32px/1.42 var(--sans); margin: 0; }
+  .lead { font-size: 40px; line-height: 1.35; color: #2A2E33; max-width: 1500px; }
+  .muted { color: var(--muted); }
+  .mono { font-family: var(--mono); }
+  .serif { font-family: var(--serif); }
+  .src { font: 400 20px/1.4 var(--mono); color: var(--muted); }
+  .row { display: flex; gap: 40px; }
+  .grow { flex: 1; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 28px; padding: 40px 44px; }
+  .chip { display: inline-flex; align-items: center; gap: 10px; font: 600 20px var(--mono); letter-spacing: .08em; padding: 8px 16px; border-radius: 999px; border: 1.5px solid currentColor; }
+  .chip .dot { width: 10px; height: 10px; border-radius: 50%; background: currentColor; }
+  .v { font-family: var(--serif); font-weight: 600; letter-spacing: -.01em; }
+  .pass { color: #2F9E67; } .needs { color: #B8741C; } .unable { color: #6E757C; }
+  .bg-pass { background: color-mix(in srgb, var(--mint) 18%, white); border-color: color-mix(in srgb, var(--mint) 55%, white); }
+  .bg-needs { background: color-mix(in srgb, var(--amber) 16%, white); border-color: color-mix(in srgb, var(--amber) 50%, white); }
+  .bg-unable { background: #EEF0F1; border-color: #D3D7DA; }
+  .bg-sky { background: color-mix(in srgb, var(--sky) 12%, white); border-color: color-mix(in srgb, var(--sky) 45%, white); }
+  .bg-violet { background: color-mix(in srgb, var(--violet) 10%, white); border-color: color-mix(in srgb, var(--violet) 40%, white); }
+  .pending { font: 600 18px var(--mono); color: #B8741C; background: color-mix(in srgb, var(--amber) 14%, white); border-radius: 8px; padding: 2px 10px; white-space: nowrap; }
+  ul.clean { list-style: none; padding: 0; margin: 0; }
+  ul.clean li { padding-left: 34px; position: relative; margin-bottom: 16px; }
+  ul.clean li::before { content: ""; position: absolute; left: 0; top: 18px; width: 14px; height: 14px; border-radius: 4px; background: var(--sky); }
+
+  /* 1 title */
+  .s-title { justify-content: center; }
+  .s-title h1 { font-size: 220px; letter-spacing: -.05em; }
+  .s-title .tag { font: 500 54px/1.25 var(--sans); letter-spacing: -.02em; max-width: 1400px; margin-top: 24px; }
+  .pillmark { position: absolute; right: 140px; top: 210px; width: 560px; }
+
+  /* 2 moment */
+  .moment-grid { display: grid; grid-template-columns: 1.25fr .9fr; gap: 48px; flex: 1; min-height: 0; }
+  .verdict-big { font: 600 92px/1 var(--serif); margin: 8px 0 18px; white-space: nowrap; }
+  .money { font: 600 44px var(--mono); }
+
+  /* 3 numbers */
+  .big-num { font: 800 230px/0.9 var(--sans); letter-spacing: -.06em; color: var(--ink); white-space: nowrap; }
+  .stat { border-top: 2px solid var(--ink); padding-top: 24px; }
+  .stat b { font: 700 52px/1.1 var(--sans); letter-spacing: -.02em; display: block; margin-bottom: 10px; }
+
+  /* 4 idea */
+  .vs { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px; }
+  .vs .card b { font: 700 80px/1 var(--sans); letter-spacing: -.03em; display: block; margin: 10px 0 12px; }
+
+  /* 6 three words */
+  .words { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; flex: 1; }
+  .words .card { display: flex; flex-direction: column; gap: 20px; }
+  .words .v { font-size: 72px; line-height: 1.02; }
+  .rule { font: 600 22px var(--mono); color: var(--muted); }
+
+  /* 7 run */
+  .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 22px; }
+  .step { background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 28px 26px; min-height: 260px; }
+  .step .n { font: 700 22px var(--mono); color: var(--sky); }
+  .step h3 { font-size: 30px; margin: 14px 0 10px; }
+  .step p { font-size: 24px; line-height: 1.38; color: #3A3F45; }
+  .step.money-step .n { color: var(--violet); }
+
+  /* 8 app grid */
+  .shots { display: grid; grid-template-columns: repeat(8, 1fr); gap: 16px; align-items: start; }
+  .shots figure { margin: 0; }
+  .shots img { width: 100%; aspect-ratio: 488 / 1055; height: auto; object-fit: cover; object-position: top; border-radius: 22px; border: 1px solid var(--line); background: white; box-shadow: 0 18px 40px -24px rgba(22,24,27,.35); display: block; }
+  .shots figcaption { font: 600 19px/1.3 var(--mono); color: var(--muted); margin-top: 14px; text-align: center; }
+
+  /* 9 clinic */
+  .clauses { font-size: 26px; }
+  .clauses li { font-size: 26px; line-height: 1.35; margin-bottom: 12px; display: grid; grid-template-columns: 64px 1fr; }
+  .clauses b { font-family: var(--mono); }
+  .phone-shot { height: 760px; border-radius: 30px; border: 1px solid var(--line); box-shadow: 0 24px 50px -28px rgba(22,24,27,.45); }
+
+  /* 10 coinbase */
+  .s-cb h2 { color: var(--ink); }
+  .term { background: #15131F; color: #E7E3FF; border-radius: 24px; padding: 32px 36px; font: 400 23px/1.55 var(--mono); white-space: pre; overflow: hidden; }
+  .term .c { color: #8F84B8; } .term .k { color: #B7A6FF; } .term .ok { color: var(--mint); } .term .w { color: #FFC37A; }
+  .violet { color: var(--violet); }
+
+  /* 11 real vs sim */
+  .rvs { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; flex: 1; }
+  .rvs li { font-size: 27px; line-height: 1.36; margin-bottom: 14px; }
+  .rvs .bg-pass ul.clean li::before { background: var(--mint); }
+  .rvs .bg-needs ul.clean li::before { background: var(--amber); }
+
+  /* 13 tracks */
+  .tracks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .track { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 22px 24px; }
+  .track b { font: 650 26px/1.2 var(--sans); display: block; margin-bottom: 8px; }
+  .track span { font: 400 21px/1.35 var(--sans); color: #3A3F45; }
+  .track.cond { border-style: dashed; }
+
+  /* 14 thanks */
+  .qrs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 36px; margin-top: 48px; }
+  .qr { border: 3px dashed #C5CBCA; border-radius: 24px; height: 300px; display: flex; align-items: center; justify-content: center; text-align: center; font: 600 24px/1.4 var(--mono); color: var(--muted); background: white; }
+  .qr-cap { font: 600 26px var(--sans); margin-top: 16px; text-align: center; }
+  .qr-cap small { display: block; font: 400 20px var(--mono); color: var(--muted); margin-top: 6px; }
+
+</style>
+</head>
+<body>
+<div id="stage">
+
+<!-- 1 · title -->
+<section class="slide s-title" data-n="1">
+  <p class="eyebrow">Cal Hacks 13.0 · &lt;names&gt;</p>
+  <h1>Pill</h1>
+  <p class="tag">A $40 box that tests one tablet before the supplier is paid.</p>
+  <div class="row" style="margin-top:56px; gap:18px">
+    <span class="chip pass"><span class="dot"></span>PASS</span>
+    <span class="chip needs"><span class="dot"></span>NEEDS LAB</span>
+    <span class="chip unable"><span class="dot"></span>UNABLE TO VERIFY</span>
+  </div>
+  <p class="src" style="margin-top:44px">pill-site.vercel.app</p>
+  <svg class="pillmark" viewBox="0 0 560 560" aria-hidden="true">
+    <defs><clipPath id="pc"><rect x="60" y="200" width="440" height="160" rx="80" transform="rotate(-28 280 280)"/></clipPath></defs>
+    <g clip-path="url(#pc)">
+      <rect x="0" y="0" width="560" height="560" fill="#FFFFFF"/>
+      <rect x="0" y="0" width="372" height="560" fill="#5FD39A" opacity=".9"/>
+    </g>
+    <rect x="60" y="200" width="440" height="160" rx="80" transform="rotate(-28 280 280)" fill="none" stroke="#16181B" stroke-width="8"/>
+    <line x1="280" y1="160" x2="280" y2="400" transform="rotate(-28 280 280)" stroke="#16181B" stroke-width="6" stroke-dasharray="10 12"/>
+    <text x="300" y="520" font-family="ui-monospace, Menlo, monospace" font-size="28" fill="#5B6168">83 % of reference</text>
+  </svg>
+</section>
+
+<!-- 2 · the moment -->
+<section class="slide" data-n="2">
+  <p class="eyebrow">The moment · delivery d-1042 · replay TM-02</p>
+  <h2>Same label. Chalk inside.</h2>
+  <div class="moment-grid">
+    <div class="card" style="padding:32px 36px">
+      <svg viewBox="0 0 960 560" width="100%" height="100%" aria-label="Inline channel rises into the band; the glow channel stays flat">
+        <rect x="80" y="170" width="840" height="76" fill="#4FB3FF" opacity=".12"/>
+        <line x1="80" y1="170" x2="920" y2="170" stroke="#4FB3FF" stroke-dasharray="8 8" stroke-width="2"/>
+        <line x1="80" y1="246" x2="920" y2="246" stroke="#4FB3FF" stroke-dasharray="8 8" stroke-width="2"/>
+        <text x="900" y="160" text-anchor="end" font-family="ui-monospace, Menlo, monospace" font-size="22" fill="#2A7FC2">reference band 0.36–0.47</text>
+        <line x1="80" y1="490" x2="920" y2="490" stroke="#16181B" stroke-width="2"/>
+        <line x1="80" y1="40" x2="80" y2="490" stroke="#16181B" stroke-width="2"/>
+        <text x="80" y="530" font-family="ui-monospace, Menlo, monospace" font-size="22" fill="#5B6168">0 s</text>
+        <text x="920" y="530" text-anchor="end" font-family="ui-monospace, Menlo, monospace" font-size="22" fill="#5B6168">180 s</text>
+        <path d="M80 490 C 200 420, 300 300, 420 250 S 700 222, 920 220" fill="none" stroke="#4FB3FF" stroke-width="7" stroke-linecap="round"/>
+        <path d="M80 488 C 300 486, 600 484, 920 483" fill="none" stroke="#5FD39A" stroke-width="7" stroke-linecap="round"/>
+        <text x="600" y="205" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="650" fill="#16181B">blue inline: in the band</text>
+        <text x="600" y="462" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="650" fill="#16181B">green 90° glow: flat</text>
+      </svg>
+    </div>
+    <div class="card bg-needs" style="display:flex; flex-direction:column; justify-content:center">
+      <span class="rule">RULE N2 · inline moved, glow did not rise</span>
+      <div class="verdict-big needs">NEEDS LAB</div>
+      <p style="font-size:28px">A one-sensor tester would have passed it.</p>
+      <div style="height:2px; background:#E8C99A; margin:30px 0"></div>
+      <span class="rule">POLICY P2 · hold, draft the lab referral</span>
+      <div class="money" style="margin-top:10px">$480.00 held</div>
+      <span class="chip unable" style="margin-top:16px; align-self:flex-start">SANDBOX · REPLAY</span>
+    </div>
+  </div>
+</section>
+
+<!-- 3 · one in ten -->
+<section class="slide" data-n="3">
+  <p class="eyebrow">Why it matters</p>
+  <div class="row" style="align-items:flex-end; gap:56px">
+    <div class="big-num">1 in 10</div>
+    <p class="lead" style="max-width:820px; padding-bottom:16px; font-size:36px">WHO estimates 1 in 10 medical products in low- and middle-income countries is substandard or falsified.</p>
+  </div>
+  <p class="src" style="margin:20px 0 44px">WHO, 28 Nov 2017 · covers substandard (badly made) and falsified products together</p>
+  <div class="row" style="gap:56px">
+    <div class="stat grow"><b>116,000 a year</b><p style="font-size:26px">A London School of Hygiene &amp; Tropical Medicine model estimates substandard and falsified antimalarials could cause 116,000 extra malaria deaths a year in sub-Saharan Africa (range 64,000–158,000).</p><p class="src" style="margin-top:12px">WHO, 2017 · modelled estimate</p></div>
+    <div class="stat grow"><b>more than 300</b><p style="font-size:26px">Contaminated children's cough syrups were linked to more than 300 deaths in three countries, most of them children under five.</p><p class="src" style="margin-top:12px">WHO, 23 Jan 2023</p></div>
+  </div>
+</section>
+
+<!-- 4 · the idea -->
+<section class="slide" data-n="4">
+  <p class="eyebrow">The idea</p>
+  <h2>Don't ask "is this drug good?" Ask: does one tablet dissolve like the reference, and should the money wait?</h2>
+  <div class="vs">
+    <div class="card">
+      <p class="eyebrow" style="margin:0">Lab dissolution today</p>
+      <b>$20,000–$100,000</b>
+      <p>A new USP-style dissolution tester typically costs $20,000–$100,000. Lab dissolution results typically take 7–10 business days.</p>
+      <p class="src" style="margin-top:16px">LabX marketplace FAQ; Auriga Research</p>
+    </div>
+    <div class="card bg-sky">
+      <p class="eyebrow" style="margin:0">Pill at the clinic</p>
+      <b>about $40</b>
+      <p>One quarter tablet in 900 mL of water, about three minutes, at the moment the delivery is signed for. A screening result, not a lab test.</p>
+      <p class="src" style="margin-top:16px">our parts list · prototype</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · two channels -->
+<section class="slide" data-n="5">
+  <p class="eyebrow">Two channels that must agree</p>
+  <h2>Riboflavin absorbs blue and glows green. Chalk only blocks light.</h2>
+  <div class="row" style="flex:1; gap:48px; min-height:0">
+    <div class="card" style="flex:1.1; padding:24px">
+      <svg viewBox="0 0 900 560" width="100%" height="100%" aria-label="Station light path">
+        <rect x="300" y="110" width="320" height="340" rx="18" fill="#EAF6FF" stroke="#16181B" stroke-width="4"/>
+        <rect x="300" y="210" width="320" height="240" rx="0" fill="#BFE3FF" opacity=".55"/>
+        <text x="460" y="96" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="22" fill="#5B6168">900 mL · ¼ tablet · paddle</text>
+        <circle cx="200" cy="320" r="34" fill="#4FB3FF" stroke="#16181B" stroke-width="4"/>
+        <text x="200" y="390" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="650">blue LED</text>
+        <line x1="236" y1="320" x2="700" y2="320" stroke="#4FB3FF" stroke-width="10" opacity=".8"/>
+        <rect x="700" y="290" width="60" height="60" rx="10" fill="#16181B"/>
+        <rect x="690" y="290" width="10" height="60" fill="#4FB3FF"/>
+        <text x="730" y="390" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="650">inline</text>
+        <text x="730" y="418" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="19" fill="#5B6168">blue filter</text>
+        <path d="M460 320 L460 480" stroke="#5FD39A" stroke-width="8" stroke-dasharray="12 10"/>
+        <rect x="430" y="480" width="60" height="60" rx="10" fill="#16181B"/>
+        <rect x="430" y="470" width="60" height="10" fill="#5FD39A"/>
+        <text x="520" y="520" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="650">90° glow</text>
+        <text x="520" y="546" font-family="ui-monospace, Menlo, monospace" font-size="19" fill="#5B6168">green filter</text>
+        <circle cx="460" cy="320" r="20" fill="#5FD39A" opacity=".55"/>
+      </svg>
+    </div>
+    <div style="flex:.9; display:flex; flex-direction:column; gap:24px">
+      <div class="card bg-pass"><h3>Vitamin B2 tablet</h3><p>Inline light drops <b>and</b> the 90° channel glows green. Both agree → can PASS.</p></div>
+      <div class="card bg-needs"><h3>Chalk tablet</h3><p>Inline light drops (cloudy water). The 90° channel stays dark → NEEDS LAB.</p></div>
+      <p class="src">ESP32 · blue LED · two photoresistors · stepper paddle · thermistor · tilt-switch lid · a dark reading before every sweep</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6 · three words -->
+<section class="slide" data-n="6">
+  <p class="eyebrow">Three words. Never a fourth.</p>
+  <h2>Seven rules set the verdict. No model does.</h2>
+  <div class="words">
+    <div class="card bg-pass">
+      <div class="v pass">PASS</div>
+      <span class="rule">P1</span>
+      <p style="font-size:28px">Plateau inside the reference band and the 90° glow rose with it.</p>
+      <p class="muted" style="font-size:24px; margin-top:auto">"This is a screening result, not a lab test."</p>
+    </div>
+    <div class="card bg-needs">
+      <div class="v needs">NEEDS LAB</div>
+      <span class="rule">N1 · N2 · N3</span>
+      <p style="font-size:28px">Below the band, no glow, or above the band.</p>
+      <p class="muted" style="font-size:24px; margin-top:auto">Send this lot to a lab.</p>
+    </div>
+    <div class="card bg-unable">
+      <div class="v unable">UNABLE TO VERIFY</div>
+      <span class="rule">U1 · U2 · U3</span>
+      <p style="font-size:28px">No reference for this drug, a station fault (lid opened), or the reading never settled.</p>
+      <p class="muted" style="font-size:24px; margin-top:auto">Escalate to a person. No money moves.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 7 · how a run works -->
+<section class="slide" data-n="7">
+  <p class="eyebrow">How a run works · clinic mode</p>
+  <h2>From a delivery at the door to one line in the log.</h2>
+  <div class="steps">
+    <div class="step money-step"><span class="n">01</span><h3>Delivery logged</h3><p>Lot, supplier, amount. The invoice moves into escrow (SANDBOX / TESTNET).</p></div>
+    <div class="step"><span class="n">02</span><h3>Bottle photo</h3><p>Gemini reads drug, strength, lot, maker, expiry. Every field editable; the photo is never stored.</p></div>
+    <div class="step"><span class="n">03</span><h3>Recall check</h3><p>The lot is checked for a recall. A hit holds the payment, whatever the verdict (P4).</p></div>
+    <div class="step"><span class="n">04</span><h3>Place the tablet</h3><p>Four station checks go green: LED, dark reading, paddle, lid.</p></div>
+    <div class="step"><span class="n">05</span><h3>~3 minute run</h3><p>One reading a second; the pill drawing fills to 100 % of the reference plateau.</p></div>
+    <div class="step"><span class="n">06</span><h3>Seven rules</h3><p>U1 → P1 in order; the first match wins and its id goes on the card.</p></div>
+    <div class="step"><span class="n">07</span><h3>Two-sentence why</h3><p>Claude explains the numbers; a clause filter drops any claim about the medicine.</p></div>
+    <div class="step money-step"><span class="n">08</span><h3>Policy proposes</h3><p>Six plain-text clauses P1–P6: release, hold or escalate.</p></div>
+    <div class="step money-step"><span class="n">09</span><h3>Pharmacist taps</h3><p>The only path that releases money. The model can only downgrade.</p></div>
+    <div class="step"><span class="n">10</span><h3>One log line</h3><p>Time, lot, verdict, rule, quoted clause, outcome, tx id, who tapped.</p></div>
+  </div>
+</section>
+
+<!-- 8 · the app -->
+<section class="slide" data-n="8">
+  <p class="eyebrow">The app · one web app on the phone, the laptop and the station's touchscreen</p>
+  <h2 style="margin-bottom:36px">Eight screens from the build.</h2>
+  <div class="shots">
+    <figure><img src="img/flowsa-welcome.webp" alt="Onboarding: medical or personal"><figcaption>Who are you</figcaption></figure>
+    <figure><img src="img/flowsa-bottle-fields-medical.webp" alt="Bottle fields read from a label photo"><figcaption>Bottle → fields</figcaption></figure>
+    <figure><img src="img/pillmotion-run-mid-phone.webp" alt="Run in progress"><figcaption>Run, live curve</figcaption></figure>
+    <figure><img src="img/runeval-eval-pass.webp" alt="PASS evaluation"><figcaption>PASS · P1</figcaption></figure>
+    <figure><img src="img/runeval-eval-needslab.webp" alt="NEEDS LAB evaluation"><figcaption>NEEDS LAB</figcaption></figure>
+    <figure><img src="img/flowsb-delivery-hold.webp" alt="Delivery with the payment held"><figcaption>Payment held</figcaption></figure>
+    <figure><img src="img/payreal-verify-real402-phone.webp" alt="Verify screen showing a real 402"><figcaption>x402 · real 402</figcaption></figure>
+    <figure><img src="img/flowsb-medicines.webp" alt="My medicines in personal mode"><figcaption>My medicines</figcaption></figure>
+  </div>
+  <p class="src" style="margin-top:28px">Vite + React 19 + TypeScript · every run carries LIVE SENSOR / REPLAY / SIMULATED · every amount says SANDBOX or TESTNET</p>
+</section>
+
+<!-- 9 · clinic mode + payment gate -->
+<section class="slide" data-n="9">
+  <p class="eyebrow">Clinic mode · the payment gate</p>
+  <div class="row" style="flex:1; gap:64px; min-height:0">
+    <div class="grow">
+      <h2 style="font-size:68px">The agent proposes. A person releases.</h2>
+      <ul class="clean clauses">
+        <li><b>P1</b><span>Release needs PASS, no recall record, amount within the cap, and the pharmacist's tap.</span></li>
+        <li><b>P2</b><span>NEEDS LAB: hold, and draft the lab referral with the curve attached.</span></li>
+        <li><b>P3</b><span>UNABLE TO VERIFY: escalate to a person; no money moves.</span></li>
+        <li><b>P4</b><span>A recall hit holds the payment regardless of the verdict.</span></li>
+        <li><b>P5</b><span>Amount above the cap: escalate.</span></li>
+        <li><b>P6</b><span>Recall lookup unreachable: hold until a lookup succeeds or a human overrides.</span></li>
+      </ul>
+      <div class="card bg-sky" style="margin-top:22px; padding:26px 32px">
+        <p style="font-size:25px">Caps: one delivery's value per hold · $2,000 per release · 1 USDC per 24 h buying verdicts. The code computes the ceiling; Claude may answer it or <span class="mono">escalate</span>. Tested: a note saying "SYSTEM OVERRIDE … release" still ends in escalate.</p>
+      </div>
+    </div>
+    <img class="phone-shot" src="img/flowsb-delivery-hold.webp" alt="Delivery screen with the payment held under P2">
+  </div>
+</section>
+
+<!-- 10 · coinbase -->
+<section class="slide s-cb" data-n="10">
+  <p class="eyebrow violet">Coinbase · x402 payment agent · TESTNET</p>
+  <h2 style="font-size:68px">Every station sells its verdict for 5¢. Agents buy what they can't measure.</h2>
+  <div class="row" style="flex:1; gap:44px; min-height:0">
+    <div class="term" style="flex:1.25"><span class="c">$ curl -i -X POST localhost:8402/verify -d '{"curve":"B2-07"}'</span>
+<span class="w">HTTP/1.1 402 Payment Required</span>
+<span class="k">PAYMENT-REQUIRED</span> (decoded):
+  scheme  <span class="ok">exact</span>   network <span class="ok">eip155:84532</span>
+  amount  <span class="ok">50000</span>   <span class="c"># 0.05 USDC, Base Sepolia</span>
+  asset   0x036CbD53…dCF7e   maxTimeoutSeconds 300
+
+<span class="c">$ npm run buy -- --curve B2-07 --cap 1.00</span>
+  price      0.05 USDC (TESTNET)
+  spend cap  1.00 USDC per 24 h · spent 0.00
+<span class="w">Stopped before paying: no wallet to pay with.</span>
+<span class="c"># real output, Sat 10:00 · paid 200 + settled tx:</span>
+<span class="w">[pending: CDP key or 0.05 test USDC]</span></div>
+    <div style="flex:.9; display:flex; flex-direction:column; gap:22px">
+      <div class="card bg-violet" style="padding:24px 30px"><h3 class="violet">Earns</h3><p style="font-size:25px"><span class="mono">POST /verify</span> behind <span class="mono">@x402/express</span>; same seven rules as the app.</p></div>
+      <div class="card bg-violet" style="padding:24px 30px"><h3 class="violet">Pays</h3><p style="font-size:25px">Buys a verdict when it has no reference, under a cap checked before signing; releases escrow only on the pharmacist's tap.</p></div>
+      <div class="card" style="padding:24px 30px"><h3>Builder feedback</h3><p style="font-size:23px"><span class="mono">auth-capture</span> ships in <span class="mono">@x402/evm</span> but not on the public Base Sepolia facilitator. It would replace our three escrow wallets with one route.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 · real vs simulated -->
+<section class="slide" data-n="11">
+  <p class="eyebrow">Real vs simulated · Saturday</p>
+  <h2>What runs live, and what is labelled as not.</h2>
+  <div class="rvs">
+    <div class="card bg-pass">
+      <h3 class="pass">Live now</h3>
+      <ul class="clean">
+        <li>Label reading: Gemini, from a photo held in memory only</li>
+        <li>The two-sentence why: Claude, clause-filtered</li>
+        <li>Escrow clerk: Claude, downgrade-only, six-case policy test</li>
+        <li>Seven deterministic rules, same code in app and service</li>
+        <li>x402: a real <span class="mono">402</span> and the facilitator's signature check</li>
+      </ul>
+    </div>
+    <div class="card bg-needs">
+      <h3 class="needs">Simulated, replayed or pending</h3>
+      <ul class="clean">
+        <li>Paid <span class="mono">200</span>: needs the CDP key or 0.05 test USDC</li>
+        <li>USDC escrow moves: simulated until the CDP key</li>
+        <li>Nessie mirror: client built, key pending</li>
+        <li>Recall check: one demo recall lot in the app</li>
+        <li>Station: being built Saturday; demo curves are replays</li>
+        <li>The app's week of history: fixture data</li>
+      </ul>
+    </div>
+  </div>
+  <p class="src" style="margin-top:22px">All money is SANDBOX (Nessie) or TESTNET (Base Sepolia). Every screen carries LIVE SENSOR / REPLAY / SIMULATED.</p>
+</section>
+
+<!-- 12 · what's next -->
+<section class="slide" data-n="12">
+  <p class="eyebrow">What's next</p>
+  <h2>One drug, one clinic, one honest comparison.</h2>
+  <div class="row" style="gap:40px">
+    <div class="card grow"><h3>Pilot</h3><p style="font-size:28px">20 B2 tablets side by side with a GPHF Minilab, a field screening kit that costs EUR 4,720 for about 1,000 test runs, before reference standards.</p></div>
+    <div class="card grow"><h3>References</h3><p style="font-size:28px">A library one drug at a time: ten calibration runs and a leave-one-out check per band.</p></div>
+    <div class="card grow"><h3>Production</h3><p style="font-size:28px">Printed enclosure with a lid interlock; a real login behind the tap; <span class="mono">auth-capture</span> on x402 when a facilitator supports it.</p></div>
+  </div>
+  <p class="lead" style="margin-top:48px">And the first thing: a conversation with a practising pharmacist about what they would hold. <span class="pending">pending</span></p>
+</section>
+
+<!-- 13 · tracks -->
+<section class="slide" data-n="13">
+  <p class="eyebrow">Tracks we enter</p>
+  <h2 style="margin-bottom:32px">One build, read from many sides.</h2>
+  <div class="tracks">
+    <div class="track"><b>Hyphenate</b><span>an autonomous finance agent that knows when to ask</span></div>
+    <div class="track"><b class="violet">Coinbase x402</b><span>earns and pays verdicts; escrow on testnet</span></div>
+    <div class="track"><b>Capital One Nessie</b><span>the fiat mirror of the same escrow</span></div>
+    <div class="track"><b>Microsoft</b><span>production-minded healthcare agent</span></div>
+    <div class="track"><b>Anthropic</b><span>Claude explains and logs; never decides</span></div>
+    <div class="track"><b>Best Hardware</b><span>the two-channel station</span></div>
+    <div class="track"><b>People-First</b><span>clinics, and grandparents at home</span></div>
+    <div class="track"><b>Most Technical</b><span>optics, rules, two models, x402</span></div>
+    <div class="track"><b>MLH Gen AI</b><span>Claude + Gemini, both contained</span></div>
+    <div class="track"><b>MLH Gemini</b><span>bottle label → five fields</span></div>
+    <div class="track"><b>Armadin security</b><span>agent containment, tested</span></div>
+    <div class="track"><b>Figma</b><span>idea → demo, stage log</span></div>
+    <div class="track"><b>MLH Commit</b><span>working team prototype</span></div>
+    <div class="track cond"><b>Tiger Data</b><span>if the readings mirror ships</span></div>
+    <div class="track cond"><b>Apify / Bright Data</b><span>if the live recall lookup ships</span></div>
+  </div>
+</section>
+
+<!-- 14 · thank you -->
+<section class="slide" data-n="14">
+  <p class="eyebrow">Thank you</p>
+  <h1 style="font-size:150px">Try to make it pass the chalk.</h1>
+  <div class="qrs">
+    <div><div class="qr">QR<br>placeholder</div><p class="qr-cap">Website<small>pill-site.vercel.app</small></p></div>
+    <div><div class="qr">QR<br>placeholder</div><p class="qr-cap">App<small>[pending: deploy URL]</small></p></div>
+    <div><div class="qr">QR<br>placeholder</div><p class="qr-cap">Repo<small>[pending: GitHub URL]</small></p></div>
+    <div><div class="qr">QR<br>placeholder</div><p class="qr-cap">Video<small>[pending: YouTube URL]</small></p></div>
+  </div>
+  <p class="src" style="margin-top:36px">Method: a published optical dissolution approach, Peel (HackMIT 2026), method only, no code · &lt;names&gt;</p>
+</section>
+
+</div>
+<script>
+(() => {
+  const slides = [...document.querySelectorAll('.slide')];
+  const stage = document.getElementById('stage');
+  let i = 0;
+  const fromHash = () => { const n = parseInt(location.hash.slice(1), 10); return Number.isFinite(n) ? Math.min(Math.max(n, 1), slides.length) - 1 : 0; };
+  const show = (n) => {
+    i = Math.min(Math.max(n, 0), slides.length - 1);
+    slides.forEach((s, k) => s.classList.toggle('on', k === i));
+    const h = '#' + (i + 1);
+    if (location.hash !== h) history.replaceState(null, '', h);
+  };
+  const fit = () => {
+    const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+    stage.style.transform = `scale(${s}) translate(-50%, -50%)`;
+  };
+  addEventListener('keydown', (e) => {
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); show(i + 1); }
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); show(i - 1); }
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(slides.length - 1);
+    else if (e.key === 'f' || e.key === 'F') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
+  });
+  addEventListener('click', (e) => { if (e.clientX > innerWidth / 2) show(i + 1); else show(i - 1); });
+  addEventListener('hashchange', () => show(fromHash()));
+  addEventListener('resize', fit);
+  fit(); show(fromHash());
+})();
+</script>
+</body>
+</html>
