@@ -1,10 +1,10 @@
 // Streaming Gemini (generativelanguage v1beta :streamGenerateContent?alt=sse). Yields text deltas as they arrive; thought
 // parts and thought signatures are skipped. Same key, model chain, token cap and error type as gemini.ts; nothing is
-// written or logged.
+// written or logged. Errors carry a fixed reason code only (never Google's text, which can name the key).
 // Until the first text arrives, a failing model falls through to the next one in geminiModelChain(): 429 (free-tier quota
 // is per model per day), 404, 5xx, or no first text within FIRST_TEXT_MS (some preview models hang). After text has
 // streamed, a failure throws: the caller decides what to show.
-import { GeminiError, MAX_OUTPUT_TOKENS, coolDown, geminiModelChain, isCooling, thinkingConfigFor, type GeminiContent } from './gemini.js';
+import { GeminiError, MAX_OUTPUT_TOKENS, coolDown, geminiModelChain, isCooling, reasonForStatus, thinkingConfigFor, type GeminiContent, type GeminiReason } from './gemini.js';
 
 const BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 const FIRST_TEXT_MS = 12_000;
@@ -26,11 +26,13 @@ export interface GeminiStreamRequest {
 type Chunk = { candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] }; finishReason?: string }[]; promptFeedback?: { blockReason?: string }; error?: { message?: string } };
 
 /** Marks a failure that may move on to the next model (nothing has streamed yet). */
-class NextModel extends Error {}
+class NextModel extends Error {
+  constructor(readonly reason: GeminiReason, readonly status: number | null = null) { super(reason); }
+}
 
 export async function* geminiStream(req: GeminiStreamRequest): AsyncGenerator<string, { model: string; finish: string | null }> {
   const key = process.env.GEMINI_API_KEY;
-  if (!key) throw new GeminiError('no GEMINI_API_KEY on the service');
+  if (!key) throw new GeminiError('not_configured');
   const timeoutMs = req.timeoutMs ?? 20_000;
   const overall = AbortSignal.timeout(timeoutMs);
   const body = (model: string) => {
@@ -46,7 +48,7 @@ export async function* geminiStream(req: GeminiStreamRequest): AsyncGenerator<st
     return JSON.stringify(b);
   };
 
-  let last = 'gemini unreachable';
+  let last = new NextModel('model_unavailable');
   const chain = geminiModelChain(req.model);
   const ready = chain.filter((m) => !isCooling(m));
   for (const model of ready.length ? ready : chain) {
@@ -63,22 +65,21 @@ export async function* geminiStream(req: GeminiStreamRequest): AsyncGenerator<st
           method: 'POST', headers: { 'x-goog-api-key': key, 'content-type': 'application/json' }, body: body(model), signal,
         });
       } catch (e) {
-        if (first.signal.aborted) { coolDown(model, 120); throw new NextModel(`gemini ${model}: no answer in ${FIRST_TEXT_MS / 1000} s`); }
+        if (first.signal.aborted) { coolDown(model, 120); throw new NextModel('timeout'); }
         throw e;
       }
       if (!res.ok || !res.body) {
-        const j = (await res.json().catch(() => ({}))) as Chunk;
-        const msg = `gemini ${res.status} (${model}): ${(j.error?.message ?? res.statusText).slice(0, 160)}`;
+        await res.body?.cancel().catch(() => {});
         if (res.status === 429) coolDown(model, 60);
-        if (res.status === 429 || res.status === 404 || res.status >= 500) throw new NextModel(msg);
-        throw new GeminiError(msg, res.status);
+        if (res.status === 429 || res.status === 404 || res.status >= 500) throw new NextModel(reasonForStatus(res.status), res.status);
+        throw new GeminiError(reasonForStatus(res.status), res.status);
       }
       reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
       let buf = '';
       for (;;) {
         let chunk: ReadableStreamReadResult<string>;
         try { chunk = await reader.read(); } catch (e) {
-          if (!any && first.signal.aborted) throw new NextModel(`gemini ${model}: no text in ${FIRST_TEXT_MS / 1000} s`);
+          if (!any && first.signal.aborted) throw new NextModel('timeout');
           throw e;
         }
         if (chunk.done) break;
@@ -91,8 +92,8 @@ export async function* geminiStream(req: GeminiStreamRequest): AsyncGenerator<st
           if (!data) continue;
           let c: Chunk;
           try { c = JSON.parse(data) as Chunk; } catch { continue; }
-          if (c.error) throw new GeminiError(`gemini (${model}): ${(c.error.message ?? 'stream error').slice(0, 200)}`);
-          if (c.promptFeedback?.blockReason) throw new GeminiError(`gemini blocked the prompt (${c.promptFeedback.blockReason})`);
+          if (c.error) throw new GeminiError('model_unavailable', res.status);
+          if (c.promptFeedback?.blockReason) throw new GeminiError('blocked', res.status);
           const cand = c.candidates?.[0];
           if (cand?.finishReason) finish = cand.finishReason;
           for (const p of cand?.content?.parts ?? []) {
@@ -102,17 +103,16 @@ export async function* geminiStream(req: GeminiStreamRequest): AsyncGenerator<st
           }
         }
       }
-      if (!any) throw new NextModel(`gemini ${model} returned no text${finish ? ` (${finish})` : ''}`);
+      if (!any) throw new NextModel('bad_reply', res.status);
       return { model, finish };
     } catch (e) {
-      if (e instanceof NextModel) { last = e.message; continue; }
+      if (e instanceof NextModel) { last = e; continue; }
       if (e instanceof GeminiError) throw e;
-      const err = e as Error;
-      throw new GeminiError(overall.aborted ? `gemini timed out after ${timeoutMs} ms` : `gemini stream broke: ${err.message}`);
+      throw new GeminiError(overall.aborted ? 'timeout' : 'model_unavailable');
     } finally {
       clearTimeout(timer);
       if (reader) void reader.cancel().catch(() => {});   // closes the upstream request if the caller stopped early
     }
   }
-  throw new GeminiError(overall.aborted ? `gemini timed out after ${timeoutMs} ms` : last);
+  throw new GeminiError(overall.aborted ? 'timeout' : last.reason, last.status);
 }

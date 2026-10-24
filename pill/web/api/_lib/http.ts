@@ -2,7 +2,8 @@
 // POST only, origin check, Cache-Control: no-store, JSON body ≤ 1.5 MB, spend limits (429 {mode:'busy'}).
 // Logs only `[api <route>] <status> <ms>ms`: never bodies, images or chat text.
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { clientIp, takeQuota } from './limits.js';
+import { failReason } from './gemini.js';
+import { clientIp, rateKey, routeCost, takeQuota } from './limits.js';
 
 export type ApiReq = IncomingMessage & { body?: unknown };
 /** `origins`: the local service passes its CORS list (app dev ports). Default (Vercel): same origin only. */
@@ -63,12 +64,12 @@ export async function guard(route: string, req: ApiReq, res: ServerResponse, opt
   try { body = await readBody(req); } catch { sendJson(res, 400, { mode: 'unavailable', error: 'body is not JSON' }); logDone(route, 400, t0); return null; }
   if (body === Symbol.for('too-large')) { sendJson(res, 413, { mode: 'unavailable', error: 'body over 1.5 MB' }); logDone(route, 413, t0); return null; }
   if (!body || typeof body !== 'object' || Array.isArray(body)) { sendJson(res, 400, { mode: 'unavailable', error: 'send a JSON object' }); logDone(route, 400, t0); return null; }
-  const q = takeQuota(clientIp(req));
+  const q = takeQuota(rateKey(clientIp(req)), routeCost(route));
   if (!q.ok) { res.setHeader('Retry-After', String(q.retryAfterS)); sendJson(res, 429, { mode: 'busy', error: q.reason, retryAfterS: q.retryAfterS }); logDone(route, 429, t0); return null; }
   return body as Record<string, unknown>;
 }
 
-/** guard → run → JSON answer; a thrown error is a 502 with its message (no content). */
+/** guard → run → JSON answer; a thrown error is a 502 with a fixed reason (the detail is never sent; see failReason). */
 export function endpoint(route: string, run: (body: Record<string, unknown>, req: ApiReq) => Promise<{ status?: number; body: unknown }>, opts?: EndpointOpts) {
   return async (req: ApiReq, res: ServerResponse) => {
     const t0 = Date.now();
@@ -81,7 +82,7 @@ export function endpoint(route: string, run: (body: Record<string, unknown>, req
       sendJson(res, status, out.body);
     } catch (e) {
       status = 502;
-      sendJson(res, status, { mode: 'unavailable', error: (e as Error).message.slice(0, 200) });
+      sendJson(res, status, { mode: 'unavailable', error: failReason(route, e) });
     }
     logDone(route, status, t0);
   };

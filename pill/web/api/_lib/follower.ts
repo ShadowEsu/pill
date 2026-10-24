@@ -3,10 +3,11 @@
 //   assist()    → streamed answer to one question about the current screen (SSE in api/assist.ts and on the local service)
 //   assistTip() → one proactive sentence for the screen, cached in memory per route + context for 60 s
 // The app sends a compact screen context (≤ ~1.5 KB) built from its own store. Nothing is written to disk or logged
-// (the 60 s tip cache lives in this process's memory only). Every answer passes the clause filter before it is final.
+// (the 60 s tip cache lives in this process's memory only). Every answer passes the clause filter before it is sent:
+// /api/assist streams clause by clause, and only clauses that passed the filter and the guard leave the server.
 import type { ServerResponse } from 'node:http';
-import { filterClauses } from './filter.js';
-import { GeminiError, type GeminiContent } from './gemini.js';
+import { BANNED, filterClauses } from './filter.js';
+import { failReason, type GeminiContent, type GeminiReason } from './gemini.js';
 import { geminiStream } from './gemini-stream.js';
 import { guard, logDone, sendJson, type ApiReq, type EndpointOpts } from './http.js';
 
@@ -86,7 +87,7 @@ function contentsFor(i: AssistInput): GeminiContent[] {
   return out;
 }
 
-// ---- output guards (on the full text, after streaming) ----
+// ---- output guards (per clause while streaming, then on the full text) ----
 
 /** Follower-specific clauses that may not stand: "fine to take", "you can take two", "the reading is wrong". */
 const GUARD = /\b(?:fine|okay|ok|alright|good)\s+to\s+take\b|\b(?:verdict|result|sensor|reading|test)\s+(?:is|was|seems|looks|might\s+be|may\s+be)\s+(?:wrong|incorrect|mistaken|off|unreliable)\b/i;
@@ -130,33 +131,78 @@ export type AssistEvent =
   | { type: 'model'; model: string }
   | { type: 'delta'; text: string }
   | { type: 'replace'; text: string; reason: 'filter' | 'disclaimer' | 'fallback' }
-  | { type: 'done'; mode: 'live' | 'template'; model: string; filtered: true; dropped: number; disclaimer: boolean; ms: number; error?: string };
+  | { type: 'done'; mode: 'live' | 'template'; model: string; filtered: true; dropped: number; disclaimer: boolean; ms: number; error?: GeminiReason };
+
+/** A clause boundary in the raw stream: `. ; ! ?` followed by whitespace, or a newline. */
+const BOUNDARY = /[.;!?](?=\s)|\n/;
+
+/**
+ * Streams only text that passed the filters: buffers the model's deltas up to a clause boundary, runs the banned-word
+ * filter and the follower guard on that piece's clauses, and passes on what survives. The unfinished tail never leaves
+ * the server until the stream ends. A piece that is only "Yes." waits for the next one, since guardAnswer drops it when
+ * the next clause is dose advice. `end()` flushes the tail and returns everything emitted.
+ */
+export function clauseStream(emit: (text: string) => void) {
+  let buf = '', held = '', out = '';
+  // nothing shown yet: no leading whitespace (a dropped first clause would otherwise leave its trailing space)
+  const send = (t: string) => { const s = out ? t : t.trimStart(); if (s) { out += s; emit(s); } };
+  const piece = (seg: string) => {
+    const parts = seg.trim() ? seg.trim().split(SPLIT).filter(Boolean) : [];
+    const guarded = parts.some(blocked);
+    if (!guarded && !parts.some((c) => BANNED.test(c))) {
+      if (parts.length && parts.every((c) => AFFIRM.test(c.trim()))) { held += seg; return; }
+      send(held + seg); held = '';
+      return;
+    }
+    if (!guarded) send(held);
+    held = '';
+    const kept = parts.filter((c) => !BANNED.test(c) && !blocked(c) && !(guarded && AFFIRM.test(c.trim())));
+    if (!kept.length) return;
+    const text = kept.join(' ').replace(/\s+/g, ' ').replace(/[,;:—]\s+(?=[A-Z])/g, '. ').replace(/[,;:—]\s*$/, '.').trim();
+    send(`${/^\s*/.exec(seg)![0] || ' '}${text}`);
+  };
+  return {
+    push(d: string) {
+      buf += d;
+      let m: RegExpExecArray | null;
+      while ((m = BOUNDARY.exec(buf))) { piece(buf.slice(0, m.index + 1)); buf = buf.slice(m.index + 1); }
+    },
+    end() {
+      if (buf) piece(buf);
+      buf = '';
+      send(held); held = '';
+      return out;
+    },
+  };
+}
 
 export async function assist(i: AssistInput, emit: (e: AssistEvent) => void, signal?: AbortSignal): Promise<void> {
   const t0 = Date.now();
   let raw = '', model = FOLLOWER_MODEL;
+  const stream = clauseStream((text) => emit({ type: 'delta', text }));
   try {
     const onModel = (m: string) => { model = m; emit({ type: 'model', model: m }); };
     for await (const d of geminiStream({ system: FOLLOWER_SYSTEM, contents: contentsFor(i), model: FOLLOWER_MODEL, signal, temperature: 0.3, onModel })) {
       raw += d;
-      emit({ type: 'delta', text: d });
+      stream.push(d);
     }
   } catch (e) {
     if (signal?.aborted) return;
-    const error = e instanceof GeminiError ? e.message : (e as Error).message;
+    const error = failReason('assist', e);
     // Whatever streamed before the failure is dropped: an unfinished answer could read as advice.
     emit({ type: 'replace', text: UNREACHABLE[i.mode], reason: 'fallback' });
     emit({ type: 'done', mode: 'template', model: 'template', filtered: true, dropped: 0, disclaimer: true, ms: Date.now() - t0, error });
     return;
   }
+  const shown = stream.end();
   const g = guardAnswer(raw, i.message, i.mode);
-  if (g.text !== raw.trim()) emit({ type: 'replace', text: g.text, reason: g.fellBack ? 'fallback' : g.dropped.length ? 'filter' : 'disclaimer' });
+  if (g.text !== shown.trim()) emit({ type: 'replace', text: g.text, reason: g.fellBack ? 'fallback' : g.dropped.length ? 'filter' : 'disclaimer' });
   emit({ type: 'done', mode: 'live', model, filtered: true, dropped: g.dropped.length, disclaimer: g.disclaimer, ms: Date.now() - t0 });
 }
 
 // ---- tip (cached 60 s per route + context) ----
 
-export interface Tip { tip: string; mode: 'live' | 'template'; model: string; cached: boolean; filtered: true; dropped: number; ms: number; error?: string }
+export interface Tip { tip: string; mode: 'live' | 'template'; model: string; cached: boolean; filtered: true; dropped: number; ms: number; error?: GeminiReason }
 
 const TIP_TTL = 60_000, TIP_MAX = 200;
 const tips = new Map<string, { at: number; tip: Omit<Tip, 'cached'> }>();
@@ -183,7 +229,7 @@ export async function assistTip(i: TipInput): Promise<Tip> {
   try {
     for await (const d of geminiStream({ system: FOLLOWER_SYSTEM, contents: [{ role: 'user', parts: [{ text: `${screenBlock(i)}\n\n${TIP_ADDON}` }] }], model: FOLLOWER_MODEL, temperature: 0.4, onModel: (m) => { model = m; } })) raw += d;
   } catch (e) {
-    return { tip: TIP_TEMPLATE[i.mode], mode: 'template', model: 'template', cached: false, filtered: true, dropped: 0, ms: Date.now() - now, error: (e as Error).message };
+    return { tip: TIP_TEMPLATE[i.mode], mode: 'template', model: 'template', cached: false, filtered: true, dropped: 0, ms: Date.now() - now, error: failReason('assist-tip', e) };
   }
   const f = filterClauses(raw.replace(/\s+/g, ' ').trim());
   const guardHit = f.text.split(SPLIT).some(blocked);

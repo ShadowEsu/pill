@@ -1,8 +1,8 @@
 // Gemini vision label read: five fields from one photo, or {mode:'unavailable'}. The image is only held for the call.
-import { GEMINI_CHECKER_MODEL, GeminiError, geminiAvailable, geminiGenerate, imagePart } from './gemini.js';
+import { GEMINI_CHECKER_MODEL, failReason, geminiAvailable, geminiGenerate, imagePart, type GeminiReason } from './gemini.js';
 
 export interface LabelFields { drug: string | null; strength: string | null; lot: string | null; maker: string | null; expiry: string | null; confidence: number }
-export type LabelRead = (LabelFields & { model: 'gemini'; model_id: string; mode: 'live'; ms: number }) | { mode: 'unavailable'; error: string };
+export type LabelRead = (LabelFields & { model: 'gemini'; model_id: string; mode: 'live'; ms: number }) | { mode: 'unavailable'; error: GeminiReason };
 
 const LABEL_PROMPT = [
   'You read a medicine bottle label from a photo for a pharmacy intake form.',
@@ -16,20 +16,20 @@ const field = (v: unknown) => (typeof v === 'string' && v.trim() && v.trim().toL
 
 /** Image reading uses GEMINI_CHECKER_MODEL (then the fallback chain). */
 export async function readLabel(image: unknown, timeoutMs = 30_000): Promise<LabelRead> {
-  if (!geminiAvailable()) return { mode: 'unavailable', error: 'no GEMINI_API_KEY on the service' };
+  if (!geminiAvailable()) return { mode: 'unavailable', error: 'not_configured' };
   const img = imagePart(image);
-  if (!img) return { mode: 'unavailable', error: 'send {"image": "data:image/png|jpeg|webp;base64,…"}' };
+  if (!img) return { mode: 'unavailable', error: 'bad_input' };
   try {
     const r = await geminiGenerate({ parts: [{ text: LABEL_PROMPT }, img], json: true, model: GEMINI_CHECKER_MODEL, timeoutMs });
     const o = r.json;
-    if (!o) return { mode: 'unavailable', error: 'gemini reply was not JSON' };
+    if (!o) return { mode: 'unavailable', error: 'bad_reply' };
     const conf = typeof o.confidence === 'number' && Number.isFinite(o.confidence) ? o.confidence : 0;
     return {
       drug: field(o.drug), strength: field(o.strength), lot: field(o.lot), maker: field(o.maker), expiry: field(o.expiry),
       confidence: Math.max(0, Math.min(1, conf)), model: 'gemini', model_id: r.model, mode: 'live', ms: r.ms,
     };
   } catch (e) {
-    return { mode: 'unavailable', error: e instanceof GeminiError ? e.message : (e as Error).message };
+    return { mode: 'unavailable', error: failReason('label', e) };
   }
 }
 

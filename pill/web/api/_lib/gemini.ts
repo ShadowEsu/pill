@@ -1,6 +1,7 @@
 // Shared Gemini REST client (generativelanguage v1beta generateContent), used by the Vercel functions in pill/web/api and
 // mounted by the local pill-pay service. The key (GEMINI_API_KEY) stays server-side; nothing is written to disk and nothing
-// about the content is logged. Callers get either a result or a thrown GeminiError with a short reason.
+// about the content is logged. Callers get either a result or a thrown GeminiError with a fixed reason code: Google's error
+// text never leaves this module (it can name the key), and failures are logged as error class + HTTP status only.
 // Model routing is env-driven (no code change when billing lands):
 //   GEMINI_CHECKER_MODEL        checker vision + summary + label reads   default gemini-3.1-pro-preview
 //   GEMINI_CHECKER_TOOLS_MODEL  checker function-calling rounds          default gemini-3.1-pro-preview-customtools
@@ -55,8 +56,22 @@ export interface GeminiResult {
   ms: number;
 }
 
+/** Fixed reasons a caller may see. Nothing else about an upstream failure reaches a response body, an SSE event or a log. */
+export type GeminiReason = 'not_configured' | 'bad_input' | 'quota' | 'timeout' | 'blocked' | 'bad_reply' | 'model_unavailable';
+
 export class GeminiError extends Error {
-  constructor(message: string, readonly status: number | null = null) { super(message); this.name = 'GeminiError'; }
+  constructor(readonly reason: GeminiReason, readonly status: number | null = null) { super(reason); this.name = 'GeminiError'; }
+}
+
+/** HTTP status from Google → fixed reason (400 bad request, 429 quota, everything else the model is unavailable). */
+export const reasonForStatus = (status: number): GeminiReason => (status === 400 ? 'bad_input' : status === 429 ? 'quota' : 'model_unavailable');
+
+/** The fixed reason to put in a response for any thrown value, after logging `[gemini <where>] <class> <status> <reason>`. */
+export function failReason(where: string, e: unknown): GeminiReason {
+  const reason = e instanceof GeminiError ? e.reason : 'model_unavailable';
+  const status = e instanceof GeminiError ? e.status : null;
+  console.log(`[gemini ${where}] ${e instanceof Error ? e.name : typeof e} ${status ?? '-'} ${reason}`);
+  return reason;
 }
 
 export const geminiAvailable = () => Boolean(process.env.GEMINI_API_KEY);
@@ -140,20 +155,20 @@ async function attempt(model: string, key: string, req: GeminiRequest, contents:
     if (res.status >= 500 && Date.now() - t0 < timeoutMs - 3_000) { await sleep(600); res = await call(); }
   } catch (e) {
     const err = e as Error;
-    if (err.name === 'TimeoutError') { coolDown(model, 120); throw new GeminiError(`${model} timed out after ${timeoutMs} ms`); }
-    throw new GeminiError(`gemini unreachable: ${err.message}`);
+    if (err.name === 'TimeoutError') { coolDown(model, 120); throw new GeminiError('timeout'); }
+    throw new GeminiError('model_unavailable');
   }
   const j = (await res.json().catch(() => ({}))) as GeminiReply;
   if (res.status === 429) {
     // quota for this model: cool it down for the delay Google names (default 60 s)
     coolDown(model, Number(/^(\d+)/.exec(j.error?.details?.find((d) => d.retryDelay)?.retryDelay ?? '')?.[1] ?? 60));
-    throw new GeminiError(`gemini 429 on ${model}: quota exceeded`, 429);
+    throw new GeminiError('quota', 429);
   }
-  if (!res.ok) throw new GeminiError(`gemini ${res.status} on ${model}: ${(j.error?.message ?? res.statusText).slice(0, 160)}`, res.status);
-  if (j.promptFeedback?.blockReason) throw new GeminiError(`gemini blocked the prompt (${j.promptFeedback.blockReason})`);
+  if (!res.ok) throw new GeminiError(reasonForStatus(res.status), res.status);
+  if (j.promptFeedback?.blockReason) throw new GeminiError('blocked', res.status);
   const cand = j.candidates?.[0];
   const parts = cand?.content?.parts ?? [];
-  if (!parts.length) throw new GeminiError(`${model} returned no content${cand?.finishReason ? ` (${cand.finishReason})` : ''}`);
+  if (!parts.length) throw new GeminiError('bad_reply', res.status);
   const text = parts.filter((p) => typeof p.text === 'string' && !p.thought).map((p) => String(p.text)).join('').trim();
   const functionCalls = parts.flatMap((p) => {
     const fc = p.functionCall;
@@ -170,9 +185,9 @@ async function attempt(model: string, key: string, req: GeminiRequest, contents:
 /** Tries the model chain in order (skipping cooling models while any other is ready) until one answers. */
 export async function geminiGenerate(req: GeminiRequest): Promise<GeminiResult> {
   const key = process.env.GEMINI_API_KEY;
-  if (!key) throw new GeminiError('no GEMINI_API_KEY on the service');
+  if (!key) throw new GeminiError('not_configured');
   const contents = req.contents ?? [{ role: 'user' as const, parts: req.parts ?? [] }];
-  if (!contents.length || contents.every((c) => !c.parts.length)) throw new GeminiError('nothing to send');
+  if (!contents.length || contents.every((c) => !c.parts.length)) throw new GeminiError('bad_input');
   const deadline = Date.now() + (req.timeoutMs ?? 45_000);
   const chain = geminiModelChain(req.model);
   const ready = chain.filter((m) => !isCooling(m));
@@ -183,9 +198,9 @@ export async function geminiGenerate(req: GeminiRequest): Promise<GeminiResult> 
     try {
       return await attempt(model, key, req, contents, Math.min(ATTEMPT_TIMEOUT_MS, left));
     } catch (e) {
-      lastError = e instanceof GeminiError ? e : new GeminiError((e as Error).message);
-      if (lastError.message.startsWith('gemini blocked')) throw lastError;
+      lastError = e instanceof GeminiError ? e : new GeminiError('model_unavailable');
+      if (lastError.reason === 'blocked') throw lastError;
     }
   }
-  throw lastError ?? new GeminiError('gemini: no time left for any model');
+  throw lastError ?? new GeminiError('timeout');
 }

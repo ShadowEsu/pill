@@ -11,7 +11,7 @@
 // Precedence: the sensor verdict is copied from the request into the response and never changed. A summary that names a
 // different verdict word, or not the sensor's, is replaced by the template.
 // Privacy: images and fields live only for the request. Nothing is written to disk; the log line has step names and ms only.
-import { GEMINI_CHECKER_MODEL, GEMINI_CHECKER_TOOLS_MODEL, GeminiError, geminiAvailable, geminiGenerate, imagePart, type GeminiContent, type GeminiFunctionDecl, type GeminiPart } from './gemini.js';
+import { GEMINI_CHECKER_MODEL, GEMINI_CHECKER_TOOLS_MODEL, GeminiError, failReason, geminiAvailable, geminiGenerate, imagePart, type GeminiContent, type GeminiFunctionDecl, type GeminiPart } from './gemini.js';
 import { filterClauses } from './filter.js';
 import { readLabel, type LabelFields } from './label.js';
 
@@ -173,7 +173,7 @@ export async function inspectFrames(frames: string[], timeoutMs = 25_000): Promi
   const parts: GeminiPart[] = [{ text: FRAME_PROMPT }, ...frames.map((f) => imagePart(f)!)];
   const r = await geminiGenerate({ parts, json: true, schema: FRAME_SCHEMA, timeoutMs, model: GEMINI_CHECKER_MODEL });
   const o = r.json;
-  if (!o) throw new GeminiError('frame reply was not JSON');
+  if (!o) throw new GeminiError('bad_reply');
   const anomalies = Array.isArray(o.anomalies) ? o.anomalies.filter((a): a is string => typeof a === 'string').slice(0, 3)
     .map((a) => filterClauses(a.slice(0, 60))).filter((f) => !f.fellBack).map((f) => f.text) : [];
   const c = num(o.confidence);
@@ -287,7 +287,7 @@ export async function runCheck(input: CheckInput): Promise<CheckReport> {
       log({ step: 'inspectFrames', tool: `gemini vision · ${model}`, by: 'gemini', status: 'ok', input: `${input.frames.length} frame(s)`, output: brief(o) }, start);
       return o;
     } catch (e) {
-      log({ step: 'inspectFrames', tool: 'gemini vision', by: 'gemini', status: 'failed', input: `${input.frames.length} frame(s)`, output: (e as Error).message }, start);
+      log({ step: 'inspectFrames', tool: 'gemini vision', by: 'gemini', status: 'failed', input: `${input.frames.length} frame(s)`, output: failReason('check frames', e) }, start);
       return null;
     }
   })();
@@ -354,7 +354,7 @@ export async function runCheck(input: CheckInput): Promise<CheckReport> {
         contents.push({ role: 'user', parts: responses });
       }
     } catch (e) {
-      agentError = (e as Error).message;
+      agentError = failReason('check agent', e);
     }
   }
   // anything the agent did not call runs scripted, in order
@@ -371,7 +371,7 @@ export async function runCheck(input: CheckInput): Promise<CheckReport> {
       models.add(r.model);
       log({ step: 'summarise', tool: `gemini · ${r.model}`, by: 'gemini', status: 'ok', input: 'tool results', output: 'summary written (filtered below)' }, start);
     } catch (e) {
-      log({ step: 'summarise', tool: 'gemini', by: 'gemini', status: 'failed', input: 'tool results', output: (e as Error).message }, start);
+      log({ step: 'summarise', tool: 'gemini', by: 'gemini', status: 'failed', input: 'tool results', output: failReason('check summary', e) }, start);
     }
   }
   const accepted = summaryRaw ? acceptSummary(summaryRaw, input.sensor.verdict) : null;
