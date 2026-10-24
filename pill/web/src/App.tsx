@@ -29,6 +29,7 @@ import Settings from './screens/Settings';
 import AgentRecord from './screens/AgentRecord';
 import Demo, { DemoDriver } from './screens/Demo';
 import Pay from './screens/Pay';
+import Check from './screens/Check';
 
 /** Shared route enter: on mount and every path change the screen column fades in and rises 8 px (260 ms). Reduced motion: static. */
 function useRouteEnter() {
@@ -100,6 +101,7 @@ export default function App() {
           <Route path="/agent" element={<Gate><AgentRecord /></Gate>} />
           <Route path="/demo" element={<Demo />} />
           <Route path="/pay" element={<Gate><Pay /></Gate>} />
+          <Route path="/check" element={<Gate><Check /></Gate>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Frame>
