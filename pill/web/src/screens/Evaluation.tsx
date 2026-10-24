@@ -4,6 +4,9 @@
 // the two-channel diagram draws its arrows into the rule box, and the why types itself in. Tone by verdict, never red.
 // With VITE_PAY_URL set, Claude writes the why (POST /why, clause-filtered on the service) above the deterministic rule text;
 // the answer lives in component state + sessionStorage per run, never in the store.
+// 'Run the Gemini checker on this run' (a tap) sends the sensor numbers, the saved bottle's fields and any frames the
+// checker watched during the run (memory only) to POST /api/check; its report card sits under the why. The verdict above
+// is the sensor's and the report never changes it.
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Action, NavLink, Screen, SrcBadge } from '../components/Shell';
@@ -19,6 +22,9 @@ import ReadAloud from '../components/ReadAloud';
 import { ShareSheet } from '../components/ShareCard';
 import TypeIn from '../components/TypeIn';
 import '../components/cinema.css';
+import Checker, { sensorOf, useChecker } from '../components/Checker';
+import CameraCapture from '../components/CameraCapture';
+import { getRunFrames, setRunFrames } from '../lib/camera';
 
 const HERO_TINT: Record<Verdict, string> = { PASS: 'var(--mint-tint)', 'NEEDS LAB': 'var(--amber-tint)', 'UNABLE TO VERIFY': 'var(--grey-tint)' };
 const HERO_GLOW: Record<Verdict, string> = { PASS: 'rgba(95,211,154,.35)', 'NEEDS LAB': 'rgba(224,154,58,.32)', 'UNABLE TO VERIFY': 'rgba(154,160,166,.3)' };
@@ -77,6 +83,9 @@ export default function Evaluation() {
   const [copied, setCopied] = useState<'copied' | 'failed' | null>(null);
   const [sharing, setSharing] = useState(false);
   const ai = useWhy(run, mode === 'personal' ? 'personal' : 'medical', stationRef, bottle?.recall ?? 'unchecked');
+  const checker = useChecker();
+  const [frames, setFrames] = useState<string[]>(() => getRunFrames(id));
+  const [camera, setCamera] = useState(false);
   // the verdict's sound plays from the Stamp, on the frame the word lands
 
   if (!run) return (
@@ -234,6 +243,32 @@ export default function Evaluation() {
             )}
             <p className="eyebrow" style={{ marginTop: PAY_URL ? 4 : 0 }}>rule text</p>
             <p style={{ color: 'var(--ink-2)' }}>{live ? ev.why : <TypeIn text={ev.why} cps={70} delay={700} />}</p>
+          </section>
+
+          <section className="stack" style={{ gap: 10 }} aria-label="Gemini checker">
+            {checker.state.status === 'idle' && !camera && (
+              <>
+                <button type="button" className="btn ghost" data-action="checker" style={{ minHeight: 60, fontSize: 18 }}
+                  onClick={() => {
+                    const sensor = sensorOf(run);
+                    if (!sensor) return;
+                    void checker.run({
+                      sensor, runId: run.id, frames,
+                      bottle: bottle ? { drug: bottle.drug, lot: bottle.lot, expiry: bottle.expiry, strength: bottle.strength, maker: bottle.maker } : { drug: run.drug, lot: run.lot },
+                    });
+                  }}>
+                  Run the Gemini checker on this run
+                </button>
+                <button type="button" className="btn ghost" data-action="frames" style={{ minHeight: 48 }} onClick={() => setCamera(true)}>
+                  {frames.length ? `Replace the ${frames.length} frame${frames.length === 1 ? '' : 's'} of the cup` : 'Add frames of the cup first (optional)'}
+                </button>
+              </>
+            )}
+            {camera && (
+              <CameraCapture count={3} title="Frames of the cup" onCancel={() => setCamera(false)}
+                onFrames={(f) => { setRunFrames(run.id, f); setFrames(f.slice(0, 3)); setCamera(false); }} />
+            )}
+            <Checker state={checker.state} frames={frames} />
           </section>
 
           {!personal && meaning}

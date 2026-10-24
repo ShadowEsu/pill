@@ -1,11 +1,15 @@
 // The run: the capsule fills as the tablet dissolves, the timetable walks fill → dissolve → settle → hold, the curve draws,
 // the light path shows which channel is moving, the station checks stay visible. Ends on the evaluation.
+// 'Let the checker watch' (a tap, never automatic) opens the camera and takes 3 frames of the cup a second apart (or a
+// chosen photo/video); they stay in memory for the Gemini checker on the evaluation screen.
 // Motion: the capsule grows in to the column width; beside it a dark "90° glow" meter lights mint only when riboflavin
 // glows (chalk leaves it dark). The moment: once the glow has stayed flat past 40 s while something dissolves, a quiet
 // amber wash spreads behind the capsule and the status turns into one serif sentence. The current timetable block pulses.
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Action, Screen, SrcBadge } from '../components/Shell';
+import CameraCapture from '../components/CameraCapture';
+import { getRunFrames, setRunFrames } from '../lib/camera';
 import PillFill from '../components/PillFill';
 import Curve, { RunReadout } from '../components/Curve';
 import RunPhases, { clock, phaseAt } from '../components/RunPhases';
@@ -57,6 +61,8 @@ export default function Run() {
   const [src, setSrc] = useState<Source | null>(null);
   const [finishedHere, setFinishedHere] = useState(false);
   const [showCurve, setShowCurve] = useState(false);
+  const [watching, setWatching] = useState(false);
+  const [watched, setWatched] = useState(() => getRunFrames(id).length);
   const created = useRef(false);
 
   // /run/new (or an unknown id): make the run from the replay, then land on its real id.
@@ -160,7 +166,19 @@ export default function Run() {
               ? <p className="cn-moment" aria-live="polite"><Words text={MOMENT} step={90} /></p>
               : <p style={{ fontSize: personal ? 19 : 16, color: 'var(--ink-2)', textAlign: 'center', maxWidth: 420, minHeight: '2.9em' }} aria-live="polite">{statusLine}</p>}
             <p className="mono muted" style={{ fontSize: 13 }}>{clock(t)} / 3:00{ref ? ` · ${pctNow} % of reference` : ''}</p>
+            {!watching && (
+              <div className="stack" style={{ gap: 6, width: '100%', maxWidth: 420, marginTop: 6 }}>
+                <button type="button" className="btn ghost" data-action="watch" onClick={() => setWatching(true)} style={{ minHeight: 52 }}>
+                  {watched ? 'Let the checker watch again' : 'Let the checker watch'}
+                </button>
+                {watched > 0 && <span className="chip ok" style={{ alignSelf: 'center' }} data-watched={watched}><span className="dot" />{watched} frame{watched === 1 ? '' : 's'} kept for the checker · not saved</span>}
+              </div>
+            )}
           </section>
+          {watching && (
+            <CameraCapture count={3} title="The checker watches the cup" onCancel={() => setWatching(false)}
+              onFrames={(f) => { setRunFrames(run.id, f); setWatched(Math.min(3, f.length)); setWatching(false); }} />
+          )}
           <section className="card stack cn-phases" style={{ gap: 6 }}>
             <div className="row between"><span className="eyebrow">timetable</span><span className="mono muted" style={{ fontSize: 12 }}>{speed}× replay</span></div>
             <RunPhases t={t} fault={fault ? fault.t : null} big={personal} />

@@ -1,0 +1,35 @@
+/* Gemini checker: camera panel, animated step list, report card. Words stay ink; colour only in dots, lines and fills. */
+.cam-frame { position: relative; border-radius: 16px; overflow: hidden; background: #16181b; aspect-ratio: 4 / 3; }
+.cam-frame video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cam-panel label.btn { position: relative; }
+
+.ck-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; position: relative; }
+.ck-step { display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); min-width: 0; }
+.ck-step:first-child { border-top: 0; }
+.ck-step.in { animation: cn-field-in 380ms var(--ease) both; }
+.ck-step.wait { opacity: .45; }
+.ck-step .ck-title { font-size: 18px; font-weight: 600; line-height: 1.25; }
+.ck-step .ck-out { font-family: var(--mono); font-size: 12px; color: var(--ink-2); overflow-wrap: anywhere; margin-top: 2px; }
+.ck-step .ck-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.ck-mark { width: 22px; height: 22px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 13px; font-weight: 700; border: 1.5px solid var(--line-2); color: var(--ink); background: var(--surface); }
+.ck-mark.ok { border-color: var(--mint); background: var(--mint-tint); animation: pop-in 320ms var(--ease) backwards; }
+.ck-mark.failed { border-color: var(--amber); background: var(--amber-tint, rgba(224, 154, 58, .14)); }
+.ck-mark.skipped { border-style: dashed; }
+.ck-mark .cn-spin { width: 14px; height: 14px; }
+
+.ck-report { display: grid; gap: 16px; }
+.ck-agree { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 21px; font-weight: 600; line-height: 1.3; }
+.ck-agree .ck-bar { width: 6px; align-self: stretch; border-radius: 3px; background: var(--grey); min-height: 28px; }
+.ck-agree.yes .ck-bar { background: var(--mint); }
+.ck-agree.no .ck-bar { background: var(--amber); }
+.ck-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ck-chips .chip { white-space: normal; text-align: left; }
+.ck-thumbs { display: flex; gap: 8px; flex-wrap: wrap; }
+.ck-thumbs img { width: 88px; height: 88px; object-fit: cover; border-radius: 12px; border: 1px solid var(--line); }
+.ck-summary { font-size: 20px; line-height: 1.45; font-weight: 500; }
+.ck-big-actions { display: grid; gap: 10px; }
+.ck-big-actions .btn { min-height: 64px; font-size: 19px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ck-step.in, .ck-mark.ok { animation: none !important; }
+}

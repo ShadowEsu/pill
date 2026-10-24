@@ -1,5 +1,5 @@
 // Model features for the app. Keys come from .env and never leave this process.
-//   readLabel  → Gemini vision: five label fields, or {mode:'unavailable'}; nothing is written to disk
+//   (Gemini label reading and the checker live in pill/web/api/_lib, shared with the Vercel functions)
 //   explainWhy → Claude 'Why' (SOFTWARE-PLAN §6), clause-filtered; deterministic template when Claude is not reachable
 //   escrowLog  → Claude escrow clerk (§6); code validates it so the model can only keep the policy outcome or downgrade to escalate
 //   ask        → Ask Pill: answers only from the record the app sends and the fixed rule/policy texts, clause-filtered
@@ -329,49 +329,4 @@ export async function ask(i: AskInput) {
     .map((l) => l.text.replace(/^(?:and|but|so)\s+/i, '').replace(/^[a-z]/, (c) => c.toUpperCase())).join('\n');
   if (!answer) return fallback('every line lost more than half its clauses to the word filter', whole.dropped);
   return { answer, model: 'claude' as const, model_id: CLAUDE_MODEL, filtered: true as const, dropped: whole.dropped, mode: 'live' as const };
-}
-
-// ---------------------------------------------------------------- Gemini label
-
-export interface LabelFields { drug: string | null; strength: string | null; lot: string | null; maker: string | null; expiry: string | null; confidence: number }
-
-const LABEL_PROMPT = [
-  'You read a medicine bottle label from a photo for a pharmacy intake form.',
-  'Return JSON only: {"drug": string|null, "strength": string|null, "lot": string|null, "maker": string|null, "expiry": string|null, "confidence": number}.',
-  'drug: the active ingredient name in Title Case (e.g. "Riboflavin"). strength: amount with unit (e.g. "100 mg"). lot: the lot or batch code exactly as printed. maker: the brand or manufacturer. expiry: YYYY-MM.',
-  'Copy only what is printed and legible. If a field is not visible or you are unsure, use null. Never guess or fill in a likely value.',
-  'confidence: 0 to 1, how sure you are that every non-null field is read correctly.',
-].join('\n');
-
-const DATA_URL = /^data:(image\/(?:png|jpeg|jpg|webp|heic|heif));base64,([A-Za-z0-9+/=]+)$/;
-
-export async function readLabel(image: unknown): Promise<(LabelFields & { model: 'gemini'; model_id: string; mode: 'live' }) | { mode: 'unavailable'; error: string }> {
-  const key = process.env.GEMINI_API_KEY;
-  if (!key) return { mode: 'unavailable', error: 'no GEMINI_API_KEY on the service' };
-  const m = typeof image === 'string' ? DATA_URL.exec(image) : null;
-  if (!m) return { mode: 'unavailable', error: 'send {"image": "data:image/png|jpeg|webp;base64,…"}' };
-  try {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
-      method: 'POST',
-      headers: { 'x-goog-api-key': key, 'content-type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: LABEL_PROMPT }, { inline_data: { mime_type: m[1] === 'image/jpg' ? 'image/jpeg' : m[1], data: m[2] } }] }],
-        generationConfig: { responseMimeType: 'application/json', temperature: 0 },
-      }),
-      signal: AbortSignal.timeout(30_000),
-    });
-    const j = (await res.json().catch(() => ({}))) as { candidates?: { content?: { parts?: { text?: string }[] } }[]; error?: { message?: string } };
-    if (!res.ok) return { mode: 'unavailable', error: `gemini ${res.status}: ${j.error?.message ?? res.statusText}` };
-    const text = (j.candidates?.[0]?.content?.parts ?? []).map((p) => p.text ?? '').join('');
-    const o = firstJson(text);
-    if (!o) return { mode: 'unavailable', error: 'gemini reply was not JSON' };
-    const s = (v: unknown) => (typeof v === 'string' && v.trim() && v.trim().toLowerCase() !== 'null' ? v.trim().slice(0, 80) : null);
-    const conf = num(o.confidence);
-    return {
-      drug: s(o.drug), strength: s(o.strength), lot: s(o.lot), maker: s(o.maker), expiry: s(o.expiry),
-      confidence: conf === null ? 0 : Math.max(0, Math.min(1, conf)), model: 'gemini', model_id: GEMINI_MODEL, mode: 'live',
-    };
-  } catch (e) {
-    return { mode: 'unavailable', error: (e as Error).message };
-  }
 }

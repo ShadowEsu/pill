@@ -10,38 +10,30 @@ export const AI_BASE = PAY_URL ?? '';
 
 export type Unavailable = { mode: 'unavailable'; error: string };
 
-async function post<T>(path: string, body: unknown, timeoutMs: number): Promise<T | Unavailable> {
-  if (!PAY_URL) return { mode: 'unavailable', error: 'no VITE_PAY_URL' };
+async function postTo<T>(base: string, path: string, body: unknown, timeoutMs: number): Promise<T | Unavailable> {
   try {
-    const res = await fetch(`${PAY_URL}${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(timeoutMs) });
-    const j = (await res.json()) as T | Unavailable;
-    return res.ok ? j : { mode: 'unavailable', error: (j as Unavailable).error ?? `HTTP ${res.status}` };
+    const res = await fetch(`${base}${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(timeoutMs) });
+    const j = (await res.json()) as T | (Unavailable & { retryAfterS?: number });
+    if (res.ok) return j as T;
+    const err = j as Unavailable;
+    return { mode: 'unavailable', error: res.status === 429 ? `busy: ${err.error ?? 'too many requests'}, try again in a minute` : err.error ?? `HTTP ${res.status}` };
   } catch (e) {
     return { mode: 'unavailable', error: (e as Error).message };
   }
 }
 
-// ---- POST /label (Gemini vision) ----
+const post = <T>(path: string, body: unknown, timeoutMs: number): Promise<T | Unavailable> =>
+  PAY_URL ? postTo<T>(PAY_URL, path, body, timeoutMs) : Promise.resolve({ mode: 'unavailable', error: 'no VITE_PAY_URL' });
+
+/** Gemini routes: the local service when VITE_PAY_URL is set, the app's own /api functions otherwise. */
+export const aiPost = <T>(path: string, body: unknown, timeoutMs: number) => postTo<T>(AI_BASE, path, body, timeoutMs);
+
+// ---- POST /api/label (Gemini vision) ----
 
 export interface LabelRead { drug: string | null; strength: string | null; lot: string | null; maker: string | null; expiry: string | null; confidence: number; model: 'gemini'; model_id: string; mode: 'live' }
 
-/** Downscale to ≤1280 px JPEG so the body stays under the service's 1 MB cap; the photo never leaves memory. */
-async function toDataUrl(file: File): Promise<string> {
-  const bmp = await createImageBitmap(file);
-  const scale = Math.min(1, 1280 / Math.max(bmp.width, bmp.height));
-  const c = document.createElement('canvas');
-  c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
-  c.getContext('2d')!.drawImage(bmp, 0, 0, c.width, c.height);
-  bmp.close();
-  return c.toDataURL('image/jpeg', 0.85);
-}
-
-export async function readLabel(file: File): Promise<LabelRead | Unavailable> {
-  if (!PAY_URL) return { mode: 'unavailable', error: 'no VITE_PAY_URL' };
-  let image: string;
-  try { image = await toDataUrl(file); } catch (e) { return { mode: 'unavailable', error: `could not read the photo: ${(e as Error).message}` }; }
-  return post<LabelRead>('/label', { image }, 35_000);
-}
+/** `image`: a JPEG data URL from lib/camera (≤ 300 KB); the photo never leaves memory. */
+export const readLabel = (image: string) => aiPost<LabelRead>('/api/label', { image }, 35_000);
 
 // ---- POST /why (Claude, clause-filtered) ----
 
@@ -120,3 +112,41 @@ export const postSamples = (run: Run, station = 'STATION 01') =>
     run_id: run.id, station, started_at: run.startedAt,
     samples: run.samples.map((s) => ({ t: s.t, abs: +absorbance(s.blank, s.adc0).toFixed(4), glow: +absorbance(s.blank, s.adc90).toFixed(4), temp: s.temp })),
   }, 15_000);
+
+// ---- POST /api/check (the Gemini checker; mirrors api/_lib/checker.ts CheckReport) ----
+
+export interface CheckSensor { verdict: Verdict; rule: RuleId; plateau: number; band: [number, number] | null; glowRise: number; glowMin: number | null; drug: string }
+export interface CheckStep { step: string; tool: string; by: 'gemini' | 'code' | 'app' | 'script'; status: 'ok' | 'skipped' | 'failed'; input: string; output: string; at: number; ms: number }
+export interface FrameObservation {
+  cupVisible: boolean; liquidClarity: 'clear' | 'hazy' | 'cloudy' | 'unknown'; colour: 'none' | 'yellow' | 'other' | 'unknown';
+  tabletState: 'intact' | 'breaking' | 'gone' | 'unknown'; anomalies: string[]; confidence: number;
+}
+export interface CheckReport {
+  mode: 'live' | 'partial';
+  agent: 'gemini function-calling' | 'scripted';
+  agentError: string | null;
+  model: string | null;
+  runId: string | null;
+  /** the sensor verdict, unchanged */
+  verdict: Verdict;
+  sensor: CheckSensor;
+  label: { drug: string | null; strength: string | null; lot: string | null; maker: string | null; expiry: string | null; source: 'gemini' | 'given'; confidence: number | null } | null;
+  recall: { status: 'recall' | 'no_record' | 'unreachable' | 'unchecked'; source: 'openFDA' | 'demo list' | null; lot: string | null; id: string | null; product: string | null; note: string };
+  crossCheck: { expiry: 'past' | 'current' | 'unknown'; drugMatches: 'yes' | 'no' | 'unknown'; lotPlausible: 'yes' | 'no' | 'unknown'; notes: string[] };
+  frames: FrameObservation | null;
+  reconcile: { agrees: 'yes' | 'no' | 'unclear'; expected: string; saw: string; note: string };
+  summary: { text: string; by: 'gemini' | 'template'; filtered: true; dropped: string[]; rejected: string | null };
+  steps: CheckStep[];
+  totalMs: number;
+  notice: string;
+}
+export interface CheckRequest {
+  label?: { image: string };
+  frames?: string[];
+  runId?: string;
+  sensor: CheckSensor;
+  /** fields the app already has (a saved bottle, or the run's own drug and lot); skips the label read */
+  bottle?: { drug: string; lot: string; expiry?: string; strength?: string; maker?: string };
+}
+
+export const runChecker = (req: CheckRequest) => aiPost<CheckReport>('/api/check', req, 70_000);

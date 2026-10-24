@@ -17,14 +17,18 @@ import { CheckoutBook, RPC_URL, checkoutRouter } from './checkout.ts';
 import type { SettleResultContext } from '@x402/core/server';
 import { getAddress, isHash } from 'viem';
 import { calendarStatus, createEvent, type CalendarEventInput } from './calendar.ts';
-import { CLAUDE_MODEL, GEMINI_MODEL, aiHas, ask, escrowLog, explainWhy, parseAsk, parseEscrow, parseWhy, readLabel } from './ai.ts';
+import { CLAUDE_MODEL, GEMINI_MODEL, aiHas, ask, escrowLog, explainWhy, parseAsk, parseEscrow, parseWhy } from './ai.ts';
 import { nessieAccounts, nessieMode, nessieTransfer, setupNessie } from './nessie.ts';
 import { MAX_SPEAK_CHARS, speak, speechMode } from './speech.ts';
 import { initTiger, insertSamples, parseSamples, plateauCurve, tigerMode, tigerStatus } from './tiger.ts';
+import { assistHandler, tipRoute } from '../../web/api/_lib/follower.ts';
+import { endpoint as apiEndpoint } from '../../web/api/_lib/http.ts';
+import { labelRoute } from '../../web/api/_lib/label.ts';
+import { checkRoute } from '../../web/api/_lib/checker.ts';
 
 const DESCRIPTION = 'Pill dissolution verdict for a curve';
 const ROUTE = 'POST /verify';
-const ORIGINS = new Set((process.env.CORS_ORIGINS || 'http://127.0.0.1:5183,http://localhost:5183,http://127.0.0.1:5186,http://localhost:5186,http://127.0.0.1:5189,http://localhost:5189,http://127.0.0.1:5191,http://localhost:5191,http://127.0.0.1:5195,http://localhost:5195,http://localhost:5173').split(',').map((s) => s.trim()).filter(Boolean));
+const ORIGINS = new Set((process.env.CORS_ORIGINS || 'http://127.0.0.1:5183,http://localhost:5183,http://127.0.0.1:5186,http://localhost:5186,http://127.0.0.1:5189,http://localhost:5189,http://127.0.0.1:5191,http://localhost:5191,http://127.0.0.1:5195,http://localhost:5195,http://127.0.0.1:5196,http://localhost:5196,http://127.0.0.1:5197,http://localhost:5197,http://localhost:5173').split(',').map((s) => s.trim()).filter(Boolean));
 
 const app = express();
 
@@ -42,8 +46,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// Parse every body as JSON regardless of content type (`curl -d` sends form-urlencoded by default). 1 MB cap (a label photo is downscaled in the app first).
-app.use(express.json({ type: () => true, limit: '1mb' }));
+// Parse every body as JSON regardless of content type (`curl -d` sends form-urlencoded by default). 1.6 MB cap: the Gemini
+// checker sends a label photo and up to 3 frames (each ≤ 300 KB, downscaled in the app); its own guard caps it at 1.5 MB.
+app.use(express.json({ type: () => true, limit: '1.6mb' }));
 
 // Every real x402 settlement (cdp and public-facilitator modes; simulated never settles) also lands in the checkout list
 // as a paid order, and claims its tx hash so the chain watcher never credits that transfer to a QR order.
@@ -118,13 +123,12 @@ app.get('/health', (_req, res) => {
 });
 
 // ---- model features (keys stay in .env; every model text passes the clause filter) ----
-// Gemini reads the label photo in memory; nothing is written to disk.
-app.post('/label', async (req, res) => {
-  const r = await readLabel((req.body as { image?: unknown } | undefined)?.image);
-  if (r.mode === 'live') console.log(`[label gemini] ${r.drug ?? '?'} ${r.strength ?? '?'} lot ${r.lot ?? '?'} conf ${r.confidence}`);
-  else console.warn(`[label] unavailable: ${r.error}`);
-  res.json(r);
-});
+// Gemini label reading and the checker: the same handlers as the Vercel functions pill/web/api/label.ts and check.ts.
+// Images live only for the request; nothing is written to disk; the log has route, status and ms only. /label is the old alias.
+const labelHandler = apiEndpoint('label', labelRoute, { origins: ORIGINS });
+app.post('/api/label', labelHandler);
+app.post('/label', labelHandler);
+app.post('/api/check', apiEndpoint('check', checkRoute, { origins: ORIGINS }));
 
 app.post('/why', async (req, res) => {
   const w = parseWhy(req.body);
@@ -150,6 +154,11 @@ app.post('/ask', async (req, res) => {
   console.log(`[ask ${r.mode}] ${i.mode} · ${i.question.length} chars${r.mode === 'template' ? ` (${r.reason})` : ''}${r.dropped.length ? ` · dropped ${r.dropped.length}` : ''}`);
   res.json(r);
 });
+
+// Follower assistant (Gemini): the same handlers as the Vercel functions pill/web/api/assist.ts and assist-tip.ts.
+// /api/assist streams SSE; nothing about the content is logged or stored.
+app.post('/api/assist', assistHandler({ origins: ORIGINS }));
+app.post('/api/assist-tip', apiEndpoint('assist-tip', tipRoute, { origins: ORIGINS }));
 
 // ---- Tiger Data (TimescaleDB hypertable of station samples; TIGER_URL only) ----
 app.get('/tiger/status', async (_req, res) => { res.json(await tigerStatus()); });

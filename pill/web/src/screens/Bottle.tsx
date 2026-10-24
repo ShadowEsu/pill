@@ -1,7 +1,8 @@
 // Add a bottle: photograph the label → five editable fields → openFDA recall lookup → save.
-// Label reading: with VITE_PAY_URL set, the photo goes to the pill-pay service's POST /label (Gemini vision) and the fields
-// type in from its answer; unreadable fields stay empty. Without the service, or when it is unavailable, the fields are the
-// demo prefill (?demo= or the file name) and the chip says `demo`. The photo is only held in memory, then dropped.
+// Label reading: the photo (live camera on a 'Use the camera' tap, or a chosen file through the viewfinder) becomes a
+// ≤ 300 KB JPEG and goes to POST /api/label (Gemini vision, on the app's own functions or the local service); the fields
+// type in from its answer and unreadable fields stay empty. When Gemini is unavailable the fields are the demo prefill
+// (?demo= or the file name) and the chip says `demo`. The photo is only held in memory, then dropped.
 // Motion: the Viewfinder's brackets lock on and a scan line sweeps while reading; fields rise and type in one by one with a
 // soft tick each; the recall check is a magnifier that searches until openFDA answers. Desktop: the bottle drawn large.
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -9,8 +10,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Action, Screen } from '../components/Shell';
 import Viewfinder from '../components/Viewfinder';
 import Glyph from '../components/Glyph';
+import CameraCapture from '../components/CameraCapture';
 import { actions, useStore } from '../lib/store';
-import { PAY_URL, readLabel } from '../lib/api';
+import { readLabel } from '../lib/api';
+import { fileToFrames } from '../lib/camera';
 import { playSound } from '../lib/sound';
 import type { RecallStatus } from '../lib/types';
 import '../components/cinema.css';
@@ -74,8 +77,9 @@ export default function Bottle() {
   const [liveRead, setLiveRead] = useState(false);
   const [reading, setReading] = useState<Fields | null>(null);
 
+  const [camera, setCamera] = useState(false);
+
   useEffect(() => () => clearTimeout(timer.current), []);
-  useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
 
   const showFields = (v: Fields, src: 'gemini' | 'demo', note: string | null, confidence: number | null) => {
     setValues(v);
@@ -83,16 +87,17 @@ export default function Bottle() {
     setPreview(null); setTypedMs(0); setStep('fields');
   };
 
-  const startReading = (file: File | null) => {
-    const demo = prefill(params.get('demo'), file?.name ?? null);
-    setPreview(file ? URL.createObjectURL(file) : null);
-    setReading(file ? null : demo);
+  /** `photo`: a JPEG data URL from the camera or a chosen file; null = the demo label. */
+  const startReading = (photo: { image: string; name: string | null } | null) => {
+    const demo = prefill(params.get('demo'), photo?.name ?? null);
+    setPreview(photo?.image ?? null);
+    setReading(photo ? null : demo);
     setStep('reading');
     clearTimeout(timer.current);
     const token = ++readToken.current;
-    setLiveRead(Boolean(file && PAY_URL));
-    if (file && PAY_URL) {
-      void readLabel(file).then((r) => {
+    setLiveRead(Boolean(photo));
+    if (photo) {
+      void readLabel(photo.image).then((r) => {
         if (token !== readToken.current) return;
         if (r.mode === 'live') {
           // Only what Gemini read; a field it could not read stays empty for the person to fill in.
@@ -103,7 +108,11 @@ export default function Bottle() {
       });
       return;
     }
-    timer.current = window.setTimeout(() => showFields(demo, 'demo', file && !PAY_URL ? 'Label reading needs the pill-pay service (VITE_PAY_URL); demo values filled in.' : null, null), READ_MS);
+    timer.current = window.setTimeout(() => showFields(demo, 'demo', null, null), READ_MS);
+  };
+  const fromFile = (file: File) => {
+    void fileToFrames(file, 1).then(([image]) => startReading({ image, name: file.name }))
+      .catch(() => showFields(prefill(params.get('demo'), file.name), 'demo', 'Could not open that photo; demo values filled in.', null));
   };
 
   // Fields type themselves in, one after another; editable once typed.
@@ -167,22 +176,31 @@ export default function Bottle() {
           {step !== 'attach' && (
             <div className="row" style={{ gap: 8, flexWrap: 'wrap', marginTop: -4 }}>
               {label?.src === 'gemini'
-                ? <span className="chip ok pop-in" data-label-src="gemini" title="Read by Gemini through the pill-pay service; the percentage is the model's own confidence."><span className="dot" />label reading · gemini{label.confidence !== null ? ` · ${Math.round(label.confidence * 100)} %` : ''}</span>
+                ? <span className="chip ok pop-in" data-label-src="gemini" title="Read by Gemini on the server; the percentage is the model's own confidence."><span className="dot" />label reading · gemini{label.confidence !== null ? ` · ${Math.round(label.confidence * 100)} %` : ''}</span>
                 : label?.src === 'demo'
                   ? <span className="chip warn pop-in" data-label-src="demo" title={label.note ?? 'Demo label: no photo was read.'}><span className="dot" />label reading · demo</span>
-                  : <span className={'chip' + (step === 'reading' ? ' live' : '')} title={PAY_URL ? 'A photo goes to Gemini through the pill-pay service; demo values only if it is unavailable.' : 'No pill-pay service (VITE_PAY_URL): fields will be demo values.'}><span className="dot" />label reading · {PAY_URL ? 'gemini' : 'demo'}</span>}
+                  : <span className={'chip' + (step === 'reading' ? ' live' : '')} title="A photo goes to Gemini on the server; demo values only if it is unavailable."><span className="dot" />label reading · gemini</span>}
               {step === 'fields' && <span className="chip ok pop-in" style={{ animationDelay: '200ms' }}><span className="dot" />photo deleted</span>}
             </div>
           )}
 
-          {(step === 'photo' || step === 'reading') && (
+          {step === 'photo' && camera && (
+            <CameraCapture count={1} title="Photograph the label" onCancel={() => setCamera(false)}
+              onFrames={([image]) => { setCamera(false); startReading({ image, name: null }); }} />
+          )}
+          {(step === 'reading' || (step === 'photo' && !camera)) && (
             <>
-              <Viewfinder preview={preview} reading={step === 'reading'} live={liveRead} onFile={startReading} demo={reading} readMs={READ_MS} />
+              <Viewfinder preview={preview} reading={step === 'reading'} live={liveRead} onFile={fromFile} demo={reading} readMs={READ_MS} />
               <p className="footnote" style={{ textAlign: 'center' }}>Front of the bottle, lot number in view. Good light helps.</p>
               {step === 'photo' && (
-                <button type="button" className="btn ghost" onClick={() => startReading(null)} style={{ marginTop: 'auto' }}>
-                  No camera? Use the demo label
-                </button>
+                <div className="stack" style={{ gap: 10, marginTop: 'auto' }}>
+                  <button type="button" className="btn" data-action="camera" onClick={() => setCamera(true)} style={{ minHeight: 60, fontSize: 19 }}>
+                    Use the camera
+                  </button>
+                  <button type="button" className="btn ghost" onClick={() => startReading(null)}>
+                    No camera? Use the demo label
+                  </button>
+                </div>
               )}
             </>
           )}
