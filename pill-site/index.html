@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pill — The box measures. Pill explains.</title>
+  <meta name="description" content="A $40 lab-in-a-box that dissolves one tablet and says PASS, NEEDS LAB or UNABLE TO VERIFY. Built at Cal Hacks 13.0 on the method published by Peel.">
+  <meta property="og:title" content="Pill — The box measures. Pill explains.">
+  <meta property="og:description" content="One tablet. About three minutes. PASS / NEEDS LAB / UNABLE TO VERIFY. In clinic mode the verdict holds the supplier's payment.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/instrument-serif-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/src/styles.css">
+  <script>document.documentElement.classList.remove('no-js');</script>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="dot" aria-hidden="true"></span>Pill</a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#problem">The problem</a>
+      <a href="#station">The station</a>
+      <a href="#how">How it works</a>
+      <a href="#verdicts">Verdicts</a>
+      <a href="#clinic">Clinic mode</a>
+      <a href="#limits">Limits</a>
+      <a href="#peel">Built on Peel</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- 1. Hero -->
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow reveal">Cal Hacks 13.0 · Berkeley · October 2026</p>
+      <h1 class="display reveal">The box measures.<br><em>Pill</em> explains.</h1>
+      <p class="lead reveal">A $40 lab-in-a-box. Drop one tablet in water, close the lid, and three minutes later it says <b>PASS</b>, <b>NEEDS LAB</b> or <b>UNABLE TO VERIFY</b>. In a clinic, that answer decides whether the supplier gets paid.</p>
+      <div class="cta reveal">
+        <a class="btn" href="#demo">Watch the 90-second demo <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="btn ghost" href="#how">How it works</a>
+      </div>
+      <div class="hero-meta reveal">
+        <div><b>$40</b>bill of materials</div>
+        <div><b>1 tablet</b>per test, destroyed</div>
+        <div><b>3 answers</b>never a guess</div>
+        <div><b>Built on Peel</b>HackMIT 2026, cited</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Station: the exploded blueprint on dark -->
+  <section class="section dark stage" id="station">
+    <div class="wrap">
+      <div class="stage-head">
+        <div>
+          <p class="eyebrow">Fig 1 · The station</p>
+          <h2 class="h2">Every part, pulled apart.</h2>
+        </div>
+        <p class="stage-hint">scroll to explode</p>
+      </div>
+      <div class="station" id="station-mount" aria-label="Line drawing of the Pill station: a dark box with a clear container, a paddle motor on the lid, LEDs and light sensors across one corner, a thermistor, an ESP32 board and a Raspberry Pi with a touchscreen"></div>
+      <div class="stage-labels">
+        <div><p class="caption">01 · Chamber</p><p>A clear 1-quart container inside a light-tight box. 900 mL of water, the same volume the pharmacopeia uses.</p></div>
+        <div><p class="caption">02 · Paddle</p><p>A stepper motor turns a paddle at the same speed every run, so runs compare.</p></div>
+        <div><p class="caption">03 · Light path</p><p>A blue LED and a sensor across one corner. Riboflavin absorbs blue; as the tablet dissolves, less light gets through.</p></div>
+        <div><p class="caption">04 · Glow sensor</p><p>A second sensor at 90° behind a green filter. Riboflavin glows green; chalk does not.</p></div>
+        <div><p class="caption">05 · Thermistor</p><p>Water temperature on every reading, because dissolution speed depends on it.</p></div>
+        <div><p class="caption">06 · Brains</p><p>An ESP32 streams one reading a second. A Raspberry Pi touchscreen, or your phone, shows the curve.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. The problem -->
+  <section class="section" id="problem">
+    <div class="wrap">
+      <p class="eyebrow reveal">The problem</p>
+      <h2 class="h2 reveal">One in ten.</h2>
+      <p class="lead reveal" style="margin-top:24px">WHO estimates that 1 in 10 medical products in low- and middle-income countries is substandard or falsified. A model cited by WHO puts the cost at about 116,000 extra malaria deaths a year in sub-Saharan Africa from substandard and falsified antimalarials alone. The instrument that catches this in a lab costs $20,000 to $100,000 and sits far from the clinics that need it.</p>
+      <div class="stats">
+        <div class="stat reveal"><div class="big num" data-count="10" data-prefix="1 in ">1 in 10</div><p class="what">medical products in low- and middle-income countries estimated substandard or falsified</p><p class="src"><a href="https://www.who.int/news/item/28-11-2017-1-in-10-medical-products-in-developing-countries-is-substandard-or-falsified" target="_blank" rel="noopener">WHO, 2017</a></p></div>
+        <div class="stat reveal"><div class="big num" data-count="116000">116,000</div><p class="what">extra malaria deaths a year in sub-Saharan Africa, modelled, from substandard and falsified antimalarials (range 64,000–158,000)</p><p class="src"><a href="https://www.who.int/news/item/28-11-2017-1-in-10-medical-products-in-developing-countries-is-substandard-or-falsified" target="_blank" rel="noopener">LSHTM model, cited by WHO, 2017</a></p></div>
+        <div class="stat reveal"><div class="big num" data-count="300" data-prefix="&gt;">&gt;300</div><p class="what">children's deaths linked to contaminated cough syrups in three countries, 2022–23, most under five</p><p class="src"><a href="https://www.who.int/news/item/23-01-2023-who-urges-action-to-protect-children-from-contaminated-medicines" target="_blank" rel="noopener">WHO, Jan 2023</a></p></div>
+        <div class="stat reveal"><div class="big num num-small" data-count="30.5" data-prefix="$" data-suffix="B" data-decimals="1">$30.5B</div><p class="what">spent each year on substandard and falsified medical products, by WHO's estimate</p><p class="src"><a href="https://www.who.int/news-room/fact-sheets/detail/substandard-and-falsified-medical-products" target="_blank" rel="noopener">WHO fact sheet, 2024</a></p></div>
+      </div>
+      <div class="facts reveal">
+        <div><b class="num">7,152</b><span>pharmaceutical crime incidents logged in 2025 (counterfeiting, diversion and theft), the most on record</span><a class="src" href="https://www.psi-inc.org/incident-trends" target="_blank" rel="noopener">PSI</a></div>
+        <div><b class="num">3.7 million</b><span>counterfeit pharmaceutical items seized at the US border in fiscal 2024</span><a class="src" href="https://www.cbp.gov/sites/default/files/2025-01/IntellectualPropertyRightsSeizureStatisticsFiscalYear2024%20FINAL.pdf" target="_blank" rel="noopener">US CBP</a></div>
+        <div><b class="num">up to $4.4B</b><span>of cross-border trade in counterfeit pharmaceuticals in 2016</span><a class="src" href="https://euipo.europa.eu/tunnel-web/secure/webdav/guest/document_library/observatory/documents/reports/Trade_in_Counterfeit_Pharmaceutical_Products/Trade_in_Counterfeit_Pharmaceutical_Products_en.pdf" target="_blank" rel="noopener">OECD/EUIPO, 2020</a></div>
+        <div><b class="num">20%, 17%</b><span>antimalarials and antibiotics: the two most-reported categories to WHO</span><a class="src" href="https://www.who.int/news/item/28-11-2017-1-in-10-medical-products-in-developing-countries-is-substandard-or-falsified" target="_blank" rel="noopener">WHO, 2017</a></div>
+        <div><b class="num">20 days</b><span>from report to public alert for Uzbekistan's contaminated syrups; about 8 months for falsified Ozempic. Then the alert still has to reach the clinic.</span><a class="src" href="https://www.who.int/news/item/11-01-2023-medical-product-alert-n-1-2023-substandard-%28contaminated%29-liquid-dosage-medicines" target="_blank" rel="noopener">WHO alerts</a></div>
+        <div><b class="num">€25.85</b><span>per sample for the cheapest field screening kit in one 13-country network; a lab result takes 7–10 business days</span><a class="src" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9338985" target="_blank" rel="noopener">GPHF Minilab study, 2022</a></div>
+      </div>
+      <div class="callout reveal">
+        <p class="caption">Why a lookup is not enough</p>
+        <p class="h3">Lot numbers can be copied. Dissolution cannot.</p>
+        <p class="body" style="margin-top:10px">In December 2025 the FDA found counterfeit Ozempic inside the legitimate US supply chain, labelled with a lot number that was also a real one. A recall lookup alone passes that product. A measurement of the tablet itself is the only check that does not trust the label. <a class="src" href="https://www.fda.gov/drugs/drug-alerts-and-statements/fda-warns-consumers-not-use-counterfeit-ozempic-semaglutide-found-us-drug-supply-chain" target="_blank" rel="noopener">FDA, Dec 2025</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Typing line -->
+  <section class="section dark" style="padding-block: clamp(72px, 9vw, 120px)">
+    <div class="wrap">
+      <p class="eyebrow">How Pill works</p>
+      <div class="typeline" id="typeline" aria-live="polite"><span class="words">It dissolves.</span><span class="caret" aria-hidden="true"></span></div>
+    </div>
+  </section>
+
+  <!-- 5. Fig grid: the parts (Linear FIG style) -->
+  <section class="section dark" id="parts" style="padding-top:0">
+    <div class="wrap">
+      <div class="figs">
+        <div class="fig reveal"><p class="caption">Fig 0.1</p><div class="art" data-part="container"></div><h4>Chamber</h4><p>A clear quart container, 900 mL fill line, light path across one corner.</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.2</p><div class="art" data-part="led"></div><h4>Blue LED</h4><p>5 mm, 465–475 nm. Riboflavin absorbs here at about 85% of its peak.</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.3</p><div class="art" data-part="ldr"></div><h4>Two light sensors</h4><p>One inline behind blue plastic, one at 90° behind green plastic.</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.4</p><div class="art" data-part="thermistor"></div><h4>Thermistor</h4><p>In the water. Every reading carries its temperature.</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.5</p><div class="art" data-part="stepper"></div><h4>Stepper paddle</h4><p>28BYJ-48 and its driver. The same speed every run.</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.6</p><div class="art" data-part="esp32"></div><h4>ESP32 Feather</h4><p>Reads the sensors, streams one JSON line a second. It decides nothing.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. How it works: one run, minute by minute (Oura) -->
+  <section class="section" id="how">
+    <div class="wrap">
+      <p class="eyebrow reveal">Fig 2 · One run</p>
+      <h2 class="h2 reveal">Three minutes, start to verdict.</h2>
+      <div class="steps" style="margin-top:56px">
+        <div class="t">t = 0:00 → 3:00</div>
+        <div>
+          <div class="step reveal">
+            <div><p class="caption">0:00</p><h3 class="h3">Photograph the bottle.</h3><p class="body">Drug, strength, lot and maker come off the label. The lot is checked against the FDA recall list; the answer is shown as <em>no record for this lot</em>, <em>recall</em>, or <em>lookup unavailable</em>. Never "clear".</p></div>
+            <div class="art-slot" data-art="bottle"></div>
+          </div>
+          <div class="step reveal">
+            <div><p class="caption">0:20</p><h3 class="h3">Dark, then blank.</h3><p class="body">Lights off for a dark reading. Plain water for a blank. If the lid is open or the blank is unstable, the run does not start.</p></div>
+            <div class="art-slot" data-art="blank"></div>
+          </div>
+          <div class="step reveal">
+            <div><p class="caption">0:40</p><h3 class="h3">Drop one tablet. The paddle turns.</h3><p class="body">The inline sensor watches blue light fade as riboflavin dissolves. The 90° sensor watches the green glow grow. The thermistor logs the water.</p></div>
+            <div class="art-slot" data-art="drop"></div>
+          </div>
+          <div class="step reveal">
+            <div><p class="caption">3:00</p><h3 class="h3">The curve flattens. Pill decides.</h3><p class="body">The plateau is compared with last night's ten reference runs on this same box. Seven rules, checked in order. The rule that fired is printed on the card.</p></div>
+            <div class="art-slot" data-art="curve"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Verdicts + phone -->
+  <section class="section dark" id="verdicts">
+    <div class="wrap">
+      <div class="split">
+        <div>
+          <p class="eyebrow">Fig 3 · The app</p>
+          <h2 class="h2">Three answers.<br>Never a guess.</h2>
+          <p class="lead">The same screen runs on the Pi touchscreen and on your phone. Green means the curve matched the reference. Warm red means it did not, and the money stays put. Grey means Pill has nothing to compare against, so it asks a person.</p>
+          <ul class="list">
+            <li><b>P1</b><span><b style="color:var(--pass)">PASS</b> — plateau inside the band and the green glow rose with it.</span></li>
+            <li><b>N1</b><span><b style="color:#E0532E">NEEDS LAB</b> — light dropped but nothing glowed. Something dissolved; it was not riboflavin.</span></li>
+            <li><b>U1</b><span><b style="color:#A3A8B0">UNABLE TO VERIFY</b> — no reference for this drug, a fault, or the lid opened.</span></li>
+          </ul>
+        </div>
+        <div class="phone-slot" id="phone-mount"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Results (honest, placeholder until Saturday's runs) -->
+  <section class="section" id="demo">
+    <div class="wrap">
+      <p class="eyebrow reveal">Fig 4 · Real results</p>
+      <h2 class="h2 reveal">One tablet against a bad one.</h2>
+      <p class="lead reveal" style="margin-top:24px">Below is the chart this page will carry after Saturday's calibration: ten riboflavin runs that set the grey band, one chalk tablet that fell outside it, and the run id under each curve. Until then the chart is marked as an illustration.</p>
+      <div class="chart reveal" id="chart-mount" style="margin-top:48px"></div>
+      <div class="split" style="margin-top:56px">
+        <div>
+          <table class="rules" aria-label="Test table">
+            <thead><tr><th>Tablets tested</th><th>Caught</th><th>Missed</th><th>Inconclusive</th><th>Drugs covered</th></tr></thead>
+            <tbody><tr><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td>riboflavin (1)</td></tr></tbody>
+          </table>
+          <p class="src" style="margin-top:12px">Filled in from Saturday's runs. Numbers here are counted, not estimated.</p>
+        </div>
+        <div class="video reveal" id="video-mount">
+          <div class="box" style="aspect-ratio:16/9; display:grid; place-items:center"><p class="muted">90-second demo clip goes here (click to play, captioned)</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. Clinic mode -->
+  <section class="section" id="clinic" style="padding-top:0">
+    <div class="wrap">
+      <div class="split">
+        <div class="art-slot reveal" data-art="delivery"></div>
+        <div>
+          <p class="eyebrow reveal">Clinic mode</p>
+          <h2 class="h2 reveal">The verdict holds the payment.</h2>
+          <p class="lead reveal">A clinic samples one tablet from each delivery. PASS proposes release; NEEDS LAB holds the money and drafts a lab referral; UNABLE TO VERIFY escalates. Every decision is logged with the lot, the time, the rule that fired and the policy clause it quotes. No money moves without a pharmacist's tap. Payments run on the Capital One Nessie sandbox: simulated money, real workflow.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. Personal mode -->
+  <section class="section" id="personal" style="padding-top:0">
+    <div class="wrap">
+      <div class="split">
+        <div>
+          <p class="eyebrow reveal">Personal mode</p>
+          <h2 class="h2 reveal">One tablet per bottle.</h2>
+          <p class="lead reveal">Photograph a new bottle, test one tablet from it, and Pill keeps the result in <em>My medicines</em> with the recall check and a one-tap dose log. It never nags, never tells you to stop a medicine, and says plainly that measuring a dose needs the station.</p>
+        </div>
+        <div class="art-slot reveal" data-art="medicines"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. Limits -->
+  <section class="section" id="limits" style="padding-top:0">
+    <div class="wrap">
+      <p class="eyebrow reveal">Fig 5 · What PASS does not mean</p>
+      <h2 class="h2 reveal">Pill screens tablets. It does not certify them.</h2>
+      <div class="split" style="margin-top:40px; align-items:start">
+        <div class="box reveal">
+          <h4>PASS means</h4>
+          <p class="body">The dissolution curve of this one tablet, on this box, was consistent with last night's riboflavin reference runs. No red flags found.</p>
+          <h4 style="margin-top:20px">PASS does not mean</h4>
+          <p class="body">That the tablet is the right drug, the right dose, or free of contaminants. Pill has one reference drug today. Anything it cannot compare goes to a lab, by design.</p>
+        </div>
+        <div class="reveal">
+          <table class="rules">
+            <thead><tr><th>Rule</th><th>Fires when</th><th>Verdict</th></tr></thead>
+            <tbody>
+              <tr><td>U1</td><td>No reference for this drug on this box</td><td>UNABLE TO VERIFY</td></tr>
+              <tr><td>U2</td><td>Any fault: lid open, sensor saturated, LED dead, temperature out of range</td><td>UNABLE TO VERIFY</td></tr>
+              <tr><td>U3</td><td>Water temperature more than 3 °C from calibration, or under 30 s of data</td><td>UNABLE TO VERIFY</td></tr>
+              <tr><td>N1</td><td>Light dropped but no green glow</td><td>NEEDS LAB</td></tr>
+              <tr><td>N2</td><td>No plateau before timeout, or below the detection limit</td><td>NEEDS LAB</td></tr>
+              <tr><td>N3</td><td>Plateau outside the reference band</td><td>NEEDS LAB</td></tr>
+              <tr><td>P1</td><td>Plateau in band and the glow rose with it</td><td>PASS</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12. Built on Peel + team + BOM -->
+  <section class="section dark" id="peel">
+    <div class="wrap">
+      <div class="split" style="align-items:start">
+        <div>
+          <p class="eyebrow">Built on Peel</p>
+          <h2 class="h2">We started from a winner, and said so.</h2>
+          <p class="lead" style="margin-top:20px"><a href="https://plume.hackmit.org/project/qxodw-wgjqk-lidau-dxrpe" target="_blank" rel="noopener" style="text-decoration:underline; text-underline-offset:4px">Peel</a> won HackMIT 2026 with an optical dissolution tester and published it under the MIT licence. We used its method and none of its code. New this weekend: the two-channel glow test, the clinic payment gate, the recall-by-lot check, the two modes, the printed station with a phone window, and every line of firmware, backend and app.</p>
+          <p class="muted" style="margin-top:20px; font-size:15px">Team: <span id="team">names added by the team</span>. All implementation during the Cal Hacks 13.0 hacking period.</p>
+          <div class="cta" style="margin-top:28px; display:flex; gap:12px; flex-wrap:wrap">
+            <a class="btn" href="#" id="link-devpost">Devpost <span class="arrow" aria-hidden="true">→</span></a>
+            <a class="btn ghost" href="#" id="link-github">GitHub</a>
+            <a class="btn ghost" href="#" id="link-figma">Figma</a>
+          </div>
+        </div>
+        <div>
+          <p class="eyebrow">Bill of materials</p>
+          <table class="bom" style="margin-top:16px">
+            <tbody>
+              <tr><td>ESP32 Feather V2</td><td>$22</td></tr>
+              <tr><td>2× photoresistor, blue LED, thermistor</td><td>$3</td></tr>
+              <tr><td>28BYJ-48 stepper + ULN2003</td><td>$4</td></tr>
+              <tr><td>Clear quart container, filters, tape, box</td><td>$5</td></tr>
+              <tr><td>Vitamin B2 reference tablets</td><td>$6</td></tr>
+              <tr><td><b>Total</b></td><td><b>$40</b></td></tr>
+            </tbody>
+          </table>
+          <p class="src" style="margin-top:12px">Pi 3 + touchscreen optional; the app runs on any phone.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div>
+      <a class="brand" href="#top"><span class="dot" aria-hidden="true"></span>Pill</a>
+      <p class="muted" style="font-size:14px; margin-top:10px">Screening, not a pharmacopeial test. Sandbox money, real workflow.</p>
+    </div>
+    <div class="links">
+      <a href="https://www.who.int/news/item/28-11-2017-1-in-10-medical-products-in-developing-countries-is-substandard-or-falsified" target="_blank" rel="noopener">WHO source</a>
+      <a href="https://plume.hackmit.org/project/qxodw-wgjqk-lidau-dxrpe" target="_blank" rel="noopener">Peel</a>
+      <a href="https://open.fda.gov/apis/drug/enforcement/" target="_blank" rel="noopener">openFDA recalls</a>
+      <a href="https://cal-hacks-13-0.devpost.com/" target="_blank" rel="noopener">Cal Hacks 13.0</a>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
