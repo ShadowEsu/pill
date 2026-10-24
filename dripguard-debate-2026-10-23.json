@@ -1,0 +1,1170 @@
+{
+ "round1": {
+  "oncology_infusion_nurse": {
+   "per_idea": {
+    "DripGuard": {
+     "hackathon_1_10": 8,
+     "real_world_value_1_10": 7,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "An LDR on a drip chamber will false-alarm every time someone bumps the pole, the chamber fogs, or the light changes, and four loud buzzers screaming at a bedside is exactly the alarm fatigue that makes nurses rip the thing off by Tuesday."
+    },
+    "ChemoChain": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 4,
+     "buildable_36h_1_10": 5,
+     "biggest_objection": "In twelve years no one ever asked me for a blockchain proof the bag was cold; my clinic compounds in-house, a $30 temp logger with a paper strip already covers the courier, and the Solana/x402 bits are sponsor bait that don't make anyone's shift easier."
+    },
+    "BreathBuddy": {
+     "hackathon_1_10": 7,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "Incentive spirometry is a slow deep INHALE, not blowing, and a tiny DC motor spun by a breath puts out millivolts of noise, so unless you prove the turbine reads inspiration you've built a party-blower game, plus judges will not share a mouthpiece at the table."
+    },
+    "PillStep": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 4,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "Capecitabine patients already get a blister calendar and the problem is never the carousel, it's nausea, hand-foot syndrome and whether to hold the dose\u2014and a student-built Claude telling my patient what to do after vomiting is a liability I would not put in a home."
+    },
+    "CleanHands": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 9,
+     "biggest_objection": "An ultrasonic sensor can't tell a nurse from a visitor, a linen cart or a wheelchair, so the door beeps at the wrong people all day and the charge nurse unplugs it within a week; infection control wants attribution, which you've deliberately given up."
+    },
+    "FeverLine": {
+     "hackathon_1_10": 4,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "The rules are right and patients really do sit on a 38.4 at 2 a.m., but a 7-inch box where you type a number from your own thermometer is a phone app wearing a costume, and a thermistor reading the room temperature is theater the judges will see through."
+    }
+   },
+   "ranking_best_first": [
+    "DripGuard",
+    "BreathBuddy",
+    "CleanHands",
+    "FeverLine",
+    "PillStep",
+    "ChemoChain"
+   ],
+   "top_pick_reason": "I counted drops with a wristwatch for three months in Guatemala and I have run gravity antibiotics in the US during pump shortages; a bag running dry or a rate doubling because someone leaned on the roller clamp is a real, daily, physical problem and this is the only idea where a judge can watch a live drip, twist the clamp, and see the nurse-station screen change in five seconds. It uses the parts they actually own, it works offline at the bed, and it makes one nurse's job visibly easier, which is what past winners did.",
+   "one_improvement_to_top_pick": "Throw out three of the four buzzers and build a tiered alert instead: bedside LED/LCD first, nurse-station screen after 60 seconds, a single buzzer only for drip-stopped or empty bag, with an acknowledge/snooze button at the bed and a drop-factor selector (10/15/20/60 gtt per mL) on the keypad so the mL/h number is actually believable\u2014then demo it with a real IV set and a saline bag, not a syringe."
+  },
+  "hospital_pharmacy_director": {
+   "per_idea": {
+    "DripGuard": {
+     "hackathon_1_10": 8,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "No US hospital runs chemo by gravity and I would never let a hobby servo touch a roller clamp on a vesicant line, so your real market is LMIC wards and antibiotics, and your drop-counter has to handle 10/15/20/60 gtt/mL sets and ambient light or the rate number is fiction."
+    },
+    "ChemoChain": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 4,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "I already own Controlant and Sensitech loggers, compounded preparations are exempt from DSCSA so your 'why now' is wrong, a DHT11 at \u00b12\u00b0C cannot adjudicate a 2\u20138\u00b0C excursion, and nobody in my pharmacy has ever asked for a blockchain."
+    },
+    "BreathBuddy": {
+     "hackathon_1_10": 8,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "Incentive spirometry is inhalation, not blowing, and a kit fan on a brushed motor will barely twitch on inspiratory flow; plus a shared turbine you cannot clean is an infection-control non-starter on a surgical ward."
+    },
+    "PillStep": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 4,
+     "buildable_36h_1_10": 4,
+     "biggest_objection": "Oral chemo is a hazardous drug that no pharmacist will decant into a student-built carousel, the market is already full of Hero and MedMinder, and a chatbot telling a patient what to do after vomiting capecitabine is a liability I would shut down on Monday."
+    },
+    "CleanHands": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 9,
+     "biggest_objection": "An ultrasonic sensor on a corridor door cannot tell a nurse from a meal cart, so your denominator is garbage and infection control already has cheaper dispenser counters that give the same noisy ratio."
+    },
+    "FeverLine": {
+     "hackathon_1_10": 4,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "It is a phone app running on a Raspberry Pi; the patient still types the temperature themselves, the thermistor reads the room, and I cannot see what the hardware is for other than qualifying for a track."
+    }
+   },
+   "ranking_best_first": [
+    "DripGuard",
+    "BreathBuddy",
+    "ChemoChain",
+    "CleanHands",
+    "FeverLine",
+    "PillStep"
+   ],
+   "top_pick_reason": "It is the only one where a judge can watch a physical thing happen\u2014drops fall, the rate drifts, alarms fire, the nurse station updates\u2014and immediately see one nurse's hourly job (counting drops against a wristwatch) get easier; it matches every past winner's pattern, uses your actual parts without needing a sensor you don't have, and the gravity-drip problem is genuinely real in most of the world and during US pump and fluid shortages.",
+   "one_improvement_to_top_pick": "Rip out the servo clamp\u2014it is a free-flow and occlusion hazard no clinician will trust\u2014and replace it with what nurses actually do: keypad entry of ordered mL/h and drop factor (10/15/20/60), a pulsed IR emitter/detector pair so ambient ward light does not fake drops, and a big 'measured vs ordered, minutes to empty' readout per bed; alarm and escalate, never actuate."
+  },
+  "rural_clinic_physician": {
+   "per_idea": {
+    "DripGuard": {
+     "hackathon_1_10": 9,
+     "real_world_value_1_10": 9,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "The drop sensor is the whole product and it is the hardest part: a photoresistor in venue lighting, on a fogged drip chamber, with 10-, 15-, 20- and 60-drop/mL giving sets, will miscount, and the SG90 servo cannot physically close a roller clamp \u2014 if your alarm cries wolf twice my night nurse will unplug it, and I will do the same."
+    },
+    "ChemoChain": {
+     "hackathon_1_10": 7,
+     "real_world_value_1_10": 4,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "I already get a $30 LogTag with the vaccine box from KEMSA that tells me the 2-8C excursion; the hash chain and Solana anchoring solve a US regulatory paperwork problem, not a clinical one, and no courier I know will stop to tap a touchscreen at handover."
+    },
+    "BreathBuddy": {
+     "hackathon_1_10": 7,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "A shared mouthpiece on a hobby fan motor is an infection-control problem before it is a spirometer, the generator voltage from a 3V toy motor at breathing flows will be noisy and tiny, and the $5 plastic one works fine when a nurse stands there \u2014 your device does not replace the nurse standing there."
+    },
+    "PillStep": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 4,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "Hero and MedMinder already exist, capecitabine blister packs already do the calendar job, and the moment Claude tells a vomiting chemo patient what to do instead of 'call the clinic' you have built a liability, not a device."
+    },
+    "CleanHands": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 9,
+     "biggest_objection": "An ultrasonic sensor at a ward door cannot tell a nurse from a visitor from a trolley, the LDR-on-the-pump counts presses not hand rubbing, and staff learn within a day to press the pump to silence the buzzer without using sanitizer \u2014 the problem is real but this measures theatre, not hygiene."
+    },
+    "FeverLine": {
+     "hackathon_1_10": 3,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "It is a phone app wearing a Raspberry Pi costume: the patient still reads their own thermometer and types the number, the thermistor measures the room, the camera vitals are unvalidated, and the one useful part \u2014 'fever on chemo means call now' \u2014 is a laminated card I already hand out."
+    }
+   },
+   "ranking_best_first": [
+    "DripGuard",
+    "ChemoChain",
+    "BreathBuddy",
+    "CleanHands",
+    "PillStep",
+    "FeverLine"
+   ],
+   "top_pick_reason": "It is the only one of the six that addresses something that happens on my ward every night: two nurses, thirty beds, gravity drips of oxytocin, quinine, aminophylline and antibiotics set by counting drops against a wristwatch and then not looked at for two hours. A loud bedside alarm that says 'this bag is empty' or 'this rate doubled' is worth more to me than any dashboard, it costs less than the drip set, it runs on a LiPo when the power goes, and judges can watch water drip and an alarm fire in the five minutes they stand at your table.",
+   "one_improvement_to_top_pick": "Delete the servo clamp and spend those hours on the sensor: use the IR emitter/receiver pair (not the LDR) inside an opaque 3D-printed or black-tape clip that blocks room light, let the nurse select the giving set (20 drops/mL default, 60 for paediatric) on the keypad, and put a 'minutes until empty' countdown on the LCD and the nurse-station screen \u2014 that number is what my night nurse actually needs to plan her round, and a device that only alarms and never touches the line is one I would actually allow on a bed."
+  },
+  "respiratory_therapist": {
+   "per_idea": {
+    "DripGuard": {
+     "hackathon_1_10": 8,
+     "real_world_value_1_10": 7,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "Nobody on my floor will let a hobby servo touch a chemo line, and judges will ask 'what happens when it pinches the wrong thing' in the first 60 seconds \u2014 plus drop counting with an LDR falls apart with 60 gtt/mL microdrip sets and room light, so you need to show me drop-factor handling, not just a blinking LED."
+    },
+    "ChemoChain": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 5,
+     "biggest_objection": "Blockchain-in-healthcare gets an eye-roll from every clinical judge I've sat next to, the GPS won't lock indoors at the venue, and the live demo is 'watch a number not change on a screen' \u2014 the pharmacy already has a $40 USB temp logger in that cooler."
+    },
+    "BreathBuddy": {
+     "hackathon_1_10": 7,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 5,
+     "biggest_objection": "Incentive spirometry is slow sustained INHALATION, not blowing a balloon up, and a toy fan blade on a DC motor will barely twitch at 500 mL/sec inspiratory flow \u2014 if you build an exhale game you've built a toy, not an IS, and the real reason my post-op patients don't use the thing is pain and no one coaching them, which a Pi can't fix; also every judge sharing one mouthpiece makes me want to scream."
+    },
+    "PillStep": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "Hero and MedMinder already exist, and oral chemo like capecitabine is cytotoxic \u2014 a 3D-printed carousel that touches the pills and lets a caregiver fish them out is the opposite of how pharmacy wants those handled; the 'I vomited, what now' Claude part is the only genuinely new bit."
+    },
+    "CleanHands": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 9,
+     "biggest_objection": "It's done in an afternoon, which the judges will see, the HC-SR04 triggers on carts and door swings, and a buzzer that beeps at me for walking past a door without sanitizing is the fastest way to get a device ripped off the wall by night shift."
+    },
+    "FeverLine": {
+     "hackathon_1_10": 3,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "The patient types their own temperature into a box that does nothing a phone app doesn't, there's no real hardware story, and a buzzer escalating at a neutropenic patient at 3 AM is cruelty, not care \u2014 it's a decent app idea wearing a Raspberry Pi costume."
+    }
+   },
+   "ranking_best_first": [
+    "DripGuard",
+    "BreathBuddy",
+    "PillStep",
+    "ChemoChain",
+    "CleanHands",
+    "FeverLine"
+   ],
+   "top_pick_reason": "It's the only one where a judge can stand at the table, watch water actually drip, see the rate drift, hear the alarm and watch the bed flip red on the nurse-station screen \u2014 physical input, one person's job (the nurse who is checking 6 gravity drips by eye) visibly easier, offline at bedside, and a true story about pump shortages that any clinical judge already knows. It also hits the most tracks with one build, and every part is in the kit tonight.",
+   "one_improvement_to_top_pick": "Kill the servo roller-clamp pincher \u2014 it's a liability question you'll lose and roller clamps don't pinch that way mechanically \u2014 and spend those hours on what a charge nurse actually wants: a drop-factor selector (10/15/20/60 gtt/mL) with a 'minutes until empty' countdown per bed, and four beds on the Pi screen with distinct alarm tones so the demo shows triage, not a gimmick."
+  },
+  "oral_chemo_patient": {
+   "per_idea": {
+    "DripGuard": {
+     "hackathon_1_10": 8,
+     "real_world_value_1_10": 7,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "I've sat through enough infusions to know a nurse will never trust a hobby servo squeezing the roller clamp on a chemo line, and the drop counter will be twitchy under the venue's lights unless you build a proper shielded clip on a real drip chamber."
+    },
+    "ChemoChain": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "This is a temperature logger wearing a blockchain costume to hit six sponsor tracks; nobody at the table can point to the one person whose Monday gets easier, and a thermistor plus a DHT11 taped in a lunchbox isn't going to impress anyone who's shipped real cold-chain."
+    },
+    "BreathBuddy": {
+     "hackathon_1_10": 7,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "After my colectomy they handed me that plastic thing and I used it for a day, so I buy the problem, but a shared cardboard tube on a DC motor is a germ stick, and once the game's novelty wears off on day three you're back to the plastic thing in the drawer."
+    },
+    "PillStep": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 3,
+     "buildable_36h_1_10": 5,
+     "biggest_objection": "This one's aimed at me and I don't want it: my capecitabine is the same dose morning and night for 14 days, a paper calendar and a pen handle it fine, and I'm not going to dump hazardous chemo tablets out of the pharmacy bottle into a student's stepper carousel so a voice can read me the label."
+    },
+    "CleanHands": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 9,
+     "biggest_objection": "Easiest build on the list, but it's a doorbell that beeps at people who already ignore the sign over the sanitizer, the ultrasonic will count carts and visitors, and there's nothing creative for a judge to remember after the fifth table."
+    },
+    "FeverLine": {
+     "hackathon_1_10": 4,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "I already have the 38.0-twice-or-38.3-once rule and the on-call number on a fridge magnet; a 7-inch box that nags me to type a number I just read off my own thermometer is a phone app with a buzzer, and the only hardware is a touchscreen and a thermistor reading the room."
+    }
+   },
+   "ranking_best_first": [
+    "DripGuard",
+    "BreathBuddy",
+    "ChemoChain",
+    "FeverLine",
+    "CleanHands",
+    "PillStep"
+   ],
+   "top_pick_reason": "It's the only one where a judge can watch a real bag drip, see the rate on the LCD, hear the alarm when someone squeezes the line, and understand in ten seconds whose job it makes easier; it uses the parts they actually have, it's a real gap in wards without pumps, and the nurse-station view gives the software tracks something honest to hang on.",
+   "one_improvement_to_top_pick": "Cut the servo clamp entirely and put those hours into a 3D-printed or hot-glued light-tight clip that fits a real IV drip chamber, then demo with an actual gravity set and a saline bag on a pole, including the empty-bag alarm; a reliable counter plus loud alarm is what a nurse would actually use, a flaky auto-clamp is what gets the whole thing thrown out."
+  },
+  "caregiver_daughter": {
+   "per_idea": {
+    "DripGuard": {
+     "hackathon_1_10": 9,
+     "real_world_value_1_10": 8,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "A hobby servo yanking a roller clamp on a live chemo line is the one part no nurse will ever let you plug in, and a 20% drift alarm will scream every time my mother bends her arm."
+    },
+    "ChemoChain": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 4,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "Nobody at my mother's clinic has ever lost sleep over who opened the courier box; you built this for the Solana track, not for a pharmacist, and Sensitech already sells the part that matters."
+    },
+    "BreathBuddy": {
+     "hackathon_1_10": 7,
+     "real_world_value_1_10": 7,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "My mother after her port surgery could barely move the ball in the $5 spirometer, so she will not spin a DC motor as a generator, and a shared mouthpiece on a ward is an infection-control no."
+    },
+    "PillStep": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 5,
+     "biggest_objection": "The one thing I actually need, the 'she threw up 20 minutes after capecitabine, now what' answer, is a phone app; the carousel is a 36-hour mechanical jam waiting to happen and Hero already sells it."
+    },
+    "CleanHands": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "A box that beeps at every doctor walking through the door gets unplugged by Wednesday, and an ultrasonic sensor cannot tell a nurse from a meal cart."
+    },
+    "FeverLine": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "This is my exact nightmare and it still does not take her temperature: at 3 a.m. I am the one who has to wake her, find the thermometer, and type the number, so you solved the easy half with a touchscreen and a buzzer."
+    }
+   },
+   "ranking_best_first": [
+    "DripGuard",
+    "BreathBuddy",
+    "PillStep",
+    "FeverLine",
+    "ChemoChain",
+    "CleanHands"
+   ],
+   "top_pick_reason": "It is the only one where a judge can watch a real drip, see the count on the LCD, see the bag run dry and hear the alarm, all in five minutes with no Wi-Fi; it uses the LDR, buzzers, pump, ESP32 and Pi you actually own; and it makes one overworked nurse's job visibly easier, which is what every past winner did. My mother has had gravity antibiotics at home where I sat watching the chamber for an hour so the line would not run air; that is a real job and I would have paid for this.",
+   "one_improvement_to_top_pick": "Rip out the servo auto-clamp and replace it with a prediction: from the drop rate and the bag volume typed on the keypad, show 'empty in 12 min' on the LCD and the nurse-station screen, and escalate buzzer plus phone alert at 10 minutes and at empty. That is what a nurse actually trusts, it removes the scary part, it is less to break at 7 a.m. Sunday, and it adds a home-caregiver mode that lets someone like me sleep."
+  },
+  "fda_regulatory_consultant": {
+   "per_idea": {
+    "DripGuard": {
+     "hackathon_1_10": 9,
+     "real_world_value_1_10": 8,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "The moment that servo touches the roller clamp you've gone from an alarm accessory to a flow-control device in the infusion pump bucket (880.5725, Class II, 510(k), and the FDA has been burned by pump recalls for twenty years) \u2014 and an SG90 can't reliably occlude PVC tubing anyway, so you've taken on the regulatory burden for a feature that won't even work."
+    },
+    "ChemoChain": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 5,
+     "biggest_objection": "Compounded chemo is exempt from DSCSA, so your 'why now' is wrong, and the live demo is five judges watching a box not get opened while you explain a hash chain and GPS that won't get a fix indoors."
+    },
+    "BreathBuddy": {
+     "hackathon_1_10": 8,
+     "real_world_value_1_10": 7,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "A 3-6V toy motor spun by a breath gives you millivolts of noise, and the clinical maneuver is a slow sustained inhale, not a blow \u2014 if you measure exhale you've built a party horn, not an incentive spirometer (which, for the record, is Class II 510(k)-exempt under 868.5690, so your 'adherence coach' framing is fine)."
+    },
+    "PillStep": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "Hero and MedMinder already own this shelf, and the instant Claude tells a patient what to do after vomiting capecitabine it is making a patient-specific treatment recommendation that falls outside the non-device CDS criteria \u2014 that's a device function, and an oncologist's job."
+    },
+    "CleanHands": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 4,
+     "buildable_36h_1_10": 9,
+     "biggest_objection": "A pump press within ten seconds of a doorway ping is not hand hygiene compliance, infection-control nurses already know their numbers are garbage and won't trust yours either, and the hardware is a week-two Arduino tutorial."
+    },
+    "FeverLine": {
+     "hackathon_1_10": 4,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "It's a phone app glued to a 7-inch screen \u2014 the patient types the temperature themselves, the thermistor reads the room, and you've bolted on camera vitals of unproven accuracy to a decision where the one number that matters comes from a $10 thermometer."
+    }
+   },
+   "ranking_best_first": [
+    "DripGuard",
+    "BreathBuddy",
+    "PillStep",
+    "ChemoChain",
+    "CleanHands",
+    "FeverLine"
+   ],
+   "top_pick_reason": "It's the only one where a judge can stand at the table, roll the clamp on a real IV set, and watch the drop rate change on the LCD, the buzzers go off, and the nurse-station screen flag the bed \u2014 physical input, one nurse's job visibly easier, live, in under a minute. The problem is real (I've seen gravity drips in US wards during the 2022-24 shortages, never mind the rest of the world), the parts are literally in the box (LED, LDR, buzzers, LCD, ESP32, Pi), and the existing product costs $300 and still doesn't talk to a station. It hits Hardware, People-First, Anthropic and a real-time-state sponsor without faking any of them.",
+   "one_improvement_to_top_pick": "Cut the servo clamp entirely and say so on the slide: 'Monitors and alarms; never controls flow.' That keeps you an alarm/monitor, not an infusion controller, and buys you the hours you'll need for the part that will actually break \u2014 a light-shrouded clip (cardboard or 3D-printed at the venue) holding the LED and LDR on either side of a real drip chamber, with a tunable threshold so it works under the judging-hall lights. Buy a real gravity IV set and saline bag from a pet or farm supply store Saturday morning; demoing with a water pump into a cup is not a drip chamber and the judges will know."
+  },
+  "healthtech_vc": {
+   "per_idea": {
+    "DripGuard": {
+     "hackathon_1_10": 9,
+     "real_world_value_1_10": 7,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "The buyer is a hospital procurement office in a low-resource ward with no budget line for this, and DripAssist already exists at $300 and still barely sells, so your wedge is price and a nurse-station view, not novelty\u2014and a servo yanking a roller clamp is the first thing a clinical engineer will tell you to rip out."
+    },
+    "ChemoChain": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 4,
+     "buildable_36h_1_10": 5,
+     "biggest_objection": "I've sat in Tive and Controlant board decks: nobody in cold chain has ever lost a deal for lack of a blockchain, DSCSA is solved with EPCIS serialization not hash chains, and a DHT11 with \u00b12\u00b0C accuracy cannot credibly police a 2\u20138\u00b0C excursion."
+    },
+    "BreathBuddy": {
+     "hackathon_1_10": 7,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "The problem is real and the demo is fun, but a DC-motor turbine with a cardboard mouthpiece is an infection-control nonstarter on a surgical ward, the signal will be noisy, and nobody pays for an adherence toy that competes with a $5 disposable already in the room."
+    },
+    "PillStep": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 5,
+     "biggest_objection": "I've watched Hero burn nine figures and MedMinder grind for a decade in this exact category; a 28BYJ carousel on perfboard adds nothing to that market, and a chatbot giving vomited-dose advice on capecitabine is a liability demo, not a feature."
+    },
+    "CleanHands": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 9,
+     "biggest_objection": "An ultrasonic sensor plus a sanitizer LDR cannot tell staff from visitors or who actually walked to the bed, so infection-control nurses will get a noisy denominator they can't act on, and the buyers in this space already know Ecolab's badge data is only worth paying for because it's attributable."
+    },
+    "FeverLine": {
+     "hackathon_1_10": 4,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "This is a phone app wearing a Raspberry Pi costume; the patient types their own temperature, the hardware does nothing, and the judges will see exactly that in 5 minutes at the table."
+    }
+   },
+   "ranking_best_first": [
+    "DripGuard",
+    "BreathBuddy",
+    "CleanHands",
+    "ChemoChain",
+    "PillStep",
+    "FeverLine"
+   ],
+   "top_pick_reason": "It's the only one where a judge can watch a physical input (drops falling) produce a visible, correct output (rate on the LCD, alarm, bed turning red on the nurse station) in under 60 seconds, which is exactly the pattern past winners followed. The parts are a perfect fit\u2014LDR, LED, buzzers, LCD, ESP32, Pi screen\u2014the offline bedside story survives the bad Wi-Fi, and the real-world narrative (gravity drips are the default in most of the world; US pump and fluid shortages) is true without exaggeration. The buyer story is weak, but it's the least weak of the six, and the nurse whose job gets easier is identifiable and specific.",
+   "one_improvement_to_top_pick": "Drop the servo clamp\u2014no clinician will accept a hobby servo touching a roller clamp, and if it jams on stage you lose Functionality points. Spend those hours instead on making the drop detection rock solid (IR pair in a 3D-printed or taped-on shroud so room light doesn't false-trigger, show a live drop-count graph) and on the multi-bed nurse-station view with two or three drip chambers running simultaneously at different rates so the shared-state story is undeniable live. If you want a physical actuator for the Hardware track, use the relay to kill a bedside lamp or trigger the call-light, which is what a real ward would actually wire into."
+  },
+  "hospital_biomed_engineer": {
+   "per_idea": {
+    "DripGuard": {
+     "hackathon_1_10": 8,
+     "real_world_value_1_10": 7,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "The moment a hobby servo touches the roller clamp you have built an infusion controller with no fail-safe, and I would pull it off the ward before it reached a patient; plus an LDR drop counter under fluorescent lights and a fogged drip chamber will false-alarm all shift until the nurses mute it."
+    },
+    "ChemoChain": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 4,
+     "buildable_36h_1_10": 5,
+     "biggest_objection": "A DHT11 is spec'd at \u00b12\u00b0C, which is useless for proving a 2-8\u00b0C cold chain, GPS gives you nothing inside a hospital, and the pharmacy already buys single-use Sensitech loggers for twenty bucks, so the blockchain is solving a problem nobody at the loading dock has."
+    },
+    "BreathBuddy": {
+     "hackathon_1_10": 8,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 5,
+     "biggest_objection": "You are asking a post-op patient to inhale through a brushed DC motor you cannot disinfect, and I am not convinced a 3-6V toy motor spun by breath gives you a clean enough signal to run a game off without a lot of filtering you don't have time for."
+    },
+    "PillStep": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 4,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "Capecitabine is a hazardous drug and your open carousel driven by a 28BYJ that skips steps under load is a wrong-dose machine; Hero and MedMinder already do this with a lot more engineering."
+    },
+    "CleanHands": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 3,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "An HC-SR04 at a ward door counts carts, visitors and the same nurse four times, and a buzzer that goes off at the entrance will be unplugged by the charge nurse on day one because it is one more alarm nobody owns."
+    },
+    "FeverLine": {
+     "hackathon_1_10": 4,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "This is a phone app wearing a Raspberry Pi as a costume; the thermistor measures the room, the camera vitals are not something I would trust to triage a neutropenic patient, and the judges will see there is no physical input doing any work."
+    }
+   },
+   "ranking_best_first": [
+    "DripGuard",
+    "BreathBuddy",
+    "ChemoChain",
+    "PillStep",
+    "CleanHands",
+    "FeverLine"
+   ],
+   "top_pick_reason": "It is the only one where a judge can watch a real job get easier in five minutes: hang a bag, open the clamp, the LCD shows mL/h, the nurse-station screen updates across beds. Gravity drips without pumps are the reality in most of the world and in US shortages right now, the parts in the box (IR pair, ESP32, buzzers, LCD, Pi) map directly onto it, and it is honest about being bedside-offline. It also hits the most tracks without faking any of them.",
+   "one_improvement_to_top_pick": "Rip out the servo clamp entirely. Monitor only, never actuate: use an IR LED pulsed at a few kHz with the phototransistor and synchronous detection so ambient light and chamber fog don't trigger it, make the bedside alarm a two-stage thing (LED and LCD first, buzzer only after the nurse-station escalation goes unanswered), and put a 'clean this with a wipe' enclosure on the clip with no exposed PCB. That turns it from a device I would ban into one I would actually let on a ward for a pilot."
+  },
+  "dscsa_compliance_lead": {
+   "per_idea": {
+    "DripGuard": {
+     "hackathon_1_10": 9,
+     "real_world_value_1_10": 7,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "The servo pinching the roller clamp turns a monitor into a flow-controlling device \u2014 that's the line between 'nice alarm' and 'Class II medical device that gets pulled when it occludes a chemo line by mistake,' and your >20% drift alarm will scream every time the patient bends their arm."
+    },
+    "ChemoChain": {
+     "hackathon_1_10": 8,
+     "real_world_value_1_10": 3,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "I sat through MediLedger and three other pilots and here's the same mistake: DSCSA is serialization and EPCIS transaction data at the saleable-unit level, it doesn't require temperature, 503A compounded chemo is exempt from it anyway, and a $20 single-use Sensitech TagAlert already does the cold-chain part \u2014 the Solana anchor adds nothing a signed log and a timestamp don't, GPS won't get a fix inside a hospital, and no verifier is going to pay x402 micropayments for a record they're entitled to under the law."
+    },
+    "BreathBuddy": {
+     "hackathon_1_10": 8,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "A $5 incentive spirometer is single-patient disposable for a reason; a shared turbine mouthpiece on a surgical ward is an infection-control conversation you'll lose, and the motor's back-EMF is noisy enough that your 'relative effort' will mostly measure how hard someone spits."
+    },
+    "PillStep": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 4,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "Capecitabine is a USP <800> hazardous drug \u2014 you don't decant it loose into a hobby carousel in someone's kitchen \u2014 and Hero/MedMinder already own this shelf, so you're left differentiating on a chatbot giving post-emesis dosing advice, which is exactly the thing the oncology pharmacist will not let near a patient."
+    },
+    "CleanHands": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 4,
+     "buildable_36h_1_10": 9,
+     "biggest_objection": "One ultrasonic sensor can't tell entering from leaving or two people from one, so your compliance denominator is fiction and the buzzer nudges the wrong person half the time; it's a weekend Arduino project, not a hack, and infection-control already has dispenser counters."
+    },
+    "FeverLine": {
+     "hackathon_1_10": 4,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "It's a phone app wearing a Raspberry Pi costume \u2014 the patient types their own thermometer reading, the thermistor reads the room, and a rules engine for 38.0\u00b0C x2 is an if-statement; the only real hardware is four buzzers yelling at a sick person."
+    }
+   },
+   "ranking_best_first": [
+    "DripGuard",
+    "BreathBuddy",
+    "ChemoChain",
+    "PillStep",
+    "CleanHands",
+    "FeverLine"
+   ],
+   "top_pick_reason": "It's the only one where a judge can watch a physical thing (a dripping bag) and see one named person's job (the nurse checking eight gravity drips) get visibly easier in five minutes, it works fully offline with the parts on the table, the problem is real right now in both the US shortage and most of the world, and it stacks Hardware, People-First, Anthropic, Microsoft and a real-time-state sponsor without faking any of them. ChemoChain reads better on paper but I've watched that paper fail in production for six years.",
+   "one_improvement_to_top_pick": "Rip out the servo clamp \u2014 monitor, don't actuate \u2014 and spend those hours on two things that make the mL/h number honest and the demo convincing: a selectable drop factor (10/15/20/60 gtt/mL, with time-to-empty computed from bag volume) and a second bed on the Uno so the Pi nurse-station view is aggregating two live drips during the pitch, one of which you deliberately let run dry on camera."
+  },
+  "calhacks_main_judge": {
+   "per_idea": {
+    "DripGuard": {
+     "hackathon_1_10": 9,
+     "real_world_value_1_10": 8,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "Your drop counter is the whole product and it's an LDR in a bright gym staring at a clear plastic chamber \u2014 if ambient light or a wobbly clip gives you a false 'empty' alarm during my 5 minutes, the servo pinching a clamp goes from clever to terrifying, and no nurse will let a hobby servo touch a chemo line anyway."
+    },
+    "ChemoChain": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "Nothing happens live \u2014 a box that sits on the table logging temperature while you talk about DSCSA and Solana is a slide deck with a thermistor, and the pharmacy courier you named already has a $40 Sensitech logger and a signature pad."
+    },
+    "BreathBuddy": {
+     "hackathon_1_10": 8,
+     "real_world_value_1_10": 7,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "A 3-6V toy motor used as a generator will give you millivolts of noisy signal from a breath and probably won't spin at all on inhale, which is the half of incentive spirometry that actually matters \u2014 if you can't show a clean inhale trace by Saturday noon, you don't have a project."
+    },
+    "PillStep": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 5,
+     "biggest_objection": "Hero and Pillo exist with $50M behind them, and a 28BYJ stepper carousel built out of cardboard in 36 hours will jam on the demo, so you'll have spent your whole weekend on the one part that isn't differentiated while the actually interesting part \u2014 Claude handling 'I threw up after capecitabine' safely \u2014 is a web app."
+    },
+    "CleanHands": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 9,
+     "biggest_objection": "It's two sensors and an if-statement \u2014 it'll work flawlessly, every judge will have seen it before, and the infection-control nurse's real problem is who didn't sanitize, which you've explicitly designed yourself out of answering."
+    },
+    "FeverLine": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 7,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "The patient types their own temperature from their own thermometer, so the box is a 7-inch touchscreen reminding them to use a phone app \u2014 the hardware is decorative, and 'Claude applies neutropenic-fever rules' is three if-statements the clinic already printed on a fridge magnet."
+    }
+   },
+   "ranking_best_first": [
+    "DripGuard",
+    "BreathBuddy",
+    "ChemoChain",
+    "FeverLine",
+    "PillStep",
+    "CleanHands"
+   ],
+   "top_pick_reason": "It's the only one where I can watch a real person's job get easier in 90 seconds: hang a bag of water, pinch the line, the drop count drifts, the buzzer screams and the nurse-station screen on the Pi flags bed 3 \u2014 physical input, visible output, a named user, and it fits six tracks without faking any of them. The parts match exactly (LED/LDR, buzzers, LCD, servo, ESP32, Pi), and the real-world story \u2014 gravity drips in wards with no pumps \u2014 is true and cheap to prove.",
+   "one_improvement_to_top_pick": "Drop the servo-pinches-the-clamp feature entirely and spend those hours making the drop sensor bulletproof: use an IR LED + phototransistor pair in a 3D-printed/opaque clip that shields ambient light, modulate the LED and do synchronous detection so gym lighting can't fool it, and demo it with two simultaneous bags on two chambers so the multi-bed nurse-station view is real, not simulated. A monitor that never alarms falsely beats one that also tries to be an actuator and makes a nurse nervous."
+  },
+  "hardware_judge": {
+   "per_idea": {
+    "DripGuard": {
+     "hackathon_1_10": 9,
+     "real_world_value_1_10": 8,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "Your whole product is one optical drop counter, and an LDR with no shielding in a venue with hall lighting and judges' phone flashes will miscount or saturate; if the count isn't rock solid on the table for five minutes, the alarms, the servo clamp and the nurse station are a dashboard with no sensor under it."
+    },
+    "ChemoChain": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "A thermistor and a DHT11 with \u00b12\u00b0C spec logging 2\u20138\u00b0C excursions isn't a cold-chain logger, it's a hobby datalogger wearing a hash chain, and the Solana anchor adds nothing the signed log on the ESP32 doesn't already prove \u2014 the hardware is decorative around a blockchain pitch."
+    },
+    "BreathBuddy": {
+     "hackathon_1_10": 7,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 5,
+     "biggest_objection": "A 3\u20136V toy motor spun by human breath through a cardboard tube will generate tens of millivolts with huge bearing stiction at low flow, so the balloon game will respond to hard blows and nothing else, and you can't demo inhalation (which is what incentive spirometers actually measure) without a sealed, hygienic flow path you don't have."
+    },
+    "PillStep": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "A 28BYJ stepper carousel jams, double-dispenses or misaligns the moment a pill is the wrong shape, and in a crowded market (Hero, MedMinder) the only hardware I'd be judging is a reminder box; the real value is Claude's 'I vomited' flow, which is a liability demo, not a hardware demo."
+    },
+    "CleanHands": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "An HC-SR04 at a door can't tell one person from two walking together or a cart, and the 'pump press detected' is a single LDR behind a bottle \u2014 it's easy to build because there's barely any hardware, and judges will see a doorbell with a dashboard."
+    },
+    "FeverLine": {
+     "hackathon_1_10": 4,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "The patient types the temperature into a touchscreen \u2014 the thermistor measures the room \u2014 so there is no hardware here; it's a tablet app with buzzers bolted on, and I'd score it zero on 'is the hardware essential'."
+    }
+   },
+   "ranking_best_first": [
+    "DripGuard",
+    "BreathBuddy",
+    "ChemoChain",
+    "PillStep",
+    "CleanHands",
+    "FeverLine"
+   ],
+   "top_pick_reason": "It's the only idea where the hardware is the product and not a prop: the sensor measures something that matters (drops per minute), has a hard, clear failure mode it is designed to catch (rate drift, empty bag), acts physically (servo on the roller clamp, loud buzzers), works offline at the bedside, and can be demoed live in 90 seconds with a real IV set and a water bag \u2014 you pinch the line, the alarm fires, the nurse station turns red. That is exactly the 'one person's job visibly easier' pattern past winners had, and the parts list actually supports it: ESP32, LDR/IR, servo, buzzers, LCD, Pi for the station.",
+   "one_improvement_to_top_pick": "Ditch the bare LDR and build a proper beam-break: use the IR LED from the remote kit (or a visible LED) and the photoresistor/IR receiver in an opaque 3D-printed or black-taped clip that fully encloses the drip chamber, modulate the LED (e.g. 1 kHz PWM) and detect the AC dip so ambient light and flashes can't fake or hide a drop; then show me the raw ADC trace on the LCD/Pi during the demo with a per-drop pulse and a fault state for 'sensor blocked / clip removed / ambient too bright', and run the whole bedside node from the LiPo so I can see it survive a wall-power pull."
+  },
+  "people_first_judge": {
+   "per_idea": {
+    "DripGuard": {
+     "hackathon_1_10": 9,
+     "real_world_value_1_10": 8,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "I've stood in wards in Malawi and rural Guatemala where gravity drips are the norm, and the thing that fails isn't drop counting\u2014it's that nobody is in the room; so if your nurse-station view dies with weak Wi-Fi and the servo-clamp fails closed on a patient with a vesicant chemo line, you've built a liability, not a helper, so the bedside box must be fully useful alone and the clamp must be opt-in."
+    },
+    "ChemoChain": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 4,
+     "buildable_36h_1_10": 5,
+     "biggest_objection": "The beneficiary here is a compliance officer and a courier, not a patient, and the under-served clinics shipping compounded chemo won't touch anything with 'Solana' in the pitch\u2014the blockchain is sponsor-chasing that adds nothing a signed SQLite log doesn't already do."
+    },
+    "BreathBuddy": {
+     "hackathon_1_10": 7,
+     "real_world_value_1_10": 7,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "Post-op patients are 70-year-olds on opioids and infection control will never let a shared 7-inch touchscreen and a hand-cut fan turbine near a mouthpiece on a surgical ward, so the honest version is a single-patient home device for kids\u2014which is a smaller, different pitch than the one you wrote."
+    },
+    "PillStep": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 5,
+     "biggest_objection": "Hero and MedMinder already lose money in this space, oral chemo is dispensed in blister packs that your carousel can't accept without a pharmacist repacking hazardous drugs, and a hackathon Claude giving vomiting-redose advice is the single most dangerous demo I could watch."
+    },
+    "CleanHands": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 9,
+     "biggest_objection": "A doorway ultrasonic plus a buzzer cannot tell visitor from nurse from the dietary cart, so your compliance numbers will be garbage and infection-control nurses\u2014who already fight staff over secret-shopper audits\u2014will get blamed for a beeping door everyone learns to ignore within a week."
+    },
+    "FeverLine": {
+     "hackathon_1_10": 4,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "The patient types their own temperature into a box, which is a phone app wearing a 7-inch screen; the actual under-served failure is people who don't own a thermometer or don't call because they fear the ER bill, and this touches neither."
+    }
+   },
+   "ranking_best_first": [
+    "DripGuard",
+    "BreathBuddy",
+    "CleanHands",
+    "FeverLine",
+    "ChemoChain",
+    "PillStep"
+   ],
+   "top_pick_reason": "DripGuard is the only one where the named beneficiary is both a frontline worker in the poorest health systems on earth and a US nurse in a pump shortage, the hardware actually does the job (an LDR counting drops is real sensing, not decoration), it works offline, and a judge can watch a drip chamber, pinch the line, and hear the alarm in five minutes\u2014that is exactly what past winners did.",
+   "one_improvement_to_top_pick": "Drop the servo clamp and the cloud stack from the headline and spend those hours making the bedside unit cost-honest and robust: print the BOM (target under $15), run it off the LiPo + solar for the pitch, make the clip fit three different drip-chamber sizes, and show a nurse-station page that degrades gracefully to 'last seen 4 min ago' when Wi-Fi drops\u2014then say out loud that it is a counting-and-alerting aid, not a pump, and it never occludes a line."
+  },
+  "anthropic_judge": {
+   "per_idea": {
+    "DripGuard": {
+     "hackathon_1_10": 9,
+     "real_world_value_1_10": 7,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "Claude is bolted on here: the drop counter and buzzers are the product, and a handover note generated from a drop count is the first place Claude will invent a vital sign the nurse never recorded, so show me it only ever cites logged events."
+    },
+    "ChemoChain": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "This is track bingo, not a product; a hospital pharmacy courier wants a temperature log and a signature, not Solana, and the x402 'side door' tells me you designed for sponsors instead of the person at the handover."
+    },
+    "BreathBuddy": {
+     "hackathon_1_10": 8,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "A 3-6V hobby motor spun by a breath gives you tens of noisy millivolts, so you'll burn Saturday on signal conditioning, and 'Claude adapts the game' is a slide, not a feature I can test at the table."
+    },
+    "PillStep": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "The Claude feature is the thing I'd fail you on: a chatbot telling a capecitabine patient whether to re-dose after vomiting is a liability, and I will ask what it says the moment the clinic's rules don't cover the case."
+    },
+    "CleanHands": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 9,
+     "biggest_objection": "An HC-SR04 can't tell a nurse from a linen cart, so your compliance denominator is fiction, and Claude turning a count into a weekly paragraph is a template with an API bill."
+    },
+    "FeverLine": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 7,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "The best Claude use of the six, but the hardware is a touchscreen asking a human to type a number; every judge will say 'this is a phone app' and they'll be right."
+    }
+   },
+   "ranking_best_first": [
+    "DripGuard",
+    "BreathBuddy",
+    "FeverLine",
+    "CleanHands",
+    "ChemoChain",
+    "PillStep"
+   ],
+   "top_pick_reason": "DripGuard is the only one where a judge can watch a physical input (drops) become a visible outcome (alarm, clamp, nurse-station flag) in five minutes, it's buildable with exactly the parts in the photo, the named community is real and under-served outside the US, and the device still does its safety job offline when Claude or the venue Wi-Fi is down, which is what 'works Monday' means to me.",
+   "one_improvement_to_top_pick": "Make Claude's boundary the demo: rate drift, empty-bag and clamp decisions are hard-coded rules, and Claude only drafts the handover note from the structured event log with every sentence linked to a timestamped event, refusing to state anything (patient condition, vitals, drug name) that isn't in the log; then pull the Wi-Fi live at the table and show the bedside box still alarms and the note says 'Claude unavailable, raw log attached'."
+  },
+  "solana_crypto_judge": {
+   "per_idea": {
+    "DripGuard": {
+     "hackathon_1_10": 9,
+     "real_world_value_1_10": 8,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "Drop counting with an LDR under hackathon ceiling lights is going to miscount, and the second your rate reading is visibly wrong at the table the whole safety story dies with it\u2014use the IR receiver or a shielded IR pair and prove it on a real giving set, not a syringe."
+    },
+    "ChemoChain": {
+     "hackathon_1_10": 7,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "This is the only one I can score for my track and it's still borderline: an offline hash chain plus a signed timestamp from the receiving pharmacy gives 90% of the tamper evidence, so unless you show me the moment the courier, the clinic and the regulator all distrust each other and nobody wants to run the server, Solana is a notary stamp, and I know what a notary stamp looks like."
+    },
+    "BreathBuddy": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 5,
+     "biggest_objection": "A 3\u20136V toy motor spun by a breath puts out tens of millivolts of noisy back-EMF and the fan blade won't start spinning on a weak post-op inhale, so you'll be demoing a game that reacts to a healthy student blowing hard, which is exactly the patient who doesn't need it."
+    },
+    "PillStep": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "Hero and MedMinder already exist and the chemo-cycle logic is a config file on top of them; the live demo is a stepper rotating a carousel, and a 28BYJ with a 3D-printed drum that jams once in five minutes at the table is a funeral."
+    },
+    "CleanHands": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "Easiest build in the list and the most boring demo in the list: a judge walks past an ultrasonic sensor, a buzzer goes off, and there's nothing for the second minute of the pitch except a chart."
+    },
+    "FeverLine": {
+     "hackathon_1_10": 4,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "The patient types the temperature in themselves and the thermistor reads the room\u2014this is a phone app wearing a Pi touchscreen as a costume, and every hardware judge will see it in ten seconds."
+    }
+   },
+   "ranking_best_first": [
+    "DripGuard",
+    "ChemoChain",
+    "BreathBuddy",
+    "PillStep",
+    "CleanHands",
+    "FeverLine"
+   ],
+   "top_pick_reason": "Nothing to do with my track, and I'm telling you that so you believe the rest: DripGuard is the one where a physical thing happens live\u2014drops fall, rate drifts, four buzzers scream, a servo pinches the clamp, and a nurse-station screen updates across beds\u2014and it makes one named person's job easier in a way five judges can watch in 90 seconds. The real-time shared state across beds is genuinely load-bearing for SpacetimeDB/Convex, which is more than I can say for most sponsor-track integrations I see. Don't put a chain in it; you don't need one and I'd dock you for it.",
+   "one_improvement_to_top_pick": "Swap the LDR for the IR receiver/emitter (or shield the LDR in a black tube) and build the demo around a deliberate fault: start a normal drip, have a judge twist the roller clamp or lift the bag, and show the alarm plus the nurse-station flag fire within seconds, then let the Claude handover note cite that exact event with a timestamp\u2014one causal loop, no slides."
+  },
+  "presage_judge": {
+   "per_idea": {
+    "DripGuard": {
+     "hackathon_1_10": 8,
+     "real_world_value_1_10": 8,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "It's the best hack on this list and it doesn't touch my SDK at all, so don't come to my table with a 'we could add Presage for the patient' slide \u2014 and your LDR drop counter will false-count under venue fluorescent flicker unless you shroud the chamber and threshold on the derivative, not the level."
+    },
+    "ChemoChain": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 4,
+     "biggest_objection": "Eight sponsor tracks stapled to a cooler is a track-hunting project, not a product; nobody at a handover desk wants a Solana anchor and nobody in the room can tell whether your hash chain works, so your 5 minutes become a lecture."
+    },
+    "BreathBuddy": {
+     "hackathon_1_10": 7,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "As written the camera is redundant \u2014 the turbine already measures the breath \u2014 so 'Presage cross-checks' reads as bolted on; if the vitals don't change what the game does, I won't give you the track."
+    },
+    "PillStep": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 5,
+     "biggest_objection": "Hero and Pillo exist, and a 28BYJ carousel that jams on the second demo is the classic hackathon failure; the 'I vomited, what now?' clinical advice is the part a Microsoft healthcare judge will tear apart on liability."
+    },
+    "CleanHands": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 9,
+     "biggest_objection": "It's an afternoon of ultrasonic plus LDR and a dashboard \u2014 functional and honest, but there's almost no technical depth and the live demo is 'watch a student walk through a door,' which judges will have seen three times by noon."
+    },
+    "FeverLine": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 7,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "This is the one place camera HR/RR is genuinely clinical (tachycardia and RR>20 are SIRS flags alongside fever), but the demo is a tablet asking you to type a number \u2014 no physical input, you can't show a fever live, and a Pi 3 can't run the SDK so you're on a phone with no reliable Wi-Fi to the box."
+    }
+   },
+   "ranking_best_first": [
+    "BreathBuddy",
+    "DripGuard",
+    "FeverLine",
+    "CleanHands",
+    "PillStep",
+    "ChemoChain"
+   ],
+   "top_pick_reason": "I'll be honest: DripGuard is the stronger overall hack and would likely take Hardware and People-First. But I'm judging whether the vitals matter, and BreathBuddy is the only idea where Presage can be load-bearing AND the demo has physical input a judge can do at the table \u2014 blow into a tube, balloon rises, buzzer rewards \u2014 which is exactly what past winners did. FeverLine has the better clinical argument for camera vitals but no live demo and no hardware story. Right now BreathBuddy only earns a 7 from me because the camera is described as a cross-check, i.e. decoration.",
+   "one_improvement_to_top_pick": "Make Presage do the thing the turbine can't. Incentive spirometry is about a slow deep INHALE and a 3-second hold; your fan blade measures flow, not whether the chest actually expanded or whether the patient quit after two tries. Use the breathing waveform from the phone camera to score inhale depth and hold duration and to detect disengagement (engagement signal dropping, rate going shallow), and have the game adapt live \u2014 balloon target lowers when the patient is fatiguing, nurse summary says '6 of 10 breaths were shallow by chest motion.' Then the vitals change the product's behavior in front of me, and I can give you the track without squinting. Also: run the SDK on the phone and push to the Pi over the Pi's own hotspot, not venue Wi-Fi."
+  },
+  "cs_teammate": {
+   "per_idea": {
+    "DripGuard": {
+     "hackathon_1_10": 9,
+     "real_world_value_1_10": 8,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "Drop detection with an LDR is sensitive to venue lighting and chamber fogging, so if we don't put the LED/LDR in an opaque clip and threshold on the derivative, the counter will miss drops the second a judge leans over it."
+    },
+    "ChemoChain": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 5,
+     "biggest_objection": "The Solana anchor, GPS fix indoors, and x402 side door all need the one thing we don't have\u2014reliable internet\u2014so the live demo is a box that logs temperature and a hash chain nobody can see, and the judge will ask why the blockchain is there."
+    },
+    "BreathBuddy": {
+     "hackathon_1_10": 7,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "A 3-6V toy motor with that fan blade barely spins from a human breath and the back-EMF will be tens of millivolts of noise on the Uno ADC, so the core sensor is a Saturday-morning gamble; plus a shared mouthpiece judges blow into is a hygiene mess."
+    },
+    "PillStep": {
+     "hackathon_1_10": 5,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "It's Hero/Pillo with a 28BYJ stepper, the carousel will jam at the first 3D-print tolerance problem, and the 'I vomited, what now' Claude answer is the part a judge will try to break and we can't say 'escalate when unsure' convincingly in 5 minutes."
+    },
+    "CleanHands": {
+     "hackathon_1_10": 4,
+     "real_world_value_1_10": 5,
+     "buildable_36h_1_10": 9,
+     "biggest_objection": "Buildable Saturday before lunch, which is the problem: an HC-SR04 plus a buzzer is a kit tutorial, and the demo is 'walk past, don't pump, beep' with no technical complexity for the hardware track."
+    },
+    "FeverLine": {
+     "hackathon_1_10": 4,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "The patient types their own temperature, so the hardware is a touchscreen and buzzers wrapped around a rules-engine app, and the Presage camera vitals in a loud, badly lit venue on weak Wi-Fi is where the live demo dies."
+    }
+   },
+   "ranking_best_first": [
+    "DripGuard",
+    "BreathBuddy",
+    "ChemoChain",
+    "PillStep",
+    "FeverLine",
+    "CleanHands"
+   ],
+   "top_pick_reason": "It's the only one where the physical input is unfakeable and visible from across the table: a judge watches drops fall, the LCD rate changes, they squeeze the bag or open the roller clamp and four buzzers go off and a servo pinches the line. Every core piece (LED+LDR, LCD, buzzers, servo, ESP32) is in the kit and works fully offline, so weak Wi-Fi only takes out the nice-to-have nurse-station sync, not the demo. Real nurses do count drops by eye with a watch, so 'makes one person's job visibly easier' is literal, and it maps cleanly to Hardware, People-First, Anthropic, and a real-time backend track without forcing anything.",
+   "one_improvement_to_top_pick": "Build a dead-simple IV rig for the table on Saturday: a water bag or bottle hung from a stand with a real drip chamber and roller clamp (pharmacy IV set, or a clear tube with a pinhole), so the demo is one judge turning the clamp and watching the alarm within 10 seconds. Have the ESP32 and Pi talk over the ESP32's own soft-AP/BLE with the Pi as a local hub so the multi-bed view and Claude handover note work with zero venue Wi-Fi, and keep a cached handover note ready in case the Claude API call hangs."
+  },
+  "medical_ethicist": {
+   "per_idea": {
+    "DripGuard": {
+     "hackathon_1_10": 9,
+     "real_world_value_1_10": 7,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "The servo that pinches the roller clamp is an unlicensed actuator on a live patient line: a stuck servo stops a vancomycin drip nobody notices, a loose one does nothing when the bag empties while the nurse now believes the box handles it, and drop factor varies 10 to 60 gtt/mL by set so your mL/h is wrong unless a human enters the set type every time."
+    },
+    "ChemoChain": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 4,
+     "buildable_36h_1_10": 7,
+     "biggest_objection": "A DHT11 is accurate to about plus or minus 2 degrees, so a cryptographically signed, Solana-anchored record of whether a $10,000 chemo bag left the 2 to 8 C window is an immutable attestation of noise, and no pharmacist will discard or accept a dose on it, which means the blockchain is solving a problem the sensor already lost."
+    },
+    "BreathBuddy": {
+     "hackathon_1_10": 7,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 6,
+     "biggest_objection": "Incentive spirometry works by slow sustained maximal inspiration, and a turbine that rewards whatever spins it fastest will teach a fresh laparotomy patient to huff, cough and strain against sutures; plus a cardboard mouthpiece on a shared ward device in a neutropenic population is an infection-control incident waiting to be written up."
+    },
+    "PillStep": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 4,
+     "buildable_36h_1_10": 5,
+     "biggest_objection": "Having Claude tell a capecitabine patient at 2 AM whether to re-dose after vomiting is practicing oncology without a license on a cytotoxic drug, and a jammed 28BYJ carousel that double-dispenses or skips is a reportable medication error, in a market where Hero and MedMinder already exist with actual quality systems."
+    },
+    "CleanHands": {
+     "hackathon_1_10": 6,
+     "real_world_value_1_10": 6,
+     "buildable_36h_1_10": 9,
+     "biggest_objection": "An HC-SR04 cannot tell a nurse from a visitor from a food cart or an exit from an entry, so your compliance denominator is garbage and the weekly report Claude writes from it will be confidently wrong, while a buzzer shaming people at the door is exactly the kind of alarm that gets unplugged by Tuesday."
+    },
+    "FeverLine": {
+     "hackathon_1_10": 4,
+     "real_world_value_1_10": 3,
+     "buildable_36h_1_10": 8,
+     "biggest_objection": "The box adds no measurement the patient does not already have, the Presage heart rate is unvalidated in a sick, pale, shivering person, and the one thing it can do that a laminated card cannot is tell a neutropenic patient who typed 37.8 that they are fine, which is false reassurance with a body count and a liability trail with your names on it."
+    }
+   },
+   "ranking_best_first": [
+    "DripGuard",
+    "BreathBuddy",
+    "CleanHands",
+    "ChemoChain",
+    "PillStep",
+    "FeverLine"
+   ],
+   "top_pick_reason": "It is the only one of the six that monitors instead of advising: it watches a physical process a nurse already owns, makes a visible job easier live at the table, addresses a real gap in wards without pumps and during the current US shortages, and the failure mode of a monitor that is honest about its limits is a nuisance alarm, not a wrong dose or a missed sepsis. It also hits the most tracks with one honest story rather than bolting a blockchain or a chatbot onto a hobby sensor.",
+   "one_improvement_to_top_pick": "Delete the servo clamp entirely and ship it as alarm-only: the nurse selects the drip set (10/15/20/60 gtt per mL) and target rate on the keypad before monitoring starts, every alarm must be acknowledged by a button press that is logged with time to acknowledgement, unacknowledged alarms escalate to the nurse-station screen, and the LCD permanently reads 'MONITOR ONLY, does not control flow'. That one change turns a device a hospital lawyer would ban into one an infection-control or nursing director could plausibly pilot, and it costs you nothing in the demo because the buzzers and the station view are what judges will remember anyway."
+  }
+ },
+ "round2": {
+  "oncology_infusion_nurse": {
+   "final_pick": "DripGuard",
+   "changed_mind": false,
+   "rebuttal_to_strongest_objection_against_your_pick": "The strongest objection is 'the LDR drop counter is the whole product and it will false-alarm, so nurses rip it off by Tuesday.' I made that objection myself in round 1 and I stand by it as a BUILD failure, not a problem failure. In Guatemala I had 18 beds on gravity sets and I counted drops against my watch every 30 to 60 minutes; between those checks nobody knew if a bag had run dry or a line had positioned off. A counter that is right 95% of the time, that says 'SENSOR FAULT' out loud instead of guessing, and that only makes noise when drops have actually stopped, is a real improvement over a nurse who is not in the room. The other five candidates fail on the problem itself: nobody asked for a blockchain cold-box, the spirometer measures the wrong half of the breath, PillStep is Hero with a liability chatbot, CleanHands measures carts, FeverLine is my fridge magnet on a touchscreen. DripGuard is the only one where the fix is 'build the sensor properly and stop over-alarming' rather than 'pick a different idea.' So the whole weekend goes into the clip and the alarm logic, and if the clip is not rock-solid on a real drip chamber by Saturday noon, that is the moment to panic, not Sunday.",
+   "attack_on_the_leader_DripGuard": "'You say chemo ward. No US hospital infuses chemo by gravity, ever, and the Guatemalan ward you're actually describing has no Wi-Fi, no Raspberry Pi and no nurse station \u2014 so your bedside box is for a hospital that doesn't exist and your nurse-station view is for a hospital that already owns pumps. Meanwhile the one patient-caused event that happens fifty times a shift \u2014 the arm bends, flow stops for forty seconds, then resumes \u2014 your 20% drift rule turns into a buzzer. Show me the log of how many times this thing alarmed in the last hour sitting on this table on a real drip chamber, and tell me which alarm I'm allowed to ignore.' If the team cannot answer that with a number (false alarms per hour, measured) and a named Monday user (antibiotic/fluid gravity drips on an understaffed med-surg or LMIC ward \u2014 say 'chemo ward' only as where the team's nurse works, not where the device goes), the clinical judges will write it off as another alarm nobody owns.",
+   "must_fix_before_demo": [
+    "Delete the servo clamp entirely. Nothing touches the line. LCD line 2 permanently reads 'MONITOR ONLY - does not control flow' and the pitch says that sentence out loud in the first 30 seconds. Use the freed hours on the sensor: pulsed IR LED (from the kit remote or any 940nm LED) + IR receiver/phototransistor facing each other inside a black-taped or printed clip that fully encloses the drip chamber, threshold on the derivative with a refractory window (~80 ms), and an explicit FAULT state ('clip off / ambient too bright / chamber fogged') that shows on LCD and station instead of a fake rate. Demo on a REAL gravity administration set (20 gtt/mL macro and a 60 gtt/mL microdrip; vet/farm supply or pharmacy Saturday morning) with a saline or water bag on a pole, never a pump into a cup.",
+    "Make the mL/h number honest: before monitoring starts the nurse enters on the keypad drop factor (10/15/20/60), bag volume, and ordered mL/h. LCD shows MEASURED vs ORDERED and MINUTES TO EMPTY. That countdown is what a night nurse plans her round around; the raw drop count is not.",
+    "Rebuild the alarms so I would not unplug it: 3 of the 4 buzzers come out. Tier 1 (amber LED + LCD + station flag, silent): rate off by >25% sustained 3 minutes, or no drops for 45 s (positional occlusion \u2014 arm bend \u2014 must NOT buzz). Tier 2 (one buzzer, intermittent, plus station red): no drops for 90 s, or minutes-to-empty <= 5, or empty. Every alarm has an ACKNOWLEDGE button at the bedside that silences for 5 minutes and logs time-to-ack; unacknowledged Tier 2 escalates to the station after 60 s with a distinct tone per bed. Run the ESP32 nodes to the Pi over the Pi's own hotspot/soft-AP, not venue Wi-Fi, with 'last seen X min ago' on the station when a bed drops off, and a cached handover note in case the Claude call hangs. Claude drafts the handover only from the timestamped event log and refuses to mention vitals, drug names or patient condition that are not in it."
+   ],
+   "track_combo_you_would_enter": [
+    "Best Hardware",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "Convex (pick Convex OR SpacetimeDB, not both)",
+    "MLH Tiger Data"
+   ],
+   "does_any_crypto_fit_honestly": "No. ChemoChain's Solana anchor is a notary stamp on a \u00b12\u00b0C DHT11 reading that no pharmacist would discard or accept a $10,000 bag on; compounded chemo is DSCSA-exempt, the courier already has a $20 TagAlert strip and a signature, and nobody pays x402 micropayments for a record they are legally entitled to. For DripGuard there is no identity, payment or supply-chain story at all. Skip Solana and x402 entirely; entering them signals track-chasing to every clinical judge in the room and costs you credibility on the tracks you can actually win.",
+   "startup_potential_1_10": 3,
+   "why_startup_score": "Honest number is 3. Buyer: in the US there is no buyer \u2014 chemo and almost all antibiotics run on pumps, and the IV-fluid shortage pushes wards to oral and IV-push, not to gravity sets. The real user is an LMIC ward or an NGO, where procurement is Ministry of Health or donor money, there is no reimbursement code, and DripAssist at ~$300 with a 510(k) already exists and still barely sells. FDA: alarm-only keeps you out of the infusion-pump bucket (that was the servo), but a drop-rate monitor that nurses rely on is still a Class II accessory with a 510(k) and the alarm-performance testing to go with it \u2014 call that $150k-plus and a year before a US pilot. Incumbents: DripAssist, Shift Labs, plus every pump vendor's low-cost line. What it CAN be: a sub-$15 open-hardware kit that an NGO or a nursing school adopts, a very good hackathon win, and a strong portfolio piece \u2014 not a venture-scale company. If a student tells a judge this is a startup, the judge should ask who writes the first check; the right answer is 'nobody yet, and we know it.'"
+  },
+  "hospital_pharmacy_director": {
+   "unparsed_raw": "{\"final_pick\": \"DripGuard\", \"changed_mind\": false, \"rebuttal_to_strongest_objection_against_your_pick\": \"The strongest objection is mine and the biomed engineer's: an LDR drop counter under venue light is fiction, and the servo makes it a flow controller. Both are true of the Friday-night design and both are fixable in 36 hours, which is more than I can say for any other candidate. The servo gets deleted, full stop; then this is an alarm accessory, not an infusion controller, and I have let worse alarm acce\u2026 [truncated 5114 chars]"
+  },
+  "rural_clinic_physician": {
+   "final_pick": "DripGuard",
+   "changed_mind": false,
+   "rebuttal_to_strongest_objection_against_your_pick": "The strongest objection is 'the LDR drop counter is the whole product and it will miscount, and once it cries wolf the nurse unplugs it.' Correct, and that is exactly why I still back it: it is the only one of the six where the failure mode is an engineering problem the team can fix in 36 hours, not a market, liability or physics problem. On my ward tonight there are two nurses for 30 beds, three of them on gravity ceftriaxone or metronidazole, and nobody is in the room when the bag runs dry. I do not need mL/h to two decimals; I need 'drip stopped' and 'empty in 10 minutes' to reach the nurse at the desk, and a beam-break counter with a drop-factor entry and hysteresis does that. Every other project either measures nothing (FeverLine, ChemoChain's \u00b12\u00b0C), measures the wrong thing (BreathBuddy exhale, CleanHands carts), or hands a student chatbot a cytotoxic drug (PillStep). DripAssist exists at $300 and I have never seen one in Kenya; a $15 alarm-only clip the county can buy 30 of is a different product. But the servo goes, or I would not let it on a bed either.",
+   "attack_on_the_leader_DripGuard": "'You just told me 42 mL/h on a set you never asked the drop factor for, under my phone torch the count jumped, and a minute ago you said this replaces the nurse checking the bag. So on a ward with two nurses, every false alarm teaches them to mute it, every missed empty bag happens while they now trust your box instead of walking the round \u2014 you have not made her job easier, you have given her a third thing to distrust, and if that servo ever touches a vancomycin line it is your name on the incident form.' If the count is not rock solid for five minutes on a real drip chamber at the table, nothing else on the Pi screen matters.",
+   "must_fix_before_demo": [
+    "SENSOR, not dashboard: throw out the bare LDR. Pulsed IR LED (from the remote kit) + IR receiver/phototransistor facing each other inside a black-taped or 3D-printed clip that fully encloses a REAL drip chamber (buy a 20 gtt/mL giving set and a 500 mL saline/water bag from a farm or pet supply store Saturday morning; a pump into a cup is disqualifying). Modulate the LED ~1 kHz, detect the AC dip, threshold on the derivative not the level, 40 ms debounce, fault state on the LCD for 'clip removed / ambient too bright / no signal'. Keypad entry before monitoring starts: drop factor (20 default, 10/15/60 selectable), ordered mL/h, bag volume. LCD shows measured vs ordered and MINUTES TO EMPTY. Show the raw per-drop pulse on the Pi so the hardware judge can see it.",
+    "DELETE THE SERVO. LCD line 2 permanently reads 'MONITOR ONLY - does not control flow' and the slide says it. Tiered alarms, not four buzzers: bedside LED/LCD when drift >25% sustained 2 minutes (one arm bend must not trigger); nurse-station flag at 60 s unacknowledged; ONE buzzer only for drip stopped (no drop for 3x the expected interval, min 30 s) or predicted empty <10 min; an acknowledge/snooze button at the bed, every acknowledgement logged with time-to-ack. Distinct tones per bed on the Pi.",
+    "WORKS WITH NO VENUE WI-FI AND NO WALL POWER: ESP32 soft-AP/BLE to the Pi as local hub, bedside node on the LiPo, nurse-station shows 'last seen 4 min ago' when a node drops. Run TWO beds live (ESP32 + Uno) at different rates, let one run dry on camera, have a judge twist the roller clamp and see the alarm inside 10 s. Claude drafts the handover note only from the timestamped event log, every sentence cites an event, no vitals, no drug names it was not given; keep a cached note and a 'Claude unavailable, raw log attached' fallback, and pull the Wi-Fi at the table to prove it."
+   ],
+   "track_combo_you_would_enter": [
+    "Best Hardware",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "Convex (nurse-station shared state)",
+    "MLH Tiger Data (drop-rate time series)"
+   ],
+   "does_any_crypto_fit_honestly": "No. The only candidate is ChemoChain and it is a notary stamp on a \u00b12\u00b0C sensor; KEMSA already sends me a $30 LogTag in the vaccine box and the courier signs a paper. A signed log on the ESP32 plus the receiving pharmacist's timestamp gives all the tamper evidence anyone has ever asked me for. Putting Solana or x402 on DripGuard would be visible sponsor-chasing and would cost the team the credibility they need with the clinical judges. Skip Solana and x402 entirely.",
+   "startup_potential_1_10": 4,
+   "why_startup_score": "The need is real and enormous in numbers (most beds in the world run gravity drips) but the buyer is the problem: in Kenya it is a county procurement office or a donor (UNICEF, PEPFAR, church hospital networks) with no budget line for 'IV alarm', and the price has to be under about $20 per bed with a 2-year battery and a wipeable case or it dies in the store room. DripAssist has existed at $300 for years and I have never seen one; Shift Labs barely moves. In the US the hospital runs pumps and the gravity-drip moment is a shortage story, not a market. Regulatory: alarm-only keeps you an accessory/monitor rather than an infusion controller (880.5725 Class II with pump-recall baggage), but any clinical claim still needs CE/510(k)-type work and Kenya PPB registration; no reimbursement code anywhere. Realistic path is an NGO-funded pilot and a nonprofit or a Rice 360-style device programme, not a venture company. As a hackathon project it is a 9; as a startup it is a 4, and the team should say that out loud rather than pitch a unicorn."
+  },
+  "respiratory_therapist": {
+   "final_pick": "DripGuard",
+   "changed_mind": false,
+   "rebuttal_to_strongest_objection_against_your_pick": "The strongest objection is 'the drop counter is the whole product and an LDR under gym lights will miscount, so the whole safety story dies at the table.' Correct as written, and that's why the fix isn't optional. A beam-break through an opaque clip is a solved problem: pulse the IR LED from the remote kit at ~1 kHz, read the IR receiver/phototransistor synchronously, detect the AC dip per drop, and the venue lights become DC that the filter ignores. Add a fault state ('clip removed / ambient too bright / no drops 30s') so the device says 'I can't see' instead of lying. I count drops with my thumb and a watch on every gravity line I've ever hung on a ward without pumps; a shielded beam-break that does that and shows minutes-to-empty is believable to me in a way a bare photoresistor never would be. If they can't get a stable count on a real drip chamber by Saturday noon, they pivot the demo to the empty-bag/stopped-drip alarm only, which is the alarm nurses actually want anyway.",
+   "attack_on_the_leader_DripGuard": "'Show me a nurse who would clip this on. You've put a hobby servo on a roller clamp \u2014 roller clamps don't pinch, they roll, so your servo either does nothing or jams the line shut on a vanc or a vesicant with no one noticing; you're now an infusion controller with no fail-safe. And you've put four buzzers at a bedside. I work on a surgical ward: every alarm that cries wolf twice gets muted by night shift by Tuesday, and your 20% drift alarm fires every time the patient bends their elbow or someone bumps the pole. So you've built the two things that get a device thrown off a ward \u2014 an actuator nobody trusts and an alarm nobody owns \u2014 wrapped around a sensor you haven't proven on a real drip chamber. What's your false-alarm rate per hour, and what happens when the Pi loses Wi-Fi mid-shift?'",
+   "must_fix_before_demo": [
+    "Delete the servo clamp entirely. LCD line 2 permanently reads 'MONITOR ONLY \u2013 does not control flow' and the slide says it out loud. Spend those hours on the sensor: pulsed IR LED + IR receiver/phototransistor in a black-taped/3D-printed clip that fully encloses a REAL drip chamber from a real gravity set (pet/farm supply Saturday AM, saline or water bag on a pole). Threshold on the derivative/AC dip, not level; show the raw per-drop pulse trace on the Pi; fault state for 'sensor blocked / ambient too bright / clip off'.",
+    "Tiered alarm, not four screaming buzzers. Nurse enters drop factor (10/15/20/60 gtt/mL), ordered mL/h and bag volume on the keypad before monitoring starts. Drift >25% sustained 60s -> LED + LCD only; unacknowledged 60s -> nurse-station flag; stopped drip (no drops 30s) or minutes-to-empty <10 -> ONE buzzer, distinct tone per bed, with an acknowledge/snooze button logged with time-to-ack. 'Empty in 12 min' countdown is the headline number on both LCD and station.",
+    "Zero dependence on venue Wi-Fi and zero Claude hallucination. ESP32 nodes talk to the Pi over the Pi's own hotspot/ESP soft-AP; run two beds live, deliberately let one run dry or have a judge twist the roller clamp, alarm within 10s. Station page degrades to 'last seen 4 min ago'. Claude only drafts the handover note from the structured event log, every sentence tied to a timestamped event, refuses to mention vitals/drug/condition not in the log; pull Wi-Fi at the table and the box still alarms and the note says 'Claude unavailable, raw log attached' (cached note ready)."
+   ],
+   "track_combo_you_would_enter": [
+    "Best Hardware",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "SpacetimeDB (or Convex \u2014 pick one, not both)",
+    "MLH Tiger Data"
+   ],
+   "does_any_crypto_fit_honestly": "No. The only idea that could wear Solana is ChemoChain, and 18 of 18 personas including the Solana judge said the chain is a notary stamp on a \u00b12\u00b0C DHT11 reading nobody will act on. For DripGuard there is no party that distrusts another enough to need a ledger \u2014 the nurse, the charge nurse and the patient are in the same building. x402 is 18+ verified accounts to sell drip logs; absurd. Drop every crypto track and say so if asked \u2014 judges respect 'it didn't fit' more than a bolted-on wallet.",
+   "startup_potential_1_10": 3,
+   "why_startup_score": "Real need, bad business. US hospitals run pumps; US use is a shortage stopgap with no CPT code and no reimbursement, so no US buyer. Real market is LMIC wards and NGOs buying on grant money \u2014 low price, slow procurement, no budget line. Alarm-only keeps you out of the infusion-pump bucket but you're still a Class II device needing a 510(k) (DripAssist went that road and sits at ~$300 barely selling), plus IEC 60601 alarm standards nobody on a student team has heard of. Incumbents: DripAssist, cheap Chinese drip monitors on Alibaba, and ultimately $500 refurbished pumps. The honest startup path is a <$15 open-hardware kit through an NGO like PATH or a medical-device ministry tender, which is a nonprofit, not a company. Great hackathon project; weak venture."
+  },
+  "oral_chemo_patient": {
+   "unparsed_raw": "{\"final_pick\": \"DripGuard\", \"changed_mind\": false, \"rebuttal_to_strongest_objection_against_your_pick\": \"The strongest objection is 'the drop sensor is the whole product and an LDR under gym lights will miscount, so the alarm cries wolf and gets unplugged.' Fair, and I said it myself. But it's a Saturday-morning engineering problem, not a reason to pick a worse idea: a black-taped clip with a pulsed IR LED and the IR receiver, thresholding on the dip not the level, is a few hours and some electrical tape. E\u2026 [truncated 3955 chars]"
+  },
+  "caregiver_daughter": {
+   "final_pick": "DripGuard",
+   "changed_mind": false,
+   "rebuttal_to_strongest_objection_against_your_pick": "The strongest objection is that the drop counter is the whole product and an LDR will miscount under venue lights, so the alarm cries wolf and gets muted. Fine - that is an engineering problem with a known answer, not a reason to pick a worse idea. I have watched my mother's home-infusion nurse count drops against her watch for a full minute, three times a visit, because that is literally how the rate is set. A pulsed IR LED and receiver inside a black clip that encloses the chamber, thresholding on the change in signal rather than the level, is a Saturday job for one person. Every other candidate has a fatal flaw you cannot engineer out in 36 hours: ChemoChain's sensor is \u00b12\u00b0C, BreathBuddy's motor won't spin on an inhale, PillStep needs a pharmacist to decant hazardous drugs, CleanHands can't tell a nurse from a cart, and FeverLine - my own nightmare - still makes me wake her up and type the number. DripGuard's flaw is a clip and a filter. And the servo? Everyone already agreed: it goes. Monitor, alarm, never touch the line. Nobody has to let a hobby servo near a vesicant for this to be worth building.",
+   "attack_on_the_leader_DripGuard": "\"Show me the empty-bag alarm right now, with the bag you brought, and tell me what a nurse does when this box says 'rate drifted 23%' at 3 a.m. and the patient just bent her arm.\" If the answer is a syringe dripping into a cup, or the alarm fires when I tap the pole, or you cannot say which drop factor the set is, the judge will say: \"So the only thing this device produces is a number you cannot vouch for, plus four buzzers. DripAssist is $300, FDA-cleared, and still nobody buys it - what are you except cheaper and noisier?\" And the honest follow-up that hurts: positional drift on a gravity line is normal, so a 20% alarm is alarm fatigue by design, and the first week it screams for nothing the nurse unplugs it and now the ward trusts it less than counting by hand. You do not survive that with a dashboard.",
+   "must_fix_before_demo": [
+    "Delete the servo clamp entirely; LCD second line permanently reads 'MONITOR ONLY - never controls flow'. Replace the bare LDR with the IR LED from the remote kit pulsed at ~1 kHz plus the IR receiver/phototransistor, both inside a black-taped or 3D-printed clip that fully encloses a REAL drip chamber (buy a gravity IV set + saline/water bag from a farm or pet supply Saturday morning). Trigger on the derivative of the signal, not the level; add a fault state 'clip removed / ambient too bright / no drops 60 s'.",
+    "Make the number believable and the alarms tiered: keypad entry of drop factor (10/15/20/60 gtt/mL), ordered mL/h and bag volume before monitoring starts; LCD shows measured vs ordered and 'EMPTY IN 12 MIN'. Drift alarm only if >25% sustained over a 2-minute rolling window (not instantaneous); stage 1 = LED + LCD, stage 2 = nurse-station flag after 60 s, stage 3 = ONE buzzer only for drip-stopped, empty-in-<5-min or empty. Acknowledge button logged with time-to-ack. Throw the other three buzzers in the bag.",
+    "Demo as one causal loop with zero venue Wi-Fi: two beds (ESP32 + Uno) on real chambers at different rates, Pi as local hub on its own hotspot/soft-AP, judge twists the roller clamp on bed 2 and the bedside LED, nurse-station flag and buzzer fire within 10 s; Claude handover note cites that exact timestamped event and nothing else, with a pre-cached note ready if the API hangs and a 'last seen 4 min ago' state if a node drops."
+   ],
+   "track_combo_you_would_enter": [
+    "Best Hardware",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "SpacetimeDB",
+    "MLH Tiger Data"
+   ],
+   "does_any_crypto_fit_honestly": "No. ChemoChain is the only one where you can even say the word Solana with a straight face, and it dies on a \u00b12\u00b0C DHT11 and a courier who already has a $20 Sensitech tag and a signature pad. x402 requires every member to be 18+ and verified for a feature nobody at a handover desk wants. Do not bolt a token onto DripGuard; the Anthropic and People-First judges will smell it and you lose more than you gain.",
+   "startup_potential_1_10": 3,
+   "why_startup_score": "As a weekend hack it is the clear winner; as a company it is thin. Alarm-only keeps you out of the infusion-pump bucket, but a drop counter that alarms is still a Class II accessory (DripAssist went through 510(k)), so you need roughly $100-300k and a year before a US hospital can pilot it. There is no reimbursement code - nobody bills for 'the drip was watched'. The US customer barely exists: chemo is never gravity here, and the pump/fluid shortages are episodic. The real buyer is an NGO, a ministry of health or a mission hospital in a low-income ward, which means grant cycles, no budget line, and a bill of materials that has to come in under about $15 at the bedside. DripAssist is already cleared, already $300, and still sells slowly, which tells you the problem is distribution and trust, not price alone. What saves it from a 2: the multi-bed nurse-station view is genuinely something DripAssist does not do, the BOM is real, and an IEEE/Engineering World Health style route to a few hundred units in Malawi or Guatemala is plausible. That is a good nonprofit or a good thesis, not a venture-backed company."
+  },
+  "fda_regulatory_consultant": {
+   "final_pick": "DripGuard",
+   "changed_mind": false,
+   "rebuttal_to_strongest_objection_against_your_pick": "The strongest objection is 'the drop counter is the whole product and an LDR under hall lights will miscount, so everything downstream is a dashboard with no sensor under it.' Correct as written, and I'd fail it too \u2014 but it is a solved engineering problem, not a concept flaw. Beam-break drop counting is how DripAssist got its 510(k). Fix: pulse the IR LED from the remote kit at ~1 kHz, read the phototransistor/IR receiver synchronously (sample LED-on minus LED-off), trigger on the derivative of the difference signal, not the level, inside an opaque black-taped or printed clip that fully encloses a real drip chamber. Add a debounce of 60 ms (no giving set exceeds ~15 drops/s), and a hard fault state: 'CLIP OPEN / AMBIENT HIGH / NO DROPS 30 s'. Validate on Saturday by counting 100 drops into a syringe barrel at 20 gtt/mL \u2014 if you are within \u00b15% at 60 and 120 mL/h you can say the number out loud. The servo objection I don't rebut; I concede it and delete it.",
+   "attack_on_the_leader_DripGuard": "'Deleting the servo does not make this a wellness tool. An electronic monitor for gravity-flow infusion is its own classification \u2014 21 CFR 880.2420, Class II, 510(k) required, plus IEC 60601-1-8 alarm requirements \u2014 and DripAssist already cleared exactly this and sells almost none. So your \"works Monday\" claim is false in any US ward, your LMIC wards have no procurement line, and what I am looking at is a $15 uncleared clone of a $300 device nobody buys. Also: you never calibrated it. Show me 100 drops into a graduated cylinder right now, or the mL/h on that LCD is a guess.' If the team cannot answer both halves in 30 seconds, they lose Application and Intentionality in one sentence.",
+   "must_fix_before_demo": [
+    "Delete the servo clamp entirely; LCD boot screen and slide read 'MONITOR ONLY \u2014 alarms, never controls flow.' Keypad entry of drop factor (10/15/20/60 gtt/mL), ordered mL/h and bag volume before monitoring starts; LCD shows measured vs ordered and 'empty in NN min'. Drift alarm at >25% sustained 90 s (not 20% instantaneous), flow-stopped at 30 s no drops, empty at predicted volume. One buzzer only, two-stage: LED/LCD + nurse-station flag first, buzzer after 60 s unacknowledged; acknowledge button logged with time-to-ack.",
+    "Replace bare LDR with pulsed IR emitter + receiver in a light-tight clip on a REAL gravity giving set and saline/water bag on a pole (farm/pet supply Saturday morning). Synchronous detection, derivative threshold, 60 ms debounce, explicit sensor-fault state. Calibrate 100 drops at two rates and print the error on a card at the table. Run bedside node on LiPo and pull wall power on camera.",
+    "Zero dependence on venue Wi-Fi: Pi runs its own AP, ESP32 nodes join it, two beds live during the pitch, one deliberately run dry or clamped by a judge. Claude handover note generated only from the structured event log, every sentence carrying a timestamp, hard refusal of anything not logged (no vitals, no drug names); cached note ready if the API hangs, and show the 'Claude unavailable, raw log attached' path."
+   ],
+   "track_combo_you_would_enter": [
+    "Best Hardware",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "SpacetimeDB (or Convex \u2014 pick one, not both)",
+    "MLH Tiger Data"
+   ],
+   "does_any_crypto_fit_honestly": "No. The only candidate with a plausible chain story is ChemoChain, and it fails on its own terms: compounded 503A chemo is exempt from DSCSA, DSCSA is EPCIS serialization not temperature, a DHT11 at \u00b12 \u00b0C cannot adjudicate a 2\u20138 \u00b0C excursion, and a signed log with a receiving-pharmacy timestamp gives you the tamper evidence without a chain. x402 is a paywall on a record the verifier is legally entitled to. Do not enter Solana or x402 with any of the six; a judge who knows the space will smell sponsor bait and it costs you credibility at every other table.",
+   "startup_potential_1_10": 3,
+   "why_startup_score": "Regulatory: even alarm-only, this is 880.2420 (electronic monitor for gravity-flow infusion), Class II, 510(k) with 60601-1 and 60601-1-8 testing \u2014 call it $200\u2013400k and 12\u201318 months before a US bed. Reimbursement: none; there is no CPT/DRG line for a drip monitor, so it's a capital/consumable purchase from a nursing or biomed budget that is already fighting for pumps. Buyer: US acute wards run pumps; your real buyer is an LMIC ministry of health, an NGO (PATH, MSF) or a district hospital with no procurement line and a wariness about electronics that need charging. Incumbents: DripAssist (Shift Labs) cleared exactly this, priced at ~$300, and has struggled for a decade; Monidrop in Europe likewise. The wedge is a sub-$20 BOM and multi-bed aggregation, which is a real but thin advantage, and the US IV-fluid/pump shortage angle is transient. Great hackathon project, honest humanitarian device, poor venture. If you pursue it, pursue it as a nonprofit or an NGO-funded product, not a startup."
+  },
+  "healthtech_vc": {
+   "final_pick": "DripGuard",
+   "changed_mind": false,
+   "rebuttal_to_strongest_objection_against_your_pick": "Strongest objection is mine from round 1 plus the sensor crowd: 'DripAssist already exists at $300 and barely sells, and your LDR will miscount under gym lights, so you're a worse DripAssist with a dashboard.' Rebuttal for the table, not for a board deck: the hackathon is judged on a nurse's job getting visibly easier live, and DripAssist is a single-bed device with no station view \u2014 the thing a charge nurse covering 12 gravity drips actually lacks is 'which bed empties next.' Two real drip chambers running at different rates, one deliberately run dry, time-to-empty per bed on the Pi, alarm within 10 seconds of a judge twisting the clamp \u2014 that is a physical-input causal loop no other candidate on this list can show. The sensor objection is real but it's an engineering Saturday, not a thesis flaw: pulsed IR beam-break in an opaque clip, threshold on the derivative, and a 'sensor fault' state kills it. Every other project either has no physical input doing work (FeverLine), a sensor that physically can't produce the signal (BreathBuddy inhale), a liability demo (PillStep), a tutorial (CleanHands), or sponsor bingo (ChemoChain).",
+   "attack_on_the_leader_DripGuard": "'You just told me you deleted the servo clamp because no clinician would allow it. Fine. So what's left is a drop counter with an alarm \u2014 which is DripAssist, 510(k)-cleared, on the market since 2016 at $300, and Shift Labs still can't get hospitals to buy it. Your drop counter is an LDR from a $40 Arduino kit, your rate number depends on a nurse correctly keying 10/15/20/60 gtt/mL every bag, and your nurse-station view runs on venue Wi-Fi you don't have. Name the person who writes the check, and tell me why they didn't already write it to DripAssist.' If the count twitches once while I'm saying that, the answer doesn't matter.",
+   "must_fix_before_demo": [
+    "Delete the servo clamp entirely and print 'MONITOR ONLY \u2014 never controls flow' on the LCD and the first slide. Replace the bare LDR with the kit IR LED + IR receiver/phototransistor in an opaque black-taped or 3D-printed clip that fully encloses a real drip chamber; pulse the LED (~1 kHz) and detect the AC dip / derivative, not the level; keypad entry of drop factor (10/15/20/60 gtt/mL), ordered mL/h and bag volume; LCD shows measured vs ordered and 'empty in NN min'; explicit fault states for clip removed / ambient too bright / no drops 30 s.",
+    "Buy two real gravity IV giving sets and saline (or water) bags Saturday morning (farm/pet/vet supply or pharmacy) and hang them on a stand. Two beds live at the table (ESP32 + Uno), different rates, one deliberately run dry on camera, one judge invited to twist the roller clamp and see the bedside LED/LCD within 10 s, buzzer only on empty/stopped, single ack button logged with time-to-acknowledge, station escalation at 60 s unacknowledged. One buzzer, not four.",
+    "Zero dependence on venue Wi-Fi: ESP32 soft-AP or BLE to the Pi as local hub, Convex/Tiger sync opportunistic, station view degrades to 'last seen 4 min ago'. Claude only drafts the handover note from the structured event log, every sentence tied to a timestamped event, refuses anything not logged (no vitals, no drug names); cache a pre-generated note and show 'Claude unavailable, raw log attached' when you pull the uplink live. Print a BOM under $15 for the bedside node."
+   ],
+   "track_combo_you_would_enter": [
+    "Best Hardware",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "Convex (not SpacetimeDB \u2014 pick one, the $5k one, and make the multi-bed reactive view the reason)",
+    "MLH Tiger Data (drop-rate time series, trivial to add honestly)"
+   ],
+   "does_any_crypto_fit_honestly": "No. ChemoChain is the only candidate where Solana isn't absurd, and even its sponsor judge called it a notary stamp \u2014 an ESP32-signed hash chain plus the receiving pharmacist's signed timestamp gives you the tamper evidence, nobody in the custody loop distrusts each other enough to need a chain, compounded chemo is DSCSA-exempt, and the DHT11 can't resolve the 2\u20138\u00b0C question the record is supposedly attesting. x402 requires every member 18+ and KYC'd and asks a verifier to pay for a record they're legally entitled to. Don't enter Solana or x402 with DripGuard; a 'payments for IV monitoring' slide would cost you credibility with the three judges that matter.",
+   "startup_potential_1_10": 3,
+   "why_startup_score": "Reimbursement: none. No CPT code, no DRG uplift, no payer cares whether the drip was gravity or pumped \u2014 this is hospital capex or NGO procurement. FDA: even monitor-only you are an infusion monitoring accessory in the 880.5725 neighbourhood; DripAssist needed a 510(k), so budget $300\u2013800k and 12\u201318 months before a US hospital biomed signs off, and the clamp would have made it an infusion controller outright. Buyer: in the US the gravity-drip problem only exists in shortages and ambulatory antibiotic/hydration settings; the real market is MoH/UNICEF/PATH tenders in LMICs where the price ceiling is $20\u201350 and sales cycles are 2\u20133 years. Incumbents: DripAssist (Shift Labs) has been cleared and funded since 2015 and is still sub-scale, which tells you the market pulled nothing; Chinese drip-counter alarms exist on Alibaba under $30; pumps are falling in price. Wedge that could get it to a 5: multi-bed nurse-station view sold as a ward-level staffing tool to an NGO or a hospital in a shortage, with a disposable clip under $5 \u2014 but that is a hard, slow, low-margin business. Great hackathon project, poor venture. Say that out loud to the Microsoft judge; they'll respect it more than a TAM slide."
+  },
+  "hospital_biomed_engineer": {
+   "unparsed_raw": "{\"final_pick\": \"DripGuard\", \"changed_mind\": false, \"rebuttal_to_strongest_objection_against_your_pick\": \"The strongest objection is 'the sensor is the whole product and an LDR will miscount under venue light.' Correct, and that is why the LDR is going in the bin, not why the idea dies. A drop through a chamber is a beam-break event with a sharp edge, which is the easiest optical signal there is if you stop measuring DC level. Pulse the IR LED from the remote kit at 1 kHz off an ESP32 timer, read the phototr\u2026 [truncated 4773 chars]"
+  },
+  "dscsa_compliance_lead": {
+   "unparsed_raw": "{\"final_pick\": \"DripGuard\", \"changed_mind\": false, \"rebuttal_to_strongest_objection_against_your_pick\": \"The strongest objection is 'the LDR drop counter is the whole product and it will miscount under venue light, so the alarms and the nurse station are a dashboard with no sensor under it.' Correct as written, and that is why the fix list is the sensor, not the features. A modulated IR beam-break (IR LED from the remote kit PWM'd at ~1 kHz, phototransistor/IR receiver on the other side, synchronous demodul\u2026 [truncated 6125 chars]"
+  },
+  "calhacks_main_judge": {
+   "final_pick": "DripGuard",
+   "changed_mind": false,
+   "rebuttal_to_strongest_objection_against_your_pick": "The strongest objection isn't the servo (that's a one-line deletion); it's 'an LDR on a clear chamber under gym lights will miscount and the whole product dies in minute two.' Rebuttal: drop detection is a solved beam-break problem if you stop treating it as a light-level problem. The kit has an IR LED (pull it off the remote or use any LED) plus the IR receiver/LDR; put them in an opaque clip (black electrical tape over a cut-down pill bottle or film canister works, 3D-print if the Bambu is on site), PWM the emitter at ~1 kHz, and detect the AC dip on the ESP32 ADC with a derivative threshold and a 40 ms refractory window. Ambient light is DC and gets rejected; a drop is a 5-15 ms transient. I've seen students get a clean per-drop pulse train in four hours doing exactly this. If you can't, you don't have a project, so that's the first thing built Friday night, not Saturday afternoon. Then the rest of the stack (drop factor, time-to-empty, nurse station) sits on a number that is actually true, and 'monitor, never actuate' answers every clinician in that objection list.",
+   "attack_on_the_leader_DripGuard": "'Show me the raw ADC trace right now, then let me lean over the chamber with my phone flashlight and twist the clamp to 60 drops/min. If your count is off by more than two drops in a minute, your mL/h is fiction, your 20% drift alarm is a random number generator, and the nurse-station dashboard and the Claude handover note are a pretty UI sitting on top of a sensor that doesn't work. And who is the buyer on Monday? DripAssist exists at $300 and barely sells, no US ward runs chemo by gravity, and an LMIC hospital has no procurement line for this. So you've got a hard sensor problem and no customer with a wallet. Which one are you going to fix in 36 hours?'",
+   "must_fix_before_demo": [
+    "Delete the servo clamp entirely; LCD boot screen and slide read 'MONITOR ONLY \u2013 never controls flow'. Replace LDR-on-level with a modulated IR beam-break (1 kHz PWM emitter, AC/derivative detection, 40 ms refractory) inside a light-tight clip on a REAL gravity IV set + saline/water bag on a pole (vet/farm supply Saturday AM). Show the raw drop pulse trace on the Pi and a fault state for 'clip removed / sensor blocked / too bright'.",
+    "Make the number honest: keypad entry of drop factor (10/15/20/60 gtt/mL) and ordered mL/h and bag volume before monitoring arms; display measured vs ordered and 'empty in N min'. Tiered alerts: LCD/LED first, nurse-station flag at 60 s, ONE buzzer only for stopped/empty/unacknowledged; acknowledge button logged with time-to-ack. No alarm on <20% drift for under 90 s so an arm bend doesn't fire it.",
+    "Zero dependence on venue Wi-Fi: Pi runs its own AP, two bedside nodes (ESP32 + Uno) join it, two chambers run live at different rates and you let one run dry on camera. Claude handover note generated only from the structured event log, every sentence tagged with a timestamp, refuses anything not logged; cache a pre-generated note and show 'Claude unavailable, raw log attached' when you pull the uplink."
+   ],
+   "track_combo_you_would_enter": [
+    "Best Hardware",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "Convex (or SpacetimeDB, pick one, not both)",
+    "MLH Tiger Data"
+   ],
+   "does_any_crypto_fit_honestly": "No. The only candidate with a crypto story is ChemoChain, and the Solana judge himself said an offline hash chain plus a signed receiver timestamp gets 90% of the tamper evidence; nobody at a pharmacy loading dock distrusts each other enough to need a shared ledger, and the DHT11's \u00b12\u00b0C means you'd be notarizing noise. x402 is a verifier paying for a record they're legally entitled to, which is a side door nobody will walk through. Skip Solana and x402 entirely; entering them costs you credibility with every clinical judge in the room.",
+   "startup_potential_1_10": 3,
+   "why_startup_score": "Good hackathon project, weak company. Alarm-only keeps you in the 510(k)-exempt-ish accessory territory, but the moment a US hospital uses it to make a nursing decision you're a Class II infusion accessory with a quality system and a $300k+ regulatory bill. No CPT code, no reimbursement; the buyer is a hospital procurement office or an NGO buying for LMIC wards, both slow and price-brutal. DripAssist already sells the exact thing at $300 and is barely a business; infusion pumps keep getting cheaper and refurbished pumps flood LMIC markets. The real wedge, a sub-$20 BOM plus a nurse-station view for understaffed wards, is a real need but a grant/NGO distribution play, not a venture-scale market. Worth a pilot with a global-health nonprofit; not worth quitting school for."
+  },
+  "hardware_judge": {
+   "unparsed_raw": "{\"final_pick\": \"DripGuard\", \"changed_mind\": false, \"rebuttal_to_strongest_objection_against_your_pick\": \"The strongest objection is 'the drop counter is the whole product and it won't survive venue light.' Correct, and that is exactly why it is the only project on this list where the hardware is essential rather than decorative: if the sensor works, nothing else in the room can be faked, and if it doesn't, the team deserves to lose. It is also solvable in 36 hours with parts they have. Don't use the bare Cd\u2026 [truncated 5432 chars]"
+  },
+  "people_first_judge": {
+   "unparsed_raw": "{\"final_pick\": \"DripGuard\", \"changed_mind\": false, \"rebuttal_to_strongest_objection_against_your_pick\": \"The strongest objection is mine and the biomed engineer's combined: the sensor is the whole product, and the ward you named has nobody in the room and no Wi-Fi. Rebuttal: both are fixable in 36 hours precisely because they are small. A pulsed-IR beam-break in a black clip with derivative thresholding is a Saturday-morning job, not a research problem, and DripAssist proved drop counting works commercially\u2026 [truncated 4654 chars]"
+  },
+  "anthropic_judge": {
+   "unparsed_raw": "{\"final_pick\": \"DripGuard\", \"changed_mind\": false, \"rebuttal_to_strongest_objection_against_your_pick\": \"The strongest objection against my pick from my own seat is \\\"Claude is bolted on.\\\" It is, as written. The fix is to make Claude's boundary the product: Claude never decides anything about the drip. Rate drift, empty-bag, time-to-empty are deterministic code on the ESP32 and work with the Wi-Fi cable physically unplugged. Claude gets exactly one job: turn a structured JSON event log (timestamps, bed id,\u2026 [truncated 5480 chars]"
+  },
+  "solana_crypto_judge": {
+   "final_pick": "DripGuard",
+   "changed_mind": false,
+   "rebuttal_to_strongest_objection_against_your_pick": "The strongest objection is 'the LDR drop counter is the whole product and it will miscount under venue light, so everything above it is a dashboard with no sensor.' Correct as written, and that's why the fix is the whole Saturday: swap the bare LDR for the kit's IR LED (from the remote) driven at ~1 kHz PWM off the ESP32, with the IR receiver/phototransistor opposite it inside a black-taped or printed clip that fully wraps a real drip chamber. Sample the receiver in sync with the carrier, subtract the off-phase (ambient) sample, and trigger on the derivative of that difference, not the level, with a 40 ms refractory window so a 60 gtt/mL microdrip at 150 mL/h (~2.5 drops/s) still resolves. Add a fault state: 'clip open / ambient saturated / no drops 30 s' is a different message than 'bag empty'. Then I'll stand there with my phone flash on the chamber for 20 seconds and if the count doesn't move, the objection is dead. If you can't get a clean per-drop pulse on the Pi graph by Saturday 2 PM, you fall back to the shrouded LDR plus a chamber filled with saline on a real set, but you don't fall back to a syringe or a pump into a cup.",
+   "attack_on_the_leader_DripGuard": "'Hand me the roller clamp. I'm going to slow it 15% and hold my phone flashlight on the chamber \u2014 tell me in 30 seconds whether your mL/h number is right, and then tell me why a nurse would buy this instead of the $300 DripAssist that already cleared FDA and still barely sells.' If the rate wobbles, every word about Claude, SpacetimeDB and nurse stations is a slide over a broken sensor, and if your answer to DripAssist is 'ours is cheaper' you'd better have the BOM on the table.",
+   "must_fix_before_demo": [
+    "Sensor: pulsed IR emitter + receiver in a light-tight clip on a REAL gravity IV set and saline bag on a pole (farm/pet supply Saturday morning); synchronous ambient subtraction, derivative threshold, fault states for clip-off/ambient/no-drops; raw ADC trace with per-drop pulse visible on the Pi during the demo.",
+    "Delete the servo clamp. Keypad entry of drop factor (10/15/20/60 gtt/mL), ordered mL/h and bag volume; LCD shows measured vs ordered and 'empty in N min'; two-stage alerts (LED/LCD \u2192 nurse station after 60 s \u2192 ONE buzzer only for stopped/empty), acknowledge button logged with time-to-ack; LCD permanently reads 'MONITOR ONLY \u2014 does not control flow'.",
+    "Zero venue Wi-Fi dependency: ESP32s talk to the Pi over the Pi's own hotspot/soft-AP, two beds live simultaneously at different rates, one deliberately run dry on camera; Claude handover note only cites timestamped log events, with a cached note ready and a 'Claude unavailable, raw log attached' path you demonstrate by pulling the uplink."
+   ],
+   "track_combo_you_would_enter": [
+    "Best Hardware",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "Convex (pick one of Convex/SpacetimeDB, not both)",
+    "MLH Tiger Data"
+   ],
+   "does_any_crypto_fit_honestly": "No. I run the Solana table and I'd rather give the prize to nobody than to a notary stamp. ChemoChain is the only candidate with a story, and the story fails on its own terms: a DHT11 at \u00b12\u00b0C can't adjudicate a 2\u20138\u00b0C excursion, so anchoring that log on-chain is immutable noise; the counterparties (pharmacy, courier, clinic) all already trust the pharmacy's signature and the $20 Sensitech logger, so there is no mutual-distrust moment where a shared ledger is load-bearing; and compounded chemo is DSCSA-exempt, so the 'why now' is wrong. x402 for a verifier to buy a record they're legally entitled to is a side door nobody walks through. Bolting Solana onto DripGuard (anchoring alarm logs, 'proof the nurse acknowledged') would be worse \u2014 nurses don't audit each other with a chain, and I'd call it out at the table. Skip my track, win Hardware and People-First.",
+   "startup_potential_1_10": 4,
+   "why_startup_score": "Real problem, real community, but a hard business. Alarm-only is still an infusion-pump accessory the FDA has treated as Class II (DripAssist went 510(k)), so you're looking at a quality system and ~$100k+ before a US sale, with no CPT/reimbursement code \u2014 hospitals don't get paid more for gravity drips being monitored. The real buyer is MOH procurement, NGOs and mission hospitals in LMICs, which means tenders, distributors and $15 BOM targets with thin margins; the US angle is only the periodic pump/fluid shortage. Incumbent evidence is discouraging: Shift Labs' DripAssist is a good product at $300 and has not scaled. What a startup version has going for it: a sub-$30 unit with a multi-bed station view and offline-first design is a genuinely different price point, and a nursing-school or NGO pilot is reachable. It's a fundable social-impact hardware company or a grant-funded nonprofit, not a venture-scale story."
+  },
+  "presage_judge": {
+   "final_pick": "DripGuard",
+   "changed_mind": true,
+   "rebuttal_to_strongest_objection_against_your_pick": "The strongest objection is 'the LDR drop counter is the whole product and it will miscount under venue lights, so everything above it is a dashboard with no sensor.' Correct as written, and that is why I moved off BreathBuddy: BreathBuddy's core sensor (toy-motor back-EMF on an inhale) is a physics gamble I have seen fail at three hackathons; DripGuard's core sensor is a solved problem if you build it right. Beam-break drop detection is a 40-year-old technique: IR LED pulsed at ~1 kHz, phototransistor/IR receiver on the other side of the chamber, opaque clip, detect the AC dip not the DC level, debounce 80 ms, minimum inter-drop 150 ms. Fluorescent flicker is 120 Hz and a phone flash is DC, both reject trivially with a 1 kHz carrier. If the team can show me a raw per-drop pulse train on the LCD with zero false counts while I wave my phone torch over the clip for 30 seconds, the objection is dead and the rest of the stack is earned. And it's honest about me: it doesn't use Presage, and I would rather see them not bolt my SDK on than fake a 'patient engagement' panel nobody asked for.",
+   "attack_on_the_leader_DripGuard": "'Your rate number is fiction and your alarm is a liability: you have no idea whether that's a 20 or 60 gtt/mL set, your clip isn't light-tight so I just made it alarm with my phone torch, and that servo on the roller clamp makes you an unapproved infusion controller with no fail-safe \u2014 so tell me, which is it: a monitor nurses mute by Tuesday, or a flow controller the hospital bans on Monday?' If the answer to any part of that takes more than one sentence at the table, the project loses Functionality and Intentionality in the first 60 seconds.",
+   "must_fix_before_demo": [
+    "Delete the servo clamp entirely; LCD line 2 permanently reads 'MONITOR ONLY - does not control flow'. Replace the LDR with a pulsed IR LED (from the remote kit or any IR LED) + IR receiver/phototransistor in a black-taped or 3D-printed clip that fully encloses a REAL drip chamber (buy a gravity IV giving set + saline/water bag from a farm/pet supply Saturday AM). Threshold on the AC derivative, 80 ms debounce, fault state 'CLIP OPEN / AMBIENT TOO BRIGHT' shown on LCD. Pass test: 5 minutes, zero false drops with a phone torch waved over it.",
+    "Make the mL/h honest: keypad entry of drop factor (10/15/20/60 gtt/mL, default 20) + ordered mL/h + bag volume before monitoring starts; LCD shows 'measured vs ordered' and 'empty in NN min'. Alarms tiered: LED+LCD at >20% drift sustained 60 s; nurse-station flag at 60 s unacknowledged; ONE buzzer only for drip-stopped (no drop for 3x expected interval) or empty; acknowledge button at bed, time-to-ack logged. Three of the four buzzers go back in the box.",
+    "Zero dependence on venue Wi-Fi: Pi runs its own hotspot/soft-AP, ESP32(s) join it, SpacetimeDB/Convex local or cached, two live beds (ESP32 + Uno) on the station view with one deliberately running dry on camera. Claude handover note is generated only from the structured event log, every sentence carries a timestamp, and a cached note is ready; demo pulling the Pi's power to show the bedside unit still alarms on LiPo."
+   ],
+   "track_combo_you_would_enter": [
+    "Best Hardware",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "SpacetimeDB (or Convex, pick one, not both)",
+    "MLH Tiger Data"
+   ],
+   "does_any_crypto_fit_honestly": "No. ChemoChain is the only candidate where Solana isn't absurd, and even there a signed offline hash chain plus the receiving pharmacist's timestamp gives 90% of the tamper evidence; the anchor is a notary stamp for a problem the \u00b12\u00b0C DHT11 already lost. x402 'verifier pays to pull a record' is a sponsor side door, not a workflow anyone at a handover desk has. For DripGuard, don't even put Solana or x402 on the slide \u2014 a crypto logo next to a chemo drip is the fastest way to lose the clinical judges. Same honesty applies to my own track: Presage does not belong on DripGuard, and I'd score a bolted-on 'patient HR' panel lower than its absence.",
+   "startup_potential_1_10": 4,
+   "why_startup_score": "Great hackathon project, mediocre company. Alarm-only drop monitor is likely FDA Class II under 880.2400/880.5725-adjacent accessory territory \u2014 a 510(k) with DripAssist (Shift Labs) as predicate, so maybe $150-400k and a year, not fatal. But the buyer is the problem: no US CPT/reimbursement code, hospital procurement in LMIC wards has no budget line, DripAssist exists at ~$300 and barely sells, and US wards use pumps except in shortages. The real wedge is a sub-$30 BOM plus the multi-bed nurse-station view sold through NGO/MoH tenders (Malawi, India district hospitals) or as a shortage-contingency kit for US pharmacy directors \u2014 plausible, grant-funded, low margin. A 4: a real problem, a defensible cheap device, and a slow, unglamorous path to revenue that mostly runs through donors, not hospitals."
+  },
+  "cs_teammate": {
+   "final_pick": "DripGuard",
+   "changed_mind": false,
+   "rebuttal_to_strongest_objection_against_your_pick": "The strongest objection is 'the drop sensor is the whole product and an LDR under gym lights will miscount, so everything above it is a dashboard with no sensor.' Correct as written, which is why the LDR is gone. Plan: the kit's 38 kHz IR receiver (VS1838B-type) is a demodulating receiver \u2014 it ignores DC and 100/120 Hz fluorescent flicker by design. Drive an IR LED (desolder the one from the kit remote, or buy a 940 nm LED Saturday morning along with a real gravity IV set and 500 mL saline/water bag from a vet/farm supply) with a 38 kHz PWM from the ESP32 (ledc). Beam across the drip chamber, receiver outputs steady LOW while the beam is clean; a drop refracts the beam and gives a ~5-20 ms HIGH pulse. Count rising edges with 100 ms debounce in an ISR. Whole thing lives in a black-taped clothespin/cardboard clip that fully encloses the chamber, so a judge's phone flash does nothing. Fallback if the IR LED doesn't arrive: visible LED pulsed at 1 kHz + LDR, sample on/off and threshold on the difference's derivative, not the level. Either way I want the raw per-drop pulse visible on the Pi as a strip chart so the judge sees the count tick with every drop in front of them. Rate math: drops/min x 60 / drop factor = mL/h; at 20 gtt/mL and 100 mL/h that's 33 drops/min, 1 drop every 1.8 s \u2014 trivial timing. 60 gtt/mL microdrip is 100 drops/min, still 600 ms apart, fine for the ISR. Add fault states: 'clip open / beam blocked' (no LOW for 2 s) and 'no drops 60 s' as distinct from 'empty'. If that counter isn't rock solid by Saturday 6 PM we demo single-bed and cut the second bed, not the other way around.",
+   "attack_on_the_leader_DripGuard": "'Your alarm just went off while I leaned over the table \u2014 nothing changed on the line. Tell me, right now, what mL/h you'd show for this same drip if the nurse grabbed a 60-drop microdrip set instead of a 20, and why a ward nurse wouldn't mute a box that cries wolf when someone bumps the pole. Also: DripAssist does exactly this, is FDA-cleared, costs $300 and still doesn't sell \u2014 what did you build that it didn't?' If we can't answer that in under 30 seconds with the live count still correct on screen, the servo, the buzzers, the nurse station and the Claude note are all decoration on a broken sensor.",
+   "must_fix_before_demo": [
+    "Delete the servo clamp entirely (slide + LCD say 'MONITOR ONLY \u2014 never controls flow'). Sensor = 38 kHz-modulated IR beam-break in an opaque clip on a REAL gravity IV set + saline bag on a stand, bought Saturday morning; count rising edges in an ISR with 100 ms debounce; fault states for 'clip open', 'beam blocked', 'no drops 60 s', 'empty' (no drops 60 s AND predicted volume <5 mL). Raw drop pulses plotted live on the Pi. Test under a phone flashlight and with someone bumping the stand before we sleep Saturday.",
+    "Zero dependence on venue Wi-Fi: Pi runs hostapd + dnsmasq as its own AP, ESP32 (bed 1) joins it and POSTs/WebSockets JSON events; Uno (bed 2) talks to the Pi over USB serial so there are two live beds. Nurse-station page shows 'last seen Xs ago' and greys a bed after 30 s. Claude handover note generated from the structured event log only, each sentence tagged with an event timestamp; cache a pre-generated note and a 'Claude unavailable \u2014 raw log attached' path, and rehearse pulling the Pi's uplink live.",
+    "Alert UX a nurse would tolerate: before monitoring starts the keypad takes drop factor (10/15/20/60), ordered mL/h, bag volume; LCD shows measured vs ordered and 'empty in N min'. Tiered: LED+LCD at >20% drift sustained 60 s (not instantaneous), nurse-station flag at 60 s unacked, ONE buzzer only for stopped/empty/clip-open after a further 30 s; ack button logs time-to-acknowledge. Demo loop: judge twists the roller clamp, alarm + station flag within 10 s, note cites that event."
+   ],
+   "track_combo_you_would_enter": [
+    "Best Hardware",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "MLH Tiger Data (batch-upload the drop/alarm event log when any uplink exists; local SQLite otherwise)",
+    "MLH Gen AI",
+    "SpacetimeDB ONLY if the standalone server runs on the Pi 3 by Saturday noon; otherwise drop it and skip Convex too \u2014 a cloud reactive backend on confiscated-hotspot Wi-Fi is a demo killer"
+   ],
+   "does_any_crypto_fit_honestly": "No. Nothing in DripGuard has multiple mutually-distrusting parties or a payment, so Solana and x402 are pure track-bait and the Solana judge already said he can smell a notary stamp. ChemoChain was the one idea built around crypto and it got zero first-place votes and a DHT11 at \u00b12 \u00b0C under it. Also x402 needs 18+ verified accounts per member and reliable internet, neither guaranteed. Skip both and say so if asked; it reads better than a bolted-on anchor.",
+   "startup_potential_1_10": 3,
+   "why_startup_score": "Great hackathon project, weak company. Monitor-only keeps it out of the infusion-pump bucket, but a drop-rate alarm is still a Class II device (DripAssist went through 510(k); that's the predicate), so a real product is ~$200k+ and 12-18 months before a US sale. US hospitals run pumps and get no reimbursement code for this; the actual market is LMIC wards and NGOs/MoH procurement, where the buyer has no budget line and DripAssist at ~$300 already exists and barely sells. The honest wedge is a sub-$20 BOM bedside node plus a nurse-station view for understaffed wards, which is a grant/NGO/distributor play, not a venture one. Upside: if the pilot data shows fewer run-dry events, the multi-bed station view is a defensible layer DripAssist doesn't have. Realistic ceiling: a small hardware business or an open-source design adopted by an NGO. Not nothing, not a startup."
+  },
+  "medical_ethicist": {
+   "final_pick": "DripGuard",
+   "changed_mind": false,
+   "rebuttal_to_strongest_objection_against_your_pick": "The strongest objection is not the servo (that is simply deleted, non-negotiable) \u2014 it is alarm fatigue plus false alarms from an unshielded LDR, which means the device gets muted by Tuesday and then provides false reassurance. My rebuttal: that objection is about the Friday-night design, not the product. Alarm-only, with a pulsed-IR beam-break in a light-tight clip, a drift alarm that requires 60 seconds of sustained deviation rather than a single bent arm, a single buzzer reserved for 'no drops for 30 s' or 'empty', and every alarm acknowledged by a logged button press, is a monitor I would let a nursing director pilot. The cross-check that this is a sound design: the one failure that kills in gravity infusion is an unobserved stopped or runaway drip in a room with nobody in it; a tiered alarm that escalates to the station only when unacknowledged addresses that exact failure, and it never touches the line, so the worst case is the status quo. Every other candidate either adds no measurement (FeverLine), measures the wrong thing (CleanHands), cannot be disinfected (BreathBuddy), or dispenses advice or cytotoxics (PillStep).",
+   "attack_on_the_leader_DripGuard": "\"Your failure mode is silence, not noise. A nurse who sees a green bed on your station screen checks that bed less often. When the clip slips, the chamber fogs, or a judge's phone flash saturates the receiver, your counter reads zero or garbage, and you have shown me no state that distinguishes 'sensor fault' from 'bag empty' from 'drip stopped' \u2014 so either you false-alarm and get muted, or you smooth it away and a vancomycin line sits stopped for forty minutes while the dashboard says fine. You have replaced a nurse's eyes with a photoresistor you validated on one saline bag in a gym, you have no accuracy data at 10, 20 and 60 gtt/mL, and your mL/h number is fiction if the nurse forgets to enter the set type. False reassurance has a body count; a $5 drip-chamber sticker does not.\"",
+   "must_fix_before_demo": [
+    "Delete the servo and every mention of actuation. LCD line 2 permanently reads 'MONITOR ONLY \u2013 does not control flow'; the same sentence is on the first slide and said aloud in the first 20 seconds. Drop factor (10/15/20/60 gtt/mL) and target mL/h are mandatory keypad entries before monitoring starts \u2014 no silent default \u2014 and both are displayed next to the measured rate at all times.",
+    "Sensor and fault states: IR LED pulsed ~1 kHz with the IR receiver/phototransistor in an opaque black-taped or printed clip enclosing a REAL drip chamber (buy a gravity giving set + saline bag Saturday morning), threshold on the derivative with synchronous detection, and four explicit displayed states: RUNNING / DRIP STOPPED (no drops 30 s) / EMPTY / SENSOR FAULT (clip removed, ambient too bright, no signal). Sensor fault must never be reported as 'fine'. Show the raw per-drop trace on the Pi during the demo and let a judge twist the roller clamp.",
+    "Alarm hierarchy and logging: >20% drift sustained 60 s -> LED + LCD only; unacknowledged 60 s -> nurse-station flag; single buzzer only for DRIP STOPPED or EMPTY; acknowledge button logs time-to-ack; station shows 'last seen N min ago' when the link drops (ESP32 soft-AP/BLE to the Pi, no venue Wi-Fi). Claude drafts the handover note only from timestamped log events, every sentence linked to an event, refuses to state drug, vitals or patient condition, and falls back to 'Claude unavailable \u2013 raw log attached' when the API hangs (pre-cache one note)."
+   ],
+   "track_combo_you_would_enter": [
+    "Best Hardware",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "Convex (pick one of Convex/SpacetimeDB, not both)",
+    "MLH Tiger Data"
+   ],
+   "does_any_crypto_fit_honestly": "No. None of the six has a trust problem that a signed local log plus a receiving-party timestamp does not already solve. ChemoChain's Solana anchor is a notary stamp on a \u00b12\u00b0C DHT11 reading \u2014 an immutable record of noise \u2014 and x402 asks a verifier to pay for a record they are legally entitled to. Entering Solana or x402 with any of these would be visibly sponsor-chasing and would cost credibility with every clinical judge in the room. Do not enter them.",
+   "startup_potential_1_10": 3,
+   "why_startup_score": "Honest assessment: an alarm-only gravity drip monitor is at best a Class I/II accessory (an IV drop-rate alarm sits near 880.5725/infusion-controller territory and FDA will want to see it never acts on flow; you would still need a 510(k) or a very careful exempt-accessory argument, plus IEC 60601 alarm standards, which kill hobby buzzers). There is no CPT or reimbursement code; a hospital does not get paid more for a monitored gravity drip. The US buyer barely exists: US hospitals run chemo on pumps and the gravity use case is antibiotics during pump shortages. The real market is LMIC wards whose procurement runs through NGOs and ministries (UNICEF, PATH), slow and price-driven, and DripAssist at $300 already exists there and has not scaled. The genuine wedge \u2014 a sub-$20 BOM plus a multi-bed station view \u2014 is a product a nursing director would pilot, not a venture business; liability for a missed stopped drip is real and uninsurable for students. Good hackathon project, plausible NGO pilot or open-hardware release, poor startup."
+  }
+ }
+}
