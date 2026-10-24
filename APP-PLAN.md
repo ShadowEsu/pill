@@ -1,6 +1,21 @@
-# Pill app plan (Sat 2026-10-24 01:2x PDT, draft 1 for Preston)
+# Pill app plan (Sat 2026-10-24, draft 2 after Preston's notes at 01:4x)
 
-One web app, three places: the phone (any browser), the Pi touchscreen on the station (Chromium kiosk), and a laptop at the judges' table. Two modes behind one switch: **Clinic** (verdict holds the payment) and **Personal** (one tablet per bottle, My medicines). Same backend (FastAPI, SOFTWARE-PLAN §4), same seven rules, same words as the website. The phone mock on the site (`pill-site/src/phone.js`) is the visual spec; the app should look like those screens, just real.
+One web app, three places: the phone (any browser), the Pi touchscreen on the station (Chromium kiosk), and a laptop at the judges' table. Same backend (FastAPI, SOFTWARE-PLAN §4), same seven rules, same words as the website. Code: `~/calhacks-13/pill/web` (Vite + React + TS), dev server http://127.0.0.1:5183.
+
+## 0. Preston's direction (01:4x), applied
+- **Quality bar:** Linear and the Tesla app. **Light mode** (not dark). Simple, good animations. Very informative, and simple enough for grandparents; medical mode may carry more.
+- **The hero idea:** while the station streams, the app fills a drawing of a pill with colour from 0 % to 100 %; at 100 % it gives an overall evaluation, and the evaluation has to be really good (verdict, % of reference, the two numbers, what the drug is used for, next step, ship yes/hold/ask in medical mode).
+- **Onboarding:** first screen asks who you are: hospital / medical center / enterprise, or personal. Personal → reminders, bigger text, fewer words. Medical → a list: per lot, good/bad as the verdict word, a percentage (% of reference plateau), what it's used for, good for shipment yes / hold / ask.
+- **Dashboard** only where a list is needed (deliveries, log); no dashboard home.
+- **AI chat** slot ("Ask Pill") in the app now, marked not connected; Preston wires the service later.
+- Honesty rules stay: verdict words PASS / NEEDS LAB / UNABLE TO VERIFY, "ship: yes" is the clinic's release word, percentage = plateau as a share of the reference mean (a real number), money SANDBOX / TESTNET, no banned words.
+- Decisions 1–5 from draft 1 are resolved by the above: one app with onboarding, light, hand-drawn SVG (pill + curve), x402 screen in the app, photo by file input.
+
+## 0b. Traction (Research, 01:5x; full note with links: `~/boss-handoff/agents/research/calhacks-app-traction-2026-10-24.md`)
+- Plays that fit Pill: (a) a hackathon placing → the school press office on Sunday (Peel got RIT newsroom + The Tech coverage this way); (b) a 20–30 s demo clip on X/LinkedIn/TikTok (Theseus' hackathon demo tweet → YC a day later → $4.3M); (c) Show HN only once people can try something (HN rejects sign-up pages); Product Hunt goes live 12:01 AM PT; (d) an NGO pilot ask: 20 B2 tablets side by side with a Minilab (BU's PharmaChk went Ghana field test → $2M grant → Merck). Referral waitlists are the weakest fit.
+- Claims: FDA "device" = intended for diagnosis/treatment, so no patient-outcome claims; FTC wants competent and reliable scientific evidence for health claims, apps included. Say "screens dissolution against a reference; prototype". Never "detects counterfeits", "verified safe", "lab-grade".
+- Channels for pharmacists/NGO clinics: FIP (159 member orgs), pharmacist WhatsApp groups via their leaders, the Difäm-EPN Minilab Network (16 orgs, 13 countries).
+- First-1,000 lessons: Oura (Kickstarter), Whoop (athletes via coaches; fame didn't sell), Flighty (a tweet, then an 18-month beta with frequent flyers and pilots), Medisafe (channel unsourced).
 
 ## 1. The whole process
 
