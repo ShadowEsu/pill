@@ -2,7 +2,7 @@
 // A fault freezes the pointer where it happened and greys everything after it.
 export const PHASES = [
   { key: 'fill', from: 0, to: 5, color: 'var(--c6)', status: 'filling the chamber', doing: 'the quarter tablet is breaking up' },
-  { key: 'dissolve', from: 5, to: 110, color: 'var(--c1)', status: 'dissolving', doing: 'riboflavin is leaving the tablet; the glow channel is rising' },
+  { key: 'dissolve', from: 5, to: 110, color: 'var(--c1)', status: 'dissolving', doing: 'the tablet is dissolving; both channels are being watched' },
   { key: 'settle', from: 110, to: 165, color: 'var(--c4)', status: 'settling', doing: 'the reading is settling; the band is near' },
   { key: 'hold', from: 165, to: 180, color: 'var(--c2)', status: 'holding', doing: 'holding to confirm the plateau' },
 ] as const;

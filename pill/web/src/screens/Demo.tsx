@@ -155,9 +155,9 @@ export function DemoDriver() {
 
   // after the run: one batched insert of its curve into Tiger Data (only when the service has TIGER_URL)
   useEffect(() => {
-    if (!d.on || !run?.evaluation || d.tiger) return;
-    setDemo({ tiger: 'Tiger Data: sending…' });
-    void postSamples(run).then((r) => setDemo({ tiger: r.mode === 'live' ? `Tiger Data: ${r.inserted} rows` : 'Tiger Data: unavailable' }));
+    if (!d.on || !run?.evaluation || d.tiger !== null) return;
+    setDemo({ tiger: '' });
+    void postSamples(run).then((r) => setDemo({ tiger: r.mode === 'live' ? `Tiger Data: ${r.inserted} rows` : '' }));
   }, [d.on, run, d.tiger]);
 
   const ms = step && step.ms !== 'run' ? step.ms : 0;

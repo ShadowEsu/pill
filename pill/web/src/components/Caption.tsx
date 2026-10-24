@@ -27,6 +27,7 @@ export default function Caption({ step, total, label, text, progress, paused, no
         @media (min-width: 900px) { .demo-caption { left: 232px; bottom: 0; padding: 0 24px 18px; } }
         @media (prefers-reduced-motion: reduce) { .demo-caption .say.swap { animation: none; } .demo-caption .bar i { transition: none; } }
         .app { padding-bottom: 190px; }
+        @media (max-width: 899px) { .app .screen .action-bar { bottom: 196px; } }
       `}</style>
       <div className="box">
         <div className="bar" aria-hidden="true"><i style={{ width: `${Math.round(Math.max(0, Math.min(1, progress)) * 100)}%` }} /></div>

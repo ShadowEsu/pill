@@ -83,7 +83,9 @@ export default function Run() {
   const running = !run.evaluation && !fault;
   const glowNow = last ? absorbance(last.blank, last.adc90) : 0;
   const glowFlat = phase.key === 'dissolve' && t > 40 && glowNow < 0.05;
-  const happening = phase.key === 'dissolve' && glowFlat ? 'something is dissolving; the glow channel is staying flat'
+  const glowRising = phase.key === 'dissolve' && glowNow >= 0.05;
+  const happening = glowFlat ? 'something is dissolving; the glow channel is staying flat'
+    : glowRising ? 'riboflavin is leaving the tablet; the glow channel is rising'
     : phase.key === 'settle' && !ref ? 'the reading is settling; there is no band to compare against'
     : phase.doing;
   const faultText = fault ? `${FAULT_WORDS[fault.fault ?? ''] ?? (fault.fault ?? '').replace('_', ' ')} at ${clock(fault.t)}` : null;
