@@ -22,6 +22,7 @@ import EmptyState, { SettingsLink } from '../components/EmptyState';
 import { scorecard } from '../lib/agent';
 import '../components/viz.css';
 import '../story.css';
+import '../phases.css';
 
 const SAMPLE_MS = 110, LOOP_REST = 2200;
 
@@ -193,6 +194,14 @@ export default function Dashboard() {
           <Kpi label="Released" value={k.released.value} prefix="$" trend={k.released.trend} delta={`${signed(k.released.trend, '', '$')} vs prior 3d`} series={k.released.series} accent="var(--cb)" tag="TESTNET" />
         </div>
       </section>
+
+      <Link to="/station" className="st-hero st-card" aria-label="Station: status, what it is doing now, how a run works" data-station-card>
+        <BinaryPill width={220} height={130} cell={5} scale={1.7} className="st-bpill" label="The station, printed in ones and zeros" />
+        <span className="eyebrow">station · {station.id}</span>
+        <span className="serif st-card-title">Station</span>
+        <span className="st-sub">Lights off 3 s · clear water 10 s · drop · dissolving · settling · verdict. Its status, the run on it now, the last five runs.</span>
+        <span className="st-open">Open the station <span aria-hidden="true">→</span></span>
+      </Link>
 
       <div className="wide-2">
         <section className="card panel hover-line" aria-label="Station pulse">

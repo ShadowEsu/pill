@@ -25,7 +25,7 @@ interface Part { x: number; y: number; vy: number; s: number; rot: number; vr: n
 interface Pulse { t0: number; color: string }
 
 /** The liquid's top edge: two sines at different frequencies and speeds, so the surface never looks like one rigid wave. */
-function surface(level: number, amp: number, phase: number) {
+export function surface(level: number, amp: number, phase: number) {
   const yAt = (x: number) => level + amp * (0.65 * Math.sin((x / 70) * 2 * Math.PI + phase) + 0.35 * Math.sin((x / 70) * 4.6 * Math.PI - phase * 1.6 + 1));
   let d = `M0 ${yAt(0).toFixed(2)}`;
   for (let x = 5; x <= 140; x += 5) d += ` L${x} ${yAt(x).toFixed(2)}`;

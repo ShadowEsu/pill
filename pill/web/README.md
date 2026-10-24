@@ -26,8 +26,9 @@ Open http://127.0.0.1:5183/welcome. For the kiosk screen on the Pi: `/kiosk` at 
 | `/demo` | 2-minute guided tour (the chalk tablet → NEEDS LAB → payment held); `?speed=2` |
 | `/story` | 7 chapters, swipe or arrow keys |
 | `/` | Dashboard (medical) or Home (personal) |
-| `/bottle` → `/place` → `/run/new?replay=TM-02` | the moment: cloudy chalk reaches the band, no glow → N2 |
-| `/run/new?replay=B2-07` | a PASS |
+| `/bottle` → `/place` → `/run/new?replay=TM-02` | Prepare, then the station's six phases on the rail (lights off 3 s → clear water 10 s → drop → dissolving → settling → verdict); the moment: cloudy chalk reaches the band, no glow → N2 |
+| `/run/new?replay=B2-07` | a PASS; replays play the dark and clear-water phases first and end where the station would, when the 20-s plateau window closes |
+| `/station` | the station hub: online · simulated · offline, the run on it now (live rail), temperature, last blank, last 5 runs, how a run works |
 | `/evaluation/:id` | verdict, two channels, Claude why (filtered), read aloud, share card |
 | `/delivery/:id` | escrow, policy clauses, release on a tap, Nessie mirror |
 | `/agent` | the policy agent's record: counts, limits, the 6-case downgrade-only test, where it could go wrong |

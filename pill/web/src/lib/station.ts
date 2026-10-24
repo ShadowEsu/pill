@@ -4,13 +4,23 @@
 import { PAY_URL } from './api';
 import type { Source } from './types';
 
+/** The station's latest contract line (SOFTWARE-PLAN §2): raw counts, its own state, dark pair, latched blank pair. */
+export interface StationLine {
+  seq: number; state: string; t: number; led: 'blue' | 'white' | 'off'; adc0: number; adc90: number; temp_c: number;
+  paddle: number; dark: [number, number]; blank: [number, number] | null; fault: string | null;
+}
+
 export interface StationStatus {
   mode: 'serial' | 'sim';
   src: 'real' | 'sim';
   port: string | null;
+  /** the current run's state, 'idle' when no run is on */
   state: string;
   noise: number;
   hello: { hello: string; adc_max: number; fw: string } | null;
+  last: StationLine | null;
+  run: { id: string; state: string; samples: number; t: number; dropT: number | null; message: string | null; ended: boolean } | null;
+  timeout_s: number;
 }
 
 /** The station when one is connected (a USB serial port, or the service's SERIAL_PORT=sim simulator), else null. */
