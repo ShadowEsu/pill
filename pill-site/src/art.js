@@ -140,3 +140,87 @@ art.calibration = wrap(`
 `, 'Ten riboflavin reference curves overlapping into a narrow band');
 
 export function artFor(key) { return art[key] || ''; }
+
+/* ---------- stats band: small charts under each number ---------- */
+// 0 and 1 draw the sourced figure to scale; 2 and 3 are decorative. All are labelled.
+export function statSpark(i) {
+  const W = 240, H = 56;
+  const svg = (inner, note) => `<div class="spark" aria-hidden="true"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${inner}</svg><p class="spark-note">${note}</p></div>`;
+  if (i === 0) {
+    const bw = 18, gap = (W - 10 * bw) / 9;
+    return svg(Array.from({ length: 10 }, (_, k) => `<rect class="sp-bar${k === 6 ? ' sp-hot' : ''}" x="${(k * (bw + gap)).toFixed(1)}" y="8" width="${bw}" height="44" rx="9"/>`).join(''), 'illustration · 1 of 10, to scale');
+  }
+  if (i === 1) {
+    // modelled range 64,000–158,000 on a 0–160,000 axis
+    const x = (v) => (v / 160000) * (W - 4) + 2;
+    return svg(`<line x1="2" x2="${W - 2}" y1="40" y2="40" class="sp-axis"/>
+      <rect class="sp-range" x="${x(64000)}" y="30" width="${x(158000) - x(64000)}" height="20" rx="10"/>
+      <line class="sp-mark" x1="${x(116000)}" x2="${x(116000)}" y1="22" y2="56"/>
+      <circle class="sp-dot" cx="${x(116000)}" cy="40" r="5"/>`, 'illustration · modelled range 64k–158k, to scale');
+  }
+  if (i === 2) {
+    const pts = [6, 8, 7, 11, 10, 14, 19, 17, 24, 31, 28, 36, 42, 39, 47];
+    const step = W / (pts.length - 1);
+    const line = pts.map((v, k) => `${(k * step).toFixed(1)} ${(H - 4 - v).toFixed(1)}`).join(' L');
+    return svg(`<path class="sp-area" d="M0 ${H} L${line} L${W} ${H} Z"/><path class="sp-line" d="M${line}"/>`, 'illustration · not data');
+  }
+  const vals = [18, 22, 20, 26, 24, 30, 28, 34, 33, 38, 41, 44];
+  const bw = 14, gap = (W - vals.length * bw) / (vals.length - 1);
+  return svg(vals.map((v, k) => `<rect class="sp-bar sp-bar--sky" x="${(k * (bw + gap)).toFixed(1)}" y="${H - v}" width="${bw}" height="${v}" rx="3"/>`).join(''), 'illustration · not data');
+}
+
+/* ---------- clinic: a day on one timeline, from the app's demo deliveries ---------- */
+// [hour logged, lot, verdict + rule, decision, outcome class, lane]
+const DAY = [
+  [9, 'B2-01', 'PASS · P1', 'released after the tap', 'pass', 0],
+  [10, 'B2-06', 'PASS · P1', 'released after the tap', 'pass', 1],
+  [11, 'B2-05', 'UNABLE TO VERIFY · U2', 'escalated · lid opened', 'unable', 0],
+  [13, 'TM-03', 'NEEDS LAB · N1', 'held · lab referral', 'lab', 1],
+  [15, 'B2-08', 'recall record · P4', 'held, whatever the curve says', 'recall', 0],
+  [17, 'B2-11', 'PASS · above cap · P5', 'escalated to a person', 'unable', 1],
+];
+export function timetable() {
+  const pos = (h) => (((h - 8) / 11) * 100).toFixed(2);
+  const hours = Array.from({ length: 12 }, (_, k) => 8 + k);
+  return `<div class="tt">
+    <div class="tt-axis" aria-hidden="true">${hours.map((h) => `<span style="left:${pos(h)}%">${String(h).padStart(2, '0')}:00</span>`).join('')}</div>
+    <div class="tt-lanes" role="list" aria-label="A day in a clinic: six deliveries logged, tested, then released or held">${DAY.map(([h, lot, verdict, decision, cls, lane]) => `
+      <div class="tt-b tt-${cls}" role="listitem" style="--l:${pos(h)}%; --lane:${lane}">
+        <p class="tt-time"><b>${String(h).padStart(2, '0')}:00</b> · lot ${lot}</p>
+        <div class="tt-bar" aria-hidden="true"><i class="s1"></i><i class="s2"></i><i class="s3"></i></div>
+        <p class="tt-v">${verdict}</p>
+        <p class="tt-d">${decision}</p>
+      </div>`).join('')}
+    </div>
+    <div class="tt-key" aria-hidden="true"><span><i class="k1"></i>logged, label read</span><span><i class="k2"></i>tested, about 3 min</span><span><i class="k3"></i>decision</span><span class="tt-nts">blocks not to scale</span></div>
+  </div>`;
+}
+
+/* ---------- clinic: verdicts by lot and day (the app's seven seeded days) ---------- */
+const SLOTS = ['09', '10', '11', '13–14', '15–16', '17'];
+const DAYS = ['−6d', '−5d', '−4d', '−3d', '−2d', '−1d', 'today'];
+// [day, slot, lot, class, words]
+const HEAT = [
+  [0, 0, 'B2-01', 'pass', 'PASS · released'], [0, 3, 'TM-01', 'lab', 'NEEDS LAB · held'],
+  [1, 1, 'B2-02', 'pass', 'PASS · released'], [1, 4, 'B2-03', 'lab', 'NEEDS LAB · held'],
+  [2, 0, 'B2-04', 'pass', 'PASS · released'], [2, 2, 'B2-05', 'unable', 'UNABLE TO VERIFY · escalated'],
+  [3, 1, 'B2-06', 'pass', 'PASS · released'], [3, 4, 'B2-08', 'recall', 'recall record · held'],
+  [4, 0, 'B2-09', 'pass', 'PASS · released'], [4, 3, 'TM-03', 'lab', 'NEEDS LAB · held'],
+  [5, 1, 'B2-10', 'pass', 'PASS · released'], [5, 5, 'B2-11', 'unable', 'PASS · above the cap · escalated'],
+  [6, 3, 'B2-07', 'pending', 'logged · waiting for its test'], [6, 4, 'TM-02', 'pending', 'logged · waiting for its test'],
+];
+export function heatmap() {
+  const cell = (d, s) => HEAT.find((h) => h[0] === d && h[1] === s);
+  let cells = '<span></span>' + DAYS.map((d) => `<span class="hm-col">${d}</span>`).join('');
+  SLOTS.forEach((slot, s) => {
+    cells += `<span class="hm-row">${slot}</span>`;
+    DAYS.forEach((day, d) => {
+      const h = cell(d, s);
+      cells += h
+        ? `<span class="hm-c hm-${h[3]}" role="img" title="${day} · ${slot}:00 · lot ${h[2]} · ${h[4]}" aria-label="${day}, ${slot}:00, lot ${h[2]}: ${h[4]}"><em>${h[2]}</em></span>`
+        : '<span class="hm-c hm-empty" aria-hidden="true"></span>';
+    });
+  });
+  return `<div class="hm" role="group" aria-label="Verdicts by lot and day, seven days of the app's demo deliveries">${cells}</div>
+    <div class="hm-legend" aria-hidden="true"><span><i class="hm-pass"></i>PASS · released</span><span><i class="hm-lab"></i>NEEDS LAB · held</span><span><i class="hm-unable"></i>escalated</span><span><i class="hm-recall"></i>recall · held</span><span><i class="hm-pending"></i>pending</span><span><i class="hm-empty"></i>no delivery</span></div>`;
+}

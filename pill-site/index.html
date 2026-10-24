@@ -12,24 +12,28 @@
   <link rel="preload" href="/fonts/instrument-serif-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/src/styles.css">
-  <script>document.documentElement.classList.remove('no-js');</script>
+  <script>document.documentElement.classList.remove('no-js'); if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('reduced');</script>
 </head>
 <body>
 
 <header class="nav">
   <div class="wrap">
     <a class="brand" href="#top"><span class="dot" aria-hidden="true"></span>Pill</a>
-    <nav class="nav-links" aria-label="Sections">
-      <a href="#problem">The problem</a>
-      <a href="#station">The station</a>
+    <nav class="nav-links" aria-label="Chapters">
+      <a href="#station">Station</a>
+      <a href="#problem">Problem</a>
       <a href="#how">How it works</a>
+      <a href="#story">Story</a>
       <a href="#verdicts">Verdicts</a>
-      <a href="#clinic">Clinic mode</a>
+      <a href="#clinic">Clinic</a>
       <a href="#payments">Payments</a>
+      <a href="#coinbase">Coinbase</a>
       <a href="#limits">Limits</a>
       <a href="#team">Team</a>
     </nav>
+    <p class="nav-ch" aria-hidden="true"><b></b><span></span></p>
   </div>
+  <span class="nav-progress" aria-hidden="true"></span>
 </header>
 
 <main id="top">
@@ -40,6 +44,7 @@
       <div>
         <p class="eyebrow reveal">Cal Hacks 13.0 · Berkeley · October 2026</p>
         <h1 class="display" data-split>The box measures.<br><em>Pill</em> explains.</h1>
+        <p class="hero-sub"><span class="sr">A tablet cannot lie about dissolving.</span><span class="hs-ghost" aria-hidden="true">A tablet cannot lie about dissolving.</span><span class="hs-typed" aria-hidden="true"></span></p>
         <p class="lead reveal">A $40 lab-in-a-box. Drop one tablet in water, close the lid, and three minutes later it says <b>PASS</b>, <b>NEEDS LAB</b> or <b>UNABLE TO VERIFY</b>. In a clinic, that answer decides whether the supplier gets paid.</p>
         <div class="cta reveal">
           <a class="btn" href="#demo">Watch the 90-second demo <span class="arrow" aria-hidden="true">→</span></a>
@@ -62,6 +67,7 @@
   <!-- 2. Station: the exploded blueprint on dark -->
   <section class="section dark stage" id="station">
     <div class="wrap">
+      <div class="chapter"><span class="ch-n">01</span><span class="ch-t">Meet the box.</span></div>
       <div class="stage-head">
         <div>
           <p class="eyebrow">Fig 1 · The station</p>
@@ -84,6 +90,7 @@
   <!-- 3. The problem -->
   <section class="section" id="problem">
     <div class="wrap">
+      <div class="chapter reveal"><span class="ch-n">02</span><span class="ch-t">Why it has to exist.</span></div>
       <p class="eyebrow reveal">The problem</p>
       <h2 class="h2">One in ten.</h2>
       <p class="lead reveal" style="margin-top:24px">WHO estimates that 1 in 10 medical products in low- and middle-income countries is substandard or falsified. A model cited by WHO puts the cost at about 116,000 extra malaria deaths a year in sub-Saharan Africa from substandard and falsified antimalarials alone. The instrument that catches this in a lab costs $20,000 to $100,000 and sits far from the clinics that need it.</p>
@@ -95,8 +102,8 @@
       </div>
       <div class="facts reveal">
         <div><b class="num">7,152</b><span>pharmaceutical crime incidents logged in 2025 (counterfeiting, diversion and theft), the most on record</span><a class="src" href="https://www.psi-inc.org/incident-trends" target="_blank" rel="noopener">PSI</a></div>
-        <div><b class="num">3.7 million</b><span>counterfeit pharmaceutical items seized at the US border in fiscal 2024</span><a class="src" href="https://www.cbp.gov/sites/default/files/2025-01/IntellectualPropertyRightsSeizureStatisticsFiscalYear2024%20FINAL.pdf" target="_blank" rel="noopener">US CBP</a></div>
-        <div><b class="num">up to $4.4B</b><span>of cross-border trade in counterfeit pharmaceuticals in 2016</span><a class="src" href="https://euipo.europa.eu/tunnel-web/secure/webdav/guest/document_library/observatory/documents/reports/Trade_in_Counterfeit_Pharmaceutical_Products/Trade_in_Counterfeit_Pharmaceutical_Products_en.pdf" target="_blank" rel="noopener">OECD/EUIPO, 2020</a></div>
+        <div><b class="num">3.7 million</b><span>trademark-infringing pharmaceutical items seized at the US border in fiscal 2024</span><a class="src" href="https://www.cbp.gov/sites/default/files/2025-01/IntellectualPropertyRightsSeizureStatisticsFiscalYear2024%20FINAL.pdf" target="_blank" rel="noopener">US CBP</a></div>
+        <div><b class="num">up to $4.4B</b><span>of cross-border trade in trademark-infringing pharmaceuticals in 2016</span><a class="src" href="https://euipo.europa.eu/tunnel-web/secure/webdav/guest/document_library/observatory/documents/reports/Trade_in_Counterfeit_Pharmaceutical_Products/Trade_in_Counterfeit_Pharmaceutical_Products_en.pdf" target="_blank" rel="noopener">OECD/EUIPO, 2020</a></div>
         <div><b class="num">20%, 17%</b><span>antimalarials and antibiotics: the two most-reported categories to WHO</span><a class="src" href="https://www.who.int/news/item/28-11-2017-1-in-10-medical-products-in-developing-countries-is-substandard-or-falsified" target="_blank" rel="noopener">WHO, 2017</a></div>
         <div><b class="num">20 days</b><span>from report to public alert for Uzbekistan's contaminated syrups; about 8 months for falsified Ozempic. Then the alert still has to reach the clinic.</span><a class="src" href="https://www.who.int/news/item/11-01-2023-medical-product-alert-n-1-2023-substandard-%28contaminated%29-liquid-dosage-medicines" target="_blank" rel="noopener">WHO alerts</a></div>
         <div><b class="num">€25.85</b><span>per sample for the cheapest field screening kit in one 13-country network; a lab result takes 7–10 business days</span><a class="src" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9338985" target="_blank" rel="noopener">GPHF Minilab study, 2022</a></div>
@@ -104,21 +111,22 @@
       <div class="callout reveal">
         <p class="caption">Why a lookup is not enough</p>
         <p class="h3">Lot numbers can be copied. Dissolution cannot.</p>
-        <p class="body" style="margin-top:10px">In December 2025 the FDA found counterfeit Ozempic inside the legitimate US supply chain, labelled with a lot number that was also a real one. A recall lookup alone passes that product. A measurement of the tablet itself is the only check that does not trust the label. <a class="src" href="https://www.fda.gov/drugs/drug-alerts-and-statements/fda-warns-consumers-not-use-counterfeit-ozempic-semaglutide-found-us-drug-supply-chain" target="_blank" rel="noopener">FDA, Dec 2025</a></p>
+        <p class="body" style="margin-top:10px">In December 2025 the FDA found falsified Ozempic inside the legitimate US supply chain, labelled with a lot number that was also a real one. A recall lookup alone passes that product. A measurement of the tablet itself is the only check that does not trust the label. <a class="src" href="https://www.fda.gov/drugs/drug-alerts-and-statements/fda-warns-consumers-not-use-counterfeit-ozempic-semaglutide-found-us-drug-supply-chain" target="_blank" rel="noopener">FDA, Dec 2025</a></p>
       </div>
     </div>
   </section>
 
   <!-- 4. Typing line -->
-  <section class="section dark" style="padding-block: clamp(72px, 9vw, 120px)">
+  <section class="section dark" data-nav="station" style="padding-block: clamp(72px, 9vw, 120px)">
     <div class="wrap">
+      <div class="chapter"><span class="ch-n">03</span><span class="ch-t">What it is made of.</span></div>
       <p class="eyebrow">How Pill works</p>
       <div class="typeline" id="typeline" aria-live="polite"><span class="words">It dissolves.</span><span class="caret" aria-hidden="true"></span></div>
     </div>
   </section>
 
   <!-- 5. Fig grid: the parts (Linear FIG style) -->
-  <section class="section dark" id="parts" style="padding-top:0">
+  <section class="section dark" id="parts" data-nav="station" style="padding-top:0">
     <div class="wrap">
       <div class="figs">
         <div class="fig reveal"><p class="caption">Fig 0.1</p><div class="art" data-part="container"></div><h4>Chamber</h4><p>A clear quart container, 900 mL fill line, light path across one corner.</p><p class="spec">946 mL · fill line 900 mL · path 1.5 cm · USP 〈711〉 volume</p></div>
@@ -136,6 +144,7 @@
   <!-- 6. How it works: one run, minute by minute (Oura) -->
   <section class="section" id="how">
     <div class="wrap">
+      <div class="chapter reveal"><span class="ch-n">04</span><span class="ch-t">What one run looks like.</span></div>
       <p class="eyebrow reveal">Fig 2 · One run</p>
       <h2 class="h2">Three minutes, start to verdict.</h2>
       <div class="steps" style="margin-top:56px">
@@ -166,9 +175,30 @@
     </div>
   </section>
 
+  <!-- 6b. The scroll story: one tablet's three minutes -->
+  <section class="story dark" id="story">
+    <div class="wrap story-intro">
+      <div class="chapter"><span class="ch-n">05</span><span class="ch-t">Follow one tablet.</span></div>
+      <p class="eyebrow">Fig 2b · The run, scene by scene</p>
+      <h2 class="h2">One tablet’s three minutes.</h2>
+      <p class="lead">Scroll, and follow one quarter tablet of riboflavin from a bottle label to a payment. Six moments, the same ones the station and the app walk through on the table.</p>
+    </div>
+    <div class="story-track">
+      <div class="story-pin">
+        <div class="wrap story-grid">
+          <ol class="story-rail" aria-label="Scenes"></ol>
+          <div class="story-copy" aria-live="polite"></div>
+          <div class="story-stage"></div>
+        </div>
+      </div>
+    </div>
+    <div class="wrap story-stack"></div>
+  </section>
+
   <!-- 7. Verdicts + phone -->
   <section class="section dark" id="verdicts">
     <div class="wrap">
+      <div class="chapter"><span class="ch-n">06</span><span class="ch-t">What it says back.</span></div>
       <div class="split">
         <div>
           <p class="eyebrow">Fig 3 · The app</p>
@@ -182,11 +212,19 @@
         </div>
         <div class="phone-slot" id="phone-mount"></div>
       </div>
+      <div class="onstage">
+        <div class="onstage-head"><p class="eyebrow">What you see on stage</p><p class="caption">three tablets, three screens · the same app on the Pi and on a phone</p></div>
+        <div class="onstage-row">
+          <figure class="onstage-fig"><div class="onstage-phone" data-state="pass"></div><figcaption><b class="v-pass">PASS</b><span>Riboflavin. The plateau landed in the band and the glow rose with it. Release proposed; a pharmacist taps.</span></figcaption></figure>
+          <figure class="onstage-fig"><div class="onstage-phone" data-state="needslab"></div><figcaption><b class="v-lab">NEEDS LAB</b><span>Chalk. Light dropped but nothing glowed. The payment stays in escrow and a lab referral is drafted.</span></figcaption></figure>
+          <figure class="onstage-fig"><div class="onstage-phone" data-state="recall"></div><figcaption><b class="v-recall">Recall on the lot</b><span>The label’s lot is on the openFDA recall list. Held, whatever the curve says.</span></figcaption></figure>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- 8. Results (honest, placeholder until Saturday's runs) -->
-  <section class="section" id="demo">
+  <section class="section" id="demo" data-nav="verdicts">
     <div class="wrap">
       <p class="eyebrow reveal">Fig 4 · Real results</p>
       <h2 class="h2">One tablet against a bad one.</h2>
@@ -210,6 +248,7 @@
   <!-- 9. Clinic mode -->
   <section class="section dark" id="clinic">
     <div class="wrap">
+      <div class="chapter reveal"><span class="ch-n">07</span><span class="ch-t">Where the answer holds the money.</span></div>
       <div class="split" style="align-items:start">
         <div class="phone-slot" id="phone-clinic"></div>
         <div>
@@ -233,12 +272,28 @@
           </div>
         </div>
       </div>
+      <div class="clinic-viz">
+        <div class="cv-head reveal">
+          <div><p class="eyebrow">A day in a clinic</p><h3 class="cv-title">Six deliveries: logged, tested, then released or held.</h3></div>
+          <p class="caption cv-note">illustration from the app’s demo data · six of its deliveries on one day</p>
+        </div>
+        <div class="reveal" id="tt-mount"></div>
+        <div class="cv-heat">
+          <div class="reveal">
+            <p class="eyebrow">Verdicts by lot and day</p>
+            <p class="cv-text">Seven days of the app’s seeded deliveries. Each cell is one lot, one tablet, one verdict. Red is kept for a recall; orange waits for a lab; grey asks a person.</p>
+            <p class="caption cv-note">illustration from the app’s demo data</p>
+          </div>
+          <div class="reveal" id="heat-mount"></div>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- 9b. Payments: Coinbase x402 track -->
   <section class="section pay" id="payments">
     <div class="wrap">
+      <div class="chapter reveal"><span class="ch-n">08</span><span class="ch-t">How the money moves.</span></div>
       <div class="cb-badge reveal"><span class="sq" aria-hidden="true"></span>Coinbase · x402 · payment agents</div>
       <p class="eyebrow reveal" style="margin-top:22px">Payments</p>
       <h2 class="h2">The verdict is the invoice.</h2>
@@ -264,9 +319,64 @@
     </div>
   </section>
 
+  <!-- 9c. What Coinbase is for here -->
+  <section class="section cbx" id="coinbase" aria-labelledby="cbx-title">
+    <div class="wrap">
+      <div class="cbx-band">
+        <div class="cbx-head">
+          <div>
+            <div class="cbx-badge reveal"><span class="cbx-mark" aria-hidden="true"></span>Coinbase Developer Platform · x402 · Base</div>
+            <h2 class="h2" id="cbx-title">What Coinbase is for here.</h2>
+          </div>
+          <p class="lead reveal">One job: move the money the verdict decides. USDC on Base, from wallets the agent holds but cannot spend without a person. Three uses, one rail.</p>
+        </div>
+        <div class="cbx-three">
+          <article class="cbx-card">
+            <svg class="cbx-ico" viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="14" width="16" height="20" rx="4"/><rect x="27" y="14" width="16" height="20" rx="4"/><path d="M15 24 H33"/><path d="M29 20 l4 4 l-4 4"/><circle cx="24" cy="9" r="3"/></svg>
+            <p class="cbx-k">01 · Pay</p>
+            <h3>Escrow → supplier, in USDC on Base.</h3>
+            <p>The delivery’s money waits in escrow. On PASS, a pharmacist taps release and the agent’s CDP wallet signs the transfer to the supplier. No tap, no transfer.</p>
+          </article>
+          <article class="cbx-card">
+            <svg class="cbx-ico" viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="10" width="32" height="28" rx="6"/><path d="M16 22 h16 M16 29 h10"/><circle cx="36" cy="36" r="7"/><path d="M36 33 v6 M33.5 36 h5"/></svg>
+            <p class="cbx-k">02 · Buy</p>
+            <h3>A verdict from another station, for a few cents.</h3>
+            <p>With x402 the agent pays per request for a verdict from someone else’s box: no account, no invoice, capped under $1.</p>
+          </article>
+          <article class="cbx-card">
+            <svg class="cbx-ico" viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="8" width="30" height="32" rx="6"/><path d="M17 30 C 21 30, 22 18, 31 18"/><path d="M17 36 h14"/><circle cx="31" cy="18" r="2.5"/></svg>
+            <p class="cbx-k">03 · Earn</p>
+            <h3>Every station sells <code>/verify</code>.</h3>
+            <p>Each box answers <code>/verify</code> over x402 at 5¢ a verdict (proposed). Send a curve, get PASS / NEEDS LAB / UNABLE TO VERIFY and the rule id.</p>
+          </article>
+        </div>
+        <p class="cbx-sub reveal">One x402 call, four steps</p>
+        <div class="cbx-flow" role="list" aria-label="An x402 call in four steps: 402, sign, settle, 200">
+          <div class="cbx-step" role="listitem"><b>402</b><span class="cbx-sn">Payment Required</span><p><code>GET /verify</code> answers with the price: 5¢ in USDC on Base Sepolia.</p></div>
+          <svg class="cbx-arrow" viewBox="0 0 64 24" aria-hidden="true"><path d="M2 14 C 20 2, 40 2, 58 12"/><path d="M51 7 l7 5 l-8 4"/></svg>
+          <div class="cbx-step" role="listitem"><b>sign</b><span class="cbx-sn">buyer’s wallet</span><p>The buyer’s CDP wallet signs a USDC authorization (EIP-3009). Nothing moves yet.</p></div>
+          <svg class="cbx-arrow" viewBox="0 0 64 24" aria-hidden="true"><path d="M2 14 C 20 2, 40 2, 58 12"/><path d="M51 7 l7 5 l-8 4"/></svg>
+          <div class="cbx-step" role="listitem"><b>settle</b><span class="cbx-sn">facilitator</span><p>The facilitator checks the signature and settles the transfer on Base.</p></div>
+          <svg class="cbx-arrow" viewBox="0 0 64 24" aria-hidden="true"><path d="M2 14 C 20 2, 40 2, 58 12"/><path d="M51 7 l7 5 l-8 4"/></svg>
+          <div class="cbx-step" role="listitem"><b>200</b><span class="cbx-sn">OK</span><p>The seller answers with the verdict, its rule id and a payment receipt header.</p></div>
+        </div>
+        <p class="cbx-tools reveal"><span>Built with</span>CDP API Key Wallets · CDP Facilitator · @x402/express · CdpX402Client</p>
+        <div class="cbx-foot reveal">
+          <p class="cbx-status"><i aria-hidden="true"></i><span><b>Where it stands:</b> a real 402 from our server, with the payment signature checked by the facilitator; the paid 200 lands when the CDP key is in. No real payment has happened.</span></p>
+          <p class="cbx-note">TESTNET today: Base Sepolia, test USDC, no real money. Mainnet is one config line.</p>
+        </div>
+        <blockquote class="cbx-quote reveal">
+          <p class="cbx-amber">Builder feedback</p>
+          <p>“x402’s auth-capture scheme (authorize now, capture or void later) is exactly an escrow; it isn’t on the public Base Sepolia facilitator yet, so we built escrow with three wallets and a human tap.”</p>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
   <!-- 10. Personal mode -->
   <section class="section" id="personal">
     <div class="wrap">
+      <div class="chapter reveal"><span class="ch-n">09</span><span class="ch-t">At home, one bottle at a time.</span></div>
       <div class="split" style="align-items:start">
         <div>
           <p class="eyebrow reveal">Personal mode</p>
@@ -281,7 +391,7 @@
           </ul>
           <p class="caption reveal" style="margin-top:28px">what it never does</p>
           <ul class="list reveal">
-            <li><b>—</b><span>Tell you to stop a medicine, or that a tablet is "safe".</span></li>
+            <li><b>—</b><span>Tell you to stop a medicine, or tell you a tablet is fine to take.</span></li>
             <li><b>—</b><span>Re-test from the list. Measuring a dose destroys a tablet and needs the station.</span></li>
             <li><b>—</b><span>Send your photos anywhere. Only the five label fields leave the phone.</span></li>
           </ul>
@@ -294,6 +404,7 @@
   <!-- 11. Limits -->
   <section class="section" id="limits" style="padding-top:0">
     <div class="wrap">
+      <div class="chapter reveal"><span class="ch-n">10</span><span class="ch-t">What it will not claim.</span></div>
       <p class="eyebrow reveal">Fig 5 · What PASS does not mean</p>
       <h2 class="h2">Pill screens tablets. It does not certify them.</h2>
       <div class="split" style="margin-top:40px; align-items:start">
@@ -322,7 +433,7 @@
   </section>
 
   <!-- 11b. Questions judges ask -->
-  <section class="section" id="questions" style="padding-top:0">
+  <section class="section" id="questions" data-nav="limits" style="padding-top:0">
     <div class="wrap">
       <p class="eyebrow reveal">Six questions we expect at the table</p>
       <h2 class="h2">Ask us the hard ones.</h2>

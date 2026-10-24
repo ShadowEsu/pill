@@ -1,5 +1,5 @@
 import { animate, stagger, onScroll, createTimeline, utils } from 'animejs';
-import { artFor } from './art.js';
+import { artFor, statSpark, timetable, heatmap } from './art.js';
 import * as stationMod from './station.js';
 const { mountStation, autoDemo, partFigures } = stationMod;
 import { mountPhone, PHONE_SEQUENCES } from './phone.js';
@@ -7,6 +7,7 @@ import { mountBinaryPill } from './pill.js';
 import './station.css';
 import './pay.css';
 import { mountRail, mountX402, mountCalc } from './pay.js';
+import { mountStory, mountCoinbase, mountFigArrows } from './story.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (reduced) document.documentElement.classList.add('reduced');
@@ -47,6 +48,19 @@ if (!reduced) {
     };
     wrapWords(h1);
     if (!reduced) animate(h1.querySelectorAll('.w'), { opacity: [0, 1], translateY: ['0.35em', 0], duration: 900, delay: stagger(90, { start: 150 }), ease: 'outCubic' });
+  }
+  // the second line types itself in once the headline has landed
+  const sub = document.querySelector('.hero-sub');
+  if (sub) {
+    const typed = sub.querySelector('.hs-typed');
+    const text = sub.querySelector('.hs-ghost').textContent;
+    if (reduced) { typed.textContent = text; sub.classList.add('done'); }
+    else {
+      sub.classList.add('typing');
+      let n = 0;
+      const tick = () => { typed.textContent = text.slice(0, ++n); if (n < text.length) setTimeout(tick, text[n] === ' ' ? 70 : 44); else setTimeout(() => sub.classList.add('done'), 1400); };
+      setTimeout(tick, 1350);
+    }
   }
 }
 
@@ -249,15 +263,98 @@ if (!reduced) {
   }
 }
 
-/* ---------- nav: mark the active section ---------- */
+/* ---------- nav: the current chapter (link highlight, chapter label, reading progress) ---------- */
 {
   const links = [...document.querySelectorAll('.nav-links a')];
-  const map = new Map(links.map((a) => [a.getAttribute('href').slice(1), a]));
+  const byId = new Map(links.map((a) => [a.getAttribute('href').slice(1), a]));
+  const chLabel = document.querySelector('.nav-ch');
+  const sections = [...document.querySelectorAll('main > section')];
+  let current = null;
+  const setCurrent = (s) => {
+    if (s === current) return;
+    current = s;
+    const navId = s.dataset.nav || s.id;
+    links.forEach((a) => { const on = a === byId.get(navId); a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+    // the chapter this section belongs to: its own, or the nearest one above it
+    let ch = null;
+    for (let i = sections.indexOf(s); i >= 0 && !ch; i--) ch = sections[i].querySelector('.chapter');
+    if (chLabel) {
+      chLabel.querySelector('b').textContent = ch ? ch.querySelector('.ch-n').textContent : '';
+      chLabel.querySelector('span').textContent = ch ? ch.querySelector('.ch-t').textContent : '';
+      chLabel.classList.toggle('on', !!ch);
+    }
+  };
   const io = new IntersectionObserver((entries) => {
-    entries.forEach((e) => { const a = map.get(e.target.id); if (a) a.style.color = e.isIntersecting ? 'var(--ink)' : ''; });
-  }, { rootMargin: '-40% 0px -55% 0px' });
-  map.forEach((_, id) => { const s = document.getElementById(id); if (s) io.observe(s); });
+    entries.forEach((e) => { if (e.isIntersecting) setCurrent(e.target); });
+  }, { rootMargin: '-45% 0px -54% 0px' });
+  sections.forEach((s) => io.observe(s));
+  const bar = document.querySelector('.nav-progress');
+  let raf = 0;
+  const onScrollBar = () => { raf = 0; const max = document.documentElement.scrollHeight - innerHeight; bar.style.transform = `scaleX(${max > 0 ? (scrollY / max).toFixed(4) : 0})`; };
+  if (bar) { addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(onScrollBar); }, { passive: true }); onScrollBar(); }
 }
+
+/* ---------- scroll story, Coinbase flow, FIG arrows ---------- */
+{
+  const story = document.getElementById('story');
+  if (story) mountStory(story);
+  const cb = document.getElementById('coinbase');
+  if (cb) mountCoinbase(cb);
+  const figs = document.querySelector('#parts .figs');
+  if (figs) mountFigArrows(figs);
+}
+
+/* ---------- stats band: a small chart under each number ---------- */
+document.querySelectorAll('#problem .stat').forEach((stat, i) => {
+  const big = stat.querySelector('.big');
+  big.insertAdjacentHTML('afterend', statSpark(i));
+  if (reduced) return;
+  const shapes = stat.querySelectorAll('.spark rect, .spark circle, .spark line');
+  const lines = stat.querySelectorAll('.spark .sp-line');
+  const auto = () => onScroll({ target: stat, enter: 'bottom-=10% top', repeat: false });
+  const area = stat.querySelector('.spark .sp-area');
+  utils.set([...shapes, ...(area ? [area] : [])], { opacity: 0 });
+  if (shapes.length) animate(shapes, { scaleY: [0, 1], opacity: [0, 1], duration: 700, delay: stagger(45, { start: 250 }), ease: 'outCubic', autoplay: auto() });
+  lines.forEach((p) => { const len = p.getTotalLength(); p.style.strokeDasharray = len; p.style.strokeDashoffset = len; animate(p, { strokeDashoffset: 0, duration: 1400, delay: 200, ease: 'inOutSine', autoplay: auto() }); });
+  if (area) animate(area, { opacity: [0, 1], duration: 1200, delay: 700, ease: 'outCubic', autoplay: auto() });
+});
+
+/* ---------- clinic: a day on a timeline + verdicts by lot and day ---------- */
+{
+  const tt = document.getElementById('tt-mount');
+  const hm = document.getElementById('heat-mount');
+  if (tt) {
+    tt.innerHTML = timetable();
+    if (!reduced) {
+      const blocks = tt.querySelectorAll('.tt-b');
+      utils.set(blocks, { opacity: 0 });
+      animate(blocks, { opacity: [0, 1], translateY: [14, 0], duration: 700, delay: stagger(160, { start: 200 }), ease: 'outCubic', autoplay: onScroll({ target: tt, enter: 'bottom-=12% top', repeat: false }) });
+      animate(tt.querySelectorAll('.tt-bar i'), { scaleX: [0, 1], duration: 520, delay: stagger(110, { start: 380 }), ease: 'outCubic', autoplay: onScroll({ target: tt, enter: 'bottom-=12% top', repeat: false }) });
+    }
+  }
+  if (hm) {
+    hm.innerHTML = heatmap();
+    if (!reduced) {
+      const cells = hm.querySelectorAll('.hm-c');
+      utils.set(cells, { opacity: 0 });
+      animate(cells, { opacity: [0, 1], scale: [0.6, 1], duration: 500, delay: stagger(22, { grid: [7, 6], from: 'first', start: 200 }), ease: 'outBack(1.6)', autoplay: onScroll({ target: hm, enter: 'bottom-=12% top', repeat: false }) });
+    }
+  }
+}
+
+/* ---------- what you see on stage: three phones, three outcomes ---------- */
+document.querySelectorAll('.onstage-phone').forEach((slot) => {
+  const state = slot.dataset.state;
+  const phone = mountPhone(slot, { state });
+  if (reduced) return;
+  let played = false;
+  const io = new IntersectionObserver(([e]) => {
+    if (!e.isIntersecting || played) return;
+    played = true; io.disconnect();
+    phone.setState(state);
+  }, { threshold: 0.45 });
+  io.observe(slot);
+});
 
 /* ---------- payments: rail, x402 call, calculator ---------- */
 {
