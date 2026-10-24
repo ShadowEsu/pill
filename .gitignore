@@ -1,0 +1,5 @@
+tools/discord-bridge/.env
+tools/discord-bridge/.venv/
+tools/discord-bridge/bridge.log
+discord-inbox/
+.DS_Store
