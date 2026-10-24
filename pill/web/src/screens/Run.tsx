@@ -16,7 +16,8 @@ import RunPhases, { clock, phaseAt } from '../components/RunPhases';
 import SensorPath, { GLOW_FULL } from '../components/SensorPath';
 import { Words } from '../components/TypeIn';
 import { actions, getState, useStore } from '../lib/store';
-import { replayStream } from '../lib/stream';
+import { liveStream, replayStream } from '../lib/stream';
+import { startStationRun, stationStreamUrl } from '../lib/station';
 import { absorbance, evaluate, progressPct } from '../lib/rules';
 import { DRUGS, REFERENCES, REPLAYS } from '../data/reference';
 import type { Sample, Source } from '../lib/types';
@@ -65,20 +66,34 @@ export default function Run() {
   const [watched, setWatched] = useState(() => getRunFrames(id).length);
   const created = useRef(false);
 
-  // /run/new (or an unknown id): make the run from the replay, then land on its real id.
+  // /run/new (or an unknown id): make the run, then land on its real id. ?station=1 asks the pay service's station for a
+  // run first (dark → blank → start); the station's run id rides along as ?srun=. No station → the replay, as before.
   useEffect(() => {
     if (run || created.current) return;
     created.current = true;
     const rep = REPLAYS[key];
-    const r = actions.startRun({ drug: rep.drug, lot: rep.lot, src: 'replay', bottleId: q.get('bottle'), deliveryId: q.get('delivery') });
-    nav(`/run/${r.id}?${q.toString()}`, { replace: true });
+    const make = (live: { runId: string; src: Source } | null) => {
+      const next = new URLSearchParams(q);
+      next.delete('station');
+      if (live) next.set('srun', live.runId);
+      const r = live
+        ? actions.startRun({ drug: q.get('drug') ?? rep.drug, lot: q.get('lot') ?? rep.lot, src: live.src, bottleId: q.get('bottle'), deliveryId: q.get('delivery') })
+        : actions.startRun({ drug: rep.drug, lot: rep.lot, src: 'replay', bottleId: q.get('bottle'), deliveryId: q.get('delivery') });
+      nav(`/run/${r.id}?${next.toString()}`, { replace: true });
+    };
+    if (q.has('station')) void startStationRun().then(make);
+    else make(null);
   }, [run, key, q, nav]);
 
-  const ref = run ? REFERENCES[REPLAYS[key]?.drug ?? run.drug] ?? null : null;
+  // a station run streams its samples from the pay service; everything else replays
+  const srun = q.get('srun');
+  const liveSrc: Source | null = run && srun && run.src !== 'replay' ? run.src : null;
+  const refDrug = liveSrc ? run?.drug ?? '' : REPLAYS[key]?.drug ?? run?.drug ?? '';
+  const ref = run ? REFERENCES[refDrug] ?? null : null;
   const needsStream = !!run && !run.evaluation;
   useEffect(() => {
     if (!needsStream) return;
-    const stream = replayStream(key, speed);
+    const stream = liveSrc && srun ? liveStream(stationStreamUrl(srun), liveSrc) : replayStream(key, speed);
     setSrc(stream.src);
     let all: Sample[] = [];
     let dirty = false;
@@ -87,12 +102,11 @@ export default function Run() {
     const offEnd = stream.onEnd((a) => {
       clearInterval(flush);
       actions.appendSamples(id, a.slice());
-      const r = getState().runs.find((x) => x.id === id);
-      actions.finishRun(id, evaluate(a, REFERENCES[REPLAYS[key]?.drug ?? r?.drug ?? ''] ?? null));
+      actions.finishRun(id, evaluate(a, REFERENCES[refDrug] ?? null));
       setFinishedHere(true);
     });
     return () => { stream.stop(); off(); offEnd(); clearInterval(flush); };
-  }, [id, needsStream, key, speed]);
+  }, [id, needsStream, key, speed, liveSrc, srun, refDrug]);
 
   useEffect(() => {
     if (!finishedHere) return;
@@ -123,14 +137,20 @@ export default function Run() {
   const statusWord = faultText ? 'stopped' : run.evaluation ? 'finished' : phase.status;
   const statusLine = faultText ? `Stopped: ${faultText}.`
     : run.evaluation ? `Finished: ${run.evaluation.verdict}, rule ${run.evaluation.rule}.`
+    : liveSrc && !samples.length ? 'The station is reading the dark and the clear water first, about 13 seconds.'
     : !ref ? `No reference for ${DRUGS[run.drug]?.name.toLowerCase() ?? run.drug}. Recording anyway; ${happening}.`
     : `${happening[0].toUpperCase()}${happening.slice(1)}.`;
 
-  const retest = () => {
+  const retest = async () => {
     const s = getState();
-    const r = actions.startRun({ drug: run.drug, lot: run.lot, src: run.src, bottleId: s.bottles.find((b) => b.runId === id)?.id ?? null, deliveryId: s.deliveries.find((d) => d.runId === id)?.id ?? null });
+    const links = { bottleId: s.bottles.find((b) => b.runId === id)?.id ?? null, deliveryId: s.deliveries.find((d) => d.runId === id)?.id ?? null };
     const next = new URLSearchParams(q);
-    next.set('replay', key === 'B2-LID' ? 'B2-07' : key);
+    next.delete('srun');
+    // a station run retests on the station; if it has gone away, the retest is a replay and says so
+    const live = liveSrc ? await startStationRun() : null;
+    if (live) next.set('srun', live.runId);
+    else next.set('replay', key === 'B2-LID' ? 'B2-07' : key);
+    const r = actions.startRun({ drug: run.drug, lot: run.lot, src: live ? live.src : liveSrc ? 'replay' : run.src, ...links });
     nav(`/run/${r.id}?${next.toString()}`, { replace: true });
   };
 
@@ -180,7 +200,7 @@ export default function Run() {
               onFrames={(f) => { setRunFrames(run.id, f); setWatched(Math.min(3, f.length)); setWatching(false); }} />
           )}
           <section className="card stack cn-phases" style={{ gap: 6 }}>
-            <div className="row between"><span className="eyebrow">timetable</span><span className="mono muted" style={{ fontSize: 12 }}>{speed}× replay</span></div>
+            <div className="row between"><span className="eyebrow">timetable</span><span className="mono muted" style={{ fontSize: 12 }}>{liveSrc ? `${liveSrc === 'sim' ? 'simulated station' : 'live station'} · 1 line/s` : `${speed}× replay`}</span></div>
             <RunPhases t={t} fault={fault ? fault.t : null} big={personal} />
           </section>
           {fault && (

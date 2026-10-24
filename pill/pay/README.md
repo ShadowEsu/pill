@@ -81,6 +81,61 @@ When no `X402_PAY_TO` is set, the service writes a throwaway key to `.local-wall
 
 A malformed body gets a `400` before the payment gate, so nobody pays for a bad request. CORS allows the app origins in `CORS_ORIGINS` and exposes `PAYMENT-REQUIRED`, `PAYMENT-RESPONSE`, `X-PILL-MODE` and `X-PILL-VOICE`.
 
+## Station (Arduino Uno over USB serial)
+
+`src/station.ts` bridges the station firmware (`firmware/pill_uno`, pin table and wiring in its README) to the app. It owns the run state machine (SOFTWARE-PLAN §2) and decides when a run ends. It never sets a verdict: the app's `evaluate` does, from the samples.
+
+| `SERIAL_PORT` | mode |
+|---|---|
+| unset | scans `/dev/cu.usbmodem*` and `/dev/cu.usbserial*` every 3 s, so a board plugged in after the service starts is picked up. Unplugging ends the current run as `lost`. |
+| `/dev/cu.usbmodem1101` | that port only (retried every 3 s) |
+| `sim` | built-in simulator: same commands and line format at 1 line/s (`SIM_SPEED=n` for n lines per second) with a riboflavin-like curve (inline A → 0.43, τ 30 s; 90° glow → 0.30, τ 33 s). Its lines say `"src":"sim"`, `/station/status` says `mode:'sim', src:'sim'`, and the app badges the run SIMULATED. |
+
+With no port and no `sim`, the mode is `no_station`. Nothing is invented: the app hides its station chip and Start plays the replay.
+
+Opening the port resets the Uno (DTR), so the board needs about 2 s before it answers. `run/start` answers `503` until a line has arrived in the last 3 s. Close `arduino-cli monitor` first, because only one program can hold the port.
+
+| route | body | returns |
+|---|---|---|
+| `GET /station/status` | | `{mode:'serial'\|'sim'\|'no_station', src, port, state, last (raw contract line), noise (lines that failed to parse), hello, run:{id, state, samples, t, dropT, message, ended}, timeout_s}` |
+| `POST /station/cmd` | `{"cmd":"D"\|"B"\|"S"\|"X"\|"1"\|"2"\|"R"}` | writes the byte: `{ok, sent, mode}`; `409 {mode:'no_station'}`; `400` for any other byte |
+| `POST /station/run/start` | | starts the automatic run below: `{runId, mode, src:'real'\|'sim', timeout_s}`. Any run still going ends as `stopped`. |
+| `POST /station/run/stop` | | ends the current run (`X`), returns the status |
+| `GET /station/stream?run=<id>` | | `text/event-stream`: `event: state` `{state, message}` on every change, one unnamed `data:` app `Sample` per running line, then `event: end` `{reason, message, samples}`. A late subscriber gets every sample so far first. |
+
+The run (`POST /station/run/start`):
+
+```
+R, 1, D → dark     3 lines, LEDs off; any fault (LID_OPEN: lid switch or dark0 > 100) → fault
+         → blank    10 lines on the water, paddle off; CV(adc0) < 2 % or "unstable blank, retry" (3 tries, then fault no_blank)
+B        → latched  the next line must carry blank (else fault no_blank); LED_DEAD shows up here
+S        → running  paddle on, t = 0; dropT = first t with adc0 ≥ 6 % below blank ("no drop in 30 s: drop the tablet" after 30 s)
+         → plateau  t ≥ STATION_MIN_S (60) and |least-squares slope of A over the last 20 s| < STATION_EPS (0.001 /s)
+         → timeout  t ≥ STATION_TIMEOUT_S (180 for the demo)
+any fault, a mid-run hello (board reset) or a lost port → fault | lost; the faulting line is the last sample
+```
+
+Each running line becomes one app `Sample` (`pill/web/src/lib/types.ts`). Counts are dark-subtracted so the app's `log10(blank/adc0)` is exactly SOFTWARE-PLAN §2's `A(t) = log10((blank0 − dark0)/(adc0 − dark0))`:
+
+| app field | from the line |
+|---|---|
+| `t` | `t` (seconds since `S`) |
+| `adc0` | `adc0 − dark[0]` |
+| `blank` | `blank[0] − dark[0]` (0 and raw counts until a blank is latched) |
+| `adc90` | `blank′ · (blank[1] − dark[1]) / (adc90 − dark[1])`. The 90° LDR counts **rise** with the riboflavin glow, while the app reads glow as `log10(blank/adc90)`. This makes the app's glow `log10((adc90 − dark90)/(blank90 − dark90))`: 0 on clear water and rising as the water glows. |
+| `temp`, `dark` | `temp_c`, `dark[0]` |
+| `led`, `paddle`, `lid` | `blank0 − dark0 ≥ 75`, `paddle > 0`, `fault !== 'LID_OPEN'` |
+| `fault` | `LID_OPEN→lid_open`, `LED_DEAD`/`ADC_SAT→led_fail`, `TEMP_RANGE`/`THERM_OPEN→temp_out`, `BROWNOUT→brownout`, no blank → `no_blank` |
+
+In the app, `/place` polls `/station/status` and shows a "Station online" chip (with "· simulated" in sim mode). Start then opens `/run/new?station=1&drug=…&lot=…`, `Run.tsx` calls `run/start`, and the stream fills the run. A dropped stream ends the run with the samples so far. Runs under 30 s land on U3 in the rules.
+
+```sh
+lsof -ti :8402 | xargs kill; SERIAL_PORT=sim nohup npm run serve > .serve.log 2>&1 &   # simulator
+curl -s localhost:8402/station/status
+curl -s -XPOST localhost:8402/station/run/start                                         # → {"runId":"…"}
+curl -sN "localhost:8402/station/stream?run=<runId>"
+```
+
 ## Checkout (Base Sepolia, TESTNET)
 
 A checkout order asks for an amount of **test USDC** (default 0.05) at the station's address (`payTo`, the same address as the x402 route) and gives a QR / wallet link to pay it. The order turns `paid` only when the transfer is on chain.

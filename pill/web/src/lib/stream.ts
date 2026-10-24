@@ -34,18 +34,23 @@ export function replayStream(key: keyof typeof REPLAYS, speed = 7.5): StationStr
   };
 }
 
-/** Live stream from the backend (SSE). Same shape; wired when FastAPI `/stream` exists. */
-export function liveStream(url = '/stream'): StationStream {
+/** Live stream from the station (pay service SSE, lib/station.ts). Same shape. `src` is 'real' for a USB station and 'sim'
+ *  for the service's simulator, so the badge never calls a simulation live. The stream ends once: on the service's `end`
+ *  event, or when the connection drops; either way with the samples that arrived, and the rules decide (under 30 s → U3). */
+export function liveStream(url: string, src: Source = 'real'): StationStream {
   const es = new EventSource(url);
   const subs = new Set<(s: Sample, all: Sample[]) => void>();
   const ends = new Set<(all: Sample[]) => void>();
   const all: Sample[] = [];
+  let done = false;
+  const finish = () => { if (done) return; done = true; es.close(); ends.forEach((f) => f(all)); };
   es.onmessage = (e) => { const s = JSON.parse(e.data) as Sample; all.push(s); subs.forEach((f) => f(s, all)); };
-  es.addEventListener('end', () => ends.forEach((f) => f(all)));
+  es.addEventListener('end', finish);
+  es.onerror = finish;
   return {
-    src: 'real',
+    src,
     subscribe: (fn) => { subs.add(fn); return () => subs.delete(fn); },
     onEnd: (fn) => { ends.add(fn); return () => ends.delete(fn); },
-    stop: () => es.close(),
+    stop: () => { done = true; es.close(); },
   };
 }

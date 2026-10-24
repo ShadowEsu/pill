@@ -32,6 +32,8 @@ export function evaluate(samples: Sample[], ref: Reference | null): Evaluation {
 
   if (!ref) return mk('UNABLE TO VERIFY', 'U1', 'There is no reference band for this drug on this station. Nothing was measured against anything, so there is no result to act on.', 'calibrate a reference first', 'ask');
   if (f.fault) return mk('UNABLE TO VERIFY', 'U2', `The station reported a fault (${f.fault.replace('_', ' ')}) during the run, so the curve cannot be trusted. Fix the station and retest with a new tablet.`, 'retest', 'ask');
+  const span = samples.length ? samples[samples.length - 1].t - samples[0].t : 0;
+  if (span < 30) return mk('UNABLE TO VERIFY', 'U3', `Only ${Math.max(0, Math.round(span))} s of samples arrived; a curve needs at least 30 s before it can be compared. Retest with a new tablet.`, 'retest', 'ask');
   if (f.scatter > ref.scatterMax) return mk('UNABLE TO VERIFY', 'U3', `The reading never settled: scatter ${f.scatter.toFixed(3)} is above the limit ${ref.scatterMax}. Retest with a new tablet and the lid closed the whole time.`, 'retest', 'ask');
   if (f.plateau < ref.bandLow) return mk('NEEDS LAB', 'N1', `The plateau ${f.plateau.toFixed(2)} sits below the reference band ${ref.bandLow}–${ref.bandHigh}, so this tablet dissolved less than the reference did. Send this lot to a lab; do not use this result to clear it.`, 'send to lab', 'hold');
   if (f.glowRise < ref.glowMin) return mk('NEEDS LAB', 'N2', `The inline channel moved but the 90° glow did not rise (${f.glowRise.toFixed(3)} vs ${ref.glowMin}), which is what chalk does and riboflavin does not. Send this lot to a lab.`, 'send to lab', 'hold');

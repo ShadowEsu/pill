@@ -21,6 +21,7 @@ import { CLAUDE_MODEL, GEMINI_MODEL, aiHas, ask, escrowLog, explainWhy, parseAsk
 import { nessieAccounts, nessieMode, nessieTransfer, setupNessie } from './nessie.ts';
 import { MAX_SPEAK_CHARS, speak, speechMode } from './speech.ts';
 import { initTiger, insertSamples, parseSamples, plateauCurve, tigerMode, tigerStatus } from './tiger.ts';
+import { station, stationRouter } from './station.ts';
 import { assistHandler, tipRoute } from '../../web/api/_lib/follower.ts';
 import { endpoint as apiEndpoint } from '../../web/api/_lib/http.ts';
 import { labelRoute } from '../../web/api/_lib/label.ts';
@@ -169,6 +170,10 @@ app.post('/tiger/samples', async (req, res) => {
 });
 app.get('/tiger/plateau/:run_id', async (req, res) => { res.json(await plateauCurve(req.params.run_id)); });
 
+// ---- the station (Uno over USB serial, or SERIAL_PORT=sim); owns the run state machine, never a verdict ----
+station.start();
+app.use(stationRouter());
+
 app.post('/speak', async (req, res) => {
   const text = (req.body as { text?: unknown } | undefined)?.text;
   if (typeof text !== 'string' || !text.trim()) { res.status(400).json({ mode: 'unavailable', error: 'send {"text": string}' }); return; }
@@ -260,4 +265,5 @@ app.listen(PORT, () => {
   console.log(`  models        claude ${aiHas().claude ? CLAUDE_MODEL : 'unavailable'} · gemini ${aiHas().gemini ? GEMINI_MODEL : 'unavailable'} · speech ${speechMode()}`);
   void setupNessie().then((r) => console.log(`  nessie        ${r ? `SANDBOX customer ${r.customer}` : nessieMode()}`));
   void initTiger().then((r) => console.log(`  tiger         ${r.mode === 'live' ? 'live (samples hypertable ready)' : `unavailable (${r.reason})`}`));
+  console.log(`  station       ${station.mode === 'no_station' ? 'no_station (scanning /dev/cu.usbmodem* and /dev/cu.usbserial* every 3 s)' : `${station.mode} ${station.status().port}`}`);
 });

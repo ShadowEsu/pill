@@ -1,6 +1,8 @@
 // Place the tablet. A three-step timetable (place → close → start), the light path the checks prove out, the station
 // pre-checks, the one instruction, then Start.
 // The checks are simulated until the live stream reports led/dark/paddle/lid; ?live=1 skips the simulation.
+// When the pay service reports a station (/station/status), a 'Station online' chip shows and Start runs it for real
+// (Run.tsx ?station=1); otherwise Start plays the replay.
 // Motion: each check draws its checkmark with a rising tick; the light path's arrows draw in once the LED is green; a quarter
 // tablet keeps dropping into the cup with ripple rings; Start pulses softly once every check is green.
 import { useEffect, useState } from 'react';
@@ -10,6 +12,7 @@ import SensorPath from '../components/SensorPath';
 import Glyph from '../components/Glyph';
 import { Action, Screen } from '../components/Shell';
 import { actions, useStore } from '../lib/store';
+import { stationStatus, type StationStatus } from '../lib/station';
 import { playSound } from '../lib/sound';
 import ReadAloud from '../components/ReadAloud';
 import '../components/cinema.css';
@@ -89,21 +92,46 @@ export default function Place() {
     return () => ids.forEach(clearTimeout);
   }, [live]);
 
+  // the physical station (pay service /station/status); null = none, and Start plays the replay as before
+  const [station, setStation] = useState<StationStatus | null>(null);
+  useEffect(() => {
+    let alive = true;
+    const poll = () => void stationStatus().then((s) => { if (alive) setStation(s); });
+    poll();
+    const timer = window.setInterval(poll, 5000);
+    return () => { alive = false; clearInterval(timer); };
+  }, []);
+
   const drug = bottle?.drug ?? 'Riboflavin';
   const lot = bottle?.lot ?? 'B2-07';
   const allDone = done >= CHECKS.length;
 
   const start = () => {
     playSound('rise');
+    if (station) {
+      // Run asks the station for dark → blank → start, then streams it (Run.tsx, ?station=1)
+      const q = new URLSearchParams({ station: '1', drug: drug.toLowerCase(), lot });
+      if (bottle) q.set('bottle', bottle.id);
+      if (deliveryId) q.set('delivery', deliveryId);
+      nav(`/run/new?${q.toString()}`);
+      return;
+    }
     const run = actions.startRun({ drug: drug.toLowerCase(), lot, src: 'replay', bottleId: bottle?.id ?? null, deliveryId });
     nav(`/run/${run.id}?replay=${drug.toLowerCase() === 'calcium carbonate' ? 'TM-02' : 'B2-07'}`);
   };
 
   return (
     <Screen title="Place the tablet" back tone="mint" art={<Glyph name="tablet" size={48} />}>
-      <p className="mono" style={{ fontSize: 13, color: 'var(--ink-2)', marginTop: -6 }}>
-        {drug}{bottle?.strength ? ' ' + bottle.strength : ''} · lot {lot}{deliveryId ? ` · delivery ${deliveryId}` : ''}
-      </p>
+      <div className="row" style={{ gap: 8, marginTop: -6, flexWrap: 'wrap', alignItems: 'center' }}>
+        <p className="mono" style={{ fontSize: 13, color: 'var(--ink-2)' }}>
+          {drug}{bottle?.strength ? ' ' + bottle.strength : ''} · lot {lot}{deliveryId ? ` · delivery ${deliveryId}` : ''}
+        </p>
+        {station && (
+          <span className="chip ok pop-in" data-station={station.mode} title={station.port ?? undefined}>
+            <span className="dot" />Station online{station.mode === 'sim' ? ' · simulated' : ''}
+          </span>
+        )}
+      </div>
       <div className="wide-2">
         <div className="stack" style={{ gap: 14, minWidth: 0 }}>
           <section className="card stack cn-field" style={{ gap: 6 }}>
