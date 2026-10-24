@@ -32,7 +32,10 @@
 .nav-ch b { flex: none; font-weight: 500; color: var(--blue-ink); padding: 3px 8px; border: 1px solid rgba(79,179,255,.45); border-radius: 999px; line-height: 1; }
 .nav-ch span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (max-width: 1240px) { .nav-links { gap: 18px; font-size: 13px; } }
-@media (max-width: 1100px) { .nav-links { display: none; } .nav-ch { display: flex; } }
+@media (max-width: 1100px) { .nav-links { display: none; } .nav-ch { display: flex; max-width: 40vw; } }
+.nav-app { padding: 8px 14px; font-size: 13px; min-height: 36px; margin-left: 14px; flex: none; }
+.nav .wrap { gap: 12px; }
+@media (max-width: 520px) { .nav-ch { display: none; } }
 .reduced .nav-links a::after { transition: none; }
 
 /* ---------- the scroll story ---------- */
