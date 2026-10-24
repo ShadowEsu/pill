@@ -1,0 +1,40 @@
+0b1bc5d Sat 08:34 pill app v2 base: week of seeded history + named activity feed, responsive frame (tab bar / sidebar), palette tokens, new routes (dashboard, runs, schedule, activity), vercel.json SPA rewrites
+2b402df Sat 08:32 COINBASE-TRACK: the brief verbatim, our angle, architecture, real-payment build plan, demo, submission checklist
+6b4372f Sat 01:45 pill app v1: onboarding, home (medical/personal), bottle, place, run with pill fill, evaluation, deliveries + delivery (policy, release tap), medicines, log, calibration, verify (x402), ask slot, kiosk
+05ad56f Sat 01:28 APP-PLAN draft 2: Preston's direction (light, pill fill, onboarding, modes, AI slot), traction research
+1ac4156 Sat 01:26 pill app: scaffold (Vite+React+TS, light tokens, types, 7 rules, replay stream, store, routes, shell, stub screens)
+2c621af Sat 01:19 APP-PLAN draft 1: process, 12 screens, design direction, inspiration, stack, build order, 5 decisions
+297e2da Sat 01:03 pill-site v4: words back to ink (colour in backgrounds/lines only); Payments section for the Coinbase x402 track (interactive rail, x402 call, proposed pricing + calculator); plan: payment rails 4b, tracks
+63e4fe7 Sat 00:55 pill-site v3: Peel removed from the site; sky + mint palette, translucent glass panels, tinted dark band
+91df87e Sat 00:53 PLAN: site live URL
+41fc5ed Sat 00:44 pill-site: vercel.json (static vite, font caching)
+c047b33 Sat 00:43 pill-site v2: wider data-path figure
+a2f7c9e Sat 00:41 pill-site v2: station v2 (attachScroll idle loop, spinning paddle, glyph stream), phone v2 (calibration, bottle, recall, medicines, released; 3 loops), Pi row, sticky phones
+5ebb2fb Sat 00:30 pill-site v2 WIP: binary pill hero, typing headings, FIG specs + pipeline, calibration step, richer clinic/personal, judges' questions, AI line
+6ebe8db Sat 00:22 pill-site: mobile overflow fix, label hiding on phones, dark list contrast
+939d627 Sat 00:20 pill-site: station blueprint (scroll-exploded), FIG grid, phone mock, sourced numbers
+98735ec Sat 00:10 pill-site: scaffold, tokens, hero, sourced problem section, steps, verdict, limits, Peel/BOM
+2b87c54 Fri 23:37 gitignore: channel cache
+4636b95 Fri 23:37 say.sh: channel id cache, 429 retry
+adc2e72 Fri 23:37 Signal design from Research lookups: 900 mL vessel, quarter tablet, short path, blue/green filters, stepper paddle
+d7ce5b0 Fri 23:34 WEBSITE-PLAN v2: editorial lab, 3D station from the print CAD, 10 beats, lengths, timeline, problems
+97bb295 Fri 23:31 WEBSITE-PLAN.md v1 + website references research
+595bdd9 Fri 23:29 SOFTWARE-PLAN.md v1
+840eebf Fri 23:28 PLAN: website decision row in order
+dff8f4d Fri 23:28 PLAN: website decision, corrected malaria stat
+96fb2f8 Fri 23:28 Website debate: 16 AI personas, plain honest page 8.0 vs storytelling 3.7
+dcdcbd8 Fri 23:10 Bridge: emoji categories, plain-name routing
+34a0a5f Fri 23:09 PLAN.md: master plan v1
+df9a3be Fri 23:08 Bridge: 14 PILL channels, per-channel routing to Desk and Debate panes
+ea73b35 Fri 22:53 Restore Discord bridge
+c9c0e5f Fri 22:50 Remove chat bridge (Preston: nevermind)
+d1aafb1 Fri 22:44 Discord bridge: PILL category with 10 channels, auto-setup, bot-identity replies
+1fa670a Fri 22:13 Name: Pill
+5873de3 Fri 22:11 Discord bridge: channel -> herdr pane prompts, webhook replies, attachments to inbox
+5d8c3fe Fri 22:08 Lot: product round, 16/16 clinic gate; scan screen spec, demo, features
+7732cf5 Fri 22:00 Final judging: Lot 13/16 over Bill and Streets; scope, attacks, fallback
+d10b7b7 Fri 21:07 Research: TreeHacks 2025/2026 winners
+b77c2ad Fri 21:07 Research: past winners Cal Hacks 11/12, Berkeley AI 2026, HackMIT 2025/26, HackHarvard 2025/26
+03c5c4d Fri 20:57 Payout: heat early-warning + parametric payouts; 18-persona debate, fixes, demo, hours
+d334c55 Fri 20:46 DripGuard: 18-persona two-round debate, pick + must-fix list + hour plan
+173458d Fri 20:32 Cal Hacks 13 notes: ideas shortlist, FloodToll research + 18-persona verdict

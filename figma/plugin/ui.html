@@ -1,0 +1,43 @@
+<style>
+  body { font: 13px/1.45 Inter, system-ui, sans-serif; margin: 16px; color: var(--figma-color-text, #16181B); }
+  h1 { font-size: 15px; margin: 0 0 4px; }
+  p { margin: 0 0 12px; color: var(--figma-color-text-secondary, #4A4E55); }
+  label.drop { display: block; border: 1.5px dashed var(--figma-color-border, #C9CDD1); border-radius: 10px; padding: 18px; text-align: center; cursor: pointer; }
+  label.drop.ok { border-color: #5FD39A; background: rgba(95,211,154,.12); }
+  input[type=file] { display: none; }
+  button { margin-top: 12px; width: 100%; height: 36px; border: 0; border-radius: 8px; background: #16181B; color: #fff; font: 600 13px Inter, sans-serif; cursor: pointer; }
+  button:disabled { opacity: .35; cursor: default; }
+  #log { margin-top: 12px; font: 11px/1.5 ui-monospace, Menlo, monospace; white-space: pre-wrap; max-height: 110px; overflow: auto; }
+</style>
+<h1>Pill → Figma</h1>
+<p>Pick <b>figma/deck.json</b>. In Slides it builds the deck; in Design the pages; in FigJam the ideation board.</p>
+<label class="drop" id="drop"><input type="file" id="file" accept=".json,application/json"><span id="name">Choose deck.json (or drop it here)</span></label>
+<button id="go" disabled>Build</button>
+<div id="log"></div>
+<script>
+  let deck = null;
+  const $ = (id) => document.getElementById(id);
+  const log = (s) => { $('log').textContent = s; };
+  async function load(file) {
+    try {
+      deck = JSON.parse(await file.text());
+      $('name').textContent = `${file.name} · ${deck.slides.length} slides · ${Object.keys(deck.images).length} images · ${(file.size / 1048576).toFixed(1)} MB`;
+      $('drop').classList.add('ok');
+      $('go').disabled = false;
+    } catch (e) { log('Could not read that file: ' + e.message); }
+  }
+  $('file').onchange = (e) => e.target.files[0] && load(e.target.files[0]);
+  $('drop').ondragover = (e) => e.preventDefault();
+  $('drop').ondrop = (e) => { e.preventDefault(); e.dataTransfer.files[0] && load(e.dataTransfer.files[0]); };
+  $('go').onclick = () => { $('go').disabled = true; log('Building…'); parent.postMessage({ pluginMessage: { type: 'build', deck } }, '*'); };
+  onmessage = (e) => {
+    const m = e.data.pluginMessage;
+    if (!m) return;
+    if (m.type === 'progress') log(m.text);
+    if (m.type === 'error') { log('Error: ' + m.text); $('go').disabled = false; }
+    if (m.type === 'done') {
+      log(`Done in ${m.seconds} s (${m.editor}): ${m.what}\n${m.images} images · ${m.at}` + (m.warnings.length ? '\nNotes: ' + m.warnings.join('; ') : '') + '\n\nPaste the time into figma/LINKS.md.');
+      $('go').disabled = false;
+    }
+  };
+</script>
