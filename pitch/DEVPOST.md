@@ -139,6 +139,8 @@ Five layers, each honest about its limits: (1) two-channel optics (absorbance pl
 Two models, two contained jobs: Gemini reads the bottle label from a photo into five editable fields (never inventing a field it cannot read), and Claude writes the two-sentence explanation and the escrow clerk's log line. Neither sets a verdict or moves money; every sentence goes through a clause filter with a deterministic fallback.
 
 ### MLH: Best Use of Gemini API
+
+**Built (Sat):** an agentic checker (`/check`): Gemini reads the label from the camera, looks at frames of the cup (clarity, colour, tablet state), queries openFDA for a recall through a function-call tool, cross-checks expiry/drug/lot, compares with the sensor and writes a plain summary through the clause filter; the step log shows which Gemini model answered. Plus a docked follower assistant on every screen (streams, voice input, big text, 'Not medical advice' footer). Gemini explains the sensor verdict and can never change it. Keys stay server-side (Vercel functions + the booth service).
 `POST /label` sends the bottle photo to `gemini-3.5-flash` and gets back `{drug, strength, lot, maker, expiry, confidence}`. A field Gemini cannot read comes back `null`; any failure returns `mode: unavailable` and the app's Bottle screen says `demo` instead of inventing fields. The image stays in memory and is never written to disk, and the person checks every field before saving. Gemini's lot number feeds the recall check and the delivery match.
 
 ### MLH: Best Use of Tiger Data (enter only if built)
