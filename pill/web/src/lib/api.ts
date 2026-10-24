@@ -1,6 +1,7 @@
 // Typed calls to the pill-pay service (VITE_PAY_URL). Each helper returns the service's own answer, or
 // {mode:'unavailable', error} when the URL is not set or the service does not answer: the screens fall back on that.
-import type { RuleId, Verdict } from './types';
+import type { Run, RuleId, Verdict } from './types';
+import { absorbance } from './rules';
 
 export const PAY_URL = (import.meta.env.VITE_PAY_URL as string | undefined)?.replace(/\/$/, '') || null;
 
@@ -88,3 +89,31 @@ export async function nessieAccounts(): Promise<NessieAccounts | { mode: 'unavai
     return { mode: 'unavailable', reason: (e as Error).message };
   }
 }
+
+// ---- POST /ask (Claude, answers only from the record the app sends; clause-filtered) ----
+
+export interface AskAnswer { answer: string; model: 'claude' | 'template'; model_id?: string; filtered: boolean; dropped: string[]; mode: 'live' | 'template'; reason?: string }
+
+export const askPill = (question: string, mode: 'medical' | 'personal', context: Record<string, unknown>) =>
+  post<AskAnswer>('/ask', { question, mode, context }, 30_000);
+
+// ---- Tiger Data (TimescaleDB hypertable of station samples; only when the service has TIGER_URL) ----
+
+export type TigerStatus = { mode: 'live'; rows: number; runs: number; last: string | null } | { mode: 'unavailable'; reason?: string; error?: string };
+
+export async function getTigerStatus(): Promise<TigerStatus> {
+  if (!PAY_URL) return { mode: 'unavailable', reason: 'no VITE_PAY_URL' };
+  try {
+    const res = await fetch(`${PAY_URL}/tiger/status`, { signal: AbortSignal.timeout(10_000) });
+    return (await res.json()) as TigerStatus;
+  } catch (e) {
+    return { mode: 'unavailable', reason: (e as Error).message };
+  }
+}
+
+/** One batched insert of a run's curve: t, inline absorbance, 90° glow absorbance, water temperature. */
+export const postSamples = (run: Run, station = 'STATION 01') =>
+  post<{ mode: 'live'; inserted: number }>('/tiger/samples', {
+    run_id: run.id, station, started_at: run.startedAt,
+    samples: run.samples.map((s) => ({ t: s.t, abs: +absorbance(s.blank, s.adc0).toFixed(4), glow: +absorbance(s.blank, s.adc90).toFixed(4), temp: s.temp })),
+  }, 15_000);

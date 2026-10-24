@@ -14,13 +14,14 @@ import { NETWORK, PORT, PRICE, PUBLIC_FACILITATOR, has, localWallet, missing, ty
 import { REFERENCES, evaluate, parseCurve, type CurveInput } from './rules.ts';
 import { accounts, escrowMode, move, type Move } from './escrow.ts';
 import { calendarStatus, createEvent, type CalendarEventInput } from './calendar.ts';
-import { CLAUDE_MODEL, GEMINI_MODEL, aiHas, escrowLog, explainWhy, parseEscrow, parseWhy, readLabel } from './ai.ts';
+import { CLAUDE_MODEL, GEMINI_MODEL, aiHas, ask, escrowLog, explainWhy, parseAsk, parseEscrow, parseWhy, readLabel } from './ai.ts';
 import { nessieAccounts, nessieMode, nessieTransfer, setupNessie } from './nessie.ts';
 import { MAX_SPEAK_CHARS, speak, speechMode } from './speech.ts';
+import { initTiger, insertSamples, parseSamples, plateauCurve, tigerMode, tigerStatus } from './tiger.ts';
 
 const DESCRIPTION = 'Pill dissolution verdict for a curve';
 const ROUTE = 'POST /verify';
-const ORIGINS = new Set((process.env.CORS_ORIGINS || 'http://127.0.0.1:5183,http://localhost:5183,http://127.0.0.1:5186,http://localhost:5186,http://127.0.0.1:5189,http://localhost:5189,http://localhost:5173').split(',').map((s) => s.trim()).filter(Boolean));
+const ORIGINS = new Set((process.env.CORS_ORIGINS || 'http://127.0.0.1:5183,http://localhost:5183,http://127.0.0.1:5186,http://localhost:5186,http://127.0.0.1:5189,http://localhost:5189,http://127.0.0.1:5191,http://localhost:5191,http://localhost:5173').split(',').map((s) => s.trim()).filter(Boolean));
 
 const app = express();
 
@@ -99,7 +100,7 @@ app.get('/health', (_req, res) => {
   res.json({
     mode, facilitator, network: NETWORK, payTo, price: PRICE, why: picked.why, escrow: escrowMode(), has, label: 'TESTNET',
     ai: { claude: aiHas().claude ? CLAUDE_MODEL : 'unavailable', gemini: aiHas().gemini ? GEMINI_MODEL : 'unavailable' },
-    nessie: nessieMode(), speech: speechMode(),
+    nessie: nessieMode(), speech: speechMode(), tiger: tigerMode(),
   });
 });
 
@@ -127,6 +128,24 @@ app.post('/escrow-log', async (req, res) => {
   console.log(`[escrow-log ${r.mode}] ${i.verdict} proposed ${i.proposed} → ${r.outcome} ${r.clause_id}${r.guards.length ? ` · ${r.guards.join('; ')}` : ''}`);
   res.json(r);
 });
+
+// Ask Pill: answers only from the record the app sends (and the fixed rule/policy texts); clause-filtered.
+app.post('/ask', async (req, res) => {
+  const i = parseAsk(req.body);
+  if ('error' in i) { res.status(400).json({ mode: 'unavailable', error: i.error }); return; }
+  const r = await ask(i);
+  console.log(`[ask ${r.mode}] ${i.mode} · ${i.question.length} chars${r.mode === 'template' ? ` (${r.reason})` : ''}${r.dropped.length ? ` · dropped ${r.dropped.length}` : ''}`);
+  res.json(r);
+});
+
+// ---- Tiger Data (TimescaleDB hypertable of station samples; TIGER_URL only) ----
+app.get('/tiger/status', async (_req, res) => { res.json(await tigerStatus()); });
+app.post('/tiger/samples', async (req, res) => {
+  const i = parseSamples(req.body);
+  if ('error' in i) { res.status(400).json({ mode: 'unavailable', error: i.error }); return; }
+  res.json(await insertSamples(i));
+});
+app.get('/tiger/plateau/:run_id', async (req, res) => { res.json(await plateauCurve(req.params.run_id)); });
 
 app.post('/speak', async (req, res) => {
   const text = (req.body as { text?: unknown } | undefined)?.text;
@@ -214,4 +233,5 @@ app.listen(PORT, () => {
   console.log(`  escrow        ${escrowMode()}${escrowMode() === 'simulated' ? ' (no CDP credentials; /escrow/* moves nothing)' : ''}`);
   console.log(`  models        claude ${aiHas().claude ? CLAUDE_MODEL : 'unavailable'} · gemini ${aiHas().gemini ? GEMINI_MODEL : 'unavailable'} · speech ${speechMode()}`);
   void setupNessie().then((r) => console.log(`  nessie        ${r ? `SANDBOX customer ${r.customer}` : nessieMode()}`));
+  void initTiger().then((r) => console.log(`  tiger         ${r.mode === 'live' ? 'live (samples hypertable ready)' : `unavailable (${r.reason})`}`));
 });

@@ -76,7 +76,8 @@ export default function Onboarding() {
           </div>
           <footer style={{ display: 'grid', gap: 6, justifyItems: 'center', marginTop: 4, '--i': 4 } as React.CSSProperties}>
             <p className="footnote">You can change this later in settings.</p>
-            <div className="row" style={{ gap: 4 }}>
+            <div className="row" style={{ gap: 4, flexWrap: 'wrap', justifyContent: 'center' }}>
+              <Link to="/demo" className="mono" style={{ fontSize: 12, color: 'var(--muted)', padding: '10px 12px' }}>Watch the 2-minute demo</Link>
               <Link to="/story" className="mono" style={{ fontSize: 12, color: 'var(--muted)', padding: '10px 12px' }}>How Pill works</Link>
               <Link to="/kiosk" className="mono" style={{ fontSize: 12, color: 'var(--muted)', padding: '10px 12px' }}>Station screen</Link>
             </div>

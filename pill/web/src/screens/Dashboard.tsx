@@ -13,6 +13,7 @@ import { REFERENCES } from '../data/reference';
 import type { Activity, Delivery, Run, Verdict } from '../lib/types';
 import { DAY, H, dayStart, hm, hourOf, refTo, usd, useNow } from '../lib/when';
 import EmptyState, { SettingsLink } from '../components/EmptyState';
+import { scorecard } from '../lib/agent';
 import '../components/viz.css';
 
 const HELD: Record<Delivery['outcome'], boolean> = { pending: false, release: false, released: false, hold: true, escalate: true };
@@ -104,6 +105,7 @@ export default function Dashboard() {
   const station = useStore((s) => s.station);
   const now = useNow();
   const k = kpis(deliveries, runs, now);
+  const agent = scorecard(deliveries);
 
   const items = timetableItems(acts, runs, deliveries, now);
   const hrs = [...items.map((i) => hourOf(i.at)), hourOf(now)];
@@ -213,6 +215,15 @@ export default function Dashboard() {
           </div>
         </section>
       </div>
+
+      <Link to="/agent" className="card panel hover-line" aria-label="Policy agent record" data-agent-card style={{ textDecoration: 'none', color: 'inherit', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 14 }}>
+        <ActorAvatar actor={PEOPLE.agent} />
+        <span className="stack" style={{ gap: 2, flex: '1 1 220px', minWidth: 0 }}>
+          <span style={{ fontWeight: 600 }}>Policy agent record <span className="pointer" aria-hidden="true">→</span></span>
+          <span className="mono muted" style={{ fontSize: 12 }}>{agent.proposed} proposed · {agent.releasedByPerson} released by a person · {agent.held} held · {agent.escalated} escalated · {agent.asked} asked a person</span>
+        </span>
+        <span className="chip"><span className="dot" style={{ background: 'var(--ink)' }} />{usd(agent.movedByAgentAlone)} moved by the agent alone</span>
+      </Link>
 
       <section className="card decor-dots" aria-label="Station" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12, padding: 14 }}>
         <span className={'chip ' + (station.online ? 'ok' : 'bad')}><span className="dot" />{station.id} · {station.online ? 'online' : 'offline'}</span>

@@ -24,7 +24,7 @@ import Kiosk from './screens/Kiosk';
 import Story from './screens/Story';
 import Settings from './screens/Settings';
 import AgentRecord from './screens/AgentRecord';
-import Demo from './screens/Demo';
+import Demo, { DemoDriver } from './screens/Demo';
 
 function Frame({ children }: { children: React.ReactNode }) {
   const { pathname } = useLocation();
@@ -33,6 +33,7 @@ function Frame({ children }: { children: React.ReactNode }) {
     <div className="frame">
       {!kiosk && <Nav />}
       <div className={'app' + (kiosk ? ' kiosk' : '')}>{children}</div>
+      <DemoDriver />
     </div>
   );
 }
@@ -76,7 +77,7 @@ export default function App() {
           <Route path="/story" element={<Story />} />
           <Route path="/settings" element={<Gate><Settings /></Gate>} />
           <Route path="/agent" element={<Gate><AgentRecord /></Gate>} />
-          <Route path="/demo" element={<Gate><Demo /></Gate>} />
+          <Route path="/demo" element={<Demo />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Frame>
