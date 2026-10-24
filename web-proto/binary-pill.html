@@ -1,0 +1,80 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pill: binary pill prototype</title>
+<style>
+  html,body{margin:0;height:100%;background:#0B0C0E;color:#F6F5F2;font-family:ui-sans-serif,system-ui,-apple-system,"Satoshi",sans-serif}
+  .hero{position:relative;height:100svh;display:grid;place-items:center;overflow:hidden}
+  canvas{display:block;width:min(92vw,1100px);height:auto}
+  .copy{position:absolute;left:0;right:0;bottom:8vh;text-align:center;padding:0 24px}
+  h1{font-size:clamp(28px,5vw,64px);font-weight:600;letter-spacing:-0.02em;margin:0 0 8px}
+  p{margin:0;color:#9aa0a6;font-size:clamp(15px,1.6vw,19px);font-family:"JetBrains Mono",ui-monospace,Menlo,monospace}
+  @media (prefers-reduced-motion:reduce){ .motion{display:none} }
+</style>
+<div class="hero">
+  <canvas id="c" width="1100" height="520" aria-label="A pill drawn out of ones and zeros, rotating"></canvas>
+  <div class="copy">
+    <h1>The box measures. Pill explains.</h1>
+    <p>one tablet · about 3 minutes · PASS / NEEDS LAB / UNABLE TO VERIFY</p>
+  </div>
+</div>
+<script>
+// A capsule rendered by ray-marching a signed distance field, one ray per text cell.
+// Each hit cell prints a 1 or a 0; lit faces print 1, shaded faces 0. No libraries.
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const COLS = 84, ROWS = 40;                        // text cells
+const cw = cv.width / COLS, ch = cv.height / ROWS;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const R = 0.36, HALF = 0.82;                       // capsule radius and half-length (world units)
+const light = norm([-0.45, 0.7, 1.2]);
+const bits = new Uint8Array(COLS * ROWS).map(() => Math.random() < 0.5 ? 1 : 0);
+
+function norm(v){ const l = Math.hypot(...v); return v.map(x => x / l); }
+function sdCapsule(p){                              // capsule along x
+  const x = Math.max(-HALF, Math.min(HALF, p[0]));
+  return Math.hypot(p[0] - x, p[1], p[2]) - R;
+}
+function rot(p, ay, az){                            // yaw then roll, inverse applied to rays
+  let [x, y, z] = p;
+  let cy = Math.cos(ay), sy = Math.sin(ay); [x, z] = [cy * x + sy * z, -sy * x + cy * z];
+  let cz = Math.cos(az), sz = Math.sin(az); [x, y] = [cz * x - sz * y, sz * x + cz * y];
+  return [x, y, z];
+}
+function draw(t){
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  ctx.font = `${Math.floor(ch * 0.95)}px ui-monospace, Menlo, monospace`;
+  ctx.textBaseline = 'top';
+  const ay = t * 0.6, az = 0.35 + Math.sin(t * 0.3) * 0.12;  // spin + gentle wobble
+  const aspect = cv.width / cv.height;
+  if (!reduce && Math.random() < 0.3) bits[(Math.random() * bits.length) | 0] ^= 1;  // a bit flips now and then
+  for (let j = 0; j < ROWS; j++) for (let i = 0; i < COLS; i++) {
+    const sx = ((i + 0.5) / COLS * 2 - 1) * 1.7 * aspect * 0.5, sy = -((j + 0.5) / ROWS * 2 - 1) * 1.7 * 0.5;
+    // orthographic ray from z=+3 towards -z, rotated into the capsule's frame
+    let o = rot([sx, sy, 3], -ay, -az), d = rot([0, 0, -1], -ay, -az);
+    let s = 0, hit = false, p;
+    for (let k = 0; k < 48; k++) {
+      p = [o[0] + d[0] * s, o[1] + d[1] * s, o[2] + d[2] * s];
+      const dist = sdCapsule(p);
+      if (dist < 0.004) { hit = true; break; }
+      s += dist; if (s > 7) break;
+    }
+    if (!hit) continue;
+    const e = 0.002, n = norm([
+      sdCapsule([p[0] + e, p[1], p[2]]) - sdCapsule([p[0] - e, p[1], p[2]]),
+      sdCapsule([p[0], p[1] + e, p[2]]) - sdCapsule([p[0], p[1] - e, p[2]]),
+      sdCapsule([p[0], p[1], p[2] + e]) - sdCapsule([p[0], p[1], p[2] - e])]);
+    const nw = rot(n, az, ay);                                   // normal back to view space
+    const lum = Math.max(0, nw[0] * light[0] + nw[1] * light[1] + nw[2] * light[2]);
+    const rim = Math.pow(1 - Math.max(0, nw[2]), 2);
+    const half = p[0] > 0;                                       // two-tone capsule: one half deeper blue
+    const a = 0.45 + lum * 0.55;
+    const hi = lum > 0.82;                                       // specular tier prints near-white
+    ctx.fillStyle = hi ? `rgba(220,232,255,${a})` : half ? `rgba(70,125,255,${a})` : `rgba(150,185,255,${a * 0.9 + rim * 0.1})`;
+    const bit = lum > 0.5 ? 1 : (bits[j * COLS + i] & (lum > 0.25 ? 1 : 0));
+    ctx.fillText(bit ? '1' : '0', i * cw, j * ch);
+  }
+}
+let start = performance.now();
+function frame(now){ draw(reduce ? 0.9 : (now - start) / 1000); if (!reduce) requestAnimationFrame(frame); }
+requestAnimationFrame(frame);
+</script>
