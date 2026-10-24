@@ -28,15 +28,19 @@ INBOX = Path.home() / "calhacks-13" / "discord-inbox"
 LOG = ROOT / "bridge.log"
 
 CHANNELS: list[tuple[str, str]] = [
-    ("ask-pill", "Ask the helper anything; it replies here"),
-    ("documents", "Specs, PDFs, datasheets, drafts"),
-    ("ideas", "New ideas and what-ifs"),
-    ("features", "Feature decisions for the app and station"),
+    ("inquiries", "General questions and discussion: where to build, how, connectors. The helper answers here"),
+    ("plan", "The master plan (PLAN.md), milestones, who does what, the clock to Sun 8:30 AM"),
+    ("decisions", "One message per decision: what, why, who. The helper logs them"),
+    ("ideas", "New ideas and what-ifs; the helper runs the debaters on request"),
+    ("debate", "Results from the AI debaters and judge panels"),
+    ("references", "Peel, past winners, papers, prize rules, every source we lean on"),
+    ("documents", "Specs, PDFs, datasheets, drafts; drop files here"),
     ("hardware", "Wiring, sensors, calibration runs, photos of the box"),
-    ("app", "App screens, design, bugs"),
-    ("server-updates", "Deploys, services, bot status"),
+    ("website", "Site and web app: pages, screens, design"),
+    ("software", "Firmware, backend, agent, data"),
     ("errors", "Paste errors and logs here"),
     ("pitch", "Devpost text, slides, demo script, video"),
+    ("status", "Short progress updates from the helper and team"),
     ("life-updates", "Where everyone is, food, sleep, schedule"),
 ]
 
@@ -67,6 +71,12 @@ load_env()
 TOKEN = os.environ["DISCORD_BOT_TOKEN"]
 CATEGORY = os.environ.get("DISCORD_CATEGORY", "PILL")
 TARGET = os.environ.get("HERDR_TARGET", "wZ:p1")
+# DISCORD_ROUTES="inquiries=wZ:p3,ideas=wZ:p4" sends those channels to other panes; everything else goes to TARGET.
+ROUTES: dict[str, str] = {}
+for item in os.environ.get("DISCORD_ROUTES", "").split(","):
+    if "=" in item:
+        name, pane = item.split("=", 1)
+        ROUTES[name.strip().lstrip("#")] = pane.strip()
 SETUP_ONLY = "--setup" in sys.argv
 
 intents = discord.Intents.default()
@@ -105,9 +115,9 @@ async def on_ready() -> None:
     if SETUP_ONLY:
         await client.close()
         return
-    ask = next((c for g in client.guilds for c in g.text_channels if c.name == "ask-pill" and c.id in watched), None)
+    ask = next((c for g in client.guilds for c in g.text_channels if c.name == "inquiries" and c.id in watched), None)
     if ask:
-        await ask.send("Pill is online. Ask here, or drop files in #documents. I'll answer in the same channel.")
+        await ask.send("Pill is online. Ask anything here; drop files in #documents; the plan lives in #plan. I answer in the channel you write in.")
 
 
 @client.event
@@ -139,8 +149,9 @@ async def on_message(message: discord.Message) -> None:
     except Exception:  # noqa: BLE001
         pass
     try:
+        target = ROUTES.get(chan, TARGET)
         proc = await asyncio.create_subprocess_exec(
-            "herdr", "agent", "prompt", TARGET, prompt,
+            "herdr", "agent", "prompt", target, prompt,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         )
         _, err = await proc.communicate()
