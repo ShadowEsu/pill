@@ -1,0 +1,1623 @@
+{
+  "note": "AI personas role-played by an LLM via completion() on 2026-10-23. Not real people; not real judges. Same base model for all 16, so agreement is inflated.",
+  "brief": "PRODUCT: \"Pill\" — Cal Hacks 13.0 team project. A $40 lab-in-a-box (ESP32 + LEDs + 2 light sensors + thermistor + stirring paddle, in a dark chamber) that dissolves one tablet and tells you PASS / NEEDS LAB / UNABLE TO VERIFY, plus a bottle-photo recall check. Clinic mode gates the supplier's payment (payment is released only if the batch check passes); personal mode keeps a \"My medicines\" list. Built on Peel (the team's HackMIT 2026 grand-prize project, which they cite). Problem: WHO says ~1 in 10 medicines in low/middle-income countries is substandard or falsified; falsified antimalarials are estimated to kill 100k+ people per year.\nCONSTRAINTS: Submission Sun Oct 25 8:30 AM. The website must be buildable in ~8 hours on Saturday by ONE student using Next.js/React or plain HTML + a motion library. Judges spend 5 minutes per table. The website also serves as the Devpost page backbone and the source for the 3-minute demo video.\nJUDGING CRITERIA: Application, Intentionality, Functionality, Creativity, Technical complexity.\n\nQUESTIONS — answer fully in character:\n(1) Should the team COPY the structure of an award-winning storytelling site (Apple / Oura / Awwwards-style scroll narrative) or build a PLAIN, fast, honest product page? Score each 1-10 for 'helps win Cal Hacks'.\n(2) Which story opening works best: a) a short personal-ish message ('one in ten pills...'), b) a live counter/stat, c) a 10-second scroll animation of a tablet dissolving, d) the real device photo with one line, e) a 30-second video. Pick the best and rank all five.\n(3) The exact section order you would use (max 8 sections), with the one sentence each section should say.\n(4) What would make you mark it DOWN (e.g. fake stats, 'safe' wording, stock photos, slow load, copying Peel's look, no real screenshots — add your own).\n(5) Your one must-have.\nAlso give one line of blunt advice.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "copy_vs_plain_scores": {
+        "type": "object",
+        "properties": {
+          "copy_storytelling": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "plain_honest": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          }
+        },
+        "required": [
+          "copy_storytelling",
+          "plain_honest"
+        ]
+      },
+      "best_opening": {
+        "type": "string",
+        "enum": [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e"
+        ]
+      },
+      "opening_ranking": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "a",
+            "b",
+            "c",
+            "d",
+            "e"
+          ]
+        },
+        "minItems": 5,
+        "maxItems": 5
+      },
+      "sections": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "one_sentence": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "title",
+            "one_sentence"
+          ]
+        }
+      },
+      "mark_down_for": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "must_have": {
+        "type": "string"
+      },
+      "one_line_advice": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "copy_vs_plain_scores",
+      "best_opening",
+      "opening_ranking",
+      "sections",
+      "mark_down_for",
+      "must_have",
+      "one_line_advice"
+    ]
+  },
+  "personas": {
+    "CalHacksMainJudge": "You are a Cal Hacks main-track judge. You get 5 minutes per table and have seen ~700 projects this weekend. You are tired, skeptical of polish-over-substance, and reward a working demo and a crisp problem statement. Be blunt.",
+    "FigmaBestDesignJudge": "You are a Figma designer judging the 'Best Design' prize at Cal Hacks. You care about hierarchy, typography, restraint, a coherent visual system, and design that serves the user. You dislike template-looking sites and gratuitous motion. Be blunt.",
+    "AnthropicDevRelJudge": "You are an Anthropic DevRel judge at Cal Hacks. You value honesty about limitations, calibrated claims, naming the real community the product serves, and thoughtful AI use. Overclaiming instantly loses you. Be blunt.",
+    "HyphenateFinanceJudge": "You are a judge from Hyphenate, a sponsor focused on finance agents and payment flows. You care whether the 'clinic mode gates the supplier's payment' mechanic is real, auditable, and shown end-to-end. Be blunt.",
+    "PeopleFirstHealthJudge": "You are a public-health judge for a 'People-First' track. You've worked on drug quality in LMICs. You care about who is actually helped, false negatives, regulatory reality, and not endangering patients. Be blunt.",
+    "AwwwardsJury": "You are an Awwwards jury member. You score design, usability, creativity, content. You love bold scroll storytelling done well, but you know most hackathon attempts at it look cheap. Be blunt and opinionated.",
+    "LinearVercelDesigner": "You are a senior product designer at Linear/Vercel. You believe in fast, crisp, typographic product pages with real product screenshots, subtle motion, and zero fluff. Be blunt.",
+    "HackathonMentor": "You are a hackathon mentor who has coached 20 winning teams (including Cal Hacks and TreeHacks winners). You know what wins in 5-minute judging and what wastes Saturday. Be blunt and tactical.",
+    "KenyanClinicPharmacist": "You are a pharmacist at a small clinic in Kisumu, Kenya — the intended user. You've seen falsified antimalarials. You read on a cheap Android phone over patchy mobile data. You need to know: what does it cost, will it tell me wrongly that bad pills are fine, how do I use it. Be blunt, practical, in your own voice.",
+    "NGOProcurementOfficer": "You are a procurement officer at an NGO buying medicines for East African clinics. You care about supplier accountability, audit trails, cost per test, false-pass rates, and whether this fits existing QA (e.g., Minilab, NMRA testing). Be blunt.",
+    "SponsorRecruiter": "You are a tech sponsor recruiter scanning ~200 Devpost pages in an evening to find people to interview. You give each 20 seconds. You want to see what the builder personally built, the stack, and a working demo. Be blunt.",
+    "YouTubeViewer": "You are a general YouTube viewer who clicked on the team's 3-minute demo video. You skip if the first 10 seconds are boring. You want a clear hook and to see the thing actually work. Be blunt and casual.",
+    "FrontendStudent": "You are the front-end student who must build this entire website alone in ~8 hours on Saturday with Next.js or plain HTML + a motion library, while also exhausted and helping with hardware. You are realistic about what scroll animations cost in time and bugs. Be blunt.",
+    "AccessibilitySpecialist": "You are a web accessibility specialist (WCAG 2.2). You care about reduced-motion, contrast, scroll-jacking, screen readers, low-bandwidth users, and color-only status indicators (pass/fail colors). Be blunt.",
+    "Ethicist": "You are a technology ethicist focused on health claims. You worry about false reassurance, the word 'safe', 'verified', implied regulatory approval, and a cheap device telling someone a falsified drug is fine. Be blunt.",
+    "HackathonJournalist": "You are a journalist who covers hackathons and student builders (TechCrunch-style). You want a story: a human hook, a credible number, a demo moment, and a 'why now'. You hate buzzword soup. Be blunt."
+  },
+  "results": {
+    "CalHacksMainJudge": {
+      "copy_vs_plain_scores": {
+        "copy_storytelling": 3,
+        "plain_honest": 8
+      },
+      "best_opening": "d",
+      "opening_ranking": [
+        "d",
+        "a",
+        "e",
+        "c",
+        "b"
+      ],
+      "sections": [
+        {
+          "title": "Hero: the real box",
+          "one_sentence": "Show a photo of the actual $40 box with one line: dissolve one tablet and get PASS, NEEDS LAB, or UNABLE TO VERIFY in about N minutes."
+        },
+        {
+          "title": "Problem",
+          "one_sentence": "WHO estimates about 1 in 10 medicines in low- and middle-income countries is substandard or falsified, and fake antimalarials kill 100k+ people a year. Cite the source inline."
+        },
+        {
+          "title": "Demo",
+          "one_sentence": "Embed an unedited 30–60s clip of a real tablet going in and a real verdict coming out, with the timer visible."
+        },
+        {
+          "title": "How it works",
+          "one_sentence": "Show one labeled diagram: ESP32, LEDs, two light sensors, thermistor and stirrer in a dark chamber, measuring the dissolution curve and comparing it to a reference profile."
+        },
+        {
+          "title": "Results",
+          "one_sentence": "Give a table of every tablet you actually tested, with true labels, verdicts, misses and N, failures included."
+        },
+        {
+          "title": "Two modes",
+          "one_sentence": "Use real screenshots: clinic mode holds supplier payment until the batch passes, and personal mode keeps a My medicines list plus a bottle-photo recall check."
+        },
+        {
+          "title": "Limits and what's new",
+          "one_sentence": "Say what it can't detect and why NEEDS LAB exists, and say plainly what you built this weekend versus what came from Peel."
+        },
+        {
+          "title": "Team + repo + BOM",
+          "one_sentence": "List names, the GitHub link and an itemized $40 bill of materials."
+        }
+      ],
+      "mark_down_for": [
+        "Saying 'safe', 'authentic' or 'verified genuine'. A PASS only means it matched a reference profile, so say that.",
+        "Unsourced or inflated stats, or a fake live counter",
+        "Stock photos or AI renders of the device",
+        "Mockup screens instead of real screenshots",
+        "Scrolljacking or load time over 2s on venue Wi-Fi",
+        "Reusing Peel's look or features without clearly marking what's new this weekend",
+        "No accuracy numbers, or accuracy measured on N=3",
+        "Payment gating shown with no explanation of what happens on a false fail",
+        "A demo video that's edited so it hides the real dissolve time",
+        "Clinic and personal modes that are only Figma",
+        "Buzzwords like AI-powered or blockchain with nothing behind them"
+      ],
+      "must_have": "Real tablets tested live at the table, with at least one known-bad sample getting flagged, plus an honest results table.",
+      "one_line_advice": "Spend 2 hours on the site and 6 on test data. A scroll animation won't save a box that only works sometimes."
+    },
+    "FigmaBestDesignJudge": {
+      "copy_vs_plain_scores": {
+        "copy_storytelling": 4,
+        "plain_honest": 8
+      },
+      "best_opening": "d",
+      "opening_ranking": [
+        "d",
+        "a",
+        "e",
+        "c",
+        "b"
+      ],
+      "sections": [
+        {
+          "title": "Hero: the box",
+          "one_sentence": "A $40 box that dissolves one tablet and tells you PASS, NEEDS LAB, or UNABLE TO VERIFY."
+        },
+        {
+          "title": "The problem",
+          "one_sentence": "WHO estimates about 1 in 10 medicines in low- and middle-income countries is substandard or falsified (source linked)."
+        },
+        {
+          "title": "How it works",
+          "one_sentence": "LEDs, two light sensors, a thermistor and a paddle measure how the tablet dissolves in a dark chamber, then compare it to a reference."
+        },
+        {
+          "title": "Real result",
+          "one_sentence": "Here is an actual run: raw sensor curve, the verdict, and how long it took."
+        },
+        {
+          "title": "Clinic mode",
+          "one_sentence": "The supplier only gets paid if the batch check passes."
+        },
+        {
+          "title": "Personal mode",
+          "one_sentence": "Photograph the bottle to check for recalls and keep a list of your medicines."
+        },
+        {
+          "title": "Limits, honestly",
+          "one_sentence": "It screens tablets and does not certify them, so anything it can't confirm goes to a lab."
+        },
+        {
+          "title": "Build + credits",
+          "one_sentence": "We built on Peel, our HackMIT 2026 project, and here is the BOM, the repo, and what's new this weekend."
+        }
+      ],
+      "mark_down_for": [
+        "Fake or unsourced stats, or a live 'deaths' counter",
+        "Saying 'safe', 'verified authentic', or 'guaranteed' when the device only screens",
+        "Stock photos of pills, pharmacies, or African clinics",
+        "Renders where the real device photo should be",
+        "No real screenshots or sensor data from an actual run",
+        "Scroll-jacking or a load time over 2 seconds",
+        "Reusing Peel's visual identity without saying so",
+        "Purple-gradient SaaS template look and glassmorphism",
+        "More than 2 typefaces, or no clear type scale",
+        "Making PASS green and NEEDS LAB red when NEEDS LAB isn't a failure (unclear color meaning)",
+        "Hiding the UNABLE TO VERIFY state",
+        "Hero copy that doesn't say what the product is in 5 seconds"
+      ],
+      "must_have": "A real, uncropped photo of the device next to a real verdict screen and its actual sensor curve, all from the same run.",
+      "one_line_advice": "Your device is your best design asset: photograph it well, set one strong type scale, cut the scroll theatrics, and show three honest verdict states."
+    },
+    "AnthropicDevRelJudge": {
+      "copy_vs_plain_scores": {
+        "copy_storytelling": 3,
+        "plain_honest": 8
+      },
+      "best_opening": "d",
+      "opening_ranking": [
+        "d",
+        "a",
+        "e",
+        "c",
+        "b"
+      ],
+      "sections": [
+        {
+          "title": "Hero: the real box",
+          "one_sentence": "A $40 box that dissolves one tablet and says PASS, NEEDS LAB, or UNABLE TO VERIFY. It is a screen, not a lab."
+        },
+        {
+          "title": "Who it's for",
+          "one_sentence": "Small clinics and pharmacists in low- and middle-income countries buying antimalarials from suppliers they can't fully trust. WHO estimates about 1 in 10 medicines there is substandard or falsified."
+        },
+        {
+          "title": "How it works",
+          "one_sentence": "It shines LEDs through the dissolving tablet and reads two light sensors plus a thermistor, then compares the dissolution curve to a reference for that product."
+        },
+        {
+          "title": "Real results",
+          "one_sentence": "Here are our actual test runs, with tablets, n, true and false positives, and the cases it missed."
+        },
+        {
+          "title": "Clinic mode: pay on pass",
+          "one_sentence": "The supplier's payment is released only when the batch check passes. NEEDS LAB and UNABLE TO VERIFY hold the payment for a human to decide."
+        },
+        {
+          "title": "Where AI is used and where it isn't",
+          "one_sentence": "We use AI for bottle-photo recall lookup. The PASS verdict comes from sensor thresholds, not from a model guessing."
+        },
+        {
+          "title": "Limitations",
+          "one_sentence": "It can't confirm identity or dose and it can't detect most contaminants. A PASS means 'no red flag found', not 'safe'."
+        },
+        {
+          "title": "Built on Peel, what's new",
+          "one_sentence": "We reused Peel's [specific parts]. The chamber, the payment gate and the verdict logic are new this weekend."
+        }
+      ],
+      "mark_down_for": [
+        "Saying 'safe', 'verified authentic' or 'detects counterfeits' when PASS only means 'no anomaly detected'",
+        "Stats with no source, or the 100k+ deaths figure with no citation or range",
+        "Stock photos of African clinics, or renders shown instead of the real device",
+        "Mockup screenshots instead of real app output",
+        "No numbers from your own tests (accuracy, sample size, failures)",
+        "Scroll-jacking or slow load, so the judge sees nothing in the first 10 seconds",
+        "Reusing Peel's look and story so it's unclear what was built at Cal Hacks",
+        "Payment gating with no answer for false negatives that hurt honest suppliers",
+        "Hiding UNABLE TO VERIFY, or making it look rare",
+        "Calling it AI-powered when the verdict comes from thresholds",
+        "No named user and no evidence you talked to one"
+      ],
+      "must_have": "A real test-results table with honest numbers: genuine vs degraded or fake tablets, sample size, misses, and a 'what PASS does not mean' line right next to it.",
+      "one_line_advice": "Ship a fast, plain page built around your real box and real failure data. Hype costs you points; calibrated honesty wins them."
+    },
+    "HyphenateFinanceJudge": {
+      "copy_vs_plain_scores": {
+        "copy_storytelling": 4,
+        "plain_honest": 8
+      },
+      "best_opening": "d",
+      "opening_ranking": [
+        "d",
+        "a",
+        "e",
+        "c",
+        "b"
+      ],
+      "sections": [
+        {
+          "title": "The device",
+          "one_sentence": "This $40 box dissolves one tablet and returns PASS, NEEDS LAB, or UNABLE TO VERIFY."
+        },
+        {
+          "title": "The problem",
+          "one_sentence": "WHO estimates about 1 in 10 medicines in low- and middle-income countries is substandard or falsified (source linked)."
+        },
+        {
+          "title": "How it measures",
+          "one_sentence": "Two light sensors, a thermistor, and a stirring paddle in a dark chamber record a dissolution curve, and we compare it to a reference curve."
+        },
+        {
+          "title": "Real result",
+          "one_sentence": "Here is a real raw curve from a genuine tablet and one from a bad tablet, with the thresholds that produced each verdict."
+        },
+        {
+          "title": "Clinic mode: payment gate",
+          "one_sentence": "The supplier's payment is held in escrow and released only when the batch check returns PASS, and every decision is logged with the sensor data hash, timestamp, and batch ID."
+        },
+        {
+          "title": "Personal mode",
+          "one_sentence": "A bottle photo is checked against recall lists, and the result is saved to 'My medicines'."
+        },
+        {
+          "title": "Limits",
+          "one_sentence": "This is a screening tool, not a lab assay: NEEDS LAB means send the batch for testing, and UNABLE TO VERIFY means we don't know."
+        },
+        {
+          "title": "Built on Peel / team",
+          "one_sentence": "This builds on our HackMIT project Peel, and this is exactly what is new this weekend."
+        }
+      ],
+      "mark_down_for": [
+        "Calling a drug 'safe' or 'authentic'. PASS means it matched the reference curve, nothing more.",
+        "A payment gate that is only a mocked button with no escrow state, no audit log, and no failure path shown",
+        "No demo of a FAIL holding the payment, only the happy path",
+        "Not saying what happens on UNABLE TO VERIFY: is the payment held, refunded, or sent for manual review?",
+        "Fake or unsourced stats, or a live counter that just made-up-ticks upward",
+        "Stock photos or renders instead of the real device and real screenshots",
+        "Scroll animations that slow the page or hide the demo",
+        "Reusing Peel's look or code without saying what is new",
+        "No raw sensor data and no explanation of the thresholds",
+        "Hardcoded verdicts in the demo video"
+      ],
+      "must_have": "One continuous, unedited clip: a bad tablet goes in, the box says NEEDS LAB, the dashboard shows the supplier payment HELD, and the audit log entry has the batch ID, the sensor data hash, and the reason. Then a good tablet goes in, PASS, payment RELEASED. Both paths, on camera, with real money states.",
+      "one_line_advice": "Skip the Apple scroll and spend those hours making the payment gate real: show a fail that blocks payment and a log I can audit."
+    },
+    "PeopleFirstHealthJudge": {
+      "copy_vs_plain_scores": {
+        "copy_storytelling": 4,
+        "plain_honest": 8
+      },
+      "best_opening": "d",
+      "opening_ranking": [
+        "d",
+        "a",
+        "e",
+        "c",
+        "b"
+      ],
+      "sections": [
+        {
+          "title": "The device",
+          "one_sentence": "This $40 box dissolves one tablet and says PASS, NEEDS LAB, or UNABLE TO VERIFY. Nothing else."
+        },
+        {
+          "title": "The problem",
+          "one_sentence": "WHO estimates about 1 in 10 medicines in low- and middle-income countries is substandard or falsified. The source and year are cited right there."
+        },
+        {
+          "title": "Who it's for",
+          "one_sentence": "It's for clinic pharmacists who take in supplier batches and can't reach a lab. It is not for diagnosing a sick patient."
+        },
+        {
+          "title": "How it works",
+          "one_sentence": "LEDs and two light sensors track how the tablet dissolves at a controlled temperature. That curve is compared against a reference for the same product."
+        },
+        {
+          "title": "Real results",
+          "one_sentence": "We tested N real and N deliberately bad tablets. Here is the confusion matrix, false negatives included."
+        },
+        {
+          "title": "Clinic mode",
+          "one_sentence": "The supplier gets paid only after the batch check passes. So the person selling bad drugs pays for them, not the patient."
+        },
+        {
+          "title": "What it can't do",
+          "one_sentence": "It does not confirm the active ingredient or the dose. A PASS means 'no red flag', not 'safe', and anything uncertain goes to a lab."
+        },
+        {
+          "title": "Built on Peel / what's new",
+          "one_sentence": "Peel gave us X. This weekend we built the hardware, the dissolution model, and the payment gate."
+        }
+      ],
+      "mark_down_for": [
+        "Saying 'safe', 'verified authentic', or 'detects counterfeits' anywhere",
+        "No false-negative rate, or hiding it",
+        "Stats with no source, or a 'live' counter that is really made up",
+        "Stock photos of African patients or pill piles",
+        "Rendered images instead of the real device and real app screenshots",
+        "Scroll-jacking or slow loads; the page has to work on a 3G phone",
+        "Reusing Peel's look and claims without saying what's new",
+        "Claiming it's ready for regulators, or implying it replaces WHO/national lab testing",
+        "A recall check with no data source named",
+        "Personal mode that tells a patient to stop taking a medicine",
+        "Payment gating with no answer for when the device is wrong and blocks a legitimate supplier"
+      ],
+      "must_have": "One honest validation table: how many tablets you tested, which brands, how many you caught, how many you missed (false negatives), and how many inconclusive results you got. Put it next to a plain statement that PASS does not mean safe.",
+      "one_line_advice": "Drop the Apple scroll and show the real box, the real numbers, and what you miss. Saying what it can't do wins this track."
+    },
+    "AwwwardsJury": {
+      "copy_vs_plain_scores": {
+        "copy_storytelling": 4,
+        "plain_honest": 8
+      },
+      "best_opening": "d",
+      "opening_ranking": [
+        "d",
+        "a",
+        "c",
+        "e",
+        "b"
+      ],
+      "sections": [
+        {
+          "title": "Hero: the box",
+          "one_sentence": "A $40 box that dissolves one tablet and tells you PASS, NEEDS LAB, or UNABLE TO VERIFY."
+        },
+        {
+          "title": "Why it matters",
+          "one_sentence": "WHO estimates about 1 in 10 medicines in low- and middle-income countries is substandard or falsified, and fake antimalarials are estimated to kill 100,000+ people a year."
+        },
+        {
+          "title": "How it works",
+          "one_sentence": "LEDs shine through the dissolving tablet, two light sensors and a thermistor record what happens, and the result is compared to a reference profile for that drug."
+        },
+        {
+          "title": "Real run",
+          "one_sentence": "Here is a real tablet we tested, with its raw sensor curve next to the reference, and the verdict it got."
+        },
+        {
+          "title": "Recall check",
+          "one_sentence": "Take a photo of the bottle and we check it against public recall lists in seconds."
+        },
+        {
+          "title": "Two modes",
+          "one_sentence": "Clinic mode releases the supplier's payment only if the batch passes, and personal mode saves your checks in a My medicines list."
+        },
+        {
+          "title": "Limits",
+          "one_sentence": "Pill screens tablets and flags them for a lab, so it is not a lab test, and UNABLE TO VERIFY is a valid answer."
+        },
+        {
+          "title": "Built on Peel + team",
+          "one_sentence": "We built this on Peel, our HackMIT 2026 project, and here is the bill of materials, the repo, and who built what."
+        }
+      ],
+      "mark_down_for": [
+        "Fake or uncited stats, or a fake live counter",
+        "Words like 'safe', 'certified' or 'guaranteed authentic'",
+        "Stock photos of pills or doctors",
+        "Render images instead of real device photos",
+        "Scroll-jacking or a hero that takes over 2s to load",
+        "Reusing Peel's look so it reads as a reskin",
+        "Mockups instead of real app screenshots",
+        "No raw sensor data or false-positive numbers",
+        "Hiding the UNABLE TO VERIFY result",
+        "Payment-gating copy that doesn't say who carries the risk if the result is wrong",
+        "Broken on mobile, since judges will scan it on their phones"
+      ],
+      "must_have": "One real tablet run with the raw sensor curve shown next to the reference, plus a looping GIF of the real box doing it.",
+      "one_line_advice": "Your hardware is the wow factor, not the scroll animation, so photograph the real box, show real data, and ship a fast page by 6pm."
+    },
+    "LinearVercelDesigner": {
+      "copy_vs_plain_scores": {
+        "copy_storytelling": 3,
+        "plain_honest": 8
+      },
+      "best_opening": "d",
+      "opening_ranking": [
+        "d",
+        "a",
+        "e",
+        "c",
+        "b"
+      ],
+      "sections": [
+        {
+          "title": "Hero: the box",
+          "one_sentence": "A $40 box that dissolves one tablet and tells you PASS, NEEDS LAB, or UNABLE TO VERIFY in under X minutes (use your real measured time)."
+        },
+        {
+          "title": "The problem",
+          "one_sentence": "WHO estimates about 1 in 10 medicines in low- and middle-income countries is substandard or falsified, with a source link right there."
+        },
+        {
+          "title": "How it works",
+          "one_sentence": "LEDs shine through the dissolving tablet, two light sensors and a thermistor record its dissolution curve, and the ESP32 compares that curve to a reference."
+        },
+        {
+          "title": "Live result",
+          "one_sentence": "Here is a real run: the raw sensor trace, the reference band, and the verdict it produced."
+        },
+        {
+          "title": "Clinic mode",
+          "one_sentence": "The supplier only gets paid after the batch check passes."
+        },
+        {
+          "title": "Personal mode",
+          "one_sentence": "Photograph the bottle to check for recalls and keep your medicines in one list."
+        },
+        {
+          "title": "Honest limits",
+          "one_sentence": "This is a screen, not a lab: it flags suspect tablets and says NEEDS LAB when it can't tell, and here is what we tested and how often it got it right."
+        },
+        {
+          "title": "Built on Peel + team",
+          "one_sentence": "We built this on Peel, our HackMIT 2026 grand-prize project, and here is what is new this weekend."
+        }
+      ],
+      "mark_down_for": [
+        "Unsourced or inflated stats, or a 'lives saved' counter",
+        "Words like 'safe', 'verified authentic', or 'guaranteed' when it's a screening tool",
+        "Stock photos of pills, pharmacies, or African clinics",
+        "Renders or mockups pretending to be the real device",
+        "No raw sensor data or real UI screenshots",
+        "Scroll-jacking, heavy WebGL, a hero that takes 3+ seconds to load on venue wifi",
+        "Reusing Peel's look, so judges can't tell what was built this weekend",
+        "Accuracy claims without telling us the sample size",
+        "Payment-gating explained in vague words, without showing the actual flow",
+        "Gradient blobs, a glowing 'AI-powered' badge, or hiding the three verdict states"
+      ],
+      "must_have": "One real photo of the device next to one real dissolution graph from an actual run, with the verdict, the reference band, and your test numbers (n=?, how many caught) shown honestly.",
+      "one_line_advice": "Don't spend Saturday on parallax: ship one fast page with the real box, a real curve, and honest limits, then go film the demo."
+    },
+    "HackathonMentor": {
+      "copy_vs_plain_scores": {
+        "copy_storytelling": 4,
+        "plain_honest": 8
+      },
+      "best_opening": "d",
+      "opening_ranking": [
+        "d",
+        "a",
+        "e",
+        "c",
+        "b"
+      ],
+      "sections": [
+        {
+          "title": "Hero: the real box",
+          "one_sentence": "A $40 box that dissolves one tablet and tells you PASS, NEEDS LAB, or UNABLE TO VERIFY. Photo of the actual device, lid open."
+        },
+        {
+          "title": "Why it matters",
+          "one_sentence": "WHO estimates about 1 in 10 medicines in low- and middle-income countries is substandard or falsified, and fake antimalarials are linked to an estimated 100k+ deaths a year (sources linked)."
+        },
+        {
+          "title": "How it works",
+          "one_sentence": "LEDs shine through the dissolving tablet in a dark chamber while two light sensors and a thermistor record a dissolution curve, and we compare that curve to a reference."
+        },
+        {
+          "title": "Live result",
+          "one_sentence": "Here is a real run: genuine tablet vs. a test fake, the raw sensor curves, and the verdict each one got."
+        },
+        {
+          "title": "Clinic mode",
+          "one_sentence": "The supplier only gets paid if the batch passes, which gives sellers a money reason not to ship fakes."
+        },
+        {
+          "title": "Personal mode + recall check",
+          "one_sentence": "Take a photo of the bottle to check it against recalls, and keep a 'My medicines' list (real app screenshots)."
+        },
+        {
+          "title": "Limits, honestly",
+          "one_sentence": "This is a screening tool, not a lab assay. Anything unclear goes to NEEDS LAB or UNABLE TO VERIFY, and here is what we can't catch yet."
+        },
+        {
+          "title": "Built this weekend",
+          "one_sentence": "We started from Peel (HackMIT 2026). This is what's new since then: the hardware, the firmware, the classifier, and payment gating, plus the BOM and the repo."
+        }
+      ],
+      "mark_down_for": [
+        "Saying 'safe' or 'authentic' anywhere. The device screens tablets. It does not certify them.",
+        "Stats with no source link, or rounded up to sound scarier",
+        "Stock photos of pills, clinics, or African patients",
+        "Mockups or Figma frames instead of real screenshots and the real device",
+        "No real sensor data or curves, so the verdicts look made up",
+        "A hero over 2 seconds to load, or scroll-jacking that fights the trackpad at the judging table",
+        "Reusing Peel's look and copy, which makes it read as a resubmission",
+        "Not saying which parts were built at Cal Hacks and which came from Peel",
+        "No accuracy numbers, or accuracy from n=3 presented as validation",
+        "Showing payment gating without saying who decides the reference curve and how a supplier can dispute a result",
+        "Animations that cost Saturday hours while the device still doesn't work",
+        "Using the 'kills 100k' line as emotional bait with no follow-through on who uses this and where"
+      ],
+      "must_have": "A real recorded run, genuine tablet vs. a fake, showing the raw sensor curves side by side and the verdict each got, on the page and in the video. That one graphic covers Functionality, Technical complexity, and Intentionality all at once.",
+      "one_line_advice": "Judges look at the box on the table, not your scroll animation. Have the site done by 3pm, then put every remaining hour into getting the device to catch a fake reliably and on camera."
+    },
+    "KenyanClinicPharmacist": {
+      "copy_vs_plain_scores": {
+        "copy_storytelling": 4,
+        "plain_honest": 8
+      },
+      "best_opening": "d",
+      "opening_ranking": [
+        "d",
+        "a",
+        "e",
+        "c",
+        "b"
+      ],
+      "sections": [
+        {
+          "title": "The box",
+          "one_sentence": "Real photo of the $40 box with a tablet beside it: one pill in, an answer in X minutes."
+        },
+        {
+          "title": "Why it matters",
+          "one_sentence": "WHO estimates about 1 in 10 medicines in low- and middle-income countries is substandard or falsified, with the source linked."
+        },
+        {
+          "title": "How to use it",
+          "one_sentence": "Three steps with real photos: put the tablet in, close the lid, read PASS, NEEDS LAB or UNABLE TO VERIFY."
+        },
+        {
+          "title": "What the result means",
+          "one_sentence": "PASS means the pill matched the reference profile, not that it is guaranteed safe. When in doubt, the box says NEEDS LAB."
+        },
+        {
+          "title": "How it works",
+          "one_sentence": "LEDs, two light sensors and a thermistor track how the tablet dissolves and compare it to a known-good curve."
+        },
+        {
+          "title": "Tested on",
+          "one_sentence": "A real table of drugs tested, number of samples, and true/false pass and fail counts, including the misses."
+        },
+        {
+          "title": "Clinic mode and recall check",
+          "one_sentence": "Supplier payment is released only if the batch passes, and a photo of the bottle checks it against recall lists."
+        },
+        {
+          "title": "Cost, limits, team",
+          "one_sentence": "Parts list adding up to $40, what it cannot detect, that it works offline, and that it is built on Peel."
+        }
+      ],
+      "mark_down_for": [
+        "Saying 'safe', 'verified' or 'authentic' when it is really PASS on a dissolution profile",
+        "No false-pass rate, or hiding how many bad pills it let through",
+        "Stats with no source, or the 100k deaths shown as a ticking live counter",
+        "Stock photos of African patients or pharmacies",
+        "A heavy scroll site that takes 20 seconds to load on 3G or breaks on a cheap Android phone",
+        "Renders instead of the real device and real screenshots",
+        "Looking like a copy of Peel with no clear statement of what is new",
+        "Not saying which drugs it works on (artemether-lumefantrine? only one brand?)",
+        "Ignoring that a fake can contain some real drug at the wrong dose",
+        "No running cost: reference data, power, does it need internet?",
+        "Payment gating that punishes an honest supplier because of a sensor error, with no appeal or lab follow-up"
+      ],
+      "must_have": "An honest results table: how many falsified or substandard samples it caught, how many it wrongly passed, and which drugs it was tested on.",
+      "one_line_advice": "Show me the real box, the real false-pass number and the price. Skip the Apple animation, because I am on 2G and a fake pill kills."
+    },
+    "NGOProcurementOfficer": {
+      "copy_vs_plain_scores": {
+        "copy_storytelling": 4,
+        "plain_honest": 8
+      },
+      "best_opening": "d",
+      "opening_ranking": [
+        "d",
+        "a",
+        "e",
+        "c",
+        "b"
+      ],
+      "sections": [
+        {
+          "title": "The device",
+          "one_sentence": "This is the real $40 box: drop in one tablet and get PASS, NEEDS LAB, or UNABLE TO VERIFY in about [X] minutes."
+        },
+        {
+          "title": "The problem",
+          "one_sentence": "WHO estimates about 1 in 10 medicines in low- and middle-income countries is substandard or falsified, and clinics usually can't test a batch before they pay for it."
+        },
+        {
+          "title": "How it works",
+          "one_sentence": "The box dissolves and stirs the tablet in a dark chamber, measures light absorbance and dissolution over time at a logged temperature, and compares the result with a reference profile."
+        },
+        {
+          "title": "Clinic mode: payment gate",
+          "one_sentence": "The supplier gets paid only after the batch check passes, and every result is saved with batch number, photo, timestamp, and device ID so it can be audited."
+        },
+        {
+          "title": "Results we measured",
+          "one_sentence": "These are our real test numbers: [N] tablets, [X] false passes, [Y] false flags, the drugs we tested, and what the box cannot detect."
+        },
+        {
+          "title": "Where it fits in existing QA",
+          "one_sentence": "It's a cheap first screen that sends suspect batches to Minilab or the national regulator's lab; it doesn't replace them."
+        },
+        {
+          "title": "Cost per test",
+          "one_sentence": "The hardware costs $40 and each test costs $[X] in consumables, compared with roughly $[Y] for a Minilab test and $[Z] for a full lab assay."
+        },
+        {
+          "title": "Built on Peel, what's new, and the team",
+          "one_sentence": "We started from Peel; what we built this weekend is the dissolution sensing, the recall check, and the payment gate, and here's our repo and team."
+        }
+      ],
+      "mark_down_for": [
+        "Saying 'safe' or 'verified authentic'. A pass is not a guarantee.",
+        "Stats with no source, or a fake live counter of deaths.",
+        "Stock photos of African clinics or patients.",
+        "No false-pass rate, or accuracy numbers tested only on the team's own pills.",
+        "No real screenshots of the app or the payment gate flow.",
+        "A site that copies Peel's look and hides what's new.",
+        "Scroll-jacking or a slow load on a phone with a weak signal.",
+        "Claiming it replaces Minilab, the national regulator's lab, or HPLC.",
+        "Not saying which drug classes it can't check.",
+        "A payment gate with no dispute or override process for suppliers.",
+        "A recall check that doesn't name its data source.",
+        "Calling it an audit trail when the records can be edited."
+      ],
+      "must_have": "A plain table of real results: how many tablets, which drugs, the false-pass rate, the false-flag rate, and when it says UNABLE TO VERIFY. If it isn't measured, label it unvalidated.",
+      "one_line_advice": "Don't build an Apple site in 8 hours. Show the real box and the real numbers, state the limits, and explain how a clinic would actually use it."
+    },
+    "SponsorRecruiter": {
+      "copy_vs_plain_scores": {
+        "copy_storytelling": 4,
+        "plain_honest": 8
+      },
+      "best_opening": "d",
+      "opening_ranking": [
+        "d",
+        "e",
+        "a",
+        "c",
+        "b"
+      ],
+      "sections": [
+        {
+          "title": "Hero: the real box",
+          "one_sentence": "A real photo of the $40 box next to a tablet, with the line: 'Dissolves one pill, says PASS / NEEDS LAB / UNABLE TO VERIFY.'"
+        },
+        {
+          "title": "Demo",
+          "one_sentence": "A 30-second unedited clip shows one real tablet going in and a verdict coming out, timestamped."
+        },
+        {
+          "title": "Problem",
+          "one_sentence": "WHO estimates about 1 in 10 medicines in low/middle-income countries is substandard or falsified, cited with a link."
+        },
+        {
+          "title": "How it works",
+          "one_sentence": "LEDs, two light sensors, a thermistor and a paddle track how the tablet dissolves, and the ESP32 compares that curve to a reference."
+        },
+        {
+          "title": "Two modes",
+          "one_sentence": "Clinic mode releases the supplier's payment only if the batch passes, and personal mode keeps a 'My medicines' list plus a bottle-photo recall check."
+        },
+        {
+          "title": "Results and limits",
+          "one_sentence": "Show how many tablets you tested, what it caught, what it missed, and when it says UNABLE TO VERIFY."
+        },
+        {
+          "title": "Who built what",
+          "one_sentence": "Each teammate's name, what they personally built, and the exact stack, with the GitHub link."
+        },
+        {
+          "title": "Built on Peel",
+          "one_sentence": "Say plainly what you reused from Peel at HackMIT and what is new this weekend."
+        }
+      ],
+      "mark_down_for": [
+        "Fake or uncited stats, or a live 'deaths counter' with made-up numbers",
+        "Saying 'safe' or 'authentic'. You are screening, not certifying",
+        "Stock photos or AI renders instead of the actual hardware",
+        "Scroll-jacking or a hero that takes more than 2 seconds to load",
+        "Reusing Peel's look or hiding how much code came from Peel",
+        "No real app screenshots or serial output",
+        "No per-person contribution list",
+        "Accuracy claims with no sample size",
+        "A demo video that's all montage and no live run",
+        "No GitHub link, or a repo that's just a README",
+        "Hiding the payment-gating logic behind buzzwords like 'blockchain' or 'AI' without showing it"
+      ],
+      "must_have": "An unedited clip of a real tablet going into the box and a verdict coming out, plus a clear list of who built which part.",
+      "one_line_advice": "Don't spend Saturday on parallax; spend it filming the box working and writing who built what."
+    },
+    "YouTubeViewer": {
+      "copy_vs_plain_scores": {
+        "copy_storytelling": 4,
+        "plain_honest": 8
+      },
+      "best_opening": "d",
+      "opening_ranking": [
+        "d",
+        "c",
+        "a",
+        "e",
+        "b"
+      ],
+      "sections": [
+        {
+          "title": "Hook: the box",
+          "one_sentence": "This $40 box dissolves one pill and tells you if it's fake."
+        },
+        {
+          "title": "Why it matters",
+          "one_sentence": "WHO says about 1 in 10 medicines in low- and middle-income countries is substandard or falsified, and fake antimalarials are estimated to kill over 100k people a year."
+        },
+        {
+          "title": "Watch it work",
+          "one_sentence": "Real tablet goes in, the paddle stirs, and the screen says PASS, NEEDS LAB, or UNABLE TO VERIFY."
+        },
+        {
+          "title": "How it reads a pill",
+          "one_sentence": "Inside a dark chamber, LEDs and two light sensors track how the tablet dissolves while a thermistor corrects for temperature."
+        },
+        {
+          "title": "Recall check",
+          "one_sentence": "Snap the bottle and we check it against recall lists in seconds."
+        },
+        {
+          "title": "Clinic mode",
+          "one_sentence": "The supplier only gets paid if the batch passes."
+        },
+        {
+          "title": "Personal mode",
+          "one_sentence": "Your 'My medicines' list keeps every check in one place."
+        },
+        {
+          "title": "Limits + built on Peel",
+          "one_sentence": "This is a screening tool, not a lab, it builds on our HackMIT project Peel, and here's what it can't catch."
+        }
+      ],
+      "mark_down_for": [
+        "Saying 'safe' or 'verified authentic' when you mean PASS on a screen",
+        "Stats with no source link",
+        "Stock photos of sad patients or pill piles",
+        "Renders instead of the real device",
+        "Scroll-jacking that makes me wait",
+        "Taking longer than 2 seconds to load",
+        "Reusing Peel's look so it seems recycled",
+        "No real app screenshots or result screens",
+        "Never showing a FAIL or NEEDS LAB case",
+        "Hiding the $40 parts list",
+        "Buzzwords like 'AI-powered revolution'",
+        "A 30-second intro before anything happens"
+      ],
+      "must_have": "Unedited real footage of a pill going in and a result coming out, ideally one good pill and one bad one side by side.",
+      "one_line_advice": "Show the box catching a fake pill in the first 10 seconds, or I'm gone."
+    },
+    "FrontendStudent": {
+      "copy_vs_plain_scores": {
+        "copy_storytelling": 3,
+        "plain_honest": 8
+      },
+      "best_opening": "d",
+      "opening_ranking": [
+        "d",
+        "a",
+        "e",
+        "c",
+        "b"
+      ],
+      "sections": [
+        {
+          "title": "Hero: the real box",
+          "one_sentence": "Pill is a $40 box that dissolves one tablet and tells you PASS, NEEDS LAB, or UNABLE TO VERIFY."
+        },
+        {
+          "title": "Why it matters",
+          "one_sentence": "WHO estimates about 1 in 10 medicines in low- and middle-income countries are substandard or falsified, and fake antimalarials are estimated to kill 100k+ people a year."
+        },
+        {
+          "title": "How it works",
+          "one_sentence": "LEDs shine through the dissolving tablet in a dark chamber while two light sensors, a thermistor, and a paddle record a dissolution curve, and we compare it to a reference."
+        },
+        {
+          "title": "Demo results",
+          "one_sentence": "These are real curves from tablets we tested this weekend: one good, one bad, and one we can't call."
+        },
+        {
+          "title": "Recall check",
+          "one_sentence": "Take a photo of the bottle and we check the lot against public recall lists."
+        },
+        {
+          "title": "Two modes",
+          "one_sentence": "In clinic mode, the supplier gets paid only if the batch passes; in personal mode, results go into a 'My medicines' list."
+        },
+        {
+          "title": "Honest limits",
+          "one_sentence": "Pill screens tablets but does not certify them, so NEEDS LAB means send it to a lab and UNABLE TO VERIFY means we don't know."
+        },
+        {
+          "title": "Built on Peel + team",
+          "one_sentence": "We started from Peel, our HackMIT 2026 grand-prize project, and here is exactly what is new this weekend."
+        }
+      ],
+      "mark_down_for": [
+        "Saying 'safe' or 'verified authentic' when it's a screening result",
+        "Stats without a source link (WHO link required)",
+        "Stock photos or AI-rendered device instead of the real breadboard",
+        "Fake 'live' counters with made-up numbers",
+        "Scroll-jacking that breaks on a judge's phone or the venue Wi-Fi",
+        "Hero video over 5MB autoplaying before anything shows",
+        "Reusing Peel's look and copy without saying what's new",
+        "No real screenshots of the app or real sensor curves",
+        "Calling the payment flow real when it's mocked",
+        "Not showing what happens on NEEDS LAB / UNABLE TO VERIFY",
+        "Lighthouse under 80 or layout shift on load"
+      ],
+      "must_have": "A real dissolution curve chart from our own hardware run (good tablet vs. bad tablet), shown next to a photo of the actual box, with the verdict it produced.",
+      "one_line_advice": "Build a static Next.js page, add one fade-in animation, then stop, because every hour spent on scroll effects is an hour the sensor demo doesn't get."
+    },
+    "AccessibilitySpecialist": {
+      "copy_vs_plain_scores": {
+        "copy_storytelling": 3,
+        "plain_honest": 8
+      },
+      "best_opening": "d",
+      "opening_ranking": [
+        "d",
+        "a",
+        "e",
+        "b",
+        "c"
+      ],
+      "sections": [
+        {
+          "title": "Hero: the real box",
+          "one_sentence": "A $40 dark-chamber lab that dissolves one tablet and says PASS, NEEDS LAB, or UNABLE TO VERIFY."
+        },
+        {
+          "title": "The problem",
+          "one_sentence": "WHO estimates about 1 in 10 medicines in low- and middle-income countries is substandard or falsified (cite the source with a link)."
+        },
+        {
+          "title": "How it works",
+          "one_sentence": "LEDs, two light sensors, a thermistor, and a paddle measure how the tablet dissolves and compare the result to a reference profile."
+        },
+        {
+          "title": "Three honest results",
+          "one_sentence": "Each result has an icon, a text label, and a next step, so color is never the only signal."
+        },
+        {
+          "title": "Recall check",
+          "one_sentence": "Take a photo of the bottle and we check it against public recall lists."
+        },
+        {
+          "title": "Clinic mode and personal mode",
+          "one_sentence": "Clinics release supplier payment only after a batch passes, and individuals keep a 'My medicines' list."
+        },
+        {
+          "title": "Real data and limits",
+          "one_sentence": "These are our test results, our error rate, and what the device cannot detect."
+        },
+        {
+          "title": "Built on Peel, team, and code",
+          "one_sentence": "Built on our HackMIT 2026 project Peel, with the repo, BOM, and demo video linked here."
+        }
+      ],
+      "mark_down_for": [
+        "Scroll-jacking or pinned scroll sections that trap keyboard and screen-reader users.",
+        "Motion that ignores prefers-reduced-motion. Dissolve animations have no fallback.",
+        "PASS and FAIL shown only as green and red, with no text or icon.",
+        "Words like 'safe', 'verified authentic', or 'guaranteed'. A pass is not a safety certificate.",
+        "Fake or uncited stats, including a 'live' counter made of invented numbers.",
+        "Stock photos of pills or labs instead of your actual device.",
+        "Pages over 2MB, or autoplay video for users in the target low-bandwidth regions.",
+        "Gray text below 4.5:1 contrast, or light text on top of photo backgrounds.",
+        "Mocked UI presented as real screenshots.",
+        "Copying Peel's look so it reads as a recycled project.",
+        "Videos without captions, or images without alt text.",
+        "Focus states that are missing, or tap targets smaller than 24x24px."
+      ],
+      "must_have": "Every result must show text, an icon, and a color together, and must be announced to screen readers through a live region. Example: 'NEEDS LAB — dissolution 38% slower than reference. Do not take; send sample to lab.' Also include a captioned demo video with a transcript, and a static page with no motion that works on 3G.",
+      "one_line_advice": "Make a fast, honest page with real photos, real numbers, and stated limits; a site that looks great but can't be used is a counterfeit too."
+    },
+    "Ethicist": {
+      "copy_vs_plain_scores": {
+        "copy_storytelling": 4,
+        "plain_honest": 8
+      },
+      "best_opening": "d",
+      "opening_ranking": [
+        "d",
+        "a",
+        "e",
+        "c",
+        "b"
+      ],
+      "sections": [
+        {
+          "title": "The device",
+          "one_sentence": "This is a $40 box that screens one tablet in about N minutes and flags the ones that look wrong."
+        },
+        {
+          "title": "The problem",
+          "one_sentence": "WHO estimates about 1 in 10 medicines in low- and middle-income countries are substandard or falsified (cited, dated, linked)."
+        },
+        {
+          "title": "What the three results mean",
+          "one_sentence": "PASS means 'no red flags on the tests we run', not 'safe'. NEEDS LAB means send it to a lab. UNABLE TO VERIFY means we can't tell."
+        },
+        {
+          "title": "How it works",
+          "one_sentence": "LED absorbance at two wavelengths, dissolution timing, and temperature get compared against a reference profile for that specific drug."
+        },
+        {
+          "title": "What it cannot detect",
+          "one_sentence": "It cannot confirm identity, dose accuracy, contaminants, or a skilled fake that copies the dissolution profile. Only a lab can."
+        },
+        {
+          "title": "Real results",
+          "one_sentence": "Here is our test data: N tablets, which drugs, real and spiked or degraded samples, true and false positive rates, and the misses."
+        },
+        {
+          "title": "Clinic and personal modes",
+          "one_sentence": "Clinics can hold supplier payment until a batch screen passes, plus a lab confirmation for flagged batches. Individuals get a recall check and a medicine list."
+        },
+        {
+          "title": "Built on Peel, and what's new",
+          "one_sentence": "We reused X from Peel and built Y and Z new this weekend."
+        }
+      ],
+      "mark_down_for": [
+        "Using the word 'safe', 'verified', 'authentic', or 'certified' for a PASS result",
+        "Anything suggesting WHO, FDA, or other regulatory approval or endorsement",
+        "The '100k+ deaths' figure without a source, year, and range",
+        "Live death counters or ticking stats; that's manipulation, not data",
+        "No false-negative rate published; a missed fake is the dangerous failure",
+        "Showing a green PASS checkmark with no disclaimer next to it",
+        "Stock photos of African or Asian patients, i.e. poverty imagery",
+        "Renders or animations used in place of the real hardware",
+        "Fake or mocked screenshots presented as real",
+        "Payment gating with no dispute or lab-override path; it pushes clinics to accept passing fakes",
+        "Not saying which drugs have reference profiles; a universal claim is a lie",
+        "Recall check implying that a bottle not on a recall list is genuine",
+        "Copying Peel's look so judges can't tell what's new",
+        "Scroll-jacked pages that take over 2 seconds to load"
+      ],
+      "must_have": "A plain-language 'What PASS does NOT mean' box, shown on every PASS screen in the app and on the site next to the result, plus a published false-negative rate from real tests.",
+      "one_line_advice": "Rename PASS to 'No red flags found'. A cheap box that tells someone a fake antimalarial is fine is worse than no box at all."
+    },
+    "HackathonJournalist": {
+      "copy_vs_plain_scores": {
+        "copy_storytelling": 4,
+        "plain_honest": 8
+      },
+      "best_opening": "d",
+      "opening_ranking": [
+        "d",
+        "a",
+        "e",
+        "c",
+        "b"
+      ],
+      "sections": [
+        {
+          "title": "Hero: the box",
+          "one_sentence": "Real photo of the $40 box with one line: \"Drop in one pill. Get PASS, NEEDS LAB, or UNABLE TO VERIFY in minutes.\""
+        },
+        {
+          "title": "Why it matters",
+          "one_sentence": "WHO estimates about 1 in 10 medicines in low- and middle-income countries are substandard or falsified, and fake antimalarials are estimated to kill 100k+ people a year (both linked to the source)."
+        },
+        {
+          "title": "Demo moment",
+          "one_sentence": "A 20-second clip, shot on a phone, of a real tablet versus a fake one: the light curves split and the screen shows a verdict."
+        },
+        {
+          "title": "How it works",
+          "one_sentence": "LEDs shine through the dissolving tablet in a dark chamber, two light sensors and a thermistor track it, and the ESP32 compares that dissolution curve to a known-good reference."
+        },
+        {
+          "title": "Clinic mode",
+          "one_sentence": "The supplier only gets paid after the batch passes, so selling fakes stops paying."
+        },
+        {
+          "title": "Personal mode + recall check",
+          "one_sentence": "Snap a photo of the bottle to check it against recalls, and keep a \"My medicines\" list."
+        },
+        {
+          "title": "Honest limits + real numbers",
+          "one_sentence": "Show how many tablets you tested, how many it got right, and what it can't catch, and say plainly that it screens pills and flags them for a lab instead of certifying them."
+        },
+        {
+          "title": "Built on Peel + team",
+          "one_sentence": "Say what you reused from Peel and what you built new this weekend, with real faces and a GitHub link."
+        }
+      ],
+      "mark_down_for": [
+        "Numbers you can't source, or accuracy claims with no test count behind them",
+        "Words like \"safe\", \"verified authentic\", or \"guaranteed\"; this screens pills, it doesn't certify them",
+        "Stock photos or AI-generated renders instead of the real box",
+        "Scroll-jacking that takes more than 2 seconds to reach the product",
+        "Reusing Peel's look and writeup without clearly showing what's new",
+        "No real screenshots, sensor graphs, or a clip of an actual test run",
+        "A live counter ticking up deaths; that's manipulative",
+        "Buzzword soup: \"AI-powered\", \"blockchain\", \"revolutionizing healthcare\"",
+        "Fuzzy payment-gating: say who holds the money, where it sits, and who releases it",
+        "A demo that only works with one fake pill you picked in advance"
+      ],
+      "must_have": "Real footage of a real pass and a real fail, from the actual box, with the light-sensor curves on screen.",
+      "one_line_advice": "Spend 2 hours on the site and 6 on test data, because judges are scoring the box, not the scroll animation."
+    }
+  },
+  "aggregate": {
+    "copy_storytelling_mean": 3.69,
+    "copy_storytelling_sd": 0.46,
+    "plain_honest_mean": 8,
+    "plain_honest_sd": 0.0,
+    "best_opening_votes": {
+      "d": 16
+    },
+    "opening_borda_5_to_1": {
+      "d": 80,
+      "a": 62,
+      "e": 47,
+      "c": 34,
+      "b": 17
+    },
+    "opening_mean_rank": {
+      "a": 2.12,
+      "b": 4.94,
+      "c": 3.88,
+      "d": 1,
+      "e": 3.06
+    },
+    "section_categories": [
+      {
+        "category": "hero",
+        "personas_including": 16,
+        "mean_position": 1
+      },
+      {
+        "category": "problem",
+        "personas_including": 15,
+        "mean_position": 2.07
+      },
+      {
+        "category": "demo",
+        "personas_including": 4,
+        "mean_position": 2.75
+      },
+      {
+        "category": "how_it_works",
+        "personas_including": 17,
+        "mean_position": 3.47
+      },
+      {
+        "category": "who_for",
+        "personas_including": 3,
+        "mean_position": 3.67
+      },
+      {
+        "category": "results",
+        "personas_including": 15,
+        "mean_position": 4.4
+      },
+      {
+        "category": "recall",
+        "personas_including": 4,
+        "mean_position": 5
+      },
+      {
+        "category": "clinic_mode",
+        "personas_including": 12,
+        "mean_position": 5.5
+      },
+      {
+        "category": "personal_mode",
+        "personas_including": 10,
+        "mean_position": 6
+      },
+      {
+        "category": "other:where ai is used and where it isn't",
+        "personas_including": 1,
+        "mean_position": 6
+      },
+      {
+        "category": "limits",
+        "personas_including": 14,
+        "mean_position": 6.79
+      },
+      {
+        "category": "built_on_peel_team",
+        "personas_including": 17,
+        "mean_position": 7.94
+      }
+    ],
+    "section_order_consensus": [
+      "hero",
+      "problem",
+      "how_it_works",
+      "results",
+      "clinic_mode",
+      "personal_mode",
+      "limits",
+      "built_on_peel_team"
+    ],
+    "mark_down_themes_keyword_matched": {
+      "safe/verified/authentic/certified wording": {
+        "count": 16,
+        "personas": [
+          "AccessibilitySpecialist",
+          "AnthropicDevRelJudge",
+          "AwwwardsJury",
+          "CalHacksMainJudge",
+          "Ethicist",
+          "FigmaBestDesignJudge",
+          "FrontendStudent",
+          "HackathonJournalist",
+          "HackathonMentor",
+          "HyphenateFinanceJudge",
+          "KenyanClinicPharmacist",
+          "LinearVercelDesigner",
+          "NGOProcurementOfficer",
+          "PeopleFirstHealthJudge",
+          "SponsorRecruiter",
+          "YouTubeViewer"
+        ]
+      },
+      "unsourced/inflated stats or fake live counter": {
+        "count": 16,
+        "personas": [
+          "AccessibilitySpecialist",
+          "AnthropicDevRelJudge",
+          "AwwwardsJury",
+          "CalHacksMainJudge",
+          "Ethicist",
+          "FigmaBestDesignJudge",
+          "FrontendStudent",
+          "HackathonJournalist",
+          "HackathonMentor",
+          "HyphenateFinanceJudge",
+          "KenyanClinicPharmacist",
+          "LinearVercelDesigner",
+          "NGOProcurementOfficer",
+          "PeopleFirstHealthJudge",
+          "SponsorRecruiter",
+          "YouTubeViewer"
+        ]
+      },
+      "stock photos / poverty imagery": {
+        "count": 16,
+        "personas": [
+          "AccessibilitySpecialist",
+          "AnthropicDevRelJudge",
+          "AwwwardsJury",
+          "CalHacksMainJudge",
+          "Ethicist",
+          "FigmaBestDesignJudge",
+          "FrontendStudent",
+          "HackathonJournalist",
+          "HackathonMentor",
+          "HyphenateFinanceJudge",
+          "KenyanClinicPharmacist",
+          "LinearVercelDesigner",
+          "NGOProcurementOfficer",
+          "PeopleFirstHealthJudge",
+          "SponsorRecruiter",
+          "YouTubeViewer"
+        ]
+      },
+      "renders/AI images instead of real device": {
+        "count": 13,
+        "personas": [
+          "AnthropicDevRelJudge",
+          "AwwwardsJury",
+          "CalHacksMainJudge",
+          "Ethicist",
+          "FigmaBestDesignJudge",
+          "FrontendStudent",
+          "HackathonJournalist",
+          "HyphenateFinanceJudge",
+          "KenyanClinicPharmacist",
+          "LinearVercelDesigner",
+          "PeopleFirstHealthJudge",
+          "SponsorRecruiter",
+          "YouTubeViewer"
+        ]
+      },
+      "mockups instead of real screenshots/sensor data": {
+        "count": 16,
+        "personas": [
+          "AccessibilitySpecialist",
+          "AnthropicDevRelJudge",
+          "AwwwardsJury",
+          "CalHacksMainJudge",
+          "Ethicist",
+          "FigmaBestDesignJudge",
+          "FrontendStudent",
+          "HackathonJournalist",
+          "HackathonMentor",
+          "HyphenateFinanceJudge",
+          "KenyanClinicPharmacist",
+          "LinearVercelDesigner",
+          "NGOProcurementOfficer",
+          "PeopleFirstHealthJudge",
+          "SponsorRecruiter",
+          "YouTubeViewer"
+        ]
+      },
+      "scroll-jacking / slow load / heavy page": {
+        "count": 16,
+        "personas": [
+          "AccessibilitySpecialist",
+          "AnthropicDevRelJudge",
+          "AwwwardsJury",
+          "CalHacksMainJudge",
+          "Ethicist",
+          "FigmaBestDesignJudge",
+          "FrontendStudent",
+          "HackathonJournalist",
+          "HackathonMentor",
+          "HyphenateFinanceJudge",
+          "KenyanClinicPharmacist",
+          "LinearVercelDesigner",
+          "NGOProcurementOfficer",
+          "PeopleFirstHealthJudge",
+          "SponsorRecruiter",
+          "YouTubeViewer"
+        ]
+      },
+      "copying Peel's look / unclear what's new": {
+        "count": 16,
+        "personas": [
+          "AccessibilitySpecialist",
+          "AnthropicDevRelJudge",
+          "AwwwardsJury",
+          "CalHacksMainJudge",
+          "Ethicist",
+          "FigmaBestDesignJudge",
+          "FrontendStudent",
+          "HackathonJournalist",
+          "HackathonMentor",
+          "HyphenateFinanceJudge",
+          "KenyanClinicPharmacist",
+          "LinearVercelDesigner",
+          "NGOProcurementOfficer",
+          "PeopleFirstHealthJudge",
+          "SponsorRecruiter",
+          "YouTubeViewer"
+        ]
+      },
+      "no accuracy / false-negative numbers or tiny n": {
+        "count": 11,
+        "personas": [
+          "AnthropicDevRelJudge",
+          "AwwwardsJury",
+          "CalHacksMainJudge",
+          "Ethicist",
+          "HackathonJournalist",
+          "HackathonMentor",
+          "KenyanClinicPharmacist",
+          "LinearVercelDesigner",
+          "NGOProcurementOfficer",
+          "PeopleFirstHealthJudge",
+          "SponsorRecruiter"
+        ]
+      },
+      "payment gate vague/mocked/no dispute path": {
+        "count": 13,
+        "personas": [
+          "AnthropicDevRelJudge",
+          "AwwwardsJury",
+          "CalHacksMainJudge",
+          "Ethicist",
+          "FrontendStudent",
+          "HackathonJournalist",
+          "HackathonMentor",
+          "HyphenateFinanceJudge",
+          "KenyanClinicPharmacist",
+          "LinearVercelDesigner",
+          "NGOProcurementOfficer",
+          "PeopleFirstHealthJudge",
+          "SponsorRecruiter"
+        ]
+      },
+      "hiding NEEDS LAB / UNABLE TO VERIFY or fail path": {
+        "count": 9,
+        "personas": [
+          "AccessibilitySpecialist",
+          "AnthropicDevRelJudge",
+          "AwwwardsJury",
+          "CalHacksMainJudge",
+          "Ethicist",
+          "FigmaBestDesignJudge",
+          "FrontendStudent",
+          "HyphenateFinanceJudge",
+          "YouTubeViewer"
+        ]
+      },
+      "buzzwords (AI-powered, blockchain)": {
+        "count": 6,
+        "personas": [
+          "AnthropicDevRelJudge",
+          "CalHacksMainJudge",
+          "HackathonJournalist",
+          "LinearVercelDesigner",
+          "SponsorRecruiter",
+          "YouTubeViewer"
+        ]
+      },
+      "implied regulatory approval / replaces labs": {
+        "count": 3,
+        "personas": [
+          "Ethicist",
+          "NGOProcurementOfficer",
+          "PeopleFirstHealthJudge"
+        ]
+      },
+      "color-only status / a11y failures": {
+        "count": 2,
+        "personas": [
+          "AccessibilitySpecialist",
+          "FigmaBestDesignJudge"
+        ]
+      }
+    },
+    "mark_down_union_raw": [
+      "A 30-second intro before anything happens",
+      "A demo that only works with one fake pill you picked in advance",
+      "A demo video that's all montage and no live run",
+      "A demo video that's edited so it hides the real dissolve time",
+      "A heavy scroll site that takes 20 seconds to load on 3G or breaks on a cheap Android phone",
+      "A hero over 2 seconds to load, or scroll-jacking that fights the trackpad at the judging table",
+      "A live counter ticking up deaths; that's manipulative",
+      "A payment gate that is only a mocked button with no escrow state, no audit log, and no failure path shown",
+      "A payment gate with no dispute or override process for suppliers.",
+      "A recall check that doesn't name its data source.",
+      "A recall check with no data source named",
+      "A site that copies Peel's look and hides what's new.",
+      "Accuracy claims with no sample size",
+      "Accuracy claims without telling us the sample size",
+      "Animations that cost Saturday hours while the device still doesn't work",
+      "Anything suggesting WHO, FDA, or other regulatory approval or endorsement",
+      "Broken on mobile, since judges will scan it on their phones",
+      "Buzzword soup: \"AI-powered\", \"blockchain\", \"revolutionizing healthcare\"",
+      "Buzzwords like 'AI-powered revolution'",
+      "Buzzwords like AI-powered or blockchain with nothing behind them",
+      "Calling a drug 'safe' or 'authentic'. PASS means it matched the reference curve, nothing more.",
+      "Calling it AI-powered when the verdict comes from thresholds",
+      "Calling it an audit trail when the records can be edited.",
+      "Calling the payment flow real when it's mocked",
+      "Claiming it replaces Minilab, the national regulator's lab, or HPLC.",
+      "Claiming it's ready for regulators, or implying it replaces WHO/national lab testing",
+      "Clinic and personal modes that are only Figma",
+      "Copying Peel's look so it reads as a recycled project.",
+      "Copying Peel's look so judges can't tell what's new",
+      "Fake 'live' counters with made-up numbers",
+      "Fake or mocked screenshots presented as real",
+      "Fake or uncited stats, including a 'live' counter made of invented numbers.",
+      "Fake or uncited stats, or a fake live counter",
+      "Fake or uncited stats, or a live 'deaths counter' with made-up numbers",
+      "Fake or unsourced stats, or a live 'deaths' counter",
+      "Fake or unsourced stats, or a live counter that just made-up-ticks upward",
+      "Focus states that are missing, or tap targets smaller than 24x24px.",
+      "Fuzzy payment-gating: say who holds the money, where it sits, and who releases it",
+      "Gradient blobs, a glowing 'AI-powered' badge, or hiding the three verdict states",
+      "Gray text below 4.5:1 contrast, or light text on top of photo backgrounds.",
+      "Hardcoded verdicts in the demo video",
+      "Hero copy that doesn't say what the product is in 5 seconds",
+      "Hero video over 5MB autoplaying before anything shows",
+      "Hiding UNABLE TO VERIFY, or making it look rare",
+      "Hiding the $40 parts list",
+      "Hiding the UNABLE TO VERIFY result",
+      "Hiding the UNABLE TO VERIFY state",
+      "Hiding the payment-gating logic behind buzzwords like 'blockchain' or 'AI' without showing it",
+      "Ignoring that a fake can contain some real drug at the wrong dose",
+      "Lighthouse under 80 or layout shift on load",
+      "Live death counters or ticking stats; that's manipulation, not data",
+      "Looking like a copy of Peel with no clear statement of what is new",
+      "Making PASS green and NEEDS LAB red when NEEDS LAB isn't a failure (unclear color meaning)",
+      "Mocked UI presented as real screenshots.",
+      "Mockup screens instead of real screenshots",
+      "Mockup screenshots instead of real app output",
+      "Mockups instead of real app screenshots",
+      "Mockups or Figma frames instead of real screenshots and the real device",
+      "More than 2 typefaces, or no clear type scale",
+      "Motion that ignores prefers-reduced-motion. Dissolve animations have no fallback.",
+      "Never showing a FAIL or NEEDS LAB case",
+      "No GitHub link, or a repo that's just a README",
+      "No accuracy numbers, or accuracy from n=3 presented as validation",
+      "No accuracy numbers, or accuracy measured on N=3",
+      "No demo of a FAIL holding the payment, only the happy path",
+      "No false-negative rate published; a missed fake is the dangerous failure",
+      "No false-negative rate, or hiding it",
+      "No false-pass rate, or accuracy numbers tested only on the team's own pills.",
+      "No false-pass rate, or hiding how many bad pills it let through",
+      "No named user and no evidence you talked to one",
+      "No numbers from your own tests (accuracy, sample size, failures)",
+      "No per-person contribution list",
+      "No raw sensor data and no explanation of the thresholds",
+      "No raw sensor data or false-positive numbers",
+      "No raw sensor data or real UI screenshots",
+      "No real app screenshots or result screens",
+      "No real app screenshots or serial output",
+      "No real screenshots of the app or real sensor curves",
+      "No real screenshots of the app or the payment gate flow.",
+      "No real screenshots or sensor data from an actual run",
+      "No real screenshots, sensor graphs, or a clip of an actual test run",
+      "No real sensor data or curves, so the verdicts look made up",
+      "No running cost: reference data, power, does it need internet?",
+      "Not saying what happens on UNABLE TO VERIFY: is the payment held, refunded, or sent for manual review?",
+      "Not saying which drug classes it can't check.",
+      "Not saying which drugs have reference profiles; a universal claim is a lie",
+      "Not saying which drugs it works on (artemether-lumefantrine? only one brand?)",
+      "Not saying which parts were built at Cal Hacks and which came from Peel",
+      "Not showing what happens on NEEDS LAB / UNABLE TO VERIFY",
+      "Numbers you can't source, or accuracy claims with no test count behind them",
+      "PASS and FAIL shown only as green and red, with no text or icon.",
+      "Pages over 2MB, or autoplay video for users in the target low-bandwidth regions.",
+      "Payment gating shown with no explanation of what happens on a false fail",
+      "Payment gating that punishes an honest supplier because of a sensor error, with no appeal or lab follow-up",
+      "Payment gating with no answer for false negatives that hurt honest suppliers",
+      "Payment gating with no answer for when the device is wrong and blocks a legitimate supplier",
+      "Payment gating with no dispute or lab-override path; it pushes clinics to accept passing fakes",
+      "Payment-gating copy that doesn't say who carries the risk if the result is wrong",
+      "Payment-gating explained in vague words, without showing the actual flow",
+      "Personal mode that tells a patient to stop taking a medicine",
+      "Purple-gradient SaaS template look and glassmorphism",
+      "Recall check implying that a bottle not on a recall list is genuine",
+      "Render images instead of real device photos",
+      "Rendered images instead of the real device and real app screenshots",
+      "Renders instead of the real device",
+      "Renders instead of the real device and real screenshots",
+      "Renders or animations used in place of the real hardware",
+      "Renders or mockups pretending to be the real device",
+      "Renders where the real device photo should be",
+      "Reusing Peel's look and claims without saying what's new",
+      "Reusing Peel's look and copy without saying what's new",
+      "Reusing Peel's look and copy, which makes it read as a resubmission",
+      "Reusing Peel's look and story so it's unclear what was built at Cal Hacks",
+      "Reusing Peel's look and writeup without clearly showing what's new",
+      "Reusing Peel's look or code without saying what is new",
+      "Reusing Peel's look or features without clearly marking what's new this weekend",
+      "Reusing Peel's look or hiding how much code came from Peel",
+      "Reusing Peel's look so it reads as a reskin",
+      "Reusing Peel's look so it seems recycled",
+      "Reusing Peel's look, so judges can't tell what was built this weekend",
+      "Reusing Peel's visual identity without saying so",
+      "Saying 'safe' or 'authentic' anywhere. The device screens tablets. It does not certify them.",
+      "Saying 'safe' or 'authentic'. You are screening, not certifying",
+      "Saying 'safe' or 'verified authentic' when it's a screening result",
+      "Saying 'safe' or 'verified authentic' when you mean PASS on a screen",
+      "Saying 'safe' or 'verified authentic'. A pass is not a guarantee.",
+      "Saying 'safe', 'authentic' or 'verified genuine'. A PASS only means it matched a reference profile, so say that.",
+      "Saying 'safe', 'verified authentic' or 'detects counterfeits' when PASS only means 'no anomaly detected'",
+      "Saying 'safe', 'verified authentic', or 'detects counterfeits' anywhere",
+      "Saying 'safe', 'verified authentic', or 'guaranteed' when the device only screens",
+      "Saying 'safe', 'verified' or 'authentic' when it is really PASS on a dissolution profile",
+      "Scroll animations that slow the page or hide the demo",
+      "Scroll-jacked pages that take over 2 seconds to load",
+      "Scroll-jacking or a hero that takes more than 2 seconds to load",
+      "Scroll-jacking or a hero that takes over 2s to load",
+      "Scroll-jacking or a load time over 2 seconds",
+      "Scroll-jacking or a slow load on a phone with a weak signal.",
+      "Scroll-jacking or pinned scroll sections that trap keyboard and screen-reader users.",
+      "Scroll-jacking or slow load, so the judge sees nothing in the first 10 seconds",
+      "Scroll-jacking or slow loads; the page has to work on a 3G phone",
+      "Scroll-jacking that breaks on a judge's phone or the venue Wi-Fi",
+      "Scroll-jacking that makes me wait",
+      "Scroll-jacking that takes more than 2 seconds to reach the product",
+      "Scroll-jacking, heavy WebGL, a hero that takes 3+ seconds to load on venue wifi",
+      "Scrolljacking or load time over 2s on venue Wi-Fi",
+      "Showing a green PASS checkmark with no disclaimer next to it",
+      "Showing payment gating without saying who decides the reference curve and how a supplier can dispute a result",
+      "Stats with no source link",
+      "Stats with no source link, or rounded up to sound scarier",
+      "Stats with no source, or a 'live' counter that is really made up",
+      "Stats with no source, or a fake live counter of deaths.",
+      "Stats with no source, or the 100k deaths shown as a ticking live counter",
+      "Stats with no source, or the 100k+ deaths figure with no citation or range",
+      "Stats without a source link (WHO link required)",
+      "Stock photos of African clinics or patients.",
+      "Stock photos of African clinics, or renders shown instead of the real device",
+      "Stock photos of African or Asian patients, i.e. poverty imagery",
+      "Stock photos of African patients or pharmacies",
+      "Stock photos of African patients or pill piles",
+      "Stock photos of pills or doctors",
+      "Stock photos of pills or labs instead of your actual device.",
+      "Stock photos of pills, clinics, or African patients",
+      "Stock photos of pills, pharmacies, or African clinics",
+      "Stock photos of sad patients or pill piles",
+      "Stock photos or AI renders instead of the actual hardware",
+      "Stock photos or AI renders of the device",
+      "Stock photos or AI-generated renders instead of the real box",
+      "Stock photos or AI-rendered device instead of the real breadboard",
+      "Stock photos or renders instead of the real device and real screenshots",
+      "Taking longer than 2 seconds to load",
+      "The '100k+ deaths' figure without a source, year, and range",
+      "Unsourced or inflated stats, or a 'lives saved' counter",
+      "Unsourced or inflated stats, or a fake live counter",
+      "Using the 'kills 100k' line as emotional bait with no follow-through on who uses this and where",
+      "Using the word 'safe', 'verified', 'authentic', or 'certified' for a PASS result",
+      "Videos without captions, or images without alt text.",
+      "Words like \"safe\", \"verified authentic\", or \"guaranteed\"; this screens pills, it doesn't certify them",
+      "Words like 'safe', 'certified' or 'guaranteed authentic'",
+      "Words like 'safe', 'verified authentic', or 'guaranteed' when it's a screening tool",
+      "Words like 'safe', 'verified authentic', or 'guaranteed'. A pass is not a safety certificate."
+    ]
+  }
+}
