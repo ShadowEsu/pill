@@ -1,13 +1,17 @@
 // Ask Pill, connected to Claude through the pill-pay service (POST /ask). The app builds a compact record from the
 // store (runs, deliveries, recalls, the band; in personal mode medicines and reminders), shows it in "What Pill knows",
 // and sends exactly that. The service answers only from it, runs the clause filter, and says which model answered.
-// Motion: messages slide in from their side, the spinning pill is the assistant's avatar, three dots while waiting.
+// Motion: messages rise in from their side and Pill's newest reply types itself in; the spinning pill is the assistant's
+// avatar, glowing and spinning faster while it thinks; three dots while waiting; the suggested questions stagger in;
+// "What Pill knows" opens and closes with a height animation.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Screen } from '../components/Shell';
 import SpinPill from '../components/SpinPill';
 import ReadAloud from '../components/ReadAloud';
+import TypeIn from '../components/TypeIn';
 import { useMediaQuery, useReducedMotion } from '../lib/motion';
+import '../components/cinema.css';
 import { getState, useStore, type State } from '../lib/store';
 import { PAY_URL, askPill, type AskAnswer } from '../lib/api';
 import { playSound } from '../lib/sound';
@@ -88,7 +92,8 @@ function ModelChip({ meta }: { meta: NonNullable<Msg['meta']> }) {
     : <span className="chip warn" data-model="template" title={meta.reason}><span className="dot" />template{drop}</span>;
 }
 
-function Knows({ ctx: c, mode, open }: { ctx: AskContext; mode: Mode; open: boolean }) {
+function Knows({ ctx: c, mode, defaultOpen }: { ctx: AskContext; mode: Mode; defaultOpen: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
   const ref = c.reference;
   const lines: string[] = mode === 'medical'
     ? [
@@ -103,22 +108,29 @@ function Knows({ ctx: c, mode, open }: { ctx: AskContext; mode: Mode; open: bool
         `${c.runs.length} tests: ${c.runs.map((r) => `${r.lot} ${r.verdict}`).join(' · ') || 'none'}`,
       ];
   return (
-    <details className="card" open={open} style={{ padding: '12px 16px' }} data-knows>
-      <summary style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'center', listStyle: 'none' }}>
-        <span style={{ fontWeight: 600 }}>What Pill knows</span>
-        <span className="mono muted" style={{ fontSize: 12 }}>sent with every question</span>
-      </summary>
-      <ul style={{ margin: '10px 0 0', paddingLeft: 18, display: 'grid', gap: 6, fontSize: 14, color: 'var(--ink-2)' }}>
-        {ref && <li>Reference band {ref.drug} {ref.band[0]}–{ref.band[1]}, glow minimum {ref.glow_min}, {ref.reference_runs} runs, CV {ref.cv_pct} %</li>}
-        {lines.map((l) => <li key={l} style={{ overflowWrap: 'anywhere' }}>{l}</li>)}
-        <li>The seven rules (U1–P1) and the payment policy (P1–P6), quoted on the service</li>
-      </ul>
-      <details style={{ marginTop: 10 }}>
-        <summary className="mono" style={{ cursor: 'pointer', fontSize: 12, color: 'var(--muted)' }}>the exact JSON ({JSON.stringify(c).length.toLocaleString('en-US')} characters)</summary>
-        <pre className="mono" style={{ fontSize: 11, maxHeight: 260, overflow: 'auto', background: 'var(--bg)', padding: 10, borderRadius: 10, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', margin: '8px 0 0' }}>{JSON.stringify(c, null, 1)}</pre>
-      </details>
-      <p className="footnote" style={{ marginTop: 10 }}>Nothing else leaves the app. Answers pass a word filter before you see them.</p>
-    </details>
+    <section className={'card cn-knows' + (open ? ' open' : '')} style={{ padding: '12px 16px' }} data-knows aria-label="What Pill knows">
+      <button type="button" className="cn-knows-toggle" aria-expanded={open} aria-controls="knows-body" onClick={() => setOpen((v) => !v)}>
+        <span style={{ display: 'grid', gap: 2 }}>
+          <span style={{ fontWeight: 600 }}>What Pill knows</span>
+          <span className="mono muted" style={{ fontSize: 11.5 }}>sent with every question</span>
+        </span>
+        <span className="chev" aria-hidden="true" style={{ width: 30, height: 30, borderRadius: '50%', border: '1px solid var(--line-2)', display: 'grid', placeItems: 'center', fontSize: 14, lineHeight: 1 }}>⌄</span>
+      </button>
+      <div className="cn-knows-body" id="knows-body" inert={!open}>
+        <div>
+          <ul key={String(open)} style={{ margin: '10px 0 0', paddingLeft: 18, display: 'grid', gap: 6, fontSize: 14, color: 'var(--ink-2)' }}>
+            {ref && <li>Reference band {ref.drug} {ref.band[0]}–{ref.band[1]}, glow minimum {ref.glow_min}, {ref.reference_runs} runs, CV {ref.cv_pct} %</li>}
+            {lines.map((l, i) => <li key={l} style={{ overflowWrap: 'anywhere', animationDelay: `${(i + 1) * 60}ms` }}>{l}</li>)}
+            <li style={{ animationDelay: `${(lines.length + 1) * 60}ms` }}>The seven rules (U1–P1) and the payment policy (P1–P6), quoted on the service</li>
+          </ul>
+          <details style={{ marginTop: 10 }}>
+            <summary className="mono" style={{ cursor: 'pointer', fontSize: 12, color: 'var(--muted)' }}>the exact JSON ({JSON.stringify(c).length.toLocaleString('en-US')} characters)</summary>
+            <pre className="mono" style={{ fontSize: 11, maxHeight: 260, overflow: 'auto', background: 'var(--bg)', padding: 10, borderRadius: 10, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', margin: '8px 0 0' }}>{JSON.stringify(c, null, 1)}</pre>
+          </details>
+          <p className="footnote" style={{ marginTop: 10 }}>Nothing else leaves the app. Answers pass a word filter before you see them.</p>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -158,7 +170,7 @@ export default function Ask() {
       <div role="log" aria-live="polite" style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingBottom: 8 }}>
         {msgs.map((m) => (
           <div key={m.id} className={'ask-row' + (m.who === 'me' ? ' me' : '')} style={{ '--i': m.id === 0 ? 2 : 0 } as React.CSSProperties}>
-            {m.who === 'pill' && <SpinPill size={56} speed={m.id === msgs.length - 1 ? 1.6 : 0.8} label="Pill" />}
+            {m.who === 'pill' && <span className="cn-avatar"><SpinPill size={56} speed={m.id === msgs.length - 1 ? 1.6 : 0.8} glow={m.id === msgs.length - 1} label="Pill" /></span>}
             <div style={bubble(m.who === 'me')} data-answer={m.who === 'pill' && m.meta ? m.meta.mode : undefined}>
               {m.who === 'pill' && (
                 <div className="row between" style={{ gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
@@ -166,7 +178,7 @@ export default function Ask() {
                   {m.meta && <ModelChip meta={m.meta} />}
                 </div>
               )}
-              <p style={{ whiteSpace: 'pre-line', overflowWrap: 'anywhere' }}>{m.text}</p>
+              <p style={{ whiteSpace: 'pre-line', overflowWrap: 'anywhere' }}>{m.who === 'pill' && m.id > 0 && m.id === msgs.length - 1 ? <TypeIn text={m.text} cps={120} /> : m.text}</p>
               {m.links && m.links.length > 0 && (
                 <div className="row" style={{ gap: 12, flexWrap: 'wrap', marginTop: 8 }}>
                   {m.links.map((l) => <Link key={l.to} to={l.to} style={{ fontWeight: 600, textUnderlineOffset: 3, textDecorationColor: 'var(--sky)' }}>{l.label} →</Link>)}
@@ -178,15 +190,15 @@ export default function Ask() {
         ))}
         {thinking && (
           <div className="ask-row" role="status" aria-label="Pill is replying">
-            <SpinPill size={56} speed={2.4} label="Pill" />
+            <span className="cn-avatar thinking"><SpinPill size={56} speed={3.2} glow label="Pill" /></span>
             <div style={bubble(false)}><span className="typing-dots" aria-hidden="true"><i /><i /><i /></span></div>
           </div>
         )}
-        <div ref={end} />
+        <div ref={end} style={{ scrollMarginBottom: wide ? 160 : 340 }} />
       </div>
       {/* on phones the tab bar is sticky too; sit the composer just above it */}
       <div style={{ position: 'sticky', bottom: wide ? 0 : 'calc(62px + env(safe-area-inset-bottom))', paddingTop: 10, paddingBottom: wide ? 8 : 8, background: 'linear-gradient(180deg, transparent, var(--bg) 24%)', display: 'grid', gap: 10 }}>
-        <div className="row" role="group" aria-label="Suggested questions" style={{ gap: 8, flexWrap: 'wrap' }}>
+        <div className="row cn-sugg" role="group" aria-label="Suggested questions" style={{ gap: 8, flexWrap: 'wrap' }}>
           {SUGGEST[mode].map((q) => (
             <button key={q} type="button" className="chip" disabled={thinking} onClick={() => void send(q)} style={{ cursor: 'pointer', minHeight: 36, background: 'var(--surface)' }}>{q}</button>
           ))}
@@ -200,10 +212,11 @@ export default function Ask() {
   );
 
   return (
-    <Screen title="Ask Pill" eyebrow={mode === 'medical' ? 'for the clinic pharmacist' : 'for you at home'} back="/" right={<span className={'chip ' + (PAY_URL ? 'ok' : 'warn')}><span className="dot" />{PAY_URL ? 'claude · filtered' : 'not connected'}</span>}>
+    <Screen title="Ask Pill" eyebrow={mode === 'medical' ? 'for the clinic pharmacist' : 'for you at home'} back="/" tone="sky"
+      right={<span className={'chip ' + (PAY_URL ? 'ok' : 'warn')}><span className="dot" />{PAY_URL ? 'claude · filtered' : 'not connected'}</span>}>
       {wide
-        ? <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 340px', gap: 20, alignItems: 'start' }}>{chat}<div style={{ position: 'sticky', top: 16 }}><Knows ctx={ctx} mode={mode} open /></div></div>
-        : <><Knows ctx={ctx} mode={mode} open={false} />{chat}</>}
+        ? <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 340px', gap: 20, alignItems: 'start' }}>{chat}<div style={{ position: 'sticky', top: 16 }}><Knows ctx={ctx} mode={mode} defaultOpen /></div></div>
+        : <><Knows ctx={ctx} mode={mode} defaultOpen={false} />{chat}</>}
     </Screen>
   );
 }

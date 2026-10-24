@@ -1,6 +1,8 @@
 // The station's own 7-inch screen (1024 × 600, landscape). One button; the run plays inline with the capsule, the curve,
 // the light path and the timetable; the verdict holds for 20 s under a countdown ring, then the station is ready again.
-// Idle for 30 s while ready (?idle=N overrides), it loops a 20 s attract sequence until someone taps or presses a key.
+// Idle for 30 s while ready (?idle=N overrides), it loops a 20 s attract sequence until someone taps or presses a key:
+// the site's binary pill on the dark navy panel, full bleed, with the three words cycling in serif and the four beats.
+// Type is sized for 1024 × 600 at arm's length; the verdict word stamps in (the sound plays when the run ends).
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Screen, SrcBadge } from '../components/Shell';
@@ -8,8 +10,8 @@ import PillFill, { VERDICT_FILL } from '../components/PillFill';
 import Curve, { RunReadout } from '../components/Curve';
 import RunPhases, { clock, phaseAt } from '../components/RunPhases';
 import SensorPath, { GLOW_FULL } from '../components/SensorPath';
-import SpinPill from '../components/SpinPill';
-import FlowArrows from '../components/FlowArrows';
+import BinaryPill from '../components/BinaryPill';
+import Stamp from '../components/Stamp';
 import { actions, useStore } from '../lib/store';
 import { replayStream } from '../lib/stream';
 import { absorbance, evaluate, progressPct } from '../lib/rules';
@@ -18,6 +20,7 @@ import { playSound, verdictSound } from '../lib/sound';
 import { REFERENCES } from '../data/reference';
 import type { Sample, Source, Verdict } from '../lib/types';
 import '../story.css';
+import '../components/cinema.css';
 
 const REF = REFERENCES.riboflavin;
 const HOLD_S = 20;
@@ -49,11 +52,22 @@ const BEATS = [
 ];
 const LOOP_MS = 20000, BEAT_MS = LOOP_MS / BEATS.length, WORD_MS = 2500;
 
-/** The idle loop: the pill spinning in each verdict's light, the three words, the four beats along a flow strip. */
+/** Window size, for the full-bleed canvas. */
+function useViewport() {
+  const [vp, setVp] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }));
+  useEffect(() => {
+    const on = () => setVp({ w: window.innerWidth, h: window.innerHeight });
+    window.addEventListener('resize', on);
+    return () => window.removeEventListener('resize', on);
+  }, []);
+  return vp;
+}
+
+/** The idle loop: the binary pill on the navy panel, the three words cycling in serif, the four beats with a progress strip. */
 function Attract({ onWake }: { onWake: () => void }) {
   const reduce = useReducedMotion();
   const narrow = useMediaQuery('(max-width: 720px)');
-  const short = useMediaQuery(SHORT);
+  const { w, h } = useViewport();
   const [ms, setMs] = useState(0);
   useEffect(() => {
     if (reduce) return;
@@ -66,32 +80,27 @@ function Attract({ onWake }: { onWake: () => void }) {
     return () => window.removeEventListener('keydown', onWake);
   }, [onWake]);
   const beat = Math.floor(ms / BEAT_MS);
-  const word = WORDS[Math.floor(ms / WORD_MS) % WORDS.length];
-  const ids = ['tablet', 'water', 'sensors', 'verdict'];
+  const wordAt = Math.floor(ms / WORD_MS);
+  const word = WORDS[wordAt % WORDS.length];
+  // the pill sits right of the words on the 1024 × 600 panel, behind them on a phone
+  const cw = narrow ? w : Math.round(w * 0.64), ch = narrow ? Math.round(h * 0.62) : h;
   return (
-    <div className="attract" role="button" tabIndex={0} aria-label="Station idle. Tap anywhere to begin." onClick={onWake}>
-      <div className="attract-main">
-        <SpinPill size={narrow ? 180 : short ? 260 : 340} speed={1.4} verdict={reduce ? null : word} label="Pill, spinning" />
-        <div className="attract-words">
-          <p className="eyebrow">STATION 01 · three words, never a guess</p>
-          {reduce
-            ? <p className="attract-word" style={{ fontSize: 'clamp(36px, 5vw, 56px)' }}>PASS · NEEDS LAB · UNABLE TO VERIFY</p>
-            : <p className="attract-word" aria-hidden="true"><span key={word + Math.floor(ms / WORD_MS)}>{word}</span></p>}
-          <div style={{ width: 64, height: 4, borderRadius: 2, background: reduce ? 'var(--sky)' : VERDICT_FILL[word], transition: 'background .6s var(--ease)' }} />
-          <p className="attract-beat">{BEATS[beat]}</p>
-          <p className="attract-cta">Drop one quarter tablet to begin</p>
+    <div className="cn-attract" role="button" tabIndex={0} aria-label="Station idle. Tap anywhere to begin." onClick={onWake}>
+      <BinaryPill width={cw} height={ch} dark scale={narrow ? 3.4 : 2.5} className="cn-attract-pill" label="Pill, drawn in ones and zeros" />
+      <div className="cn-attract-main">
+        <p className="eyebrow">STATION 01 · three words, never a guess</p>
+        {reduce
+          ? <p className="cn-attract-word" style={{ fontSize: 'clamp(40px, 6vw, 64px)', minHeight: 0 }}>PASS · NEEDS LAB · UNABLE TO VERIFY</p>
+          : <p className="cn-attract-word" aria-hidden="true"><span key={wordAt}>{word}</span></p>}
+        <div className="cn-attract-bar" style={{ background: reduce ? 'var(--sky)' : VERDICT_FILL[word] }} />
+        <p key={beat} className="cn-attract-beat cn-field">{BEATS[beat]}</p>
+        <div className="cn-dots" aria-hidden="true" style={{ '--beat': `${BEAT_MS}ms` } as React.CSSProperties}>
+          {BEATS.map((_, i) => <i key={i + (i === beat ? '-on' : '')} className={i === beat ? 'on' : i < beat ? 'past' : undefined} style={i < beat ? { background: 'rgba(255,255,255,.8)' } : undefined} />)}
         </div>
+        <p className="cn-attract-cta">Drop one quarter tablet to begin</p>
       </div>
-      <div className="attract-foot">
-        <FlowArrows label="How a run goes"
-          nodes={[
-            { id: 'tablet', label: '¼ tablet', sub: 'in the water', accent: beat === 0 ? 'var(--sky)' : 'var(--line-2)' },
-            { id: 'water', label: 'Dissolve', sub: '3 min, stirred', accent: beat === 1 ? 'var(--sky)' : 'var(--line-2)' },
-            { id: 'sensors', label: 'Two sensors', sub: 'inline + 90°', accent: beat === 2 ? 'var(--mint)' : 'var(--line-2)' },
-            { id: 'verdict', label: 'Three words', sub: 'seven rules', accent: beat === 3 ? 'var(--mint)' : 'var(--line-2)' },
-          ]}
-          edges={ids.slice(1).map((to, k) => ({ from: ids[k], to, live: !reduce && beat >= k + 1, color: beat === k + 1 ? 'var(--sky-ink)' : undefined }))} />
-        <p className="footnote" style={{ textAlign: 'center' }}>Tap anywhere to begin · screening result, not a pharmacopeial test</p>
+      <div className="cn-attract-foot">
+        <span>Tap anywhere to begin · screening result, not a pharmacopeial test</span>
       </div>
     </div>
   );
@@ -158,53 +167,63 @@ export default function Kiosk() {
   const running = !!run && !ev;
   const status = !run ? 'ready' : phase.status;
   const doing = !run ? 'Place a quarter tablet, close the lid, press Start.' : `${phase.doing[0].toUpperCase()}${phase.doing.slice(1)}.`;
+  const startBtn = (
+    <button type="button" className={'btn' + (!running ? ' cn-ready' : '')} style={{ flex: short ? 'none' : '1 0 280px', width: short ? '100%' : 'auto', minHeight: short ? 64 : 72, fontSize: 22 }} disabled={running} onClick={() => { setLeft(null); playSound('rise'); setRunId(actions.startRun({ drug: 'riboflavin', lot: 'B2-07', src: 'replay' }).id); }}>
+      {running ? `Running · ${clock(t)} / 3:00` : ev ? 'Start again (replay B2-07)' : 'Start (replay B2-07)'}
+    </button>
+  );
 
   return (
-    <Screen title="Pill" eyebrow={`STATION 01 · ${REF.label}`} right={src ? <SrcBadge src={src} /> : <span className="chip ok"><span className="dot" />ready</span>}>
-      <div className="wide-2" style={{ flex: 1, minHeight: 0, alignItems: 'center' }}>
-        <section className="card glass decor-dots" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 20, minWidth: 0, padding: '22px 16px' }}>
+    <Screen title="Pill" eyebrow={`STATION 01 · ${REF.label}`} tone={ev ? (ev.verdict === 'PASS' ? 'mint' : ev.verdict === 'NEEDS LAB' ? 'amber' : 'none') : 'sky'}
+      right={src ? <SrcBadge src={src} /> : <span className="chip ok beat"><span className="dot" />ready</span>}>
+      <div className="wide-2 cn-kiosk" style={{ flex: 1, minHeight: 0, alignItems: 'center' }}>
+        <div className="stack" style={{ gap: 12, minWidth: 0 }}>
+        <section className={'card glass decor-dots cn-hero' + (ev ? ' cn-verdict-hero' : '')} style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 20, minWidth: 0, padding: short ? '14px 16px' : '22px 16px', '--hero': ev ? `color-mix(in srgb, ${VERDICT_FILL[ev.verdict]} 35%, transparent)` : undefined } as React.CSSProperties}>
           {ev ? (
             <>
-              <div className="rise" style={{ flex: 'none' }}><PillFill pct={100} verdict={ev.verdict} size={short ? 180 : 230} /></div>
+              <div className="cn-pillwrap" style={{ flex: 'none' }}><PillFill pct={100} verdict={ev.verdict} size={short ? 190 : 240} /></div>
               <div className="rise stack" style={{ gap: 10, minWidth: 0, flex: '1 1 200px', animationDelay: '80ms' }}>
-                <p className="eyebrow">rule {ev.rule} · run {run?.id}</p>
-                <h2 className="serif" data-verdict={ev.verdict} style={{ fontSize: ev.verdict === 'PASS' ? 88 : 56, lineHeight: 0.95, fontWeight: 400, letterSpacing: '-0.01em' }}>{ev.verdict}</h2>
-                <div style={{ width: 56, height: 3, borderRadius: 2, background: VERDICT_FILL[ev.verdict] }} />
-                <p className="mono" style={{ fontSize: 15 }}>{ev.pct} % of reference</p>
-                <p style={{ color: 'var(--ink-2)' }}>Next: {ev.nextStep}.</p>
+                <p className="eyebrow" style={{ fontSize: 13 }}>rule {ev.rule} · run {run?.id}</p>
+                <h2 style={{ fontWeight: 400 }}><Stamp verdict={ev.verdict} size={ev.verdict === 'PASS' ? 88 : 54} sound={false} delay={120} /></h2>
+                <p className="mono" style={{ fontSize: 18 }}>{ev.pct} % of reference</p>
+                <p style={{ color: 'var(--ink-2)', fontSize: 20 }}>Next: {ev.nextStep}.</p>
                 <p className="footnote">Screening result, not a pharmacopeial test.</p>
                 <div className="row" style={{ gap: 10 }}>
                   <HoldRing left={left ?? 0} colour={VERDICT_FILL[ev.verdict]} />
-                  <span className="mono muted" style={{ fontSize: 13 }}>ready again in {left ?? 0} s</span>
+                  <span className="mono muted" style={{ fontSize: 15 }}>ready again in {left ?? 0} s</span>
                 </div>
               </div>
             </>
           ) : (
             <div className="stack" style={{ alignItems: 'center', gap: 8 }}>
-              <PillFill pct={pct} size={short ? 220 : 320} running={running} />
-              <p className="serif" style={{ fontSize: 36, lineHeight: 1 }}>{status}</p>
-              <p style={{ fontSize: 18, textAlign: 'center', color: 'var(--ink-2)', maxWidth: 420 }} aria-live="polite">{doing}</p>
-              <p className="mono muted" style={{ fontSize: 14 }}>{clock(t)} / 3:00{run ? ` · ${pct} % of reference` : ''}</p>
+              <div className="cn-pillwrap"><PillFill pct={pct} size={short ? 180 : 330} running={running} /></div>
+              <p className="serif" style={{ fontSize: short ? 42 : 46, lineHeight: 1 }}>{status}</p>
+              <p style={{ fontSize: 21, textAlign: 'center', color: 'var(--ink-2)', maxWidth: 440, lineHeight: 1.3 }} aria-live="polite">{doing}</p>
+              <p className="mono muted" style={{ fontSize: 16 }}>{clock(t)} / 3:00{run ? ` · ${pct} % of reference` : ''}</p>
             </div>
           )}
         </section>
-        <section className="card stack" style={{ gap: 8, minWidth: 0 }}>
+        {short && startBtn}
+        </div>
+        <section className="card stack" style={{ gap: short ? 6 : 8, minWidth: 0, padding: short ? '12px 16px' : undefined }}>
           <div className="row between"><span className="eyebrow">absorbance</span><span className="mono muted" style={{ fontSize: 12 }}>{last ? `${last.temp.toFixed(1)} °C` : '—'}</span></div>
-          <Curve samples={samples} band={REF} width={460} height={160} live={running} />
+          <Curve samples={samples} band={REF} width={460} height={short ? 118 : 160} live={running} />
           <hr className="hr" />
           <div className="row between"><span className="eyebrow">light path</span><span className="mono muted" style={{ fontSize: 12 }}>{running ? 'reading once a second' : 'idle'}</span></div>
-          <div style={{ maxWidth: short ? 280 : 330, width: '100%', margin: '0 auto' }}>
+          <div style={{ maxWidth: short ? 240 : 330, width: '100%', margin: '0 auto' }}>
             <SensorPath led={last?.led ?? !!run} inline={last ? last.adc0 / last.blank : 1} glow={last ? absorbance(last.blank, last.adc90) / GLOW_FULL : 0} running={running} />
           </div>
-          <RunReadout samples={samples} strip={false} />
+          {short
+            ? <div className="cn-phases" style={{ paddingTop: 4 }}><RunPhases t={t} legend={false} big /></div>
+            : <RunReadout samples={samples} strip={false} />}
         </section>
       </div>
-      <section className="card" style={{ padding: '12px 18px 14px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px 24px' }}>
-        <div style={{ flex: '1 1 420px', minWidth: 0 }}><RunPhases t={t} legend={false} big /></div>
-        <button type="button" className="btn" style={{ flex: '1 0 280px', width: 'auto' }} disabled={running} onClick={() => { setLeft(null); playSound('rise'); setRunId(actions.startRun({ drug: 'riboflavin', lot: 'B2-07', src: 'replay' }).id); }}>
-          {running ? `Running · ${clock(t)} / 3:00` : ev ? 'Start again (replay B2-07)' : 'Start (replay B2-07)'}
-        </button>
-      </section>
+      {!short && (
+        <section className="card cn-phases" style={{ padding: '12px 18px 14px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px 24px' }}>
+          <div style={{ flex: '1 1 420px', minWidth: 0 }}><RunPhases t={t} legend={false} big /></div>
+          {startBtn}
+        </section>
+      )}
       {attract && !runId && <Attract onWake={wake} />}
     </Screen>
   );

@@ -1,5 +1,7 @@
 // The evaluation: the verdict on a tinted hero with the gauge, the two numbers that decided it, which channel decided, why,
 // what to do next, and a one-line summary to share. Said once, calmly, and read aloud on a tap.
+// Motion: the verdict word stamps in (Stamp, with the verdict's sound on the same frame), the gauge sweeps, the % counts up,
+// the two-channel diagram draws its arrows into the rule box, and the why types itself in. Tone by verdict, never red.
 // With VITE_PAY_URL set, Claude writes the why (POST /why, clause-filtered on the service) above the deterministic rule text;
 // the answer lives in component state + sessionStorage per run, never in the store.
 import { useEffect, useState } from 'react';
@@ -13,11 +15,14 @@ import { actions, useStore } from '../lib/store';
 import { DRUGS, REFERENCES } from '../data/reference';
 import type { Evaluation as Ev, Mode, Run, Verdict } from '../lib/types';
 import { PAY_URL, fetchWhy, type Unavailable, type WhyLive, type WhyTemplate } from '../lib/api';
-import { playSound, verdictSound } from '../lib/sound';
 import ReadAloud from '../components/ReadAloud';
 import { ShareSheet } from '../components/ShareCard';
+import TypeIn from '../components/TypeIn';
+import '../components/cinema.css';
 
 const HERO_TINT: Record<Verdict, string> = { PASS: 'var(--mint-tint)', 'NEEDS LAB': 'var(--amber-tint)', 'UNABLE TO VERIFY': 'var(--grey-tint)' };
+const HERO_GLOW: Record<Verdict, string> = { PASS: 'rgba(95,211,154,.35)', 'NEEDS LAB': 'rgba(224,154,58,.32)', 'UNABLE TO VERIFY': 'rgba(154,160,166,.3)' };
+const TONE: Record<Verdict, 'mint' | 'amber' | 'none'> = { PASS: 'mint', 'NEEDS LAB': 'amber', 'UNABLE TO VERIFY': 'none' };
 
 const PLAIN: Record<Verdict, string> = {
   PASS: 'This tablet dissolved like the reference tablet did.',
@@ -70,9 +75,9 @@ export default function Evaluation() {
   const bottle = useStore((s) => s.bottles.find((b) => b.runId === id));
   const [curveOpen, setCurveOpen] = useState(false);
   const [copied, setCopied] = useState<'copied' | 'failed' | null>(null);
+  const [sharing, setSharing] = useState(false);
   const ai = useWhy(run, mode === 'personal' ? 'personal' : 'medical', stationRef, bottle?.recall ?? 'unchecked');
-  const verdict = run?.evaluation?.verdict ?? null;
-  useEffect(() => { if (verdict) playSound(verdictSound(verdict)); }, [id, verdict]);
+  // the verdict's sound plays from the Stamp, on the frame the word lands
 
   if (!run) return (
     <Screen title="No such run" back="/">
@@ -153,7 +158,6 @@ export default function Evaluation() {
     new Date(run.startedAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }),
     `run ${run.id} (${SRC_TEXT[run.src]})`,
   ].join(' · ') + '. Screening result, not a pharmacopeial test.';
-  const [sharing, setSharing] = useState(false);
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(summary);
@@ -168,10 +172,10 @@ export default function Evaluation() {
   };
 
   return (
-    <Screen eyebrow={`${drug?.name ?? run.drug} · lot ${run.lot}`} title="Evaluation" back="/" right={<SrcBadge src={run.src} />}>
+    <Screen eyebrow={`${drug?.name ?? run.drug} · lot ${run.lot}`} title="Evaluation" back="/" right={<SrcBadge src={run.src} />} tone={TONE[ev.verdict]}>
       <div className="wide-2">
         <div className="stack" style={{ gap: 16, minWidth: 0 }}>
-          <section className="card decor-dots" style={{ backgroundColor: HERO_TINT[ev.verdict], borderColor: 'transparent', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 14 }}>
+          <section className="card decor-dots cn-verdict-hero" style={{ backgroundColor: HERO_TINT[ev.verdict], '--hero': HERO_GLOW[ev.verdict], borderColor: 'transparent', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 14 } as React.CSSProperties}>
             <VerdictCard run={run} evaluation={ev} size={104} wordSize={ev.verdict === 'UNABLE TO VERIFY' ? 36 : 44} />
             <div className="rise" style={{ ...STEP(1), flex: '1 1 170px', display: 'flex', justifyContent: 'center' }}>
               <Gauge pct={comparable ? ev.pct : null} low={ref ? Math.round((ref.bandLow / ref.bandMean) * 100) : 87} high={ref ? Math.round((ref.bandHigh / ref.bandMean) * 100) : 113} verdict={ev.verdict} width={300}
@@ -223,13 +227,13 @@ export default function Evaluation() {
                           {live.contradiction && <span className="chip warn"><span className="dot" />inputs disagree</span>}
                         </div>
                         {personal && live.plain && <p style={{ fontSize: 18, fontWeight: 500, lineHeight: 1.4 }}>{live.plain}</p>}
-                        <p style={{ lineHeight: 1.5 }}>{live.why}</p>
+                        <p style={{ lineHeight: 1.5 }}><TypeIn text={live.why} cps={90} /></p>
                       </>
                     : <div><span className="chip" data-why="unavailable" title={ai.mode === 'template' ? ai.reason : ai.mode === 'unavailable' ? ai.error : undefined}><span className="dot" />claude unavailable · rule text only</span></div>}
               </div>
             )}
             <p className="eyebrow" style={{ marginTop: PAY_URL ? 4 : 0 }}>rule text</p>
-            <p style={{ color: 'var(--ink-2)' }}>{ev.why}</p>
+            <p style={{ color: 'var(--ink-2)' }}>{live ? ev.why : <TypeIn text={ev.why} cps={70} delay={700} />}</p>
           </section>
 
           {!personal && meaning}

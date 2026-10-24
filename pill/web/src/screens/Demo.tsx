@@ -178,9 +178,12 @@ export function DemoDriver() {
   const t = run?.samples.at(-1)?.t ?? 0;
   const progress = step.ms === 'run' ? (run?.evaluation ? 1 : t / 180) : elapsed / ms;
   const last = run?.samples.at(-1);
-  const note = step.key === 'run' && last ? `glow ${absorbance(last.blank, last.adc90).toFixed(3)}` : step.key === 'evaluation' || step.key === 'delivery' ? d.tiger : step.key === 'bottle' ? 'demo label' : step.key === 'dashboard' ? 'SANDBOX / TESTNET' : null;
+  const glow = last ? absorbance(last.blank, last.adc90) : 0;
+  // the moment: in the run step, the glow has stayed flat past 40 s (the Run screen washes amber at the same time)
+  const moment = step.key === 'run' && !!last && last.t > 40 && glow < 0.05;
+  const note = step.key === 'run' && last ? `glow ${glow.toFixed(3)}` : step.key === 'evaluation' || step.key === 'delivery' ? d.tiger : step.key === 'bottle' ? 'demo label' : step.key === 'dashboard' ? 'SANDBOX / TESTNET' : null;
   return (
-    <Caption step={d.step + 1} total={STEPS.length} label={step.label} text={step.say(run)} progress={progress} paused={d.paused} note={note}
+    <Caption step={d.step + 1} total={STEPS.length} label={step.label} text={step.say(run)} progress={progress} paused={d.paused} note={note} moment={moment}
       canNext={step.ms !== 'run' || !!run?.evaluation}
       onPause={() => setDemo({ paused: !d.paused })}
       onNext={() => (d.step + 1 < STEPS.length ? setDemo({ step: d.step + 1 }) : stop(go, '/'))}
@@ -208,13 +211,13 @@ export default function Demo() {
 
   const total = Math.round((STEPS.reduce((a, s) => a + (s.ms === 'run' ? (180 / RUN_SPEED) * 1000 + 1500 : s.ms), 0)) / speed / 1000);
   return (
-    <Screen title="The two-minute demo" eyebrow="for the judging table" back="/">
+    <Screen title="The two-minute demo" eyebrow="for the judging table" back="/" tone="amber">
       <section className="card decor-dots stack" style={{ gap: 14 }}>
         <div className="row" style={{ gap: 16, alignItems: 'center' }}>
-          <SpinPill size={84} label="Pill" />
+          <SpinPill size={84} glow label="Pill" />
           <p className="serif" style={{ fontSize: 'clamp(1.35rem, 4.6vw, 1.9rem)', lineHeight: 1.15 }}>One delivery, start to hold, on the real screens.</p>
         </div>
-        <ol className="stack" style={{ gap: 8, margin: 0, paddingLeft: 22 }}>
+        <ol className="stack cn-stagger" style={{ gap: 8, margin: 0, paddingLeft: 22 }}>
           {STEPS.map((s, i) => <li key={s.key}><span className="mono muted" style={{ fontSize: 12 }}>{String(i + 1).padStart(2, '0')}</span> {s.label}{s.key === 'run' ? ': cloudy chalk reaches the band, no glow' : ''}</li>)}
         </ol>
         <p className="footnote">Seeded week plus one live replay of lot TM-02. The label is the demo label, money is SANDBOX / TESTNET, and the run is a recorded curve (the chip on the run says REPLAY). Turn sound on.</p>

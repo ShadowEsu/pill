@@ -1,5 +1,8 @@
 // The run: the capsule fills as the tablet dissolves, the timetable walks fill → dissolve → settle → hold, the curve draws,
 // the light path shows which channel is moving, the station checks stay visible. Ends on the evaluation.
+// Motion: the capsule grows in to the column width; beside it a dark "90° glow" meter lights mint only when riboflavin
+// glows (chalk leaves it dark). The moment: once the glow has stayed flat past 40 s while something dissolves, a quiet
+// amber wash spreads behind the capsule and the status turns into one serif sentence. The current timetable block pulses.
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Action, Screen, SrcBadge } from '../components/Shell';
@@ -7,18 +10,38 @@ import PillFill from '../components/PillFill';
 import Curve, { RunReadout } from '../components/Curve';
 import RunPhases, { clock, phaseAt } from '../components/RunPhases';
 import SensorPath, { GLOW_FULL } from '../components/SensorPath';
+import { Words } from '../components/TypeIn';
 import { actions, getState, useStore } from '../lib/store';
 import { replayStream } from '../lib/stream';
 import { absorbance, evaluate, progressPct } from '../lib/rules';
 import { DRUGS, REFERENCES, REPLAYS } from '../data/reference';
 import type { Sample, Source } from '../lib/types';
+import '../components/cinema.css';
 
 const FAULT_WORDS: Record<string, string> = { lid_open: 'lid opened', led_fail: 'LED failed', temp_out: 'water temperature out of range', no_blank: 'no clear-water reading' };
 const WIDE = '(min-width: 900px)';
+const MOMENT = 'Something is dissolving. Nothing is glowing.';
 function onWideChange(l: () => void) {
   const m = window.matchMedia(WIDE);
   m.addEventListener('change', l);
   return () => m.removeEventListener('change', l);
+}
+
+/** The 90° channel as a vertical meter: dark track, mint light rising with the glow once it is above the 0.05 noise floor
+ *  (chalk leaves it dark), a bulb that lights at the reference's glow minimum. */
+function GlowMeter({ glow, lit, on }: { glow: number; lit: boolean; on: boolean }) {
+  const g = Math.max(0, Math.min(1, glow));
+  return (
+    <div className="cn-meter" role="meter" aria-label="90 degree glow" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(g * 100)}>
+      <span className="eyebrow" style={{ fontSize: 9.5, letterSpacing: '.06em' }}>90°</span>
+      <span className="cn-meter-track">
+        {[0.25, 0.5, 0.75].map((k) => <span key={k} className="cn-meter-tick" style={{ bottom: `${k * 100}%` }} />)}
+        <span className="cn-meter-fill" style={{ height: lit ? `${g * 100}%` : 0, opacity: lit ? 1 : 0 }} />
+      </span>
+      <span className={'cn-meter-bulb' + (on ? ' on' : '')} />
+      <span className="mono" style={{ fontSize: 10, color: 'var(--ink-2)' }}>{Math.round(g * 100)} %</span>
+    </div>
+  );
 }
 
 export default function Run() {
@@ -84,6 +107,8 @@ export default function Run() {
   const glowNow = last ? absorbance(last.blank, last.adc90) : 0;
   const glowFlat = phase.key === 'dissolve' && t > 40 && glowNow < 0.05;
   const glowRising = phase.key === 'dissolve' && glowNow >= 0.05;
+  // the moment: the glow has stayed flat past 40 s while the tablet dissolves; it holds until the verdict lands
+  const moment = !fault && !!ref && t > 40 && glowNow < 0.05 && phase.key !== 'fill' && (running || run.evaluation?.rule === 'N2');
   const happening = glowFlat ? 'something is dissolving; the glow channel is staying flat'
     : glowRising ? 'riboflavin is leaving the tablet; the glow channel is rising'
     : phase.key === 'settle' && !ref ? 'the reading is settling; there is no band to compare against'
@@ -104,34 +129,45 @@ export default function Run() {
   };
 
   const curveCard = (
-    <div className="card tile rise stack" style={{ '--tile-accent': 'var(--c1)', gap: 10 } as React.CSSProperties}>
+    <div key="curve" className="card tile stack cn-field" style={{ '--tile-accent': 'var(--c1)', gap: 10 } as React.CSSProperties}>
       <div className="row between"><span className="eyebrow">absorbance · live</span><span className="mono muted" style={{ fontSize: 12 }}>{samples.length} samples</span></div>
       <Curve samples={samples} band={ref} live={running} />
     </div>
   );
   const sensorCard = (
-    <div className="card tile rise stack" style={{ '--tile-accent': 'var(--c2)', gap: 10, animationDelay: '60ms' } as React.CSSProperties}>
+    <div key="sensor" className={'card tile stack cn-field' + (wide ? ' cn-sensor-big' : '')} style={{ '--tile-accent': moment ? 'var(--amber)' : 'var(--c2)', gap: 10, animationDelay: '60ms' } as React.CSSProperties}>
       <div className="row between"><span className="eyebrow">light path</span><span className="mono muted" style={{ fontSize: 12 }}>{running ? 'reading once a second' : 'idle'}</span></div>
       <SensorPath led={last?.led ?? true} inline={last ? last.adc0 / last.blank : 1} glow={glowNow / GLOW_FULL} running={running} />
+      {moment && <p className="footnote cn-field">Inline: the light is dimming, so something is in the water. 90°: dark. Riboflavin would glow here.</p>}
     </div>
   );
 
   return (
-    <Screen title={run.evaluation ? 'Done' : fault ? 'Stopped' : 'Dissolving…'} eyebrow={`run ${run.id} · ${run.drug} · lot ${run.lot}`} back="/" right={<SrcBadge src={src ?? run.src} />}>
-      <div className="wide-2">
+    <Screen title={run.evaluation ? 'Done' : fault ? 'Stopped' : 'Dissolving…'} eyebrow={`run ${run.id} · ${run.drug} · lot ${run.lot}`} back="/" right={<SrcBadge src={src ?? run.src} />}
+      tone={moment ? 'amber' : run.evaluation ? 'none' : 'sky'}>
+      <div className="wide-2 cn-run">
         <div className="stack" style={{ gap: 14, minWidth: 0 }}>
-          <section className="card glass decor-dots stack" style={{ alignItems: 'center', gap: 6, padding: '18px 12px 16px' }}>
-            <PillFill pct={pctNow} verdict={run.evaluation?.verdict ?? null} fault={!!fault} size={wide ? 340 : personal ? 300 : 290} label={!!ref} running={running} />
+          <section className={'card glass decor-dots stack cn-hero' + (moment ? ' moment' : '')} data-moment={moment || undefined} style={{ alignItems: 'center', gap: 6, padding: '18px 12px 16px' }}>
+            <span className="cn-wash" aria-hidden="true" />
+            <div className="cn-hero-row">
+              <div className="cn-pillwrap">
+                <PillFill pct={pctNow} verdict={run.evaluation?.verdict ?? null} fault={!!fault} size={wide ? 380 : 420} label={!!ref} running={running} />
+              </div>
+              {ref && <GlowMeter glow={glowNow / GLOW_FULL} lit={glowNow >= 0.05} on={glowNow >= ref.glowMin} />}
+            </div>
             <p className="serif" style={{ fontSize: personal ? 38 : 34, lineHeight: 1, marginTop: 6 }}>{statusWord}</p>
-            <p style={{ fontSize: personal ? 19 : 16, color: 'var(--ink-2)', textAlign: 'center', maxWidth: 420, minHeight: '2.9em' }} aria-live="polite">{statusLine}</p>
+            {moment && !run.evaluation
+              ? <p className="cn-moment" aria-live="polite"><Words text={MOMENT} step={90} /></p>
+              : <p style={{ fontSize: personal ? 19 : 16, color: 'var(--ink-2)', textAlign: 'center', maxWidth: 420, minHeight: '2.9em' }} aria-live="polite">{statusLine}</p>}
+            {moment && !run.evaluation && <p className="footnote" style={{ textAlign: 'center', maxWidth: 380 }}>{statusLine}</p>}
             <p className="mono muted" style={{ fontSize: 13 }}>{clock(t)} / 3:00{ref ? ` · ${pctNow} % of reference` : ''}</p>
           </section>
-          <section className="card stack" style={{ gap: 6 }}>
+          <section className="card stack cn-phases" style={{ gap: 6 }}>
             <div className="row between"><span className="eyebrow">timetable</span><span className="mono muted" style={{ fontSize: 12 }}>{speed}× replay</span></div>
             <RunPhases t={t} fault={fault ? fault.t : null} big={personal} />
           </section>
           {fault && (
-            <div className="card rise stack" style={{ gap: 6, borderColor: 'rgba(154,160,166,.6)' }}>
+            <div className="card stack cn-field" style={{ gap: 6, borderColor: 'rgba(154,160,166,.6)' }}>
               <p className="eyebrow">station fault</p>
               <p>The {FAULT_WORDS[fault.fault ?? ''] ?? 'station faulted'} at {clock(fault.t)}. {personal ? 'This reading cannot be used. Start again with a new piece of tablet.' : 'The curve after this point cannot be trusted; this run will end as UNABLE TO VERIFY (U2). Retest with a new tablet and the lid closed.'}</p>
             </div>
@@ -147,8 +183,7 @@ export default function Run() {
             </>
           ) : (
             <>
-              {curveCard}
-              {sensorCard}
+              {wide ? <>{sensorCard}{curveCard}</> : <>{curveCard}{sensorCard}</>}
               <RunReadout samples={samples} />
             </>
           )}

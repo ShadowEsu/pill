@@ -2,15 +2,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { animate } from 'animejs';
 import PillFill, { VERDICT_FILL } from './PillFill';
+import Stamp from './Stamp';
+import './cinema.css';
 import type { Run, Evaluation, Reference, RuleId } from '../lib/types';
 
 export const SRC_TEXT = { real: 'LIVE SENSOR', replay: 'REPLAY', sim: 'SIMULATED' } as const;
 export const VERDICT_CLASS = { PASS: 'verdict-pass', 'NEEDS LAB': 'verdict-needslab', 'UNABLE TO VERIFY': 'verdict-unable' } as const;
 
-/** Three-step entrance (pill, word, numbers); each step 420 ms, 80 ms apart, all done by 580 ms. */
+/** Three-step entrance (pill, word, numbers); each step 420 ms, 80 ms apart, all done by 580 ms. The word itself is stamped (Stamp). */
 export const STEP = (i: number): React.CSSProperties => ({ animationDelay: `${i * 80}ms`, animationDuration: '420ms' });
 
-export default function VerdictCard({ run, evaluation, size = 90, wordSize = 44 }: { run: Run; evaluation: Evaluation; size?: number; wordSize?: number }) {
+export default function VerdictCard({ run, evaluation, size = 90, wordSize = 44, sound = true }: { run: Run; evaluation: Evaluation; size?: number; wordSize?: number; sound?: boolean }) {
   return (
     <section className="row" style={{ gap: 18, alignItems: 'center' }} aria-label={`Verdict: ${evaluation.verdict}`}>
       <div className="rise" style={{ ...STEP(0), flex: 'none' }}>
@@ -18,8 +20,7 @@ export default function VerdictCard({ run, evaluation, size = 90, wordSize = 44 
       </div>
       <div className="rise" style={{ ...STEP(1), minWidth: 0 }}>
         <p className="eyebrow">rule {evaluation.rule} · run {run.id} · {SRC_TEXT[run.src]}</p>
-        <h2 className="serif" data-verdict={evaluation.verdict} style={{ fontSize: wordSize, lineHeight: 1, letterSpacing: '-0.01em', fontWeight: 400, marginTop: 6 }}>{evaluation.verdict}</h2>
-        <div style={{ width: 44, height: 3, borderRadius: 2, background: VERDICT_FILL[evaluation.verdict], marginTop: 10 }} />
+        <h2 style={{ marginTop: 10, fontWeight: 400 }}><Stamp verdict={evaluation.verdict} size={wordSize} sound={sound} /></h2>
       </div>
     </section>
   );
@@ -72,7 +73,7 @@ const DECIDERS: Record<RuleId, { inline: boolean; glow: boolean; caption: string
   U2: { inline: false, glow: false, caption: 'neither channel: the station faulted during the run' },
   U1: { inline: false, glow: false, caption: 'neither channel: there is no reference to compare against' },
 };
-const CH_CSS = `.ch-flow { stroke-dasharray: 3 8; animation: ch-flow .8s linear infinite; } @keyframes ch-flow { to { stroke-dashoffset: -11; } } @media (prefers-reduced-motion: reduce) { .ch-flow { animation: none; } }`;
+const CH_CSS = `.ch-flow { stroke-dasharray: 3 8; animation: ch-flow .8s linear infinite, ch-in .3s 900ms var(--ease) backwards; } @keyframes ch-flow { to { stroke-dashoffset: -11; } } @keyframes ch-in { from { opacity: 0; } } @media (prefers-reduced-motion: reduce) { .ch-flow { animation: none; } }`;
 
 export function Channels({ evaluation, reference }: { evaluation: Evaluation; reference: Reference | null }) {
   const d = DECIDERS[evaluation.rule];
@@ -89,26 +90,32 @@ export function Channels({ evaluation, reference }: { evaluation: Evaluation; re
   return (
     <figure style={{ margin: 0 }} className="stack">
       <style href="pm-channels" precedence="pm">{CH_CSS}</style>
-      <svg viewBox="0 0 360 138" style={{ width: '100%', height: 'auto', display: 'block' }} role="img" aria-label={`Two channels; ${d.caption}`}>
-        {rows.map((r) => {
+      <svg className="cn-ch-draw" viewBox="0 0 360 138" style={{ width: '100%', height: 'auto', display: 'block' }} role="img" aria-label={`Two channels; ${d.caption}`}>
+        {rows.map((r, i) => {
           const stroke = r.on ? colour : 'var(--line-2)';
           const path = `M140 ${r.y} C 182 ${r.y}, 192 69, 228 69`;
           return (
             <g key={r.key}>
-              <rect x="4" y={r.y - 22} width="132" height="44" rx="10" fill="var(--surface)" stroke={r.on ? 'var(--ink)' : 'var(--line-2)'} strokeWidth="1.2" />
-              <rect x="14" y={r.y - 9} width="4" height="18" rx="2" fill={r.swatch} />
-              <text x="26" y={r.y - 3} style={{ ...mono, fill: 'var(--ink)' }}>{r.name}</text>
-              <text x="26" y={r.y + 12} style={mono}>{r.text}</text>
-              <path d={path} fill="none" stroke={stroke} strokeWidth={r.on ? 2.5 : 1.5} strokeDasharray={r.on ? undefined : '3 4'} strokeLinecap="round" />
+              <g className="cn-box" style={{ animationDelay: `${i * 90}ms` }}>
+                <rect x="4" y={r.y - 22} width="132" height="44" rx="10" fill="var(--surface)" stroke={r.on ? 'var(--ink)' : 'var(--line-2)'} strokeWidth="1.2" />
+                <rect x="14" y={r.y - 9} width="4" height="18" rx="2" fill={r.swatch} />
+                <text x="26" y={r.y - 3} style={{ ...mono, fill: 'var(--ink)' }}>{r.name}</text>
+                <text x="26" y={r.y + 12} style={mono}>{r.text}</text>
+              </g>
+              {r.on
+                ? <path className="cn-edge" d={path} pathLength={1} fill="none" stroke={stroke} strokeWidth={2.5} strokeLinecap="round" style={{ animationDelay: `${200 + i * 140}ms` }} />
+                : <path className="cn-box" d={path} fill="none" stroke={stroke} strokeWidth={1.5} strokeDasharray="3 4" strokeLinecap="round" style={{ animationDelay: `${300 + i * 140}ms` }} />}
               {r.on && <path className="ch-flow" d={path} fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" />}
             </g>
           );
         })}
-        <polygon points="232,69 222,64 222,74" fill={d.inline || d.glow ? colour : 'var(--line-2)'} />
-        <rect x="234" y="44" width="122" height="50" rx="12" fill="var(--surface)" stroke="var(--ink)" strokeWidth="1.2" />
-        <rect x="234" y="44" width="6" height="50" rx="3" fill={colour} />
-        <text x="250" y="64" style={{ ...mono, fill: 'var(--muted)' }}>rule {evaluation.rule}</text>
-        <text x="250" y="82" style={{ fontFamily: 'var(--mono)', fontSize: evaluation.verdict === 'UNABLE TO VERIFY' ? 9.5 : 13, fill: 'var(--ink)' }}>{evaluation.verdict}</text>
+        <g className="cn-box" style={{ animationDelay: '780ms' }}>
+          <polygon points="232,69 222,64 222,74" fill={d.inline || d.glow ? colour : 'var(--line-2)'} />
+          <rect x="234" y="44" width="122" height="50" rx="12" fill="var(--surface)" stroke="var(--ink)" strokeWidth="1.2" />
+          <rect x="234" y="44" width="6" height="50" rx="3" fill={colour} />
+          <text x="250" y="64" style={{ ...mono, fill: 'var(--muted)' }}>rule {evaluation.rule}</text>
+          <text x="250" y="82" style={{ fontFamily: 'var(--mono)', fontSize: evaluation.verdict === 'UNABLE TO VERIFY' ? 9.5 : 13, fill: 'var(--ink)' }}>{evaluation.verdict}</text>
+        </g>
       </svg>
       <figcaption className="footnote">{d.caption}.</figcaption>
     </figure>

@@ -1,18 +1,24 @@
 // One delivery: the held money, the tested tablet, the policy proposal, the pharmacist's tap, the log.
 // With VITE_PAY_URL set: the release goes to the pill-pay service (USDC TESTNET + the Capital One Nessie SANDBOX mirror),
 // and a card shows the three Nessie SANDBOX balances when the service has a NESSIE_KEY.
+// Motion: the TokenRail shows where the money sits (clinic → escrow → supplier) and the token travels on release; the
+// policy list lights the clause that fired; Release is press-and-hold (600 ms ring, a small squeeze) so it is never a slip.
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { animate } from 'animejs';
 import { Action, Screen, SrcBadge } from '../components/Shell';
 import VerdictChip from '../components/VerdictChip';
 import OutcomeChip from '../components/OutcomeChip';
+import TokenRail from '../components/TokenRail';
+import Glyph from '../components/Glyph';
 import { actions, useStore } from '../lib/store';
+import { playSound } from '../lib/sound';
 import { DRUGS, REFERENCES } from '../data/reference';
 import { PEOPLE } from '../data/history';
 import type { Delivery as D, LogLine } from '../lib/types';
 import CalendarButton from '../components/CalendarButton';
 import { PAY_URL, nessieAccounts, type NessieAccounts, type NessieTransfer } from '../lib/api';
+import '../components/cinema.css';
 
 const usd = (n: number) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const CAP = 2000;
@@ -90,7 +96,7 @@ function CountUp({ to, decimals = 0 }: { to: number; decimals?: number }) {
     const a = animate(o, { v: to, duration: 550, ease: 'outCubic', onUpdate: () => setV(o.v) });
     return () => { a.pause(); };
   }, [to]);
-  return <>{v.toFixed(decimals)}</>;
+  return <>{v.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}</>;
 }
 
 function LogList({ lines }: { lines: LogLine[] }) {
@@ -113,6 +119,57 @@ function localNote(d: D, want: 'hold' | 'ask') {
   return d.outcome === 'escalate' ? `Already sent to a person under ${d.clause}. No money moves.` : 'Noted: ask a person before shipping. Nothing moves unless someone taps Release.';
 }
 
+/** The clause that fired, in its outcome's tone: mint release, amber hold/escalate on a verdict, warm only for recall / lookup holds. */
+const FIRE: Record<string, [string, string]> = {
+  P1: ['var(--mint-tint)', 'var(--mint)'], P2: ['var(--amber-tint)', 'var(--amber)'], P3: ['var(--grey-tint)', 'var(--grey)'],
+  P4: ['var(--warm-tint)', 'var(--warm)'], P5: ['var(--amber-tint)', 'var(--amber)'], P6: ['var(--warm-tint)', 'var(--warm)'],
+};
+
+const HOLD_MS = 600;
+
+/** Press and hold for 600 ms to confirm: a ring and a fill track the hold, the button squeezes slightly; letting go early cancels.
+ *  Enter / Space work the same way (hold the key). */
+function HoldButton({ disabled, onConfirm, label, describedBy }: { disabled: boolean; onConfirm: () => void; label: string; describedBy: string }) {
+  const [p, setP] = useState(0);
+  const raf = useRef(0);
+  const fired = useRef(false);
+  useEffect(() => () => cancelAnimationFrame(raf.current), []);
+  const cancel = () => { cancelAnimationFrame(raf.current); if (!fired.current) setP(0); };
+  const begin = () => {
+    if (disabled || (p > 0 && p < 1)) return;
+    fired.current = false;
+    playSound('tap');
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const k = Math.min(1, (t - t0) / HOLD_MS);
+      setP(k);
+      if (k < 1) { raf.current = requestAnimationFrame(tick); return; }
+      fired.current = true;
+      navigator.vibrate?.(15);
+      onConfirm();
+    };
+    raf.current = requestAnimationFrame(tick);
+  };
+  const holding = p > 0 && p < 1;
+  return (
+    <button type="button" className={'btn mint cn-hold' + (holding ? ' pressing' : '') + (p >= 1 ? ' done' : '')} disabled={disabled} aria-describedby={describedBy}
+      aria-label={`${label}: press and hold`} data-hold-release
+      style={{ '--p': p } as React.CSSProperties}
+      onPointerDown={(e) => { try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* synthetic or already-released pointer: the hold still works */ } begin(); }}
+      onPointerUp={cancel} onPointerCancel={cancel} onLostPointerCapture={cancel}
+      onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) { e.preventDefault(); begin(); } }}
+      onKeyUp={(e) => { if (e.key === 'Enter' || e.key === ' ') cancel(); }}
+      onContextMenu={(e) => e.preventDefault()}>
+      <span className="fillbar" aria-hidden="true" />
+      <svg className="ring" viewBox="0 0 26 26" aria-hidden="true">
+        <circle cx="13" cy="13" r="10" fill="none" stroke="rgba(255,255,255,.35)" strokeWidth="2.5" />
+        <circle className="p" cx="13" cy="13" r="10" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" pathLength={1} transform="rotate(-90 13 13)" />
+      </svg>
+      <span style={{ position: 'relative' }}>{holding ? 'Keep holding…' : p >= 1 ? 'Released' : `Hold to ${label.toLowerCase()}`}</span>
+    </button>
+  );
+}
+
 export default function Delivery() {
   const { id = '' } = useParams();
   const nav = useNavigate();
@@ -123,6 +180,9 @@ export default function Delivery() {
   const [nessieTx, setNessieTx] = useState<NessieTransfer | null>(null);
   const [nessieRefresh, setNessieRefresh] = useState(0);
   const releaseRef = useRef<HTMLDivElement>(null);
+  // the token arrives in escrow a beat after the screen opens (clinic → escrow), then waits there
+  const [entered, setEntered] = useState(false);
+  useEffect(() => { const t = window.setTimeout(() => setEntered(true), 450); return () => clearTimeout(t); }, []);
 
   useEffect(() => {
     if (d?.outcome === 'released' && releaseRef.current && !reduced()) {
@@ -149,16 +209,27 @@ export default function Delivery() {
   const recall = bottle?.recall ?? 'unchecked';
 
   return (
-    <Screen eyebrow={`Delivery · lot ${d.lot}`} title={d.supplier} back="/deliveries" right={run ? <SrcBadge src={run.src} /> : undefined}>
+    <Screen eyebrow={`Delivery · lot ${d.lot}`} title={d.supplier} back="/deliveries" right={run ? <SrcBadge src={run.src} /> : undefined}
+      tone={released || d.outcome === 'release' ? 'mint' : d.outcome === 'hold' || d.outcome === 'escalate' ? 'amber' : 'sky'} art={<Glyph name="escrow" size={48} />}>
       <p style={{ color: 'var(--ink-2)', marginTop: -8 }}>{drug?.name ?? d.drug}<span className="muted"> · {drug?.usedFor ?? 'No drug table entry.'}</span></p>
 
       {/* money: the only card with the Coinbase-blue hairline */}
-      <section className="card stack" style={{ borderTop: '2px solid var(--cb)' }} aria-label="Payment">
+      <section className="card stack cn-field" style={{ borderTop: '2px solid var(--cb)', gap: 14 }} aria-label="Payment">
         <div className="row between">
           <span className="eyebrow">{released ? 'Released' : 'Held in escrow'}</span>
           <span className="chip"><span className="dot" style={{ background: 'var(--cb)' }} />SANDBOX / TESTNET</span>
         </div>
-        <p><span className="mono" style={{ fontSize: 28, letterSpacing: '-0.02em' }}>${usd(d.amountUsd)}</span> <span className="muted" style={{ fontSize: 15 }}>{released ? 'released' : 'held'} · SANDBOX</span></p>
+        <p><span className="num" style={{ fontSize: 30, letterSpacing: '-0.02em' }}>$<CountUp to={d.amountUsd} decimals={2} /></span> <span className="muted" style={{ fontSize: 15 }}>{released ? 'released' : 'held'} · SANDBOX</span></p>
+        <TokenRail label="Where the money is"
+          nodes={[
+            { id: 'clinic', label: 'Clinic', sub: 'pays in', glyph: 'clinic' },
+            { id: 'escrow', label: 'Escrow', sub: released ? 'paid out' : 'holds it', glyph: 'escrow' },
+            { id: 'supplier', label: 'Supplier', sub: released ? 'paid' : 'on a tap', glyph: 'supplier' },
+          ]}
+          at={released ? 2 : entered ? 1 : 0} amount={`${usd(d.amountUsd)} USDC`}
+          held={!released && entered && (d.outcome === 'hold' || d.outcome === 'escalate')}
+          flowing={d.outcome === 'release'}
+          edgeLabels={['invoice in', released ? 'released' : d.outcome === 'release' ? 'waiting for a tap' : 'human tap only']} />
         <dl className="kv">
           <dt>Rail</dt><dd>USDC TESTNET · Base Sepolia</dd>
           <dt>Mirror</dt><dd>Nessie SANDBOX</dd>
@@ -204,15 +275,20 @@ export default function Delivery() {
 
       {/* policy */}
       {proposed && d.clause && (
-        <section className="card stack rise" aria-label="Policy proposal">
+        <section className="card stack cn-field" style={{ animationDelay: '80ms' }} aria-label="Policy proposal">
           <div className="row between">
             <span className="eyebrow">Policy proposes</span>
             <OutcomeChip outcome={d.outcome} />
           </div>
-          <blockquote style={{ margin: 0, paddingLeft: 12, borderLeft: '2px solid var(--line-2)' }}>
-            <span className="mono" style={{ fontSize: 13, marginRight: 8 }}>{d.clause}</span>
-            <span>{CLAUSES[d.clause]}</span>
-          </blockquote>
+          <ol className="cn-clauses" aria-label="Policy clauses P1 to P6">
+            {Object.entries(CLAUSES).map(([k, text], i) => (
+              <li key={k} className={k === d.clause ? 'fired' : undefined} aria-current={k === d.clause ? 'true' : undefined}
+                style={{ animationDelay: `${i * 60}ms`, ...(k === d.clause ? { '--fire': FIRE[k][0], '--fire-line': FIRE[k][1] } : {}) } as React.CSSProperties}>
+                <span className="k">{k}</span>
+                <span>{text}</span>
+              </li>
+            ))}
+          </ol>
           {d.clause === 'P2' && (
             <CalendarButton compact summary={`Lab referral · lot ${d.lot} (${d.supplier})`} description={`NEEDS LAB on one tablet from this delivery. Curve and raw trace attached in Pill. Payment held in escrow (SANDBOX / TESTNET).`} start={`${new Date(Date.now() + 86400e3).toISOString().slice(0, 10)}T10:00:00`} minutes={30} label="Book the lab drop-off in Google Calendar" />
           )}
@@ -244,10 +320,9 @@ export default function Delivery() {
         {run && !proposed && <button type="button" className="btn" disabled={!ev} onClick={() => actions.propose(d.id)}>Run policy</button>}
         {proposed && !released && (
           <>
-            <button type="button" className="btn mint" disabled={d.outcome !== 'release'} onClick={() => { actions.approve(d.id); if (PAY_URL) void releaseOnChain(PAY_URL, d).then((n) => { setNessieTx(n); setNessieRefresh((x) => x + 1); }); }} aria-describedby="release-why">
-              Release ${usd(d.amountUsd)}
-            </button>
-            <p id="release-why" className="footnote" style={{ textAlign: 'center' }}>{d.outcome === 'release' ? 'Your tap moves TESTNET USDC to the supplier.' : `Release is off: ${d.clause} decided ${d.outcome}.`}</p>
+            <HoldButton disabled={d.outcome !== 'release'} label={`Release $${usd(d.amountUsd)}`} describedBy="release-why"
+              onConfirm={() => { actions.approve(d.id); if (PAY_URL) void releaseOnChain(PAY_URL, d).then((n) => { setNessieTx(n); setNessieRefresh((x) => x + 1); }); }} />
+            <p id="release-why" className="footnote" style={{ textAlign: 'center' }}>{d.outcome === 'release' ? 'Press and hold. Your hold moves TESTNET USDC to the supplier.' : `Release is off: ${d.clause} decided ${d.outcome}.`}</p>
             <div className="row" style={{ gap: 10 }}>
               <button type="button" className="btn ghost" onClick={() => setNote(localNote(d, 'hold'))}>Hold instead</button>
               <button type="button" className="btn ghost" onClick={() => setNote(localNote(d, 'ask'))}>Ask a person</button>
