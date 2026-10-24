@@ -88,8 +88,13 @@ function contentsFor(i: AssistInput): GeminiContent[] {
 
 // ---- output guards (on the full text, after streaming) ----
 
-/** Follower-specific clauses that may not stand: "fine to take", "yes, you can take", "the reading is wrong". */
-const GUARD = /\b(?:fine|okay|ok|alright|good)\s+to\s+take\b|\byes,?\s+(?:you\s+)?(?:can|may|should)\s+take\b|\b(?:verdict|result|sensor|reading|test)\s+(?:is|was|seems|looks|might\s+be|may\s+be)\s+(?:wrong|incorrect|mistaken|off|unreliable)\b/i;
+/** Follower-specific clauses that may not stand: "fine to take", "you can take two", "the reading is wrong". */
+const GUARD = /\b(?:fine|okay|ok|alright|good)\s+to\s+take\b|\b(?:verdict|result|sensor|reading|test)\s+(?:is|was|seems|looks|might\s+be|may\s+be)\s+(?:wrong|incorrect|mistaken|off|unreliable)\b/i;
+/** Affirmative dose advice; a clause that hedges or refers it ("whether you can take two", "ask…", "cannot") may stay. */
+const DOSE = /\byou\s+(?:can|may|should|could)\s+(?:safely\s+|also\s+)?take\b|\btake\s+(?:two|2|three|3|another|more|extra|a\s+double|double)\b/i;
+const HEDGE = /\b(?:whether|if|ask|asking|cannot|can't|can not|not|never|only)\b/i;
+const AFFIRM = /^(?:yes|yeah|sure|ok|okay|of course)[,.!]?$/i;
+const blocked = (c: string) => GUARD.test(c) || (DOSE.test(c) && !HEDGE.test(c));
 const SPLIT = /(?<=[.;:,—])\s+|\s+(?=\b(?:but|and|so)\b)/;
 const MEDICAL_ISH = /\b(?:take|taking|took|dose|doses|dosing|mg|tablets?|pills?|medicines?|medications?|drugs?|side\s+effects?|symptoms?|pregnan\w*|allerg\w*|swallow\w*|PASS|NEEDS LAB|UNABLE TO VERIFY|verdict|plateau|lab)\b/i;
 const FALLBACK: Record<AssistMode, string> = {
@@ -107,11 +112,12 @@ export interface Guarded { text: string; dropped: string[]; disclaimer: boolean;
 export function guardAnswer(raw: string, question: string, mode: AssistMode): Guarded {
   const f = filterClauses(raw);
   const clauses = f.text ? f.text.split(SPLIT).filter(Boolean) : [];
-  const guarded = clauses.filter((c) => GUARD.test(c));
-  const kept = clauses.filter((c) => !GUARD.test(c));
+  const guarded = clauses.filter(blocked);
+  const kept = clauses.filter((c) => !blocked(c) && !(guarded.length && AFFIRM.test(c.trim())));
   const dropped = [...f.dropped, ...guarded];
   if (f.fellBack || kept.length === 0 || kept.length < clauses.length / 2) return { text: FALLBACK[mode], dropped, disclaimer: true, fellBack: true };
-  let text = dropped.length ? kept.join(' ').replace(/\s+/g, ' ').trim() : raw.trim();
+  // after a drop, a kept clause may end in a comma that now runs into the next sentence: close it with a full stop
+  let text = dropped.length ? kept.join(' ').replace(/\s+/g, ' ').replace(/[,;:—]\s+(?=[A-Z])/g, '. ').replace(/[,;:—]\s*$/, '.').trim() : raw.trim();
   const has = text.includes(DISCLAIMER);
   const need = !has && (MEDICAL_ISH.test(question) || MEDICAL_ISH.test(text));
   if (need) text = `${text.replace(/\s+$/, '')}${/[.!?]$/.test(text) ? '' : '.'} ${DISCLAIMER}`;
@@ -180,7 +186,7 @@ export async function assistTip(i: TipInput): Promise<Tip> {
     return { tip: TIP_TEMPLATE[i.mode], mode: 'template', model: 'template', cached: false, filtered: true, dropped: 0, ms: Date.now() - now, error: (e as Error).message };
   }
   const f = filterClauses(raw.replace(/\s+/g, ' ').trim());
-  const guardHit = GUARD.test(f.text);
+  const guardHit = f.text.split(SPLIT).some(blocked);
   const text = f.fellBack || !f.text || guardHit ? TIP_TEMPLATE[i.mode] : f.text;
   const tip: Omit<Tip, 'cached'> = { tip: text, mode: 'live', model, filtered: true, dropped: f.dropped.length + (guardHit ? 1 : 0), ms: Date.now() - now };
   if (tips.size >= TIP_MAX) tips.delete(tips.keys().next().value as string);

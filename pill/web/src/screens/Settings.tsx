@@ -1,4 +1,4 @@
-// Settings (/settings): who I am, big text, sound, the Google Calendar bridge status (live from pill-pay), the station,
+// Settings (/settings): who I am, big text, sound, the follower assistant and its voice replies, the Google Calendar bridge status (live from pill-pay), the station,
 // reset the demo data, the build, and credits & sources (the website first, so the site and the app read as one product).
 // Groups carry a hand-drawn glyph each; switches spring their thumb.
 import { useEffect, useState } from 'react';
@@ -8,6 +8,7 @@ import Glyph, { type GlyphName } from '../components/Glyph';
 import BinaryPill from '../components/BinaryPill';
 import { actions, useStore } from '../lib/store';
 import { useSound } from '../lib/sound';
+import { followerSettings, useFollowerSettings } from '../lib/follower';
 import { dayLabel, hm } from '../lib/when';
 import { REFERENCES } from '../data/reference';
 import '../story.css';
@@ -40,6 +41,7 @@ export default function Settings() {
   const bigText = useStore((s) => s.bigText);
   const station = useStore((s) => s.station);
   const sound = useSound();
+  const follower = useFollowerSettings();
   const [cal, setCal] = useState<Cal>(PAY_URL ? { state: 'checking' } : { state: 'off', why: 'no pay service configured (VITE_PAY_URL)' });
   const [confirm, setConfirm] = useState(false);
   const [resetAt, setResetAt] = useState<number | null>(null);
@@ -91,6 +93,14 @@ export default function Settings() {
                 <button type="button" className="btn ghost" disabled={!sound.on} onClick={() => sound.play('chime')}>Test</button>
                 <Switch on={sound.on} label="Sound" onToggle={() => { sound.setOn(!sound.on); if (!sound.on) window.setTimeout(() => sound.play('tick'), 30); }} />
               </span>
+            </div>
+            <div className="set-row">
+              <span><span className="lbl">Follower assistant</span><span className="sub">The round Pill button, bottom right. Gemini explains the screen you are on; a pharmacist or doctor decides.</span></span>
+              <Switch on={follower.on} label="Follower assistant" onToggle={() => { followerSettings.setOn(!follower.on); sound.play('tap'); }} />
+            </div>
+            <div className="set-row">
+              <span><span className="lbl">Voice replies</span><span className="sub">The assistant reads each answer aloud with the browser voice.</span></span>
+              <Switch on={follower.voice} label="Voice replies" onToggle={() => { followerSettings.setVoice(!follower.voice); sound.play('tap'); }} />
             </div>
             <div className="set-row">
               <span><span className="lbl">How Pill works</span><span className="sub">Seven short chapters.</span></span>

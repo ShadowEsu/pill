@@ -30,6 +30,7 @@ import AgentRecord from './screens/AgentRecord';
 import Demo, { DemoDriver } from './screens/Demo';
 import Pay from './screens/Pay';
 import Check from './screens/Check';
+import Follower from './components/Follower';
 
 /** Shared route enter: on mount and every path change the screen column fades in and rises 8 px (260 ms). Reduced motion: static. */
 function useRouteEnter() {
@@ -55,6 +56,7 @@ function Frame({ children }: { children: React.ReactNode }) {
         {!kiosk && <Nav />}
         <div ref={ref} className={'app' + (kiosk ? ' kiosk' : '')}>{children}</div>
         <DemoDriver />
+        <Follower />
       </div>
     </>
   );

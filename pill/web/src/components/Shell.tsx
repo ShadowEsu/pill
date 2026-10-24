@@ -46,7 +46,7 @@ export function Screen({ title, back, right, children, eyebrow, art, tone = 'non
 /** Sticky bottom action area: the one thing to do on this screen. */
 export function Action({ children, note }: { children: React.ReactNode; note?: string }) {
   return (
-    <div className="action-bar" style={{ marginTop: 'auto', position: 'sticky', bottom: 0, paddingTop: 12, background: 'linear-gradient(180deg, transparent, var(--bg) 30%)' }}>
+    <div className="action-bar" style={{ marginTop: 'auto', position: 'sticky', paddingTop: 12, background: 'linear-gradient(180deg, transparent, var(--bg) 30%)' }}>
       {note && <p className="footnote" style={{ marginBottom: 10, textAlign: 'center' }}>{note}</p>}
       <div className="stack">{children}</div>
     </div>

@@ -148,6 +148,7 @@ html.big .btn { min-height: 64px; font-size: 19px; }
 @media (max-width: 899px) { .frame { flex-direction: column; } .frame > .nav { order: 2; } .frame > .app { order: 1; width: 100%; } }
 .wide-2 > *, .wide-3 > *, .wide-4 > *, .app .screen > * { min-width: 0; max-width: 100%; }
 /* phone: keep sticky actions above the tab bar */
+.action-bar { bottom: 0; }
 @media (max-width: 899px) { .app .screen { padding-bottom: calc(24px + env(safe-area-inset-bottom)); } .app .screen .action-bar { bottom: 68px; } }
 
 /* =====================================================================================================
