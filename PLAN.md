@@ -5,7 +5,7 @@ Last updated: Fri 2026-10-23 23:20 PDT by the helper (wZ:p1). The clock: **submi
 ## 1. What Pill is (one paragraph, use it everywhere)
 Pill is a $40 lab-in-a-box that tells you whether a tablet is what the label says. Drop one tablet in water inside the chamber; LEDs shine through, two light sensors watch it dissolve, and the app shows the curve filling to 100% against a known reference, then one of three answers: **pass**, **needs lab**, **unable to verify**. A bottle photo gives drug, lot and manufacturer and checks them against FDA/WHO recalls. In **clinic mode** the verdict gates the supplier's payment (test one tablet from a delivery; pass releases, fail holds and files a report, unsure asks a human). In **personal mode** it keeps My medicines, the recall checks and a simple dose log. Built on Peel (HackMIT 2026 grand prize, MIT licence), cited openly; what Pill adds is the decision after the measurement.
 
-Why it matters: WHO estimates 1 in 10 medicines in low- and middle-income countries is substandard or falsified; falsified antimalarials alone kill 100,000+ a year. Lab dissolution rigs cost five figures and sit far from the people who need them.
+Why it matters: WHO estimates about 1 in 10 medical products in low- and middle-income countries is substandard or falsified (WHO, 2017). An LSHTM model cited by WHO estimates 64,000–158,000 extra malaria deaths a year in sub-Saharan Africa from substandard and falsified antimalarials. Lab dissolution rigs cost five figures and sit far from the people who need them.
 
 ## 2. Decisions so far (log every change in Discord #decisions)
 | When | Decision | Why |
@@ -15,6 +15,7 @@ Why it matters: WHO estimates 1 in 10 medicines in low- and middle-income countr
 | Fri 21:00 | DripGuard (IV drip monitor) picked by 18/18 then dropped | cannot get IV sets; Preston wants bigger impact |
 | Fri 21:40 | Payout (heat early warning + parametric payouts) picked 18/18 | real precedent (SEWA $340k to 46k women); dropped: no solar panel, sensor accuracy |
 | Fri 22:00 | **Pill** (Peel-derived) beats Bill and Streets 13/16 | sensor → one honest number → money decision; matches every past winner pattern |
+| Fri 23:55 | Website: plain, fast, honest page (8 sections), not an Apple/Oura-style scroll story | 16 AI personas: 8.0 vs 3.7; "spend 2 h on the site, 6 on test data"; see `website-debate-2026-10-24.md` |
 | Fri 22:25 | Clinic mode first; Preston keeps personal mode too | 16/16 AI personas said clinic only (test destroys the tablet); Preston overrides: both modes, clinic first |
 | Fri 22:50 | Name: Pill | Preston |
 | Fri 23:00 | Discord server + bridge; two helper panes (Desk, Debate) | so the team never waits on one agent |
