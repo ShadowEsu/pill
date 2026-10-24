@@ -1,8 +1,9 @@
 // App state. One store, persisted to localStorage, read with useStore(). No backend yet: every mutation is local.
 // When FastAPI exists, these mutations become fetch calls with the same names (SOFTWARE-PLAN §4).
 import { useSyncExternalStore } from 'react';
-import type { Bottle, Delivery, LogLine, Mode, Run, Evaluation, Sample, Source } from './types';
+import type { Bottle, Delivery, LogLine, Mode, Run, Evaluation, Sample, Source, Activity } from './types';
 import { DRUGS } from '../data/reference';
+import { seedHistory, PEOPLE } from '../data/history';
 
 export interface State {
   mode: Mode | null;            // null until onboarding
@@ -11,20 +12,14 @@ export interface State {
   runs: Run[];
   deliveries: Delivery[];
   station: { id: string; online: boolean; calibratedAt: number | null; reference: string | null };
+  activities: Activity[];
 }
 
-const KEY = 'pill.state.v1';
-const seed = (): State => ({
-  mode: null,
-  bigText: false,
-  bottles: [],
-  runs: [],
-  deliveries: [
-    { id: 'd-1041', supplier: 'Northside Pharma Supply', drug: 'riboflavin', lot: 'B2-07', amountUsd: 1240, bottleId: null, runId: null, outcome: 'pending', clause: null, log: [{ at: Date.now() - 3600e3, text: 'delivery logged · 1,240.00 clinic → escrow (SANDBOX / TESTNET)', kind: 'money' }] },
-    { id: 'd-1042', supplier: 'Bayview Medical Wholesale', drug: 'calcium carbonate', lot: 'TM-02', amountUsd: 480, bottleId: null, runId: null, outcome: 'pending', clause: null, log: [{ at: Date.now() - 1800e3, text: 'delivery logged · 480.00 clinic → escrow (SANDBOX / TESTNET)', kind: 'money' }] },
-  ],
-  station: { id: 'STATION 01', online: true, calibratedAt: null, reference: 'riboflavin' },
-});
+const KEY = 'pill.state.v2';
+const seed = (): State => {
+  const h = seedHistory();
+  return { mode: null, bigText: false, bottles: h.bottles, runs: h.runs, deliveries: h.deliveries, activities: h.activities, station: { id: 'STATION 01', online: true, calibratedAt: Date.now() - 3 * 3600e3, reference: 'riboflavin' } };
+};
 
 let state: State = (() => { try { const raw = localStorage.getItem(KEY); return raw ? { ...seed(), ...JSON.parse(raw) } : seed(); } catch { return seed(); } })();
 const listeners = new Set<() => void>();
@@ -41,7 +36,14 @@ export function useStore<T>(sel: (s: State) => T): T {
 export const getState = () => state;
 
 /* ---------- actions ---------- */
+/** Push a named activity line. Actors come from PEOPLE (history.ts) or the current user ("You"). */
+function activity(actor: string, text: string, kind: Activity['kind'], ref?: Activity['ref']) {
+  const a: Activity = { id: 'a-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), at: Date.now(), actor, text, kind, ref };
+  set((s) => ({ activities: [a, ...s.activities].slice(0, 500) }));
+}
+
 export const actions = {
+  activity,
   setMode(mode: Mode) { set({ mode, bigText: mode === 'personal' }); document.documentElement.classList.toggle('big', mode === 'personal'); },
   setBigText(bigText: boolean) { set({ bigText }); document.documentElement.classList.toggle('big', bigText); },
   reset() { localStorage.removeItem(KEY); state = seed(); listeners.forEach((l) => l()); },
@@ -51,10 +53,11 @@ export const actions = {
     const key = b.drug.toLowerCase();
     const bottle: Bottle = { id: 'b-' + Math.random().toString(36).slice(2, 8), takenAt: [], reminder: null, runId: null, usedFor: b.usedFor ?? DRUGS[key]?.usedFor ?? 'Ask your pharmacist what this is for.', ...b };
     set((s) => ({ bottles: [bottle, ...s.bottles] }));
+    activity(PEOPLE.you, `scanned a ${bottle.drug} label · lot ${bottle.lot} · recall ${bottle.recall === 'no_record' ? 'no record' : bottle.recall}`, bottle.recall === 'recall' ? 'hold' : 'info', { kind: 'bottle', id: bottle.id });
     return bottle;
   },
   updateBottle(id: string, patch: Partial<Bottle>) { set((s) => ({ bottles: s.bottles.map((b) => (b.id === id ? { ...b, ...patch } : b)) })); },
-  markTaken(id: string) { set((s) => ({ bottles: s.bottles.map((b) => (b.id === id ? { ...b, takenAt: [Date.now(), ...b.takenAt] } : b)) })); },
+  markTaken(id: string) { set((s) => ({ bottles: s.bottles.map((b) => (b.id === id ? { ...b, takenAt: [Date.now(), ...b.takenAt] } : b)) })); const b = state.bottles.find((x) => x.id === id); if (b) activity(PEOPLE.you, `took ${b.drug} ${b.strength}`, 'ok', { kind: 'bottle', id }); },
 
   startRun(r: { drug: string; lot: string; src: Source; bottleId?: string | null; deliveryId?: string | null }): Run {
     const run: Run = { id: 'r-' + String(1000 + state.runs.length + 1), src: r.src, drug: r.drug, lot: r.lot, startedAt: Date.now(), samples: [], evaluation: null, mode: state.mode ?? 'personal' };
@@ -63,10 +66,15 @@ export const actions = {
       bottles: r.bottleId ? s.bottles.map((b) => (b.id === r.bottleId ? { ...b, runId: run.id } : b)) : s.bottles,
       deliveries: r.deliveryId ? s.deliveries.map((d) => (d.id === r.deliveryId ? { ...d, runId: run.id } : d)) : s.deliveries,
     }));
+    activity(PEOPLE.station, `started run ${run.id} · ¼ tablet from lot ${run.lot}`, 'info', { kind: 'run', id: run.id });
     return run;
   },
   appendSamples(runId: string, samples: Sample[]) { set((s) => ({ runs: s.runs.map((r) => (r.id === runId ? { ...r, samples } : r)) })); },
-  finishRun(runId: string, evaluation: Evaluation) { set((s) => ({ runs: s.runs.map((r) => (r.id === runId ? { ...r, evaluation } : r)) })); },
+  finishRun(runId: string, evaluation: Evaluation) {
+    set((s) => ({ runs: s.runs.map((r) => (r.id === runId ? { ...r, evaluation } : r)) }));
+    activity(PEOPLE.station, `finished run ${runId} · ${evaluation.verdict} · rule ${evaluation.rule}${evaluation.pct ? ` · ${evaluation.pct} % of reference` : ''}`, evaluation.verdict === 'PASS' ? 'ok' : 'hold', { kind: 'run', id: runId });
+    activity(PEOPLE.claude, `wrote the two-sentence why for ${runId} (filtered)`, 'info', { kind: 'run', id: runId });
+  },
 
   /** Policy (deterministic, policy.md P1–P6). Sets the proposed outcome; release still needs the tap. */
   propose(deliveryId: string) {
@@ -86,16 +94,25 @@ export const actions = {
         return { ...d, outcome: 'release', clause: 'P1', log: [...d.log, line(`P1 PASS (${ev.rule}) · no recall · within cap · RELEASE proposed · needs the pharmacist's tap`, 'ok')] };
       }),
     }));
+    const d = state.deliveries.find((x) => x.id === deliveryId);
+    if (d && d.clause) activity(PEOPLE.agent, `proposed ${d.outcome.toUpperCase()} for lot ${d.lot} · ${d.clause}`, d.outcome === 'release' ? 'ok' : 'hold', { kind: 'delivery', id: deliveryId });
   },
   /** The pharmacist tap. Only legal when the proposed outcome is release. */
-  approve(deliveryId: string, who = 'pharmacist') {
+  approve(deliveryId: string, who = PEOPLE.pharmacist) {
+    const tx = '0x' + Math.random().toString(16).slice(2, 6) + '…' + Math.random().toString(16).slice(2, 6);
+    let moved: Delivery | null = null;
     set((s) => ({
       deliveries: s.deliveries.map((d) => {
         if (d.id !== deliveryId || d.outcome !== 'release') return d;
-        const tx = '0x' + Math.random().toString(16).slice(2, 6) + '…' + Math.random().toString(16).slice(2, 6);
+        moved = d;
         return { ...d, outcome: 'released', log: [...d.log, { at: Date.now(), text: `${who} tapped RELEASE`, kind: 'ok' }, { at: Date.now(), text: `USDC ${d.amountUsd.toLocaleString('en-US', { minimumFractionDigits: 2 })} escrow → supplier · Base Sepolia tx ${tx} (TESTNET) · Nessie SANDBOX mirror ok`, kind: 'money' }] };
       }),
     }));
+    if (moved) {
+      const d = moved as Delivery;
+      activity(who, `tapped RELEASE for lot ${d.lot}`, 'ok', { kind: 'delivery', id: deliveryId });
+      activity(PEOPLE.cdp, `moved USDC ${d.amountUsd.toLocaleString('en-US')} escrow → ${d.supplier} · tx ${tx} (TESTNET)`, 'money', { kind: 'delivery', id: deliveryId });
+    }
   },
   attachBottle(deliveryId: string, bottleId: string) { set((s) => ({ deliveries: s.deliveries.map((d) => (d.id === deliveryId ? { ...d, bottleId } : d)) })); },
 };

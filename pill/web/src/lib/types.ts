@@ -93,3 +93,13 @@ export interface LogLine {
   text: string;
   kind: 'info' | 'ok' | 'hold' | 'money';
 }
+
+/** Activity feed: who did what, named. Actors are people (pharmacist, tech), the station, the policy agent, Claude, openFDA, the CDP wallet. */
+export interface Activity {
+  id: string;
+  at: number;
+  actor: string;
+  text: string;
+  kind: 'info' | 'ok' | 'hold' | 'money';
+  ref?: { kind: 'run' | 'delivery' | 'bottle'; id: string };
+}
