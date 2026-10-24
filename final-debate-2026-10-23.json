@@ -1,0 +1,580 @@
+{
+ "final": {
+  "clinic_pharmacist_kenya": {
+   "per_idea": {
+    "LOT": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 7,
+     "buildable_34h_1_10": 7,
+     "startup_1_10": 5,
+     "attack_at_table": "My fake Coartem had perfect packaging and dissolved fine; it had no artemether. Your box separates a Tums from vitamin B2. Show me what it says about an actual antimalarial, and admit that answer is 'unable to verify' for everything but riboflavin.",
+     "scope_i_would_cut_to": "One calibrated reference (B2), one fake (Tums), three verdicts, recall-database lookup by lot number, escrow release/hold on Nessie only. Drop Solana, drop the early-warning map beyond a static mock, drop every pill you cannot calibrate."
+    },
+    "BILL": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 6,
+     "buildable_34h_1_10": 9,
+     "startup_1_10": 4,
+     "attack_at_table": "Five clones since March and a company fined for overclaiming. Pull one real hospital's MRF live, match one CPT line, and show the posted cash price. If the file is 2 GB and the codes don't match, your one number is invented.",
+     "scope_i_would_cut_to": "Medical bills only, one hospital whose MRF you have already parsed offline, line-by-line comparison to cash and Medicare, drafted dispute letter that waits for a human click. No kiosk, no utilities, no CRS."
+    },
+    "STREETS": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 5,
+     "buildable_34h_1_10": 5,
+     "startup_1_10": 3,
+     "attack_at_table": "You tell a driver 'hold 18 mph, green in 12 s' from a cycle you guessed on a camera with seconds of lag. When the signal is adaptive and you are wrong, that driver runs a red on your advice. Who is liable?",
+     "scope_i_would_cut_to": "One corridor: live counts from one public cam, crash-risk score per intersection by hour from DataSF, tabletop intersection on the Uno showing observed-cycle inference. Drop the dash node, drop crash detection, drop the walk-signal countdown."
+    }
+   },
+   "final_pick": "LOT",
+   "why_in_one_sentence": "It is the only one of the three that matches every winning pattern (sensor, acting agent, health, one number, honesty verdicts) and the gate-before-payment is a real decision I face every quarter, provided you stop pretending it tests antimalarials.",
+   "must_fix_for_pick": [
+    "Say plainly it is a release-dissolution screen calibrated for one reference; a real falsified drug with no API would pass this box, so the recall lookup and 'unable to verify' verdict must be front and centre.",
+    "Characterise the LDRs tonight: dark box, ten repeated B2 runs, show the spread as your one number; if drift exceeds your pass threshold the verdict logic is theatre.",
+    "Make the escrow decision defend itself: log every reading, show the agent withholding on a borderline curve and asking a human, not just the clean pass/fail."
+   ],
+   "can_traffic_light_timing_be_done_honestly": "Only as 'observed fixed cycle, confidence decays since last sighting, advisory for pedestrians and planning, never a speed-hold instruction'; on adaptive or actuated signals it cannot be done honestly at all."
+  },
+  "who_sf_medicines_officer": {
+   "per_idea": {
+    "LOT": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 8,
+     "buildable_34h_1_10": 6,
+     "startup_1_10": 5,
+     "attack_at_table": "Peel won five weeks ago with this exact box. Your dissolution test is calibrated for riboflavin only; an artesunate blister returns 'unable to verify'. So what does the escrow agent actually learn from your sensor that a lot-number lookup didn't? Show me a real-drug false negative.",
+     "scope_i_would_cut_to": "One drug (riboflavin), one supplier delivery, one escrow. Drop the early-warning map to a static mock-up slide. Spend 10 hours on dark box, LDR calibration curve and repeatability, not on Solana."
+    },
+    "BILL": {
+     "hackathon_1_10": 4,
+     "impact_1_10": 6,
+     "buildable_34h_1_10": 8,
+     "startup_1_10": 6,
+     "attack_at_table": "Fifth clone this year; one competitor was at HackHarvard two weeks ago. Your MRF parsing: show me the CPT code matching on a real hospital file, not a demo bill. And drop the 80% stat or I stop listening.",
+     "scope_i_would_cut_to": "One hospital, its real MRF, one real anonymised bill, No Surprises Act check, dispute draft. No kiosk, no CRS, no utilities. Sponsor-track play only."
+    },
+    "STREETS": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 5,
+     "buildable_34h_1_10": 5,
+     "startup_1_10": 3,
+     "attack_at_table": "You have no signal feed. Your 'green in 12 s' comes from a cycle you guessed from a webcam with seconds of latency; adaptive signals break your clock. Who dies when you say hold 18 mph and it's red? Google has 70 intersections with city data; you have a cardboard one.",
+     "scope_i_would_cut_to": "Live counts and crash-risk map on one corridor, tabletop intersection for the hardware track. Timing shown as 'observed cycle' with confidence, advisory only, never speed advice. Cut crash detection entirely."
+    }
+   },
+   "final_pick": "LOT",
+   "why_in_one_sentence": "It is the only one of the three where a physical sensor produces one honest number that a deciding agent must respect, in a domain where 'unable to verify' is a legitimate and valuable answer, and it matches what has actually won.",
+   "must_fix_for_pick": [
+    "Prove the sensor: 5 repeat riboflavin runs tonight, show the spread; if CV >15% the verdict is 'needs lab' and you say so.",
+    "Make 'unable to verify' the hero moment: Tums fails, uncalibrated pill escalates and holds funds; the agent never releases on a lookup alone.",
+    "Cite Peel in the first 20 seconds and state the one thing you added; judges will know it."
+   ],
+   "can_traffic_light_timing_be_done_honestly": "Only as 'observed cycle at this intersection, last synced N seconds ago, confidence X' for fixed-time signals, with a walk-countdown style advisory and no speed guidance; anything predicting adaptive signals or telling drivers to hold a speed is not honest with your data."
+  },
+  "patient_bill_advocate": {
+   "per_idea": {
+    "LOT": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 7,
+     "buildable_34h_1_10": 6,
+     "startup_1_10": 5,
+     "attack_at_table": "Peel won five weeks ago with this exact rig. Show me the part that isn't Peel: a tablet you did NOT calibrate, and prove the box says 'unable to verify' instead of guessing. Then why would a clinic let software hold its supplier's money?",
+     "scope_i_would_cut_to": "One drug (riboflavin), one fake (Tums), one recall-hit lot number, one escrow release/withhold/escalate on Nessie. Drop Solana. Map is a static screenshot of your own screens, nothing more."
+    },
+    "BILL": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 8,
+     "buildable_34h_1_10": 8,
+     "startup_1_10": 6,
+     "attack_at_table": "I do this for a living. MRF files are gigabytes, half-broken, and the posted cash price rarely matches an emergency claim. No Surprises Act covers narrow situations. Show me one real bill where your agent found a line I'd actually dispute, and show me the itemized bill request it drafted.",
+     "scope_i_would_cut_to": "Medical only. One hospital's MRF pre-parsed Friday night, three real CPT lines, one upcode caught (99283 vs 99285), one dispute letter, 30-day clock. No kiosk, no CRS, no other industries."
+    },
+    "STREETS": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 6,
+     "buildable_34h_1_10": 4,
+     "startup_1_10": 3,
+     "attack_at_table": "You're telling drivers to hold 18 mph based on a photoresistor and a guess at cycle length. What happens when SFMTA's signal is actuated and your countdown is wrong by 20 seconds? Who gets hurt, and what's your liability?",
+     "scope_i_would_cut_to": "Counts on two public cams plus crash-history risk score per intersection by hour. Tabletop intersection with the Uno for hardware. Kill phase prediction for real streets unless a cam shows a signal head tonight."
+    }
+   },
+   "final_pick": "LOT",
+   "why_in_one_sentence": "BILL is the one I'd actually use Monday, but five clones in two weeks and no hardware will lose a Cal Hacks table; LOT has the sensor, the health framing, the one number, and a real Hyphenate 'moment' if the escrow decision is defensible.",
+   "must_fix_for_pick": [
+    "Light-leak and LDR drift: sealed box, dark baseline before every run, show the raw curve on screen so judges see data, not a verdict.",
+    "Non-calibrated pills must return 'unable to verify' every time; demo that on purpose before a judge tries it.",
+    "Escrow release needs a written policy the agent cites: pass plus no recall hit releases; anything else withholds and files; judge enters their own lot number."
+   ],
+   "can_traffic_light_timing_be_done_honestly": "Only as 'observed cycle estimate, confidence X%, fixed-time signals only, advisory, resynced on last observation' and never as a speed instruction; the moment you say 'hold 18 mph' without a live signal feed, it's dishonest."
+  },
+  "sf_traffic_signal_engineer": {
+   "per_idea": {
+    "LOT": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 8,
+     "buildable_34h_1_10": 7,
+     "startup_1_10": 5,
+     "attack_at_table": "Peel won five weeks ago and you copied its optics with worse sensors. What did you add that isn't a smart contract stapled to someone else's dissolution test? Show me a Tums failing and riboflavin passing, live, with room lights on.",
+     "scope_i_would_cut_to": "Riboflavin pass, Tums fail, everything else 'unable to verify'. One escrow release/withhold on Nessie sandbox with spend cap and escalation log. Recall lookup on lot number. Skip the map unless it's a static layer by Sunday 6 AM."
+    },
+    "BILL": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 6,
+     "buildable_34h_1_10": 9,
+     "startup_1_10": 4,
+     "attack_at_table": "Five clones this spring, Goodbill does this for money, and the CMS files are inconsistent garbage across hospitals. Pull one real MRF live right now and match one CPT line. If it's a cached JSON, you're the sixth clone with a kiosk.",
+     "scope_i_would_cut_to": "One hospital, one real MRF parsed live, three line items compared to cash and Medicare, drafted dispute letter the agent refuses to send without a human. Drop CRS, drop the kiosk, drop utilities and airlines."
+    },
+    "STREETS": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 6,
+     "buildable_34h_1_10": 5,
+     "startup_1_10": 4,
+     "attack_at_table": "Which SF intersection? If it runs Muni transit priority or emergency preempt, your 'green in 12 s' is wrong the moment a bus shows up, and a driver holding 18 mph to catch it is now running a red. Who's liable?",
+     "scope_i_would_cut_to": "Risk map from DataSF crash history plus 511 incidents, YOLO counts on one Caltrans cam, tabletop intersection with the LDR phase sensor demonstrating cycle learning. No driver countdown, no pedestrian prediction. Dash node crash alert only if done by Saturday noon."
+    }
+   },
+   "final_pick": "LOT",
+   "why_in_one_sentence": "It's the only one of the three that matches the full winning pattern (sensor, AI that acts with money on the line, health framing, one number) and whose honest failure mode ('unable to verify') is a feature instead of a liability.",
+   "must_fix_for_pick": [
+    "Light-tight box and LDR dark/blank calibration before each run; demo with venue lights on, or it dies at the table.",
+    "Open with 'Peel proved the optics; we built the procurement gate' in the first fifteen seconds, with Peel cited on the slide.",
+    "Escrow agent must show the spend cap, the withhold, and the 'ask a human' path live; judges will run a fail sample themselves."
+   ],
+   "can_traffic_light_timing_be_done_honestly": "Only on fixed-time coordinated corridors with no transit priority or preemption, labelled 'observed cycle, last sync N seconds ago, confidence X', never as a countdown drivers or pedestrians act on; actuated intersections cannot be predicted from a photoresistor, and a wrong countdown is how people get hit."
+  },
+  "vision_zero_advocate": {
+   "per_idea": {
+    "LOT": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 7,
+     "buildable_34h_1_10": 6,
+     "startup_1_10": 5,
+     "attack_at_table": "Peel won five weeks ago; you swapped phototransistors for slow LDRs and bolted on escrow. Show me one real pill besides B2 that doesn't return 'unable to verify', or admit the only new part is a payment hook nobody at a clinic asked for.",
+     "scope_i_would_cut_to": "One calibrated tablet (B2) vs one fake (Tums), pass/fail/unsure live, agent holds or releases Nessie sandbox payment with spend cap, recall lookup on lot number, failed-screen map with three seeded points. Drop Solana."
+    },
+    "BILL": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 6,
+     "buildable_34h_1_10": 8,
+     "startup_1_10": 4,
+     "attack_at_table": "Five Devpost clones in six months and funded companies doing this; your '80% of bills have errors' stat is marketing. What happens when the hospital's MRF file is 2 GB, malformed, and the venue Wi-Fi dies mid-demo?",
+     "scope_i_would_cut_to": "Medical bills only, one hospital's MRF pre-downloaded, line-by-line cash/Medicare comparison, draft dispute letter, human approval before send. No kiosk, no CRS, no subscriptions."
+    },
+    "STREETS": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 3,
+     "buildable_34h_1_10": 4,
+     "startup_1_10": 3,
+     "attack_at_table": "'Hold 18 mph to make the green' is Audi for drivers, not Vision Zero. Caltrans cams are freeways; the High-Injury Network is surface streets with no public feed. Which dead pedestrian on Geary does your risk score save? Phones already do crash detection.",
+     "scope_i_would_cut_to": "Kill speed advice and crash detection. One corridor: YOLO counts cars/people/bikes on a public cam, overlaid on DataSF crash history and HIN, hourly exposure number for advocates. Tabletop signal only if a cam truly shows a signal head."
+    }
+   },
+   "final_pick": "LOT",
+   "why_in_one_sentence": "LOT is the only one where a physical sensor, an agent that actually withholds money, and a health framing with real body count fit this kit in 34 hours; STREETS is driver-convenience dressed as safety and BILL is a crowded software demo.",
+   "must_fix_for_pick": [
+    "Light-tight box and LDR calibration tonight: ten runs of B2 vs Tums, show the spread, or the verdict is theater.",
+    "Say 'Peel, MIT license' in the first 20 seconds and show exactly what is new: payment gate, escalation, map.",
+    "Define 'unsure' honestly: any non-B2 pill returns 'unable to verify' and the agent must NOT release funds on that."
+   ],
+   "can_traffic_light_timing_be_done_honestly": "Technically yes for fixed-time signals\u2014observe red on/off, learn the cycle, predict with error bars, resync every observation\u2014but honestly only as a pedestrian wait countdown or a dataset for advocates; telling drivers what speed to hold is a convenience feature that invites speeding, not safety."
+  },
+  "rideshare_driver": {
+   "per_idea": {
+    "LOT": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 8,
+     "buildable_34h_1_10": 6,
+     "startup_1_10": 4,
+     "attack_at_table": "Peel won five weeks ago, open source. Show me what your Tums-vs-B2 test does that Peel doesn't. If every real pill says 'unable to verify,' you built an escrow button on someone else's instrument. Who holds the money, a clinic in Lagos on Solana devnet?",
+     "scope_i_would_cut_to": "Drop the map. Riboflavin pass, Tums fail, one real antibiotic 'unable to verify, escalate'. One escrow release/withhold on Nessie with a spend cap and a written report. Say Peel's name in the first 20 seconds."
+    },
+    "BILL": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 7,
+     "buildable_34h_1_10": 8,
+     "startup_1_10": 5,
+     "attack_at_table": "Fifth clone this year, HackHarvard did it two weeks ago. Pull a real SF General line item against the CMS file in front of me, live, on this Wi-Fi. If the MRF is a 2 GB JSON you can't parse here, the demo is a slide.",
+     "scope_i_would_cut_to": "One hospital (UCSF or SF General), MRF pre-indexed offline, five real line items, one draft dispute letter with the 30-day clock. Kill utilities/airlines/rent. Kill the Pi kiosk. Use the 20-30% error stat, not 80%."
+    },
+    "STREETS": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 7,
+     "buildable_34h_1_10": 5,
+     "startup_1_10": 6,
+     "attack_at_table": "I drive 50 hours a week here. Your 'green in 12 s' is off by 8 seconds and I brake-check the guy behind me. What's your phase error on a real corridor, and what happens when the signal is actuated by a pedestrian button and your clock model is wrong?",
+     "scope_i_would_cut_to": "One corridor (Oak or Fell), counts from one public cam, risk score by hour from DataSF, phase inference with a shown confidence and resync timestamp, tabletop intersection. Cut crash detection entirely; phones do it. No 'predicts people' language."
+    }
+   },
+   "final_pick": "STREETS",
+   "why_in_one_sentence": "It's the only one I'd actually open Monday at 7 AM on Fell Street, it uses live public data judges can't call a mock, and it isn't a five-week-old grand prize or the fifth bill scanner this year.",
+   "must_fix_for_pick": [
+    "Tonight, before anyone sleeps: confirm one Caltrans/511 cam shows a readable signal head. If not, timing is tabletop plus dash-cam only and the pitch says so.",
+    "Show the number honestly: measured phase error in seconds on N observed cycles, with the resync timestamp on screen. Advisory only, never 'run the light' or 'predicts crashes'.",
+    "Cut crash detection and anything not on the one corridor. Cache the cam frames and 511 data locally so weak Wi-Fi can't kill the live demo."
+   ],
+   "can_traffic_light_timing_be_done_honestly": "Yes, if you call it what it is: an inferred fixed-cycle estimate with a confidence number and last-resync time, on one corridor you observed, advisory only, with a stated error, and you admit actuated or adaptive signals break it."
+  },
+  "hyphenate_judge": {
+   "per_idea": {
+    "LOT": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 7,
+     "buildable_34h_1_10": 6,
+     "startup_1_10": 5,
+     "attack_at_table": "I hand you a white pill you've never seen and a lot number I made up. If the only honest answer is 'unable to verify', your gate just froze a supplier's money on nothing. Show me the escrow decision log and why the agent didn't release. Also: what did Peel not do?",
+     "scope_i_would_cut_to": "Riboflavin only, one supplier delivery, three outcomes, Nessie escrow (drop Solana), spend cap, full decision log, recall check on real FDA data cached offline, map with three real seeded failures. No oncology claims."
+    },
+    "BILL": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 6,
+     "buildable_34h_1_10": 8,
+     "startup_1_10": 4,
+     "attack_at_table": "Pull this hospital's MRF live, now, on venue Wi-Fi. Those files are multi-gigabyte and inconsistent; if you pre-parsed one, say so. Then tell me what you do that the five Devpost clones and Goodbill don't, and whether you'd send a dispute without a human.",
+     "scope_i_would_cut_to": "One hospital, one real bill, MRF pre-indexed and disclosed, line-by-line comparison to cash and Medicare, drafted dispute gated behind human approval, 30-day clock. Drop other bill types and CRS."
+    },
+    "STREETS": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 5,
+     "buildable_34h_1_10": 4,
+     "startup_1_10": 3,
+     "attack_at_table": "Your countdown said 'green in 12 s'. The cam frame is 6 seconds old. What's your measured error distribution, and what happens to a pedestrian who trusts 'walk in 40 s' when you're wrong? Then: four subsystems, which one actually works end to end?",
+     "scope_i_would_cut_to": "One corridor: live counts from public cams plus risk map from crash history and 511 incidents. Timing stays tabletop with the LDR phase sensor, labelled inferred. Drop crash detection and dash-cam entirely."
+    }
+   },
+   "final_pick": "LOT",
+   "why_in_one_sentence": "LOT is the only one where a physical measurement feeds a money decision with a defensible abstain path, which is exactly my track plus Hardware plus Anthropic, and the Peel risk is manageable if you cite it and show the gate is new.",
+   "must_fix_for_pick": [
+    "Calibrate riboflavin tonight with a real curve and show the error bars; make 'unable to verify' the honest default for everything else and say so in the pitch.",
+    "Build the moment: I will swap a Tums or type a recalled lot number; the agent must withhold, log why, and escalate to a human with a spend cap visible.",
+    "Kill the Solana notary framing; use Nessie or a plain ledger and spend the saved hours on light sealing and the decision log."
+   ],
+   "can_traffic_light_timing_be_done_honestly": "Yes, only as an inferred estimate with a shown confidence and measured error, labelled 'not city signal data, advisory only', resynced on each observation; the moment you call it real-time timing or imply safety, it is dishonest."
+  },
+  "hardware_judge": {
+   "per_idea": {
+    "LOT": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 7,
+     "buildable_34h_1_10": 7,
+     "startup_1_10": 4,
+     "attack_at_table": "Open the box lid mid-run and show me the trace. Then drop a Tums: does it say 'fail' or 'unable to verify'? If it says fail, your LDR is guessing and the escrow logic is built on noise. Also, why does this need a chain?",
+     "scope_i_would_cut_to": "One calibrated analyte (riboflavin), one blue channel, thermistor logged, sealed box, Nessie sandbox escrow with spend cap, recall lookup on lot number, pass/withhold/escalate. Drop Solana, drop the map beyond a table of failed lots."
+    },
+    "BILL": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 7,
+     "buildable_34h_1_10": 8,
+     "startup_1_10": 5,
+     "attack_at_table": "Five Devpost clones in two months and a Pi kiosk with no sensor. What does your hardware measure? Nothing. Also, show me the line where you matched a CPT code to the MRF row, not a Claude guess.",
+     "scope_i_would_cut_to": "One hospital MRF parsed live, one real bill, per-line charge vs cash vs Medicare, drafted dispute with human sign-off. No kiosk, no credit sandbox, no utility rule packs. Not a hardware entry."
+    },
+    "STREETS": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 6,
+     "buildable_34h_1_10": 4,
+     "startup_1_10": 3,
+     "attack_at_table": "Your tabletop light runs a cycle you wrote; predicting it proves nothing. Show me a real SF signal, your LDR tube's red on/off timestamps, and the learned cycle drifting when the signal is actuated. Then tell me who gets hurt when 'green in 12 s' is wrong.",
+     "scope_i_would_cut_to": "One corridor: live cam counts plus crash-history risk score per hour. One real intersection phase-sensed by ESP32+LDR from a recorded hour, cycle learned, prediction with error bars. Drop crash detection, dash node, toy car, pedestrian claims."
+    }
+   },
+   "final_pick": "LOT",
+   "why_in_one_sentence": "LOT is the only one where the sensor is essential, produces one honest number (% released vs calibrated reference), has a validated reference design to de-risk 34 hours, and the gate-before-payment framing gives Hyphenate its 'knows when to ask' moment.",
+   "must_fix_for_pick": [
+    "Tonight: riboflavin dilution series through your LDR, plot the curve, pick the linear region. Anything outside it, or any non-riboflavin tablet, returns 'unable to verify' on stage. Say Peel's name in the first 20 seconds.",
+    "Light-leak interlock: tilt switch or LDR baseline check on the lid; the firmware refuses to start a run if dark-current baseline exceeds threshold. Log thermistor every sample and show it.",
+    "Kill Solana. Nessie sandbox escrow with a hard spend cap, and let the judge type a recalled lot number and watch it withhold and file. Report latency honestly; weak Wi-Fi means cache the recall index locally."
+   ],
+   "can_traffic_light_timing_be_done_honestly": "Yes, narrowly: a red-lamp photoresistor with timestamps can learn a fixed-time cycle and predict with stated error and decay since last resync; it is dishonest for actuated or adaptive signals, from a tabletop you programmed, or as anything beyond advisory."
+  },
+  "anthropic_judge": {
+   "per_idea": {
+    "LOT": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 8,
+     "buildable_34h_1_10": 6,
+     "startup_1_10": 5,
+     "attack_at_table": "Peel won five weeks ago and is MIT-licensed; your 'new' part is an escrow release on a riboflavin tablet. Show me one pill that is not vitamin B2 returning anything but 'unable to verify', and tell me why a clinic pharmacist in Lagos trusts a Solana devnet stamp over a WHO alert.",
+     "scope_i_would_cut_to": "Drop blockchain; use Nessie sandbox payment hold only. One tablet (B2) honestly calibrated, Tums as fail, third pill shows 'unable to verify' on purpose. Recall lookup against a cached FDA/WHO subset (weak Wi-Fi). Early-warning map with 3 seeded failures plus your live one. Pi touchscreen as the face."
+    },
+    "BILL": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 7,
+     "buildable_34h_1_10": 8,
+     "startup_1_10": 4,
+     "attack_at_table": "Five Devpost clones since March, one two weeks ago at HackHarvard, plus Goodbill and DoNotPay already fined for overclaiming. Hand me a real EOB right now: which line is wrong, what is that hospital's actual posted cash price, and what does your agent refuse to send without a human?",
+     "scope_i_would_cut_to": "Medical only, one hospital's real CMS MRF cached locally, three real anonymized bills. Agent produces an itemized-bill request and a dispute draft, never sends. Kill the kiosk, kill CRS. Lead with the posted-price comparison; cite the 20-30% audited error rate, not 80%."
+    },
+    "STREETS": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 6,
+     "buildable_34h_1_10": 4,
+     "startup_1_10": 3,
+     "attack_at_table": "You are telling a driver to 'hold 18 mph' based on a phase you inferred from a photoresistor and a 90-second guess, resynced on cameras with seconds of lag. What happens the first time you are wrong at a yellow? Also, Google already sells this to cities; who buys yours?",
+     "scope_i_would_cut_to": "One corridor, counts plus crash-risk score per intersection by hour from DataSF history and 511 incidents. Timing is tabletop only, labelled 'advisory, inferred'. Crash-detection dash node with GPS and buzzer, SMS to a contact. Drop phone always-on recording, drop YOLO on live cams if a signal head is not visible tonight."
+    }
+   },
+   "final_pick": "LOT",
+   "why_in_one_sentence": "LOT is the only one where a judge watches a physical sensor produce one number that gates a real payment decision for a named community, with honest 'unable to verify' guardrails, and it stacks Hardware, Anthropic, Hyphenate, Microsoft, Elastic and People-First without lying about what it measures.",
+   "must_fix_for_pick": [
+    "Open the pitch with 'Peel won HackMIT; here is what Peel could not do: gate the purchase.' Judges will know; saying it first kills the attack.",
+    "Dark box plus LDR calibration done tonight with 5 repeat runs; print the variance on the dashboard. If time-to-80% is not repeatable within ~10%, demo the pass/fail only.",
+    "Cache recall data and the Claude prompts' fallback path; rehearse the whole demo with Wi-Fi off. One Tums fail, one B2 pass, one unknown pill escalating."
+   ],
+   "can_traffic_light_timing_be_done_honestly": "Only as a tabletop model and a clearly labelled 'inferred cycle, advisory, verified against N observations' estimate for one intersection you personally logged; live 'green in 12 s' guidance to real drivers from a photoresistor and public cam lag is not honest in 34 hours."
+  },
+  "people_first_judge": {
+   "per_idea": {
+    "LOT": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 7,
+     "buildable_34h_1_10": 6,
+     "startup_1_10": 5,
+     "attack_at_table": "Peel is five weeks old and every judge saw it. Your sensor is calibrated for one vitamin. Which clinic pharmacist withholds payment from her only antimalarial supplier because a photoresistor said so, and what does she do the week her patients have no drugs?",
+     "scope_i_would_cut_to": "Riboflavin only, everything else returns 'unable to verify' on screen. Recall database cached offline. Nessie sandbox hold/release, no Solana. One shared map with lot, place, verdict. Pitch opens by crediting Peel and naming the procurement gate as the new part."
+    },
+    "BILL": {
+     "hackathon_1_10": 4,
+     "impact_1_10": 6,
+     "buildable_34h_1_10": 8,
+     "startup_1_10": 5,
+     "attack_at_table": "Medical Bill Guardian did this at HackHarvard two weeks ago. The patient who most needs you is uninsured, limited English, and never received an itemized bill. Walk me through her first step. And drop the 80% stat; audited rates are 20-30% on biased samples.",
+     "scope_i_would_cut_to": "Medical bills only. One hospital's CMS machine-readable file parsed live, three line items compared to cash price and Medicare rate, one dispute letter drafted with human approval. Cut CRS, kiosk, utilities, airlines, subscriptions."
+    },
+    "STREETS": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 5,
+     "buildable_34h_1_10": 5,
+     "startup_1_10": 4,
+     "attack_at_table": "SF's Vision Zero already published the High-Injury Network. Your user is a driver you tell to hold 18 mph; the person dying is a pedestrian in the Tenderloin without a dash node. Who exposed benefits, and how does public-cam latency of seconds make anyone safer?",
+     "scope_i_would_cut_to": "One corridor. Live counts from one Caltrans cam, hourly risk map from DataSF crash history plus 511 incidents. Tabletop signal demo labeled 'learned cycle, advisory'. Cut crash detection, dash-cam recording, walk-signal prediction, and all speed advice."
+    }
+   },
+   "final_pick": "LOT",
+   "why_in_one_sentence": "It is the only one that reaches the actually exposed population, LMIC clinic patients, with a workflow a real procurement officer performs today and a single honest number, provided you concede Peel in the first twenty seconds and stop pretending the sensor does more than it does.",
+   "must_fix_for_pick": [
+    "Default verdict is 'unable to verify'; only riboflavin can pass. Demo the Tums failing and a real ibuprofen returning 'unable to verify' on purpose.",
+    "Kill Solana. Nessie sandbox hold, release, or escalate with a spend cap; the agent never releases without a pharmacist tap. Recall database and web cache fully offline for venue Wi-Fi.",
+    "Name the buyer precisely: NGO or district pharmacy procurement officer sampling a delivery, not a patient. Show what happens to patients during a withheld lot."
+   ],
+   "can_traffic_light_timing_be_done_honestly": "Yes, only as 'learned cycle from observed red phases, advisory, confidence and seconds since last observation shown', never as real-time signal data or a safety claim, and never as speed advice on a high-injury corridor."
+  },
+  "bright_data_judge": {
+   "per_idea": {
+    "LOT": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 8,
+     "buildable_34h_1_10": 6,
+     "startup_1_10": 5,
+     "attack_at_table": "Your live web layer is a recall lookup you could cache; show me the agent hitting a lot number that returns nothing, a blocked NAFDAC page, and a conflicting WHO alert live, on venue Wi-Fi. Also: Peel shipped this 5 weeks ago; what here is yours beyond the escrow?",
+     "scope_i_would_cut_to": "Riboflavin only, hard-coded 'unable to verify' for everything else; escrow on Nessie sandbox only (drop Solana); live recall search against FDA/WHO/NAFDAC with cached fallback clearly labelled; map as a static DataSF-style layer, not a product."
+    },
+    "BILL": {
+     "hackathon_1_10": 4,
+     "impact_1_10": 6,
+     "buildable_34h_1_10": 7,
+     "startup_1_10": 6,
+     "attack_at_table": "Pull the CMS MRF for the hospital on that bill right now. Those files are 2 GB CSVs behind inconsistent URLs that 404 or 403 weekly; if you pre-downloaded one hospital, that is a mock. Also, five Devpost clones in six months; why do judges remember yours?",
+     "scope_i_would_cut_to": "Medical only, three named Bay Area hospitals whose MRFs you confirm fetchable tonight, streaming parse of only matching CPT codes, dispute draft and 30-day clock. Drop CRS, kiosk, utilities, airlines."
+    },
+    "STREETS": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 7,
+     "buildable_34h_1_10": 5,
+     "startup_1_10": 4,
+     "attack_at_table": "Open the Caltrans cam and 511 feed live now. If the cam is 15 s stale and the signal head is six pixels wide, your 'green in 12 s' is a guess dressed as a sensor. Show the empty-incident case and the stream being down.",
+     "scope_i_would_cut_to": "One corridor: live 511 incidents + one Caltrans cam with YOLO counts + DataSF crash history into a risk score per hour; tabletop intersection with LED cycle learning honestly labelled 'simulated'. Drop dash-cam, crash detection, Waze, GTFS-rt."
+    }
+   },
+   "final_pick": "LOT",
+   "why_in_one_sentence": "LOT is the only one where a physical measurement, a live public-data lookup that can genuinely fail, and an agent that defends a money decision all fit on one table, and it stacks Hyphenate, Hardware, Anthropic, Bright Data and Elastic without lying about what it measured.",
+   "must_fix_for_pick": [
+    "Live recall search must run at the table against real FDA/WHO/NAFDAC pages via Bright Data, with visible handling of blocks, timeouts and zero-result lots; a pre-indexed-only demo gets disqualified from my track.",
+    "Riboflavin curve calibrated tonight with five repeat runs and the error bar on the slide; Tums must come back 'unable to verify', not 'fake'.",
+    "Open the pitch with Peel credited by name and one slide on what is new (escrow gate, escalation, lot map); judges will search it."
+   ],
+   "can_traffic_light_timing_be_done_honestly": "Only as 'cycle inferred from N observations, last resync X s ago, advisory, may be wrong'; without a public signal feed it is a learned clock, not a sensor, and the pitch must say so."
+  },
+  "spacetimedb_judge": {
+   "per_idea": {
+    "LOT": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 8,
+     "buildable_34h_1_10": 6,
+     "startup_1_10": 5,
+     "attack_at_table": "You rebuilt a five-week-old grand-prize winner with slower, non-linear LDRs and stapled escrow on top. Show the escrow decision flip on a real failed screen, live, and tell me why a clinic pharmacist needs a chain instead of a database row.",
+     "scope_i_would_cut_to": "Riboflavin only. Three live screens: pass, fail (Tums), unsure. Nessie sandbox escrow, drop Solana. Map is a shared table every screen writes to; judge's phone subscribes and sees the fail land. No general-pill claims."
+    },
+    "BILL": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 7,
+     "buildable_34h_1_10": 8,
+     "startup_1_10": 6,
+     "attack_at_table": "Fifth Devpost clone this season and DoNotPay got fined for exactly your pitch. MRF files are multi-gigabyte inconsistent CSV/JSON; parse one real hospital's file in front of me, not a fixture, and show the 20-30% error stat, not 80%.",
+     "scope_i_would_cut_to": "One hospital's real MRF, one real anonymised bill, line-by-line cash and Medicare comparison, one dispute draft held for human approval, 30-day clock. No kiosk, no credit pull, no other bill types."
+    },
+    "STREETS": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 6,
+     "buildable_34h_1_10": 5,
+     "startup_1_10": 4,
+     "attack_at_table": "'Green in 12 s' is a clock guess from a tabletop while Google Green Light already sells this to cities. Show predicted phase versus observed phase on one real SF intersection with the error in seconds, or delete the claim.",
+     "scope_i_would_cut_to": "One corridor. Two public cams, YOLO counts plus 511 incidents into one shared live table; risk score per intersection by hour. Tabletop cycle inference with measured resync error. Cut crash detection, continuous phone recording, and all pedestrian prediction language."
+    }
+   },
+   "final_pick": "STREETS",
+   "why_in_one_sentence": "It is the only one where shared real-time state is the product, not a bolt-on: cams, ESP32 phase sensor, and dash node all write one live table and every judge's phone sees the same corridor change, while LOT is Peel-with-escrow and BILL is a crowded CRUD app.",
+   "must_fix_for_pick": [
+    "Tonight: confirm one Caltrans/SF cam shows a signal head and log cycle observations; if not, timing becomes tabletop-only and the pitch says so out loud.",
+    "One number on the slide: phase prediction error in seconds after resync (and counts drift vs 511 speeds), measured, not estimated.",
+    "Cut crash detection and continuous phone recording; every sensor and the tabletop write to the same SpacetimeDB tables with a reducer log judges can scroll."
+   ],
+   "can_traffic_light_timing_be_done_honestly": "Yes, only as an inferred fixed-cycle estimate with displayed confidence and seconds-since-last-observation, resynced on each sighting, labelled advisory, and never claimed as a signal feed or pedestrian prediction."
+  },
+  "healthtech_vc": {
+   "per_idea": {
+    "LOT": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 7,
+     "buildable_34h_1_10": 7,
+     "startup_1_10": 4,
+     "attack_at_table": "Peel won HackMIT five weeks ago with this exact rig. Your only calibrated analyte is vitamin B2; no clinic buys riboflavin. Show me one real antimalarial you can verify, or admit this is Peel plus an escrow wrapper that no NGO procurement officer would let a bot trigger.",
+     "scope_i_would_cut_to": "One analyte (riboflavin), one dark box, Pi face, three verdicts. Agent: pass releases Nessie sandbox payment, fail files report + pins the map, unsure escalates with spend cap. Drop Solana. Live recall lookup on real lot numbers. Say 'Peel-derived' in slide one."
+    },
+    "BILL": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 6,
+     "buildable_34h_1_10": 8,
+     "startup_1_10": 5,
+     "attack_at_table": "Fifth Devpost clone since March; Goodbill and Counterforce exist with staff. MRF files are multi-GB, inconsistent, and the cash price for a CPT often isn't there. Show me a real bill matched to a real MRF line on venue Wi-Fi, not a mock. And drop the 80% stat.",
+     "scope_i_would_cut_to": "One hospital's MRF pre-downloaded, one real anonymized bill, line-by-line match to cash and Medicare rate, No Surprises check, drafted dispute with mandatory human approval. No kiosk, no utilities, no CRS unless already working."
+    },
+    "STREETS": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 6,
+     "buildable_34h_1_10": 5,
+     "startup_1_10": 4,
+     "attack_at_table": "Your countdown is a guess from an uncoordinated cycle; actuated signals in SF change with demand. What happens when a driver holds 18 mph on your advice and the light turns red? Who's liable? Also, Green Light has the actual SCATS data and gives it away to cities.",
+     "scope_i_would_cut_to": "One corridor: live counts from one Caltrans cam, 511 incidents, DataSF crash history \u2192 hourly risk score on a map. Tabletop LED intersection with LDR phase sensor learning the cycle. No pedestrian countdown, no 'predict people' claims, no always-on phone."
+    }
+   },
+   "final_pick": "LOT",
+   "why_in_one_sentence": "It's the only one with a physical sensor, an agent that spends real money with a spend cap and an escalation path, a health framing with a WHO number, and a clean 'moment' for Hyphenate; the Peel problem is manageable if you cite it first and own the procurement pivot.",
+   "must_fix_for_pick": [
+    "Open with 'built on Peel (HackMIT, MIT license), what we add is the payment gate and early-warning map' so judges hear it from you, not each other.",
+    "Calibrate riboflavin tonight with three real runs; blind-test with a Tums live at the table and let judges pick the tablet. 'Unable to verify' for anything else, said out loud.",
+    "Agent must show the ledger: why it released, withheld, or escalated, with lot-recall evidence and the spend cap enforced; drop Solana, Nessie sandbox only."
+   ],
+   "can_traffic_light_timing_be_done_honestly": "Only as 'observed cycle, estimated phase, confidence X%, advisory' for fixed-time signals you've actually watched; any countdown presented as authoritative for SF's actuated signals is dishonest and dangerous."
+  },
+  "mobility_vc": {
+   "per_idea": {
+    "LOT": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 7,
+     "buildable_34h_1_10": 7,
+     "startup_1_10": 5,
+     "attack_at_table": "Peel won five weeks ago with this exact rig. Show me the one thing Peel can't do that a pharmacist would pay for, and prove your LDR curve isn't just room light leaking through cardboard.",
+     "scope_i_would_cut_to": "Riboflavin only, one pass/fail/unsure verdict, Nessie escrow release-or-hold with spend cap, Claude escalation on 'unsure', recall lookup by lot. Drop the shared map to a static mock screen."
+    },
+    "BILL": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 6,
+     "buildable_34h_1_10": 8,
+     "startup_1_10": 4,
+     "attack_at_table": "Five Devpost clones and Goodbill exist. Which hospital's live MRF did you parse at the table, and what happens when the CPT code on the bill doesn't match any row? Also: your 80% stat is marketing.",
+     "scope_i_would_cut_to": "One hospital, real MRF parsed live, three line items compared to cash and Medicare, drafted dispute letter awaiting human approval. No kiosk, no credit pull."
+    },
+    "STREETS": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 6,
+     "buildable_34h_1_10": 4,
+     "startup_1_10": 3,
+     "attack_at_table": "I've passed on three of these. SF signals are largely actuated and TSP-driven; a learned 90-second cycle drifts in minutes. What's your error after one hour without resync, and who is liable when 'hold 18 mph' is wrong?",
+     "scope_i_would_cut_to": "One corridor: live cam counts plus crash-risk score by hour. Tabletop fixed-cycle intersection showing phase inference with visible confidence and staleness. Cut crash detection and driving advice entirely."
+    }
+   },
+   "final_pick": "LOT",
+   "why_in_one_sentence": "It's the only one that hits the proven winning pattern\u2014sensor, agent that moves money, one number, health framing, honesty guardrails\u2014and stacks Hyphenate, Hardware, Anthropic and Solana/Nessie, provided you own the Peel lineage out loud.",
+   "must_fix_for_pick": [
+    "Say 'built on Peel, MIT-licensed' in sentence two of the pitch; your delta is the procurement gate and escrow decision, not the box.",
+    "Light-tight enclosure and a dark-current baseline per run tonight; publish the riboflavin calibration curve with error bars as your one number.",
+    "Script 'the moment': a Tums passes recall lookup but fails dissolution, agent withholds payment, files report, asks human; let a judge pick the sample."
+   ],
+   "can_traffic_light_timing_be_done_honestly": "Only as 'learned cycle from observed red-lamp transitions, fixed-time signals only, advisory, with confidence and seconds-since-last-sync displayed'; never claim a city feed or speed guidance, because SF's actuated and transit-priority signals will make you wrong in front of a judge."
+  },
+  "cs_teammate": {
+   "per_idea": {
+    "LOT": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 7,
+     "buildable_34h_1_10": 7,
+     "startup_1_10": 5,
+     "attack_at_table": "This is Peel from five weeks ago with an escrow bolted on. Show me what you built that they didn't, and why a clinic should trust a drifting LDR in a cardboard box over a $400 spectrometer.",
+     "scope_i_would_cut_to": "Riboflavin only, one live pass and one live Tums fail, dark-reference subtraction per run, Nessie hold/release with spend cap, Claude escalates on 'unable to verify', recall lookup, map seeded with our own screens. Solana only as a sponsor-track toggle."
+    },
+    "BILL": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 6,
+     "buildable_34h_1_10": 8,
+     "startup_1_10": 5,
+     "attack_at_table": "Five Devpost clones and Goodbill exist. Pull that hospital's MRF live on this Wi-Fi right now; and where does your error stat come from, because 80% is marketing and you know it.",
+     "scope_i_would_cut_to": "One hospital's MRF pre-parsed tonight, three line items compared to cash and Medicare, drafted dispute, human approval before send, 30-day clock. Drop CRS, kiosk, non-medical packs."
+    },
+    "STREETS": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 6,
+     "buildable_34h_1_10": 4,
+     "startup_1_10": 3,
+     "attack_at_table": "'Green in 12 s' comes from a cam with seconds of latency and a cycle you guessed. A pedestrian trusts it and steps out early. Who's liable, and how is this not Google Green Light minus the city contract?",
+     "scope_i_would_cut_to": "One corridor: YOLO counts on two Caltrans cams, risk score by hour from DataSF, tabletop intersection proving phase inference. Drop crash detection, phone dash-cam, Waze, GTFS."
+    }
+   },
+   "final_pick": "LOT",
+   "why_in_one_sentence": "It's the only one that matches the winning pattern (sensor, AI that acts with money, dashboard, health, one number) and maps part-for-part onto our kit without needing the venue Wi-Fi.",
+   "must_fix_for_pick": [
+    "Calibrate riboflavin on our LDRs tonight with a sealed box and record a fallback video; if the curve is noise by 3 AM, we switch to BILL.",
+    "Open the pitch with Peel: 'Peel verifies a pill; LOT gates the purchase and builds the recall map.' Cite them, then show the escrow moment and the escalation.",
+    "Kill the blockchain story. Nessie hold/release with a spend cap is the demo; Solana devnet is a hidden toggle for the sponsor track only."
+   ],
+   "can_traffic_light_timing_be_done_honestly": "Yes, only if every prediction shows 'inferred cycle, last observed N seconds ago, confidence X%', is labelled advisory, and the pitch says plainly there is no SF signal feed; the tabletop proves the algorithm, not the city."
+  },
+  "ethicist_privacy": {
+   "per_idea": {
+    "LOT": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 8,
+     "buildable_34h_1_10": 5,
+     "startup_1_10": 4,
+     "attack_at_table": "You calibrated one vitamin. Show me the antimalarial. If every real drug returns 'unable to verify', your escrow gate either never pays or pays on a riboflavin curve. And a 'pass' from LDRs in a cardboard box is false reassurance that a pharmacist will act on. Also: this is Peel, five weeks old.",
+     "scope_i_would_cut_to": "Drop blockchain. Keep: dissolution test on riboflavin, recall lookup by lot number, three verdicts with 'unable to verify' as the honest default, and a procurement hold/release decision log in Nessie sandbox. Credit Peel in the first 20 seconds."
+    },
+    "BILL": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 7,
+     "buildable_34h_1_10": 8,
+     "startup_1_10": 6,
+     "attack_at_table": "Five clones since March and a company already FTC-fined for overclaiming. What stops a patient from mailing your draft and losing a legitimate charge, or missing a real deadline because your 30-day clock was wrong? Where is the line between price comparison and legal advice?",
+     "scope_i_would_cut_to": "Medical bills only. One hospital's real CMS MRF file, line-by-line comparison to posted cash price and Medicare rate, uncertainty shown per line, itemized-bill request letter drafted but never sent without a human. Cut utilities, airlines, rent, CRS, kiosk, the '80%' stat."
+    },
+    "STREETS": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 5,
+     "buildable_34h_1_10": 4,
+     "startup_1_10": 3,
+     "attack_at_table": "You are telling a driver 'hold 18 mph, green in 12 s' from a cycle you inferred off a laggy public camera. When the controller re-times for a pedestrian call and your driver accelerates into a red, who is liable? And YOLO on public cams is still a surveillance pipeline, counts or not.",
+     "scope_i_would_cut_to": "One corridor. Live counts plus crash-risk score per intersection from DataSF history and 511 incidents, pedestrian-facing only. Tabletop signal demo clearly labelled as simulation. Cut driver speed advisories, crash detection, and always-on phone recording."
+    }
+   },
+   "final_pick": "BILL",
+   "why_in_one_sentence": "It is the only one of the three whose core claim is checkable in the room against a public legal document, whose worst failure mode is a letter a human chose not to send, and which does not copy a five-week-old grand prize or put inferred safety guidance in front of a moving car.",
+   "must_fix_for_pick": [
+    "Nothing leaves the app without a human click; every drafted letter carries the comparison evidence and an explicit 'this is a price comparison, not legal advice' line.",
+    "Kill the '80% of bills have errors' stat; use the audited 20-30% figure and show per-line confidence, including lines you cannot match to the MRF.",
+    "Pitch the difference from the five clones in one sentence: federal MRF comparison plus Medicare rate, cached locally for weak Wi-Fi, demoed on a real hospital's actual file."
+   ],
+   "can_traffic_light_timing_be_done_honestly": "Only as an estimate labelled as such, pedestrian-facing, with observed cycle length, uncertainty in seconds, and no instruction to drivers to adjust speed; anything that says 'hold 18 mph' from an inferred cycle is advice you cannot stand behind when the controller changes."
+  }
+ }
+}

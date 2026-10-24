@@ -1,0 +1,61 @@
+# Kit-only ideas (nothing to buy), Fri 2026-10-23 ~21:15 PDT
+
+Rule: only the parts in the photos + phones/laptops. Phone or web app connects to the ESP32 over BLE/Wi-Fi (or to the Pi's own hotspot) and leads the user through the flow. Booth rentals are a bonus, never a dependency.
+
+| # | Idea | Hardware used | App does | Tracks | Precedent |
+|---|---|---|---|---|---|
+| 1 | **Kopa: pay-as-you-go solar power + AI credit agent** | solar + LiPo, relay, keypad, LCD, buzzer, ESP32, LEDs/USB as the "load" | pay → relay unlocks light/charging for N hours; balance, battery, "cloudy tomorrow, charge now"; agent extends/declines credit from payment history and defends it | Hyphenate, Hardware, Planet-First, People-First, Solana, Coinbase x402 (402 → power), Nessie, Microsoft, Anthropic, Tiger Data, Convex | M-KOPA: 5M customers, $1B+ |
+| 2 | **Cistern: smart rooftop water tank** | HC-SR04, pump, relay, solar, buzzer | level, "runs dry Thursday", auto-fill when supply is on, night-time leak alert, pump dry-run protection; PAYG water credits | Hardware, Planet-First, People-First, Anthropic, Tiger Data, Convex, Nessie/Solana | Mumbai/Nairobi tank overflow and burnt motors |
+| 3 | **Payout-lite: heat warning + payouts** (same plan, no purchases) | DHT11 ×2 + thermistor globe, buzzer, solar, GPS | forecast + nodes → warn, pay, log | as in payout-2026-10-23.md | SEWA $340k to 46k women |
+| 4 | **ColdTrace-lite: vaccine fridge monitor** | thermistor, DHT11, buzzer, GPS, solar | 2–8 °C excursions, leads the health worker through the WHO steps, Claude excursion report | Hardware, People-First, Anthropic, Microsoft, Tiger Data | Nexleaf ColdTrace |
+| 5 | **Upstream: creek/drain flood early warning + anticipatory cash** | HC-SR04 ×2, buzzer, solar, GPS | "water reaches you in 45 min", sirens, SMS, pre-flood cash | Hardware, Planet-First, People-First, Anthropic, Nessie/Solana, Tiger | FloodNet, IFRC anticipatory action |
+| 6 | **Vent: greenhouse / chicken-coop climate guard** | DHT11, LDR, servo (vent), fan + relay, buzzer | heat-stress forecast, opens vent, runs fan, logs; smallholder app | Hardware, Planet-First, Anthropic, Tiger, Gen AI | — |
+| 7 | **Outage: neighbourhood power-cut map + compensation** | 12 V adapter sensed via divider, LiPo, LDR, ESP32 | logs every outage, maps a street, auto-files the utility complaint / parametric credit | People-First, Hyphenate (stretch), Nessie, Tiger, Convex | Nigeria/India outage compensation rules |
+| 8 | **Tap: community water ATM** | pump, HC-SR04, relay, keypad, LCD | pay → dispenses N litres, balance, stock, maintenance alerts | Hardware, People-First, Solana/Nessie, x402 | Sarvajal water ATMs (India) |
+| 9 | **Hands: clinic handwash station counter** | pump, LDR hand sensor, relay, HC-SR04 | dispenses, counts, soap/water stock, weekly infection-control report | Hardware, People-First, Microsoft, Tiger | — |
+| 10 | **Stall: market-vendor heat + footfall node** | DHT11, HC-SR04 (footfall), buzzer, solar | heat alert + customer count → "move to shade at 13:00, sales drop 40 % above 38 °C" | Hardware, People-First, Visa (stretch), Tiger | — |
+
+## Top 3 (my order)
+1. **Kopa.** Fintech is the headline and it is honest: pay-as-you-go solar is a proven $1B business, the payment IS the product, and the chain/x402 are load-bearing (unbanked, micro, cross-border, machine unlocks on payment). Hyphenate's "moment": the agent sees a customer who paid 29 of 30 days, battery at 8 %, storm forecast tonight; it extends 2 days of credit, logs why, and defends it; it declines a fraudulent "paid" message that has no matching transaction. Demo: judge pays $0.10 testnet on their phone → relay clicks → lamp and USB charger light → LCD shows hours left → stop paying → it locks.
+2. **Payout-lite.** Still the biggest impact story; the DHT11 problem is softened because the forecast decides and nodes confirm. Loses some hardware-judge points.
+3. **Cistern.** Most visual demo (pump + tub + rising level), everyday problem for hundreds of millions, honest hardware. Fintech weaker.
+
+## Rapid-fire, software-first (Preston ~21:25: no solar panel; hardware only as a light accent)
+Accent = one physical touch from the kit (button/keypad, LED, buzzer, LCD, servo, HC-SR04, GPS, Pi touchscreen). Not entering Best Hardware with these.
+1. **Payables**: accounts-payable fraud agent; catches duplicate invoices and changed vendor bank details (BEC fraud ~$2.9B/yr), verifies vendors on the public web, asks a human above a limit. Accent: keypad = physical approval key. Hyphenate, Microsoft, Anthropic, Bright Data/Apify, Convex.
+2. **Payout (public-data version)**: parametric disaster payouts triggered by NWS/USGS/FIRMS/Open-Meteo, warn-then-pay, agent validates and defends. Accent: GPS "your location", buzzer alert. Hyphenate, Microsoft, Anthropic, People-First, Solana/Nessie, Bright Data, Tiger Data.
+3. **Orbit Pointer**: servo aims at the ISS/Starlink from TLE + GPS, Grok Voice narrates passes and conjunction risk; built in Cursor. SpaceXAI (keyboard each; few teams meet Cursor+Grok), MLH SpaceXSI raffle, Gen AI.
+4. **Close Crew**: three Claude agents with separate permissions run a messy month-end close; approval queue live. Accent: button + buzzer when an agent asks. Hyphenate, Microsoft, SpacetimeDB/Convex, Anthropic.
+5. **Second Look**: CRS sandbox credit report → finds wrong accounts → drafts dispute letter. Accent: keypad PIN. CRS ($1,000), Microsoft, Anthropic.
+6. **Dispatch**: voice agent triages 311/911 overflow calls in 10 languages, live board. Accent: Pi screen as the dispatch wall, LED per priority. Cartesia/ElevenLabs, Convex, Anthropic, Microsoft, People-First.
+7. **Triage Guard**: Jira Forge agent that triages issues and defends itself against prompt injection, with audit log + rollback. Atlassian (both tracks), Armadin security, Anthropic. Niche: Forge app required, few teams.
+8. **Fair Cart**: ASI:One shopping agent for a first apartment on $300, live listings. Visa ($5K), Apify, Fetch.ai, Bright Data.
+9. **Same Voice**: live two-language call in each speaker's own voice. Meta, Cartesia, Moss, People-First.
+10. **Pulse Desk**: Presage camera vitals during study; desk lamp (relay) and buzzer nudge breathing. Presage, Backboard, People-First. Accent is real here.
+11. **Heat Desk**: Open-Meteo heat warnings by SMS for one named farmworker community, no sensors. People-First, Anthropic, Microsoft, Tiger Data.
+12. **Club Ledger**: Capital One Nessie moves the fiat, Solana records each approved expense. Nessie, Solana, Convex.
+
+## Rapid-fire, aerospace + blockchain, hardware medium (Preston ~21:30)
+1. **Kp**: space-weather GPS-outage early warning. Your GPS module is the live node (satellites seen, HDOP, fix jitter); NOAA SWPC Kp forecast says "GPS unreliable in 3 h"; alerts drone pilots / farm autosteer / surveyors; parametric payout for downtime (May 2024 G5 storm knocked out farm RTK GPS; reported ~$500M US crop losses). Buzzer + LCD on the node. → SpaceXAI (space data + Grok), Hyphenate, Solana/Nessie, Hardware, Tiger Data, Anthropic, Microsoft.
+2. **Pad**: drone-delivery landing pad with on-chain escrow. HC-SR04 detects the drone, servo opens the lid, LEDs guide, keypad PIN for pickup; proof of delivery releases escrow (Solana) to the courier. → Hardware, Solana, Convex, Anthropic, x402 (pay-per-landing), Visa (stretch).
+3. **FireLine**: NASA FIRMS satellite fire detections + wind forecast → "fire reaches you in ~4 h", pan-tilt pointer (servo + stepper) aims at the nearest detection, buzzer; anticipatory cash to enrolled households (Trace won HackHarvard '26 with this data). → SpaceXAI, Hyphenate, Solana/Nessie, People-First, Planet-First, Anthropic, Bright Data.
+4. **Conjunction**: live CelesTrak/Space-Track close-approach data → pointer tracks both objects, buzzer at closest approach, Grok narrates; parametric debris-collision cover with an AI validator (space insurance is a real ~$500M/yr premium market). → SpaceXAI, Hyphenate, Solana, Hardware-lite, Gen AI.
+5. **BlackBox**: tamper-evident drone flight recorder. ESP32 + GPS + tilt + DHT log telemetry into a hash chain, roots anchored on Solana; incident report by Claude. → Hardware, Solana, Armadin, Tiger, Convex, Anthropic.
+6. **FlatSat**: mock CubeSat: LDR sun sensor + DC-motor reaction wheel keeps a hanging box pointed at the lamp; DHT/tilt telemetry to a Pi ground station; Grok mission narration; schools kit. → Hardware (real control loop), SpaceXAI, Gen AI, Anthropic. Blockchain weak.
+7. **SkyWatch**: pointer aims at planes overhead from free ADS-B (adsb.lol/OpenSky) + GPS; LCD shows flight; aviation-noise log for a neighbourhood with on-chain complaint record. → Hardware-lite, SpaceXAI, Convex. Blockchain weak.
+8. **Slot**: drones pay for airspace/landing slots via x402; ESP32 beacon at each pad. → x402, Solana, Convex. Abstract demo.
+9. **TEMPO Air**: NASA TEMPO satellite air quality + Open-Meteo → "smoke at your school in 3 h", relay runs the fan as a purifier. → SpaceXAI, Planet-First, People-First, Anthropic.
+10. **Launch Ledger**: model-rocket/kite telemetry node (GPS, tilt, DHT) with on-chain flight certificates for school rocketry clubs. → Hardware, Solana, SpaceXAI. Needs a rocket.
+Top 3: Kp, Pad, FireLine.
+
+## Rapid-fire, "God's Eye" / live 3D / space / traffic (Preston ~21:50)
+Peel (HackMIT 2026 grand prize, the pill tester): https://plume.hackmit.org/project/qxodw-wgjqk-lidau-dxrpe · code https://github.com/viktorinkov/HackMIT-2026 · video https://youtu.be/Yiu2wGKJ6AM
+1. **Palace Eye**: live command center for this venue. Phone video of the halls → 3D model (Gaussian splat on a rented GPU, IronBook pattern); ESP32 nodes count nearby phones anonymously (Wi-Fi probe requests, hashed) + DHT11 stuffiness + HC-SR04 queue length at food; everything live in SpacetimeDB; Claude ops agent flags crowd crush risk, stuffy rooms, long queues and dispatches volunteers; Pi touchscreen on the wall. Demo on the actual event while judges walk through it. → SpacetimeDB (core), Best Hardware, People-First (Itaewon 2022: 159 dead; Astroworld), Anthropic, Microsoft, Vultr/DigitalOcean, Cartesia, Gen AI.
+2. **Adjuster**: disaster-claims agent that buys its own evidence. NWS/USGS/FIRMS alert → agent purchases a satellite image of the address via x402 (SkyFi-style API; Sentinel free for demo), verifies damage with a vision model, pays the claim in USDC/Nessie, logs and defends every decision, spend cap per hour. → Hyphenate, Coinbase Payment Agents (agent that pays for a resource), SpaceXAI (space data), Solana/Nessie, Bright Data, Anthropic, Microsoft.
+3. **Overwatch**: one live 3D map of everything moving around SF right now: planes (ADS-B), ships (AIS), buses (GTFS-rt), bikes (GBFS), satellites overhead (TLE), fires, quakes, Waze incidents; ask it anything; servo pointer aims at the nearest plane/ISS; Pi wall display. → Convex/SpacetimeDB, SpaceXAI, Bright Data, Gen AI, Hardware-lite. Startup story weak; demo strong.
+4. **Corridor**: traffic early warning for a street: HC-SR04 + LDR nodes count vehicles and speed; Waze/511 feeds; predicts the jam 20 min out; city dashboard; on-chain congestion-credit payments (stretch). → Hardware, Planet-First, Tiger Data, Convex, Solana (weak).
+5. **FindMe**: opt-in "God's Eye" for lost kids at events: parents register a BLE tag/phone; ESP32 sniffers triangulate; last-seen on the 3D map; privacy by design. → Hardware, People-First, SpacetimeDB, Armadin (security/privacy).
+6. **Debris Market**: on-chain bounty market where operators post debris-removal or conjunction-avoidance payments and agents bid, with CelesTrak data as the oracle. → SpaceXAI, Solana, Hyphenate (stretch). Abstract.
+7. **Scan & Audit** (3D version of the bill idea): phone scan of a room → inventory → compare to the rent/insurance/repair invoice; flags charges for things that aren't there. → Hyphenate, Bright Data, Anthropic. Niche.
+8. **Night Sky Pay**: satellite-pass photo bounties: app predicts a pass, you photograph the streak, verified photo earns on-chain credit; data for light-pollution science. → SpaceXAI, Solana, People-First. Cute, thin.
+Finalists so far: Lot (pill tester), Bill (price-transparency bill auditor), Palace Eye, Adjuster.
