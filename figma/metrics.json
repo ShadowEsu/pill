@@ -3,8 +3,8 @@
   "perSlideMin": 20,
   "perShotMin": 1,
   "perTokenMin": 1,
-  "screens": 360,
-  "appShots": 252,
+  "screens": 363,
+  "appShots": 255,
   "siteShots": 108,
   "tokenCount": 43,
   "drift": {
@@ -13,17 +13,17 @@
     "missing": 12,
     "siteTotal": 27
   },
-  "imagesConverted": 1,
+  "imagesConverted": 3,
   "realFigmaSec": null,
   "buildCold": 38.1,
   "pluginStubMs": {
-    "slides": 33,
-    "figma": 30,
-    "figjam": 2
+    "slides": 16,
+    "figma": 59,
+    "figjam": 3
   },
-  "buildSec": 1.2,
-  "at": "2026-10-24T19:03:08.139Z",
-  "deckBytes": 8112697,
+  "buildSec": 2.3,
+  "at": "2026-10-24T19:19:40.604Z",
+  "deckBytes": 8143085,
   "stageWords": [
     {
       "stage": "Ideation",
@@ -31,7 +31,7 @@
     },
     {
       "stage": "Prototyping",
-      "words": 157
+      "words": 190
     },
     {
       "stage": "Handoff",

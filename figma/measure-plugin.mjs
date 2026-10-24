@@ -10,11 +10,27 @@ const FONTS = { Inter: ['Regular', 'Italic', 'Medium', 'Medium Italic', 'Semi Bo
 function makeStub(editorType) {
   const loaded = new Set();
   const key = (f) => `${f.family}/${f.style}`;
-  const stats = { nodes: 0, images: 0, texts: 0, vectors: 0, slides: 0, notes: 0, styles: 0, variables: 0, stickies: 0, error: null, done: null };
+  const stats = { nodes: 0, images: 0, texts: 0, vectors: 0, reactions: 0, flows: 0, slides: 0, notes: 0, styles: 0, variables: 0, stickies: 0, error: null, done: null };
   let ids = 0;
+  const byId = new Map();
   const assert = (ok, msg) => { if (!ok) throw new Error(msg); };
   class Node {
-    constructor(type) { this.type = type; this.id = `${++ids}:1`; this.children = []; this.x = 0; this.y = 0; this.width = 100; this.height = 100; this.pd = {}; this.parent = null; this.name = type; stats.nodes++; }
+    constructor(type) { this.type = type; this.id = `${++ids}:1`; this.children = []; this.x = 0; this.y = 0; this.width = 100; this.height = 100; this.pd = {}; this.parent = null; this.name = type; stats.nodes++; byId.set(this.id, this); }
+    // dynamic-page plugins must use setReactionsAsync; checks the Reaction shape and that each destination exists
+    set reactions(v) { throw new Error('node.reactions is read-only with documentAccess "dynamic-page"; use setReactionsAsync'); }
+    async setReactionsAsync(rs) {
+      for (const r of rs) {
+        assert(r.trigger && ['ON_CLICK', 'ON_HOVER', 'ON_PRESS', 'ON_DRAG', 'AFTER_TIMEOUT'].includes(r.trigger.type), 'reaction trigger');
+        assert(Array.isArray(r.actions) && r.actions.length, 'reaction actions[]');
+        for (const a of r.actions) {
+          assert(a.type === 'NODE' && ['NAVIGATE', 'OVERLAY', 'SWAP', 'SCROLL_TO', 'CHANGE_TO'].includes(a.navigation), 'NODE action navigation');
+          assert(byId.get(a.destinationId)?.type === 'FRAME', `reaction destination ${a.destinationId} is not a frame`);
+          const t = a.transition;
+          assert(!t || (['DISSOLVE', 'SMART_ANIMATE', 'SCROLL_ANIMATE'].includes(t.type) && t.easing?.type && t.duration > 0), 'reaction transition needs type, easing and duration');
+        }
+        stats.reactions++;
+      }
+    }
     appendChild(c) { if (c.parent) c.parent.children.splice(c.parent.children.indexOf(c), 1); c.parent = this; this.children.push(c); }
     remove() { if (this.parent) this.parent.children.splice(this.parent.children.indexOf(this), 1); this.parent = null; this.removed = true; }
     resize(w, h) { assert(w >= 0.01 && h >= 0.01, `${this.type}.resize(${w}, ${h})`); this.width = w; this.height = h; }
@@ -42,7 +58,16 @@ function makeStub(editorType) {
     setRangeFontName(s, e, f) { assert(loaded.has(key(f)) && e <= this._chars.length, `range font ${key(f)}`); }
     setRangeFills(s, e, f) { assert(e <= this._chars.length && Array.isArray(f), 'range fills'); }
   }
-  const page1 = new Node('PAGE'); page1.name = 'Page 1';
+  class Page extends Node {
+    constructor() { super('PAGE'); this._flows = []; }
+    get flowStartingPoints() { return this._flows; }
+    set flowStartingPoints(v) {
+      for (const f of v) assert(typeof f.name === 'string' && byId.get(f.nodeId)?.parent === this, 'flow start must name a top-level frame on this page');
+      stats.flows += v.length - this._flows.length;
+      this._flows = v;
+    }
+  }
+  const page1 = new Page(); page1.name = 'Page 1';
   const root = new Node('DOCUMENT'); root.appendChild(page1);
   const grid = [[new Node('SLIDE')]];
   const msgs = [];
@@ -72,7 +97,7 @@ function makeStub(editorType) {
       });
       return n;
     },
-    createPage() { const p = new Node('PAGE'); root.appendChild(p); return p; },
+    createPage() { const p = new Page(); root.appendChild(p); return p; },
     async setCurrentPageAsync(p) { figma.currentPage = p; },
     viewport: { scrollAndZoomIntoView() {}, slidesMode: 'single-slide' },
     async getLocalPaintStylesAsync() { return []; },

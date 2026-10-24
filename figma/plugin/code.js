@@ -1,6 +1,6 @@
 // Pill → Figma. Reads deck.json (made by figma/build-deck.mjs) and draws it in whichever editor it runs in:
 //   Figma Slides → the pitch deck (one SlideNode per slide, speaker notes)
-//   Figma Design → pages: Deck, App screens, Website, Tokens (paint styles + variables + sheet), Stage log
+//   Figma Design → pages: Deck, Prototype (clickable judge flow), App screens, Website, Tokens (paint styles + variables + sheet), Stage log
 //   FigJam       → the ideation board (sections, stickies, the final three, the decision)
 // Re-running replaces only what this plugin made earlier (nodes tagged with plugin data "pill-figma").
 'use strict';
@@ -451,15 +451,62 @@ async function stageLogPage() {
   }
   return page;
 }
+/** Prototype page: phone frames with the shipped screens as fills, wired with click-through reactions and a flow start. */
+async function prototypePage() {
+  var spec = deck.design.prototype;
+  var page = await pageNamed(spec.title);
+  say('Prototype · ' + spec.screens.length + ' screens');
+  tag(await txt(page, 0, 0, 3600, spec.title, { font: 'serif', size: 96, lh: 100 }));
+  tag(await txt(page, 0, 120, 3600, spec.note, { size: 24, color: '#4A4E55' }));
+  var fw = spec.size.w, fh = spec.size.h, gap = 140, frames = [], hotspots = [];
+  for (var i = 0; i < spec.screens.length; i++) {
+    var sc = spec.screens[i], x = i * (fw + gap), y = 300;
+    tag(await txt(page, x, y - 64, fw, String(i + 1).padStart(2, '0') + ' · ' + sc.name, { size: 20, weight: 600, lh: 130 }));
+    tag(await txt(page, x, y - 34, fw, sc.route, { font: 'mono', size: 16, color: '#7C8188', lh: 130 }));
+    var f = tag(figma.createFrame(), 'proto-' + i);
+    f.name = String(i + 1).padStart(2, '0') + ' · ' + sc.name + '  ' + sc.route;
+    f.resize(fw, fh);
+    f.cornerRadius = 44;
+    f.clipsContent = true;
+    f.fills = [imagePaint(sc.img, fw, fh, 'top')];
+    f.strokes = [solid('rgba(22,24,27,0.18)')];
+    f.strokeWeight = 1;
+    f.effects = shadow();
+    f.setSharedPluginData('pill', 'route', sc.route);
+    place(page, f, x, y);
+    // full-frame hotspot: invisible but hit-testable, so a click anywhere on the screen moves on
+    var hot = figma.createRectangle();
+    hot.name = 'hotspot → next';
+    hot.resize(fw, fh);
+    hot.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 }, opacity: 0 }];
+    place(f, hot, 0, 0);
+    frames.push(f);
+    hotspots.push(hot);
+  }
+  var wired = 0;
+  for (var k = 0; k < frames.length; k++) {
+    var dest = frames[(k + 1) % frames.length];
+    await hotspots[k].setReactionsAsync([{
+      trigger: { type: 'ON_CLICK' },
+      actions: [{ type: 'NODE', destinationId: dest.id, navigation: 'NAVIGATE', preserveScrollPosition: false,
+        transition: { type: 'SMART_ANIMATE', easing: { type: 'EASE_OUT' }, duration: 0.3 } }],
+    }]);
+    wired++;
+  }
+  if (page.type === 'PAGE') page.flowStartingPoints = [{ nodeId: frames[0].id, name: spec.flow }];
+  else warnings.push('Prototype drawn as a frame (no page available), so it has no flow starting point; add one by hand');
+  return frames.length + ' screens, ' + wired + ' links';
+}
 async function buildDesign() {
   var deckP = await deckPage();
+  var protoInfo = await prototypePage();
   await galleryPage('App screens', deck.design.appScreens);
   await galleryPage('Website', deck.design.website);
   var tokenInfo = await tokensPage();
   await stageLogPage();
   if (deckP.type === 'PAGE') await figma.setCurrentPageAsync(deckP);
   figma.viewport.scrollAndZoomIntoView(deckP.type === 'PAGE' ? deckP.children : [deckP]);
-  return 'Deck (' + deck.slides.length + ' frames), App screens, Website, Tokens (' + tokenInfo + '), Stage log';
+  return 'Deck (' + deck.slides.length + ' frames), Prototype (' + protoInfo + '), App screens, Website, Tokens (' + tokenInfo + '), Stage log';
 }
 
 // ───────── FigJam ─────────
