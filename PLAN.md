@@ -15,10 +15,10 @@ Why it matters: WHO estimates about 1 in 10 medical products in low- and middle-
 | Fri 21:00 | DripGuard (IV drip monitor) picked by 18/18 then dropped | cannot get IV sets; Preston wants bigger impact |
 | Fri 21:40 | Payout (heat early warning + parametric payouts) picked 18/18 | real precedent (SEWA $340k to 46k women); dropped: no solar panel, sensor accuracy |
 | Fri 22:00 | **Pill** (Peel-derived) beats Bill and Streets 13/16 | sensor → one honest number → money decision; matches every past winner pattern |
-| Fri 23:55 | Website: plain, fast, honest page (8 sections), not an Apple/Oura-style scroll story | 16 AI personas: 8.0 vs 3.7; "spend 2 h on the site, 6 on test data"; see `website-debate-2026-10-24.md` |
 | Fri 22:25 | Clinic mode first; Preston keeps personal mode too | 16/16 AI personas said clinic only (test destroys the tablet); Preston overrides: both modes, clinic first |
 | Fri 22:50 | Name: Pill | Preston |
 | Fri 23:00 | Discord server + bridge; two helper panes (Desk, Debate) | so the team never waits on one agent |
+| Fri 23:55 | Website: plain, fast, honest page (8 sections), not an Apple/Oura-style scroll story | 16 AI personas: 8.0 vs 3.7; "spend 2 h on the site, 6 on test data"; see `website-debate-2026-10-24.md` |
 
 ## 3. Team and roles (fill in names in Discord #plan)
 - Hardware lead: chamber, wiring, calibration runs, 3D print if the booth has a printer.
