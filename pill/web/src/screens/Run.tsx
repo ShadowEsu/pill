@@ -159,7 +159,6 @@ export default function Run() {
             {moment && !run.evaluation
               ? <p className="cn-moment" aria-live="polite"><Words text={MOMENT} step={90} /></p>
               : <p style={{ fontSize: personal ? 19 : 16, color: 'var(--ink-2)', textAlign: 'center', maxWidth: 420, minHeight: '2.9em' }} aria-live="polite">{statusLine}</p>}
-            {moment && !run.evaluation && <p className="footnote" style={{ textAlign: 'center', maxWidth: 380 }}>{statusLine}</p>}
             <p className="mono muted" style={{ fontSize: 13 }}>{clock(t)} / 3:00{ref ? ` · ${pctNow} % of reference` : ''}</p>
           </section>
           <section className="card stack cn-phases" style={{ gap: 6 }}>
