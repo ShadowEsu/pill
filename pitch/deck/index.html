@@ -33,16 +33,20 @@
   .row { display: flex; gap: 40px; }
   .grow { flex: 1; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 28px; padding: 40px 44px; }
-  .chip { display: inline-flex; align-items: center; gap: 10px; font: 600 20px var(--mono); letter-spacing: .08em; padding: 8px 16px; border-radius: 999px; border: 1.5px solid currentColor; }
-  .chip .dot { width: 10px; height: 10px; border-radius: 50%; background: currentColor; }
+  .chip { display: inline-flex; align-items: center; gap: 10px; font: 600 20px var(--mono); letter-spacing: .08em; padding: 8px 16px; border-radius: 999px; color: var(--ink); border: 1.5px solid var(--tone, #C5CBCA); background: var(--tint, #FFFFFF); }
+  .chip .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--tone, #9AA1A8); }
   .v { font-family: var(--serif); font-weight: 600; letter-spacing: -.01em; }
-  .pass { color: #2F9E67; } .needs { color: #B8741C; } .unable { color: #6E757C; }
+  /* tone classes carry colour through lines and fills only; words stay ink */
+  .pass { --tone: var(--mint); --tint: color-mix(in srgb, var(--mint) 18%, white); color: var(--ink); }
+  .needs { --tone: var(--amber); --tint: color-mix(in srgb, var(--amber) 16%, white); color: var(--ink); }
+  .unable { --tone: #9AA1A8; --tint: #EEF0F1; color: var(--ink); }
+  .v, .verdict-big, h3.pass, h3.needs, h3.unable, h3.violet { border-left: 8px solid var(--tone); padding-left: 20px; }
   .bg-pass { background: color-mix(in srgb, var(--mint) 18%, white); border-color: color-mix(in srgb, var(--mint) 55%, white); }
   .bg-needs { background: color-mix(in srgb, var(--amber) 16%, white); border-color: color-mix(in srgb, var(--amber) 50%, white); }
   .bg-unable { background: #EEF0F1; border-color: #D3D7DA; }
   .bg-sky { background: color-mix(in srgb, var(--sky) 12%, white); border-color: color-mix(in srgb, var(--sky) 45%, white); }
   .bg-violet { background: color-mix(in srgb, var(--violet) 10%, white); border-color: color-mix(in srgb, var(--violet) 40%, white); }
-  .pending { font: 600 18px var(--mono); color: #B8741C; background: color-mix(in srgb, var(--amber) 14%, white); border-radius: 8px; padding: 2px 10px; white-space: nowrap; }
+  .pending { font: 600 18px var(--mono); color: var(--ink); background: color-mix(in srgb, var(--amber) 22%, white); border: 1.5px solid var(--amber); border-radius: 8px; padding: 2px 10px; white-space: nowrap; }
   ul.clean { list-style: none; padding: 0; margin: 0; }
   ul.clean li { padding-left: 34px; position: relative; margin-bottom: 16px; }
   ul.clean li::before { content: ""; position: absolute; left: 0; top: 18px; width: 14px; height: 14px; border-radius: 4px; background: var(--sky); }
@@ -70,16 +74,16 @@
   /* 6 three words */
   .words { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; flex: 1; }
   .words .card { display: flex; flex-direction: column; gap: 20px; }
-  .words .v { font-size: 72px; line-height: 1.02; }
+  .words .v { font-size: 62px; line-height: 1.04; }
   .rule { font: 600 22px var(--mono); color: var(--muted); }
 
   /* 7 run */
   .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 22px; }
-  .step { background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 28px 26px; min-height: 260px; }
-  .step .n { font: 700 22px var(--mono); color: var(--sky); }
+  .step { background: var(--card); border: 1px solid var(--line); border-top: 6px solid var(--sky); border-radius: 24px; padding: 28px 26px; min-height: 260px; }
+  .step .n { font: 700 22px var(--mono); color: var(--ink); }
   .step h3 { font-size: 30px; margin: 14px 0 10px; }
   .step p { font-size: 24px; line-height: 1.38; color: #3A3F45; }
-  .step.money-step .n { color: var(--violet); }
+  .step.money-step { border-top-color: var(--violet); }
 
   /* 8 app grid */
   .shots { display: grid; grid-template-columns: repeat(8, 1fr); gap: 16px; align-items: start; }
@@ -97,7 +101,8 @@
   .s-cb h2 { color: var(--ink); }
   .term { background: #15131F; color: #E7E3FF; border-radius: 24px; padding: 32px 36px; font: 400 23px/1.55 var(--mono); white-space: pre; overflow: hidden; }
   .term .c { color: #8F84B8; } .term .k { color: #B7A6FF; } .term .ok { color: var(--mint); } .term .w { color: #FFC37A; }
-  .violet { color: var(--violet); }
+  .violet { --tone: var(--violet); color: var(--ink); }
+  .eyebrow.violet { align-self: flex-start; background: color-mix(in srgb, var(--violet) 12%, white); border-left: 6px solid var(--violet); padding: 10px 18px; border-radius: 6px; }
 
   /* 11 real vs sim */
   .rvs { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; flex: 1; }
@@ -111,6 +116,7 @@
   .track b { font: 650 26px/1.2 var(--sans); display: block; margin-bottom: 8px; }
   .track span { font: 400 21px/1.35 var(--sans); color: #3A3F45; }
   .track.cond { border-style: dashed; }
+  .track.bg-violet { background: color-mix(in srgb, var(--violet) 12%, white); border-color: color-mix(in srgb, var(--violet) 45%, white); border-left: 6px solid var(--violet); }
 
   /* 14 thanks */
   .qrs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 36px; margin-top: 48px; }
@@ -156,7 +162,7 @@
         <rect x="80" y="170" width="840" height="76" fill="#4FB3FF" opacity=".12"/>
         <line x1="80" y1="170" x2="920" y2="170" stroke="#4FB3FF" stroke-dasharray="8 8" stroke-width="2"/>
         <line x1="80" y1="246" x2="920" y2="246" stroke="#4FB3FF" stroke-dasharray="8 8" stroke-width="2"/>
-        <text x="900" y="160" text-anchor="end" font-family="ui-monospace, Menlo, monospace" font-size="22" fill="#2A7FC2">reference band 0.36–0.47</text>
+        <text x="900" y="160" text-anchor="end" font-family="ui-monospace, Menlo, monospace" font-size="22" fill="#16181B">reference band 0.36–0.47</text>
         <line x1="80" y1="490" x2="920" y2="490" stroke="#16181B" stroke-width="2"/>
         <line x1="80" y1="40" x2="80" y2="490" stroke="#16181B" stroke-width="2"/>
         <text x="80" y="530" font-family="ui-monospace, Menlo, monospace" font-size="22" fill="#5B6168">0 s</text>
@@ -403,7 +409,7 @@
   <h2 style="margin-bottom:32px">One build, read from many sides.</h2>
   <div class="tracks">
     <div class="track"><b>Hyphenate</b><span>an autonomous finance agent that knows when to ask</span></div>
-    <div class="track"><b class="violet">Coinbase x402</b><span>earns and pays verdicts; escrow on testnet</span></div>
+    <div class="track bg-violet"><b>Coinbase x402</b><span>earns and pays verdicts; escrow on testnet</span></div>
     <div class="track"><b>Capital One Nessie</b><span>the fiat mirror of the same escrow</span></div>
     <div class="track"><b>Microsoft</b><span>production-minded healthcare agent</span></div>
     <div class="track"><b>Anthropic</b><span>Claude explains and logs; never decides</span></div>
