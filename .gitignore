@@ -3,3 +3,4 @@ tools/discord-bridge/.venv/
 tools/discord-bridge/bridge.log
 discord-inbox/
 .DS_Store
+tools/discord-bridge/.channels.json
