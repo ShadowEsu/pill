@@ -21,7 +21,7 @@ for line in text.splitlines(keepends=True):
     cur += line
 if cur: chunks.append(cur)
 for c in chunks:
-    req = urllib.request.Request(url, data=json.dumps({"content": c, "username": "Assay"}).encode(),
+    req = urllib.request.Request(url, data=json.dumps({"content": c, "username": "Pill"}).encode(),
                                  headers={"Content-Type": "application/json", "User-Agent": "assay-bridge/1"})
     with urllib.request.urlopen(req, timeout=20) as r:
         r.read()
