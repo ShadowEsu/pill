@@ -45,8 +45,8 @@ export function mountBinaryPill(cv, opts = {}) {
       const half = p[0] > 0;
       const a = 0.45 + lum * 0.55;
       const hi = lum > 0.82;
-      if (paper) ctx.fillStyle = hi ? `rgba(22,24,27,${0.6 + lum * 0.4})` : half ? `rgba(47,107,255,${0.5 + lum * 0.5})` : `rgba(22,24,27,${0.3 + lum * 0.55 + rim * 0.1})`;
-      else ctx.fillStyle = hi ? `rgba(230,238,255,${0.7 + lum * 0.3})` : half ? `rgba(90,140,255,${0.5 + lum * 0.5})` : `rgba(170,198,255,${0.4 + lum * 0.5 + rim * 0.1})`;
+      if (paper) ctx.fillStyle = hi ? `rgba(22,24,27,${0.6 + lum * 0.4})` : half ? `rgba(79,179,255,${0.5 + lum * 0.5})` : `rgba(95,211,154,${0.5 + lum * 0.5})`;
+      else ctx.fillStyle = hi ? `rgba(236,246,255,${0.7 + lum * 0.3})` : half ? `rgba(110,195,255,${0.5 + lum * 0.5})` : `rgba(120,225,175,${0.45 + lum * 0.5 + rim * 0.1})`;
       const bit = lum > 0.5 ? 1 : (bits[j * COLS + i] & (lum > 0.25 ? 1 : 0));
       ctx.fillText(bit ? '1' : '0', i * cw, j * ch);
     }
