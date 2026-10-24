@@ -45,6 +45,8 @@ p { margin: 0; }
 img, svg, video { display: block; max-width: 100%; }
 button { font: inherit; }
 .wrap { width: min(var(--max), 100% - 2 * var(--gutter)); margin-inline: auto; }
+.split > *, .steps > *, .step > *, .stats > *, .facts > * { min-width: 0; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .section { padding-block: var(--section); }
 .dark { background: var(--dark); color: var(--dark-text); }
 .dark .eyebrow { color: var(--dark-muted); }
@@ -202,3 +204,6 @@ table.bom td:last-child { text-align: right; font-family: var(--mono); font-size
   html { scroll-behavior: auto; }
   .btn, .btn .arrow { transition: none; }
 }
+
+.dark .list li { color: var(--dark-text); opacity: .85; }
+.dark .list li b { color: var(--dark-muted); }

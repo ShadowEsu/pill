@@ -59,3 +59,8 @@
   .station .st-dot { opacity: 1 !important; }
   .station .st-leader { stroke-dashoffset: 0 !important; }
 }
+
+/* phones: the SVG labels are too small to read; the numbered list under the figure carries them */
+@media (max-width: 700px) {
+  .st-labels { display: none; }
+}

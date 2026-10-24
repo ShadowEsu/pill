@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>dev: phone</title>
+  <link rel="stylesheet" href="/src/styles.css">
+  <style>
+    body { margin: 0; background: var(--dark); color: var(--dark-text); font-family: var(--mono); }
+    .bar { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px; }
+    .bar button { font: inherit; font-size: 12px; padding: 6px 10px; background: #1a1d21; color: inherit; border: 1px solid var(--dark-line); border-radius: 6px; cursor: pointer; }
+    .stage { display: flex; gap: 48px; align-items: flex-start; padding: 40px 60px 60px; }
+    #phone { width: 390px; }
+    #phone-sm { width: 220px; }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <button data-s="scan">scan</button>
+    <button data-s="pass">pass</button>
+    <button data-s="needslab">needslab</button>
+    <button data-s="unable">unable</button>
+    <button data-s="delivery">delivery</button>
+    <button id="play">play()</button>
+    <button id="pause">pause()</button>
+  </div>
+  <div class="stage">
+    <div id="shot" style="padding:56px"><div id="phone"></div></div>
+    <div id="phone-sm"></div>
+  </div>
+  <script type="module">
+    import { mountPhone } from '/src/phone.js';
+    const big = mountPhone(document.getElementById('phone'));
+    const small = mountPhone(document.getElementById('phone-sm'), { state: 'scan', autoplay: true });
+    window.phone = big;
+    window.phoneSmall = small;
+    document.querySelectorAll('[data-s]').forEach((b) => b.addEventListener('click', () => big.setState(b.dataset.s)));
+    document.getElementById('play').onclick = () => big.play();
+    document.getElementById('pause').onclick = () => big.pause();
+  </script>
+</body>
+</html>
