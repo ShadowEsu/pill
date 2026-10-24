@@ -1,0 +1,61 @@
+/* Pill station blueprint — expects a dark parent (var(--dark)). */
+.station {
+  position: relative;
+  width: 100%;
+  color: var(--dark-text, #E9E7E2);
+}
+.station svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.station path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* parts */
+.station .p,
+.station .pf {
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 1.25;
+}
+.station .pf { fill: var(--dark, #0B0C0E); }
+.station .w { stroke: rgba(255, 255, 255, 0.35); stroke-width: 1; }
+/* construction / guide lines */
+.station .g {
+  stroke: rgba(255, 255, 255, 0.22);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+/* the only colour: the blue LED, its beam, and the PASS dot */
+.station .b,
+.station .bf { stroke: var(--blue, #2F6BFF); stroke-width: 1.25; }
+.station .bf { fill: var(--dark, #0B0C0E); }
+.station .bb { stroke: var(--blue, #2F6BFF); stroke-width: 1.25; stroke-dasharray: 4 3; }
+.station .ok { fill: var(--pass, #1B8A5A); stroke: none; }
+
+/* labels */
+.station .st-leader {
+  stroke: rgba(255, 255, 255, 0.4);
+  stroke-width: 1;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.station .st-dot { fill: var(--dark-text, #E9E7E2); }
+.station text {
+  font-family: var(--mono, "JetBrains Mono", ui-monospace, monospace);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  fill: var(--dark-muted, #8B9097);
+}
+.station .st-title { fill: var(--dark-text, #E9E7E2); }
+.station .st-no { fill: var(--dark-muted, #8B9097); }
+
+/* reduced motion: static exploded state, labels visible */
+@media (prefers-reduced-motion: reduce) {
+  .station text,
+  .station .st-dot { opacity: 1 !important; }
+  .station .st-leader { stroke-dashoffset: 0 !important; }
+}

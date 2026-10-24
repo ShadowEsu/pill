@@ -1,5 +1,8 @@
 import { animate, stagger, onScroll, createTimeline, utils } from 'animejs';
 import { artFor } from './art.js';
+import { mountStation, autoDemo, partFigures } from './station.js';
+import { mountPhone } from './phone.js';
+import './station.css';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (reduced) document.documentElement.classList.add('reduced');
@@ -71,32 +74,31 @@ document.querySelectorAll('.art-slot[data-art], .fig .art[data-part]').forEach((
   const svg = artFor(key);
   if (svg) slot.innerHTML = svg;
 });
-// part figures from the station module replace the placeholders when the module exists
-const stationPath = '/src/station.js';
-import(/* @vite-ignore */ stationPath).then((m) => {
-  if (m.partFigures) {
-    document.querySelectorAll('.fig .art[data-part]').forEach((slot) => {
-      const svg = m.partFigures[slot.dataset.part];
-      if (svg) slot.innerHTML = svg;
-    });
-  }
+// part figures from the station module replace the placeholders
+document.querySelectorAll('.fig .art[data-part]').forEach((slot) => {
+  const svg = partFigures[slot.dataset.part];
+  if (svg) slot.innerHTML = svg;
+});
+{
   const mount = document.getElementById('station-mount');
-  if (mount && m.mountStation) {
-    const station = m.mountStation(mount);
-    if (reduced) { station.setProgress(1); return; }
-    // scroll-driven explode: progress 0 -> 1 while the stage scrolls through the viewport
-    const stage = document.getElementById('station');
-    onScroll({
-      target: stage,
-      enter: 'bottom top+=10%',
-      leave: 'top bottom-=90%',
-      sync: 0.3,
-      onUpdate: (o) => station.setProgress(utils.clamp(o.progress, 0, 1)),
-    });
-    // idle sway so it reads as 3D even before scrolling
-    if (m.autoDemo && location.hash === '#demo-station') m.autoDemo(station);
+  if (mount) {
+    const station = mountStation(mount);
+    if (reduced) { station.setProgress(1); }
+    else {
+      // scroll-driven explode: progress 0 -> 1 while the stage scrolls through the viewport
+      const stage = document.getElementById('station');
+      let driven = false;
+      const stopDemo = autoDemo(station);
+      onScroll({
+        target: stage,
+        enter: 'bottom top+=10%',
+        leave: 'top bottom-=90%',
+        sync: 0.3,
+        onUpdate: (o) => { if (!driven) { driven = true; stopDemo(); } station.setProgress(utils.clamp(o.progress, 0, 1)); },
+      });
+    }
   }
-}).catch((e) => console.warn('station module not ready', e.message));
+}
 
 /* ---------- draw-in for the blueprint strokes in paper sections ---------- */
 if (!reduced) {
@@ -113,15 +115,14 @@ if (!reduced) {
     });
   });
 }
-const phonePath = '/src/phone.js';
-import(/* @vite-ignore */ phonePath).then((m) => {
 /* ---------- phone mock ---------- */
+{
   const mount = document.getElementById('phone-mount');
-  if (mount && m.mountPhone) {
-    const phone = m.mountPhone(mount);
+  if (mount) {
+    const phone = mountPhone(mount);
     if (reduced) phone.setState('pass'); else phone.play();
   }
-}).catch((e) => console.warn('phone module not ready', e.message));
+}
 
 /* ---------- results chart (illustration until the real CSV lands) ---------- */
 {

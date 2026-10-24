@@ -15,8 +15,8 @@ const art = {
     </g>
     <g ${S} data-draw><rect x="290" y="110" width="70" height="120" rx="8"/><rect x="302" y="130" width="46" height="60" rx="3"/><circle cx="325" cy="206" r="6"/></g>
     <g ${S} data-draw><path d="M258 170 h32"/><path d="M284 164 l6 6 l-6 6"/></g>
-    <text x="300" y="118" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">lot · drug · maker</text>
-    <text x="302" y="248" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">no record for this lot</text>
+    <text x="362" y="100" text-anchor="end" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">lot · drug · maker</text>
+    <text x="362" y="250" text-anchor="end" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">no record for this lot</text>
   `, 'A pill bottle photographed by a phone; the label fields are read and the lot is checked'),
 
   blank: wrap(`
