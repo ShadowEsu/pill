@@ -1,0 +1,420 @@
+{
+ "product": {
+  "elderly_user": {
+   "user_choice": "A_clinic_gate",
+   "why": "I take nine pills. Your box verifies exactly one: a vitamin B2 I don't take. Every bottle in my cabinet would say 'unable to verify'. And it can't tell me if I took the evening pills, because it destroys the tablet it tests. Don't sell me that as an elder kit. A pharmacist checking one tablet from a delivery is the only person this honestly helps. Build that, and stop pretending otherwise.",
+   "must_have_features": [
+    "F1",
+    "F2",
+    "F3",
+    "F7",
+    "F11",
+    "F12"
+   ],
+   "cut_features": [
+    "F4",
+    "F5",
+    "F6",
+    "F8",
+    "F9",
+    "F10",
+    "F13",
+    "F14"
+   ],
+   "scan_screen_spec": "Bar means: percent of the expected B2 absorbance plateau reached, nothing else; label it so. Readings: blue-light transmission, 90\u00b0 scatter, water temperature, a green/red dot for each sensor. Verdict in letters I can read across a room: PASS (green), NEEDS LAB (yellow), UNABLE TO VERIFY (grey), with one line why, e.g. 'absorbance plateau 12% of reference'.",
+   "demo_script_90s": "'A shipment arrives. Pharmacist photographs the bottle: drug, lot, recall check, clear. Drops one tablet in. Bar climbs, curve rises, plateau hits 100%, PASS. Escrow releases supplier payment, log shows why.' Second bottle: Tums. Curve stays flat, scatter spikes: NEEDS LAB. Payment held, report exported. Third: random aspirin. UNABLE TO VERIFY, no money moves. 'It only claims what it measured.' Done.",
+   "one_line_pitch": "One tablet, one cuvette, one honest verdict, and the supplier doesn't get paid until it passes.",
+   "biggest_risk": "That you can't resist Preston's 'track all my pills' list and spend twelve hours on reminders nobody asked for, then the dissolution bar stalls at 60% at the judges' table because the paddle motor wobbles. Nail the one measurement first. Run it twenty times tonight."
+  },
+  "caregiver_daughter": {
+   "user_choice": "A_clinic_gate",
+   "why": "I manage 11 scripts for my mother. Your box verifies one vitamin and says 'unable to verify' for the other ten. That's useless on her kitchen counter, and I will not install a thirteenth reminder app; Medisafe already nags me and I hate it. A pharmacist sampling one tablet per delivery is the only person for whom destroying a tablet makes sense. Build for them. Don't bolt eldercare on to look 'overall really good'.",
+   "must_have_features": [
+    "F1",
+    "F2",
+    "F3",
+    "F7",
+    "F11",
+    "F12"
+   ],
+   "cut_features": [
+    "F4",
+    "F5",
+    "F6",
+    "F8",
+    "F9",
+    "F10",
+    "F13",
+    "F14"
+   ],
+   "scan_screen_spec": "Bar = percent of the B2 reference dissolution plateau reached, measured by 445 nm absorbance (blue LED, 0\u00b0 photoresistor) against the stored curve, stops at 100% or at timeout. Readings: live absorbance line vs reference band, scatter level, water temperature, 'sensors OK' dots. Result: one big word \u2014 PASS (green), NEEDS LAB (red), UNABLE TO VERIFY (grey) \u2014 with one line of why.",
+   "demo_script_90s": "Delivery arrives. Pharmacist photographs the bottle: drug, lot, maker, recall check, clean. Drops one tablet in, presses start. Bar climbs, curve tracks the reference band, 100%, PASS, payment released, PDF logged. Now the Tums: cloudy, no 445 nm absorption, bar stalls, NEEDS LAB, escrow held, report filed. Third, an unknown pill: UNABLE TO VERIFY, escalated. Three honest answers, one button, 90 seconds, no tablets wasted on patients.",
+   "one_line_pitch": "LOT: dissolve one tablet from each delivery, and the supplier only gets paid when the physics says it's real.",
+   "biggest_risk": "One reference drug. Judges will ask 'what about amoxicillin?' and the honest answer is 'unable to verify'. If you fudge that at the table, you're worse than the pharmacy error I caught. Second: the Tums fails on cloudiness, not chemistry; a clear fake with no colour would also just read 'unable', not 'fail'. Say so before they find it."
+  },
+  "geriatric_pharmacist": {
+   "user_choice": "A_clinic_gate",
+   "why": "The test destroys the tablet. That makes it a lot-acceptance instrument, not a daily-dose tool. Bolting a reminder app onto it is the Medisafe trap: my patients abandon reminders in six weeks, and nobody needs a cardboard box to do it badly. One sampled tablet releasing or withholding a supplier's payment is exactly how pharmacopeial sampling works. Tell Preston 'overall really good' means one thing done honestly, not seven done half.",
+   "must_have_features": [
+    "F1",
+    "F2",
+    "F3",
+    "F7",
+    "F11",
+    "F13"
+   ],
+   "cut_features": [
+    "F4",
+    "F5",
+    "F6",
+    "F8",
+    "F9",
+    "F10",
+    "F12",
+    "F14"
+   ],
+   "scan_screen_spec": "Bar = percent of the expected riboflavin absorbance plateau reached at 445 nm, time-normalised against the calibrated B2 reference; it stalls visibly if the tablet is not dissolving. Readings: live transmission/scatter curve, water temperature, LED/sensor health, elapsed seconds. Verdict: full-screen green PASS, amber NEEDS LAB, grey UNABLE TO VERIFY, each with one sentence of 'why'. No red 'fake' claim.",
+   "demo_script_90s": "\"Pharmacist receives 2,000 bottles of riboflavin. She can't trust the label.\" Photograph bottle: drug, lot, manufacturer, recall check, cached. Drop one tablet, press START. Bar climbs, curve rises, temperature steady. PASS with reason; agent releases escrow, logs decision. Second run: Tums. Curve flat, scatter high. NEEDS LAB; payment held, report drafted. Third: unknown pill. UNABLE TO VERIFY, escalated, no payment. \"Peel's chemistry, our decision gate. Every verdict says why.\"",
+   "one_line_pitch": "LOT: a $30 dissolution gate that tests one tablet from each delivery and decides whether the supplier gets paid.",
+   "biggest_risk": "One calibrated reference. If the B2 run drifts at the judges' table because water temperature or ambient light shifts, your bar never hits 100% and the whole story collapses. Calibrate on-site, run it ten times tonight, and show the sensor-health panel so a bad run reads as 'instrument' not 'fraud'."
+  },
+  "home_health_nurse": {
+   "user_choice": "A_clinic_gate",
+   "why": "I sit at kitchen tables with 30-count bottles. Nobody there will burn a pill to test it, and your box says 'unable to verify' on everything but B2. That's useless to Mrs. Alvarez and she has a $12 organizer already. A pharmacist sampling one tablet from a delivery of 10,000 is the only person the destroy-one physics fits. Reminders are a crowded, solved market; a gate that holds payment is not.",
+   "must_have_features": [
+    "F1",
+    "F2",
+    "F3",
+    "F7",
+    "F11",
+    "F13"
+   ],
+   "cut_features": [
+    "F4",
+    "F5",
+    "F6",
+    "F8",
+    "F9",
+    "F10",
+    "F12",
+    "F14"
+   ],
+   "scan_screen_spec": "Bar = percent of expected riboflavin dissolution plateau reached (blue 445nm transmission drop vs. reference curve). Shown live: absorbance line vs. dotted reference, scatter at 90\u00b0, water temperature, 'LEDs/sensors OK'. End: full-screen green PASS, amber NEEDS LAB, grey UNABLE TO VERIFY, with one sentence why. No percentages of 'realness'. Tums shows cloudy-scatter, no blue absorbance: NEEDS LAB.",
+   "demo_script_90s": "\"A delivery arrives. Pharmacist photographs the bottle\u2014drug, lot, maker, recall check, 3 seconds. Drops one tablet in the box, presses start.\" Bar fills, curve tracks reference. \"PASS. Claude explains why in plain words. Agent releases supplier payment in Nessie.\" Now Tums. \"Cloudy, no absorbance. NEEDS LAB. Payment held, report filed.\" Ibuprofen: \"Unable to verify\u2014we don't fake it.\" Done in 90.",
+   "one_line_pitch": "LOT: a $30 box that tests one tablet per delivery and won't pay the supplier until the chemistry says yes.",
+   "biggest_risk": "The riboflavin run doesn't hit plateau in under 90 seconds on the table\u2014slow dissolution, cold water, paddle stalls\u2014and the judges watch a bar crawl to 60% while you stall. Bench-time the curve tonight; set the bar on the plateau you actually get, not the one you want."
+  },
+  "kenya_clinic_pharmacist": {
+   "user_choice": "A_clinic_gate",
+   "why": "I am the user. I sample one tablet per lot before releasing payment; that is exactly what a destructive test fits. Elder reminders are a different product in a crowded market, and nobody swallows a dissolved pill. Hold the supplier's money until the lot passes; that is where fakes get stopped. Preston's scan screen and verdict survive; his pill-tracking does not.",
+   "must_have_features": [
+    "F1",
+    "F2",
+    "F3",
+    "F7",
+    "F11",
+    "F12"
+   ],
+   "cut_features": [
+    "F4",
+    "F5",
+    "F6",
+    "F8",
+    "F9",
+    "F10",
+    "F13",
+    "F14"
+   ],
+   "scan_screen_spec": "Bar = percent of the B2 reference 445 nm absorbance plateau reached, blank-corrected. Readings: blue transmission, 90\u00b0 scatter, temperature, elapsed seconds, sensor health green/red. Verdict after plateau or timeout: large PASS (green), NEEDS LAB (amber), UNABLE TO VERIFY (grey), with one line why, e.g. 'no 445 nm absorbance, high scatter: not riboflavin'.",
+   "demo_script_90s": "Delivery arrives. Photo the bottle: drug, lot, manufacturer, no recall. Blank the box, drop one tablet, start. Bar climbs as blue absorbance rises; plateau at 100%, PASS. Agent releases supplier payment in Nessie, logs the decision. Second bottle: Tums. Scatter high, zero blue absorbance. FAIL, payment held, PDF report generated with lot number. Third, an unknown tablet: UNABLE TO VERIFY, escalated. Done in ninety seconds, offline.",
+   "one_line_pitch": "LOT dissolves one tablet from each delivery and only pays the supplier if the chemistry matches.",
+   "biggest_risk": "One calibrated reference. A judge asks 'what about artemether?' and the honest answer is 'unable to verify'. Say it first, show the Tums fail clearly, and don't let the escrow demo depend on weak Wi-Fi: cache the Nessie call or demo it last."
+  },
+  "ngo_procurement_officer": {
+   "user_choice": "A_clinic_gate",
+   "why": "I sign supplier payments and get audited. One destroyed tablet per lot is exactly how a receiving check works; it makes no sense in a kitchen. B is Medisafe with a cardboard box, and reminders have nothing to do with riboflavin absorbance. Pick A: the destructive test, the escrow, the audit log and the lot map all fit one user and one story. C in 34 hours means two half-built apps.",
+   "must_have_features": [
+    "F1",
+    "F2",
+    "F3",
+    "F7",
+    "F12",
+    "F13"
+   ],
+   "cut_features": [
+    "F4",
+    "F5",
+    "F6",
+    "F8",
+    "F9",
+    "F10",
+    "F14"
+   ],
+   "scan_screen_spec": "Bar = percent of the reference B2 dissolution plateau reached (blue 445nm absorbance vs white baseline), with a hard timeout. Live: absorbance curve against the stored B2 band, scatter reading, water temperature, LED/sensor health green or red. Result: one full-width card. Green PASS: matches B2 reference. Red FAIL: outside band, cloudy. Grey UNABLE TO VERIFY: no reference. Each shows the two numbers that decided it.",
+   "demo_script_90s": "\"A pharmacist receives 500 bottles of B2. She photographs one bottle: drug, lot, manufacturer, recall check, clear. She drops one tablet in. Bar fills as it dissolves; curve tracks the reference band. PASS. Agent releases the supplier payment in Nessie, under the spend cap, logs why. Now this chalk tablet. Cloudy, no colour. FAIL. Payment held, PDF report generated, Claude explains the next step. Unknown pill? It says unable to verify. We don't guess.\"",
+   "one_line_pitch": "LOT: a $30 receiving-dock pill verifier that tests one tablet per delivery and only releases the supplier's payment when the chemistry passes.",
+   "biggest_risk": "Dissolution noise on weak hardware: the B2 plateau drifts with temperature and stirring, so a live demo tablet reads 'unable to verify' in front of judges. Fix: 20+ calibration runs tonight, wide band, and a recorded fallback run. Second risk: judges see one calibrated drug and call it a toy; say so first."
+  },
+  "ux_design_judge": {
+   "user_choice": "A_clinic_gate",
+   "why": "One tablet per lot is exactly what a procurement gate does; B contradicts your own physics\u2014you can't verify what grandma swallows, so the tracker becomes a second product bolted on. B is Medisafe with a cardboard box; judges have seen it twice. A gives one job per screen: sample, verdict, money moves. C is how teams ship nothing.",
+   "must_have_features": [
+    "F1",
+    "F2",
+    "F3",
+    "F7",
+    "F11",
+    "F13"
+   ],
+   "cut_features": [
+    "F4",
+    "F5",
+    "F6",
+    "F8",
+    "F9",
+    "F10",
+    "F12",
+    "F14"
+   ],
+   "scan_screen_spec": "Bar = % of expected 445nm absorbance plateau reached for B2, labelled 'dissolving... 62%'. Below: live absorbance curve, scatter reading, temperature, four sensor-health dots. Three end states only: green PASS with plateau value vs. expected; amber NEEDS LAB with the deviation; grey UNABLE TO VERIFY ('no reference for this drug'). Each has a one-line 'why'. Design the empty state and the sensor-fault state before the happy path.",
+   "demo_script_90s": "Delivery arrives. Pharmacist photographs the bottle: drug, lot, recall check\u2014clear. Drops one B2 tablet in the box, taps Start. Bar fills, curve rises, plateau matches reference: PASS. Agent releases $200 escrow in Nessie, logs the decision. Second run: Tums. Curve goes flat and cloudy: NEEDS LAB. Payment held, report drafted, Claude explains in plain words what to do. Unknown pill: UNABLE TO VERIFY. We don't guess.",
+   "one_line_pitch": "LOT: dissolve one tablet from a delivery, get pass / lab / unknown, and the supplier only gets paid if it passes.",
+   "biggest_risk": "The live scan takes longer than the table demo allows, or the bar stalls at 70% and you have no designed state for 'inconclusive'. Time the dissolution tonight; if it's over 90 seconds, pre-record one run and show the states, don't fake live."
+  },
+  "anthropic_judge": {
+   "user_choice": "A_clinic_gate",
+   "why": "The physics decides it. One destroyed tablet per lot is exactly how procurement sampling works and exactly how nobody takes their daily meds. Preston's tracker wants the box to be a pillbox; it's a spectrometer. B is Medisafe plus a dark box, in a field judges already saw win twice. A gives one user, one job, one agent with real money consequences. 34 hours, weak Wi-Fi: pick the thing you can finish.",
+   "must_have_features": [
+    "F1",
+    "F2",
+    "F3",
+    "F7",
+    "F11",
+    "F13"
+   ],
+   "cut_features": [
+    "F4",
+    "F5",
+    "F6",
+    "F8",
+    "F9",
+    "F10",
+    "F12",
+    "F13",
+    "F14"
+   ],
+   "scan_screen_spec": "Bar = percent of expected 445 nm absorbance plateau reached (B2 reference curve); it stalls, not fills, for a Tums. Readings: live transmission/scatter absorbance line, water temp, LED/sensor health green dots, elapsed seconds. End card: big PASS (green), NEEDS LAB (amber), UNABLE TO VERIFY (grey) with one 'why' sentence and the number that decided it.",
+   "demo_script_90s": "\"A clinic gets 10,000 tablets. One gets tested; the rest get paid for.\" Photo the bottle: drug, lot, no recall. Drop a B2 tablet, press Start. Bar climbs on the live curve, hits plateau, PASS, Claude explains the number. Agent releases supplier escrow in Nessie, logs the decision. Now a Tums: curve flat, bar stalls, NEEDS LAB, payment held, report drafted. Unknown pill: UNABLE TO VERIFY. \"It never guesses, it never pays blind.\"",
+   "one_line_pitch": "LOT is a $30 lab-in-a-box that tests one tablet per delivery and only releases the supplier's money when the chemistry says it's real.",
+   "biggest_risk": "The B2 reference curve drifts with water temperature and LED warmup, so the live demo PASS fails at the table. Calibrate three fresh runs Saturday night, bake in a temperature tolerance, and keep a recorded run as fallback. Second risk: Preston keeps pulling toward the pill tracker; cut it Monday, not Sunday."
+  },
+  "hardware_judge": {
+   "user_choice": "A_clinic_gate",
+   "why": "The test destroys the tablet. That is a sampling instrument, not a daily companion. One tablet per delivery, a pass/fail that moves money: physics and workflow match. Option B bolts a tilt switch and reminders onto a medication tracker Medisafe already does; the optics become decoration. Option C with 34 hours and weak Wi-Fi ships two half-things. Pick the user whose job actually needs the sensor.",
+   "must_have_features": [
+    "F1",
+    "F2",
+    "F3",
+    "F7",
+    "F11",
+    "F13"
+   ],
+   "cut_features": [
+    "F4",
+    "F5",
+    "F6",
+    "F8",
+    "F9",
+    "F10",
+    "F12",
+    "F14"
+   ],
+   "scan_screen_spec": "Bar = fraction of B2's expected 445 nm absorbance plateau reached, from the blank baseline, time-capped at 90 s. Live readings: blue-channel transmission and 90\u00b0 scatter in raw ADC counts, thermistor \u00b0C, paddle on/off, blank drift. Result: full-screen green PASS with plateau value vs reference band; amber NEEDS LAB with the reason (scatter high, no absorbance); grey UNABLE TO VERIFY for unknown drugs. No percentages pretending to be purity.",
+   "demo_script_90s": "Delivery arrives. Photograph the bottle: drug, lot, manufacturer, recall check, cached offline. Blank the box, drop one B2 tablet, start. Watch the bar climb as 445 nm absorbance rises, temperature and scatter beside it. PASS, inside the reference band. Agent releases escrow, logs the decision. Now a Tums: scatter spikes, no absorbance, NEEDS LAB. Payment held, report drafted. Ibuprofen: UNABLE TO VERIFY. We only claim what we can measure.",
+   "one_line_pitch": "A $40 dissolution gate that tests one tablet per delivery and only pays the supplier when the optics agree.",
+   "biggest_risk": "Photoresistor drift and ambient leak into the cardboard box make the B2 plateau wander between runs, so the PASS band is either too wide to catch anything or fails your own reference live at the table. Blank before every run, show the baseline, and rehearse ten times under the venue lights."
+  },
+  "hyphenate_judge": {
+   "user_choice": "A_clinic_gate",
+   "why": "One destroyed tablet per lot is exactly how procurement sampling already works, so the physics matches the user. Household pill-tracking is Medisafe with a cardboard box and a judge will say so. A gate that moves money on a verdict is the finance-agent story I score: limited access, clean log, knows when to stop. Preston gets his live scan and yes/no; he does not get a reminder app in 34 hours.",
+   "must_have_features": [
+    "F1",
+    "F2",
+    "F7",
+    "F3",
+    "F11",
+    "F13"
+   ],
+   "cut_features": [
+    "F4",
+    "F5",
+    "F6",
+    "F8",
+    "F9",
+    "F10",
+    "F12",
+    "F14"
+   ],
+   "scan_screen_spec": "Bar = percent of the B2 reference's dissolution plateau reached, derived from 445 nm transmission ratio over time; stalls honestly if the curve never flattens. Readings: live absorbance curve (blue/white ratio), scatter at 90\u00b0, temperature, sensor health green/red. Verdict: big green PASS, amber NEEDS LAB, grey UNABLE TO VERIFY, one-sentence why underneath. Never a red 'fake'.",
+   "demo_script_90s": "\"Delivery of 5,000 B2 tablets arrived. Pharmacist photographs the bottle; lot and recall check come back clean. Drops one tablet in, presses start.\" Bar fills, curve rises, plateaus at 100%. \"PASS. Agent releases the escrow, $1,200, under its cap, logged here.\" Second run with Tums: cloudy, no 445 nm absorbance. \"NEEDS LAB. Payment held, report drafted, nothing paid.\" Third: unknown pill. \"UNABLE TO VERIFY. It asks a human. That's the point.\"",
+   "one_line_pitch": "LOT: a $40 box that tests one tablet from a delivery and only pays the supplier if the chemistry checks out.",
+   "biggest_risk": "The plateau on the real B2 tablet is noisy or slow at the table, the bar sits at 70%, and the whole demo becomes 'trust us'. Run twenty dissolutions tonight, fix the time window, and record a fallback video. Second risk: the Nessie call fails on weak Wi-Fi, so cache the escrow state locally and sync later."
+  },
+  "people_first_judge": {
+   "user_choice": "A_clinic_gate",
+   "why": "Your own physics decides it. A destructive one-tablet-per-lot test is a lot-acceptance test. That is what a pharmacist receiving a delivery does; it is not what a grandmother does with the pill in her hand. Bolting a reminder app onto it hides the science behind a Medisafe clone in a crowded field. Falsified medicines are a supply-chain problem. Stand at the gate where the lot enters. Don't try C; 34 hours and weak Wi-Fi.",
+   "must_have_features": [
+    "F1",
+    "F2",
+    "F3",
+    "F7",
+    "F11",
+    "F12"
+   ],
+   "cut_features": [
+    "F4",
+    "F5",
+    "F6",
+    "F8",
+    "F9",
+    "F10",
+    "F13",
+    "F14"
+   ],
+   "scan_screen_spec": "Bar = percent of the B2 reference's expected 445 nm absorbance plateau reached, time-normalized, capped at the reference window. Readings: live absorbance curve (blue transmission), 90\u00b0 scatter, water temperature, LED/sensor self-check, elapsed seconds. Verdict: full-width PASS (green), NEEDS LAB (amber), UNABLE TO VERIFY (grey), with one sentence of why and the reference curve overlaid. No red 'fake'. Ever.",
+   "demo_script_90s": "\"A clinic gets a delivery. The pharmacist photographs the bottle: drug, lot, maker, recall check, offline. Drops one tablet in. Watch the bar: that's dissolution against our riboflavin reference. Plateau. PASS. Escrow releases the supplier's payment, logged. Now Tums, same bottle label. Curve flat, scatter high. NEEDS LAB. Payment held, report generated. Unknown pill? UNABLE TO VERIFY, honestly. One tablet per lot, before the lot reaches a patient.\"",
+   "one_line_pitch": "LOT: a $40 box that tests one tablet from every delivery and holds the supplier's money until the chemistry agrees.",
+   "biggest_risk": "A judge drops a random pill in and you say 'unable to verify' three times in five minutes. One calibrated reference is honest, but it looks like nothing works. Mitigate: rehearse the three-pill sequence exactly, pre-stage water temperature, and say the limitation before they ask. Second risk: the escrow agent releasing money on an 'unsure' because someone shortcut the state machine at hour 30."
+  },
+  "microsoft_judge": {
+   "user_choice": "A_clinic_gate",
+   "why": "The physics decides it. Destroying one tablet per lot is exactly what a procurement pharmacist already does; it is nothing a grandmother does daily. B bolts a reminder app onto an instrument that cannot verify the pill she swallows, in a market Medisafe owns. C is two products in 34 hours. A has a buyer, a workflow, a money consequence, and an honest sample-size story. I can see who signs the PO.",
+   "must_have_features": [
+    "F1",
+    "F2",
+    "F3",
+    "F7",
+    "F11",
+    "F12"
+   ],
+   "cut_features": [
+    "F4",
+    "F5",
+    "F6",
+    "F8",
+    "F9",
+    "F10",
+    "F13",
+    "F14"
+   ],
+   "scan_screen_spec": "Bar = percent of the riboflavin reference's expected 445 nm absorbance plateau reached, time-normalised; 100% means plateau hit within tolerance. Readings: blue transmission, 90\u00b0 scatter, temperature, LED/photoresistor health, elapsed seconds. Verdict is one full-screen card: green PASS, amber NEEDS LAB, grey UNABLE TO VERIFY, each with one sentence of why. Never a red 'fake'.",
+   "demo_script_90s": "Delivery of 10,000 B2 tablets arrives at a clinic. Pharmacist photographs the bottle: drug, lot, manufacturer, recall check cached. Drops one tablet, hits start. Bar fills, curve rises, plateau at 100%: PASS. Escrow agent releases supplier payment, logs the decision, prints the PDF. Second run: Tums. Curve flat, scatter high: NEEDS LAB. Payment held, report filed. Third: unknown pill. UNABLE TO VERIFY. We say so. That honesty is the product.",
+   "one_line_pitch": "LOT is a $30 lot-acceptance gate: one sacrificed tablet decides whether a supplier gets paid.",
+   "biggest_risk": "One calibrated reference. A judge asks 'what about amoxicillin?' and your answer is 'unable to verify'. If you pretend otherwise you lose on responsible design; if the escrow demo hangs on weak Wi-Fi you lose on functionality. Pre-record the Nessie call offline and rehearse the limitation sentence until it sounds like strategy, not apology."
+  },
+  "calhacks_main_judge": {
+   "user_choice": "A_clinic_gate",
+   "why": "Monday user: a procurement pharmacist who already samples one tablet per lot. The test destroys the tablet, so lot-sampling is the honest fit; a household 'tracker' is a bolt-on that fights the physics and lands you in Medisafe's crowded market with 34 hours and weak Wi-Fi. A pass/fail that moves money is a real decision, not a reminder. Pick one user and look like you meant it.",
+   "must_have_features": [
+    "F1",
+    "F2",
+    "F3",
+    "F7",
+    "F11",
+    "F12"
+   ],
+   "cut_features": [
+    "F4",
+    "F5",
+    "F6",
+    "F8",
+    "F9",
+    "F10",
+    "F13",
+    "F14"
+   ],
+   "scan_screen_spec": "Bar = percent of expected 445 nm absorbance plateau reached for the claimed drug (riboflavin reference curve), capped at 100%. Live: absorbance curve, 90\u00b0 scatter, water temperature, sensor health (LED baselines OK/drift). Verdict card fills the screen: green PASS with matched plateau value; amber NEEDS LAB with the deviation; grey UNABLE TO VERIFY if drug has no reference. One line 'why' under each.",
+   "demo_script_90s": "Pharmacist gets a delivery of 2,000 riboflavin tablets. Photo the bottle: drug, lot, manufacturer, no recall. Drop one tablet, press start. Bar climbs, curve rises, plateau hits, PASS; Nessie escrow releases supplier payment, log entry shown. Now a Tums posing as the same lot: cloudy scatter, no 445 nm absorbance, NEEDS LAB; payment held, report PDF generated. Unknown pill: 'unable to verify'. Honest about the limit. Built on Peel, cited.",
+   "one_line_pitch": "LOT: sample one tablet from a delivery, get a physics-based pass/fail in minutes, and only pay suppliers whose pills pass.",
+   "biggest_risk": "The riboflavin plateau drifts with water temperature and paddle speed, so the live demo gives a 'needs lab' on the real B2 at the table. Run twenty calibration dissolutions tonight, bake the tolerance band from that, and bring pre-warmed water. If the one true positive fails live, nothing else matters."
+  },
+  "healthtech_vc": {
+   "user_choice": "A_clinic_gate",
+   "why": "The physics forces it: a destructive test on one tablet per lot is a procurement sample, not a daily-use check. Grandma won't dissolve a $3 pill every bottle. Pharmacists already sample; you're just making the gate cheap and tying it to money. B is Medisafe with a cardboard box; judges have seen eldercare-plus-Claude win twice. Preston's tracker ideas are scope, not product. Kill them.",
+   "must_have_features": [
+    "F1",
+    "F2",
+    "F3",
+    "F7",
+    "F11",
+    "F13"
+   ],
+   "cut_features": [
+    "F4",
+    "F5",
+    "F6",
+    "F8",
+    "F9",
+    "F10",
+    "F12",
+    "F14"
+   ],
+   "scan_screen_spec": "Bar = percent of the B2 reference's 445 nm absorbance plateau reached (ratio of current blue transmission drop to calibrated plateau), capped at 100. Readings beside it: blue/white ratio, 90\u00b0 scatter, water temperature, time, sensor health (dark-box baseline OK). Verdict is one full-screen card: green PASS, amber NEEDS LAB, grey UNABLE TO VERIFY, with one sentence why.",
+   "demo_script_90s": "\"Fake drugs are bought, not just swallowed. LOT is the gate.\" Photo the B2 bottle: drug, lot, no recall. Drop one tablet, press start. Bar climbs, absorbance curve and temperature live. PASS at 100%, Nessie releases $500 to supplier, decision logged. Now Tums: scatter spikes, no blue absorbance, bar stalls. NEEDS LAB, payment held, Claude writes the report. Aspirin: UNABLE TO VERIFY, no reference. Honest. Built on Peel, cited.",
+   "one_line_pitch": "LOT: a $40 dissolution gate that won't pay a drug supplier until one tablet from the lot proves it's real.",
+   "biggest_risk": "The live scan fails at the table: thermistor drift, ambient light leaking into cardboard, paddle stalling, Wi-Fi dropping the Nessie call. Mitigate: hard-wire the Pi to the ESP32, cache the escrow calls locally with retry, rehearse the three-tablet sequence ten times, and record a backup video. One flaky scan and judges stop believing the yes/no."
+  },
+  "cs_teammate": {
+   "user_choice": "A_clinic_gate",
+   "why": "Physics kills B: destroying one tablet per bottle is a procurement act, not a daily habit. Pill reminders are a crowded market and judges have seen eldercare+meds win twice already. A pharmacist sampling a lot is exactly what Peel's hardware does, the escrow agent is a real consequence not a notification, and it fits Hyphenate/Anthropic/Microsoft. 34 hours, weak Wi-Fi, 2-3 people: one user, one loop, end to end.",
+   "must_have_features": [
+    "F1",
+    "F2",
+    "F7",
+    "F3",
+    "F11",
+    "F13"
+   ],
+   "cut_features": [
+    "F4",
+    "F5",
+    "F6",
+    "F8",
+    "F9",
+    "F10",
+    "F12",
+    "F14"
+   ],
+   "scan_screen_spec": "Bar = % of expected riboflavin absorbance plateau reached (B2 reference curve), capped at 100% after a 90-second timeout. Readings: live 445nm absorbance vs blank, 90\u00b0 scatter, thermistor \u00b0C, LED/sensor health dots. Verdict fills the screen: green PASS, amber NEEDS LAB, grey UNABLE TO VERIFY, one-line 'why' underneath. No red 'fake' claim ever.",
+   "demo_script_90s": "\"Pharmacist gets 500 bottles of B2. She tests one tablet.\" Photo bottle: drug, lot, recall check, no hits. Drop tablet, blank, start. Bar climbs, curve matches reference, 100%, PASS. Agent releases $200 escrow in Nessie, logs the decision. Now the Tums: curve flat, scatter high, NEEDS LAB. Payment held, report drafted by Claude, pharmacist approves. \"Peel built the sensor; we made it decide something.\"",
+   "one_line_pitch": "LOT: a $30 box that tests one tablet from a delivery and holds the supplier's money until the pill proves it's real.",
+   "biggest_risk": "Riboflavin dissolution curve isn't repeatable in a cardboard box: ambient light leak, paddle speed, temperature drift. If pass/fail flips between runs, every feature on top is theatre. Spend the first 8 hours on reference curves, not UI. Second risk: Nessie or recall API down on weak Wi-Fi, so cache both and demo offline."
+  },
+  "ethicist": {
+   "user_choice": "A_clinic_gate",
+   "why": "A pharmacist sampling one tablet per lot is exactly what destructive testing supports; the result belongs to the lot, not a pill in someone's hand. Option B tells a grandmother a bottle is 'real' from one tablet, then logs her lid-openings for relatives. That is false reassurance plus surveillance, in a crowded market. C does both badly. A keeps a trained user, an institution holding liability, and a lab as the escalation path.",
+   "must_have_features": [
+    "F1",
+    "F2",
+    "F11",
+    "F3",
+    "F7",
+    "F12"
+   ],
+   "cut_features": [
+    "F4",
+    "F5",
+    "F6",
+    "F8",
+    "F9",
+    "F10",
+    "F13",
+    "F14"
+   ],
+   "scan_screen_spec": "Bar = percent of the riboflavin reference's expected 445 nm absorbance plateau reached, labelled exactly that, never 'percent genuine'. Readings: blue-channel absorbance vs white baseline, 90\u00b0 scatter, temperature, sensor health, elapsed seconds. Verdict is three states: 'Consistent with reference (this lot, one tablet)', 'Needs lab', 'Unable to verify'. No green tick, no word 'safe'. 'Why' line names the measurement that drove it.",
+   "demo_script_90s": "Photo the bottle: drug, lot, manufacturer, recall check. Drop one B2 tablet, press start. Watch absorbance climb to plateau: consistent with reference. Escrow agent releases payment under its cap, logs the decision. Now a Tums: cloudy, no 445 nm absorbance. Needs lab; payment held, report exported. Third pill, unknown drug: unable to verify, escalate. We never say 'safe'. We say what we measured, and where the money went.",
+   "one_line_pitch": "LOT: a $40 dissolution check that tells a pharmacist whether a delivered lot matches reference before the supplier gets paid, and says 'unable to verify' when it cannot.",
+   "biggest_risk": "That 'consistent with reference' gets read, by judges or users, as 'genuine' or 'safe'. One calibrated drug and one obvious decoy is a demo, not a counterfeit detector. If the UI, the pitch, or a payment release implies more, you have built a liability machine that pays suppliers for substandard pills with a clean conscience."
+  }
+ }
+}
