@@ -92,6 +92,12 @@ Rules that never change on any screen: three verdicts only; "why" is two sentenc
 
 Shortlist I'd pick: **Oura** (Verdict + Run numbers), **Flighty** (Run progress + status line), **Mercury** (Delivery approval + decision log). Coinbase for the payment rows only.
 
+## 4c. Design references (Preston, Sat 12:5x; ideas and checks only, never copy a design or its assets)
+- details.so: curated real-site hero sections, footers, preloaders, page transitions, animations.
+- refero.design: searchable library of real web + iOS UI screens (search "assistant", "chat", "bottom sheet", "voice input" for the follower).
+- designspells.com: small delightful UI details and micro-interactions (launchers, typing indicators, send/stop morphs).
+Use for the Gemini chat + bottom-right follower first, then every review pass.
+
 ## 5. Stack and layout
 - `pill/web/`: Vite + React 19 + TypeScript, Recharts for the curve (or a 60-line SVG; Recharts is fine), `EventSource` for `/stream`, Zustand for mode/run state, CSS variables from the site tokens (copy `pill-site/src/styles.css` `:root`). PWA manifest so it installs on the phone; served by FastAPI `StaticFiles`.
 - Screens are routes: `/`, `/bottle`, `/place`, `/run/:id`, `/verdict/:id`, `/delivery/:id`, `/log`, `/medicines`, `/calibrate`, `/report/:id`, `/verify`, `/kiosk`.
