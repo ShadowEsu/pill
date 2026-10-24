@@ -10,27 +10,42 @@ set -a; . "$here/.env"; set +a
 chan="${1:?usage: say.sh <channel> \"text\"}"; shift
 if [ $# -gt 0 ]; then text="$*"; else text="$(cat)"; fi
 [ -n "$text" ] || exit 0
-python3 - "$DISCORD_BOT_TOKEN" "$chan" "$text" <<'EOF'
-import json, re, sys, urllib.request
-token, chan, text = sys.argv[1], sys.argv[2], sys.argv[3]
+python3 - "$DISCORD_BOT_TOKEN" "$chan" "$text" "$here/.channels.json" <<'EOF'
+import json, os, re, sys, time, urllib.error, urllib.request
+token, chan, text, cache_path = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 API = "https://discord.com/api/v10"
 H = {"Authorization": f"Bot {token}", "Content-Type": "application/json", "User-Agent": "pill-bridge/1"}
+def call(req):
+    for attempt in range(5):
+        try:
+            with urllib.request.urlopen(req, timeout=20) as r:
+                return json.load(r)
+        except urllib.error.HTTPError as e:
+            if e.code == 429:
+                time.sleep(float(e.headers.get("Retry-After", "2")) + 0.5); continue
+            raise
+    sys.exit("discord: still rate limited")
 def get(path):
-    with urllib.request.urlopen(urllib.request.Request(API + path, headers=H), timeout=20) as r:
-        return json.load(r)
+    return call(urllib.request.Request(API + path, headers=H))
 def post(path, body):
-    req = urllib.request.Request(API + path, data=json.dumps(body).encode(), headers=H, method="POST")
-    with urllib.request.urlopen(req, timeout=20) as r:
-        return json.load(r)
+    return call(urllib.request.Request(API + path, data=json.dumps(body).encode(), headers=H, method="POST"))
+def plain(n):
+    return re.sub(r"^[^a-z0-9]+", "", n.lower()).strip("-#")
 if chan.isdigit():
     cid = chan
 else:
-    cid = None
-    for g in get("/users/@me/guilds"):
-        for c in get(f"/guilds/{g['id']}/channels"):
-            if c.get("type") == 0 and re.sub(r"^[^a-z0-9]+", "", c["name"].lower()).strip("-") == re.sub(r"^[^a-z0-9]+", "", chan.lower()).strip("-#"):
-                cid = c["id"]; break
-        if cid: break
+    cache = {}
+    if os.path.exists(cache_path):
+        cache = json.load(open(cache_path))
+    cid = cache.get(plain(chan))
+    if not cid:
+        cache = {}
+        for g in get("/users/@me/guilds"):
+            for c in get(f"/guilds/{g['id']}/channels"):
+                if c.get("type") == 0:
+                    cache[plain(c["name"])] = c["id"]
+        json.dump(cache, open(cache_path, "w"))
+        cid = cache.get(plain(chan))
     if not cid:
         sys.exit(f"channel {chan} not found")
 chunks, cur = [], ""
