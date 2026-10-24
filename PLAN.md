@@ -66,3 +66,4 @@ Hyphenate ($8K; video opens with the moment, live demo, real-vs-simulated slide)
 
 ## 10. Rules we follow
 All implementation during the hacking period; Peel cited, no code copied. Never say "safe", "genuine" or "fake"; verdicts are pass / needs lab / unable to verify. No crypto bolt-ons. Real vs simulated labelled on every screen (Nessie sandbox = simulated money). Nobody's age, visa or school in any public text.
+pill-site live: https://pill-site.vercel.app (2026-10-24 00:52 PDT, dpl_439unawfFKbTVN2uynfdDUgb1obn)
