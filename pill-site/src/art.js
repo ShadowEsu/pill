@@ -109,26 +109,25 @@ const partFallback = (label) => `<svg viewBox="0 0 300 300" width="100%" role="i
       ${sub.map((s, i) => `<text x="${x + 14}" y="${y + 46 + i * 15}" font-family="var(--mono)" font-size="10.5" fill="${M}">${s}</text>`).join('')}
     </g>`;
   const arrow = (x1, y, x2) => `<path d="M${x1} ${y} H${x2 - 8}" ${W} class="flow" data-draw/><path d="M${x2 - 8} ${y - 4} l8 4 l-8 4" ${W}/>`;
-  art.pipeline = `<svg viewBox="0 0 980 260" width="100%" role="img" aria-label="Data path: station to backend to verdict to policy to sandbox bank and pharmacist">
-    ${node(10, 70, 160, 96, 'Station', ['ESP32 · 1 JSON line/s', 'adc0 · adc90 · temp · dark', 'blank · fault'])}
-    ${arrow(170, 118, 210)}
-    ${node(210, 70, 190, 96, 'Backend', ['absorbance = log(blank/now)', 'plateau · t80 · scatter', '7 rules, in order'])}
-    ${arrow(400, 118, 440)}
-    ${node(440, 70, 150, 96, 'Verdict', ['PASS · NEEDS LAB ·', 'UNABLE TO VERIFY', 'rule id on the card'])}
-    ${arrow(590, 118, 630)}
-    ${node(630, 70, 170, 96, 'Policy', ['policy.md P1–P6', 'release · hold · escalate', 'spend cap · log line'])}
-    ${arrow(800, 118, 840)}
-    ${node(840, 70, 130, 96, 'Money', ['Nessie SANDBOX', 'clinic → escrow →', 'supplier'], 'rgba(47,107,255,0.9)')}
-    ${node(230, 190, 170, 56, 'Claude', ['"why" text · log line · bottle fields'])}
-    <path d="M315 190 V166" ${D}/>
-    ${node(640, 190, 150, 56, 'openFDA', ['recall by lot · cached'])}
-    <path d="M715 190 V166" ${D}/>
-    ${node(840, 190, 130, 56, 'Pharmacist', ['taps every release'])}
-    <path d="M905 190 V166" ${D}/>
+  art.pipeline = `<svg viewBox="0 0 1100 270" width="100%" role="img" aria-label="Data path: station to backend to verdict to policy to sandbox bank and pharmacist">
+    ${node(10, 70, 185, 96, 'Station', ['ESP32 · 1 JSON line/s', 'adc0 · adc90 · temp · dark', 'blank · fault'])}
+    ${arrow(195, 118, 235)}
+    ${node(235, 70, 215, 96, 'Backend', ['absorbance = log(blank/now)', 'plateau · t80 · scatter', '7 rules, in order'])}
+    ${arrow(450, 118, 490)}
+    ${node(490, 70, 165, 96, 'Verdict', ['PASS · NEEDS LAB ·', 'UNABLE TO VERIFY', 'rule id on the card'])}
+    ${arrow(655, 118, 695)}
+    ${node(695, 70, 190, 96, 'Policy', ['policy.md P1–P6', 'release · hold · escalate', 'spend cap · log line'])}
+    ${arrow(885, 118, 925)}
+    ${node(925, 70, 165, 96, 'Money', ['Nessie SANDBOX', 'clinic → escrow →', 'supplier'], 'rgba(47,107,255,0.9)')}
+    ${node(255, 196, 240, 56, 'Claude', ['"why" text · log line · bottle fields'])}
+    <path d="M375 196 V166" ${D}/>
+    ${node(695, 196, 170, 56, 'openFDA', ['recall by lot · cached'])}
+    <path d="M780 196 V166" ${D}/>
+    ${node(925, 196, 165, 56, 'Pharmacist', ['taps every release'])}
+    <path d="M1007 196 V166" ${D}/>
     <text x="10" y="30" font-family="var(--mono)" font-size="11" fill="${M}">MEASURES</text>
-    <text x="210" y="30" font-family="var(--mono)" font-size="11" fill="${M}">DECIDES (deterministic)</text>
-    <text x="630" y="30" font-family="var(--mono)" font-size="11" fill="${M}">HOLDS OR RELEASES</text>
-    <text x="230" y="30" font-family="var(--mono)" font-size="11" fill="${M}" opacity="0"></text>
+    <text x="235" y="30" font-family="var(--mono)" font-size="11" fill="${M}">DECIDES (deterministic)</text>
+    <text x="695" y="30" font-family="var(--mono)" font-size="11" fill="${M}">HOLDS OR RELEASES</text>
   </svg>`;
 }
 
