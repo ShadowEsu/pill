@@ -1,0 +1,35 @@
+{
+  "name": "pill-pay",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pill pay service: sells dissolution verdicts over x402 and moves verdict-gated escrow on Base Sepolia (TESTNET).",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "serve": "tsx src/server.ts",
+    "buy": "tsx src/buy-verdict.ts",
+    "faucet": "tsx src/faucet.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@coinbase/cdp-sdk": "^1.60.0",
+    "@x402/core": "^2.28.0",
+    "@x402/evm": "^2.28.0",
+    "@x402/express": "^2.28.0",
+    "@x402/extensions": "^2.28.0",
+    "@x402/fetch": "^2.28.0",
+    "@x402/svm": "^2.28.0",
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0",
+    "viem": "^2.57.11"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  }
+}

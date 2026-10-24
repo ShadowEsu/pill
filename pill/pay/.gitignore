@@ -1,0 +1,5 @@
+.env
+.local-wallet.json
+node_modules
+dist
+.spend-ledger.json
