@@ -1,0 +1,1299 @@
+{
+ "round3": {
+  "parametric_underwriter": {
+   "per_idea": {
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)": {
+     "hackathon_1_10": 9,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 6,
+     "biggest_objection": "Your own node is your oracle. No reinsurer accepts the insured's sensor as settlement source; SEWA settles on IMD/satellite. A DHT11 at \u00b12\u00b0C has error wider than your trigger margin. Two perils in 35 hours means neither is finished."
+    },
+    "Upstream (community flood early warning + anticipatory cash)": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 8,
+     "startup_1_10": 5,
+     "biggest_objection": "'Water reaches you in 45 min' needs a rating curve you don't have; an ultrasonic over a bucket is not a creek gauge. Anticipatory cash is donor-funded, not a premium business. Still the most honest live demo: pump, rising water, siren, payment."
+    },
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 6,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 4,
+     "biggest_objection": "Cumulative dose per worker needs one uncalibrated GUVA per person; a site node gives everyone the same number. Dies if the booth has no UV sensor. No money moves, so no finance track and no 'moment'."
+    },
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 6,
+     "biggest_objection": "Nail probes drift within hours and the Kenya covers already settle on CHIRPS, so your node adds basis-risk noise, not trigger integrity. You cannot show drought arriving in five minutes at a table."
+    },
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 4,
+     "biggest_objection": "PurpleAir, AirNow and every district already push AQI alerts; you're a dashboard. It depends on live web pulls over Wi-Fi you've been told is weak, and hardware is a fan on a relay."
+    },
+    "QuakeSense (crowd + cheap-node earthquake early warning)": {
+     "hackathon_1_10": 4,
+     "impact_1_10": 5,
+     "buildable_35h_1_10": 4,
+     "startup_1_10": 2,
+     "biggest_objection": "ShakeAlert exists, is state-run and free; you can't fake a P-wave convincingly with a table thump, and a parametric quake cover needs USGS intensity, not your accelerometer."
+    }
+   },
+   "ranking_best_first": [
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)",
+    "Upstream (community flood early warning + anticipatory cash)",
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)",
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)",
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)",
+    "QuakeSense (crowd + cheap-node earthquake early warning)"
+   ],
+   "top_pick_reason": "It has a verified precedent (SEWA: $3.50 premium, $8.78 payout, 46,000 women), a physical input judges can touch, a payment that visibly executes, and a tamper-refusal moment that is exactly what Hyphenate asks for. Nobody else at the table will show an agent refusing to pay.",
+   "attack_at_the_table_on_top_pick": "\"Your sensor is the insured's sensor. Why would Swiss Re or any pool accept a self-reported DHT11 as the settlement oracle, what is your basis risk against the IMD station 3 km away, and what happens when the node's Wi-Fi drops for four hours during the heat wave?\"",
+   "must_fix_top_pick": [
+    "Cut flood. Ship heat only. Settlement index = median of \u22653 nodes AND Open-Meteo/station agreement; nodes are evidence, not the oracle. Rent DHT22/BME280; calibrate against forecast at boot and show the offset on screen.",
+    "Put the policy on screen: trigger = index \u2265 threshold for 3 consecutive hours, flat $8.78 payout, $3.50 premium, pool balance, exhaustion rule, max 2 payouts/season. The agent must quote these, not invent them.",
+    "Label every screen 'Solana devnet: simulated funds'. Handle node silence: missing data holds, never pays or denies. Keep Nessie as the fiat rail and say why: a Gujarat vendor doesn't hold USDC."
+   ],
+   "crypto_verdict": "Load-bearing only because it gives an auditable trigger log and cross-border payout without an adjuster; honest if you label devnet as simulated and admit real beneficiaries need a fiat/mobile-money off-ramp, which is why Nessie sits beside it.",
+   "tracks_to_enter": [
+    "Hyphenate (Autonomous Systems for Finance)",
+    "Best Hardware",
+    "Best People-First",
+    "Best Planet-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "MLH Solana",
+    "MLH Tiger Data"
+   ]
+  },
+  "sewa_programme_lead": {
+   "per_idea": {
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 6,
+     "biggest_objection": "Our trigger uses the IMD station, not a \u20b9300 sensor; DHT11 at \u00b12\u00b0C cannot decide a 0.5\u00b0C threshold, and no insurer accepts a node a vendor can sit under a tarp. Fix the data source or the whole claims agent is theatre."
+    },
+    "Upstream (community flood early warning + anticipatory cash)": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 5,
+     "biggest_objection": "Cash before the flood works, IFRC proved it, but 'water reaches you in 45 min' from two ultrasonic nodes on a creek is a guess dressed as a forecast; a wrong siren twice and nobody moves the third time."
+    },
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 5,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 3,
+     "biggest_objection": "A head-loader does not stop at 80% UV dose; she stops when the load is delivered. Reports for employers assume an employer exists; my members have none. Dies if the booth has no UV sensor."
+    },
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 5,
+     "biggest_objection": "Real problem, dead demo: two nails in a cup of soil and a tilt switch cannot show a drought in five minutes, and judges will not wait a season to see the payout."
+    },
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 6,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 4,
+     "biggest_objection": "It is a nicer AirNow dashboard; PurpleAir and school districts already push these alerts, and with no money attached nobody acts differently. Hardware is a fan on a relay."
+    },
+    "QuakeSense (crowd + cheap-node earthquake early warning)": {
+     "hackathon_1_10": 4,
+     "impact_1_10": 4,
+     "buildable_35h_1_10": 4,
+     "startup_1_10": 2,
+     "biggest_objection": "ShakeAlert does this with state money and thousands of stations; shaking a table in Berkeley proves nothing, and no accelerometer is even in hand."
+    }
+   },
+   "ranking_best_first": [
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)",
+    "Upstream (community flood early warning + anticipatory cash)",
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)",
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)",
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)",
+    "QuakeSense (crowd + cheap-node earthquake early warning)"
+   ],
+   "top_pick_reason": "It is the one thing on this list that already pays real women real money; the tamper-refusal is a genuine claims problem I deal with, and judges can touch it. Everything else is an alert with no consequence.",
+   "attack_at_the_table_on_top_pick": "\"Your sensor is \u00b12\u00b0C and your policy pays on a 1\u00b0C line. Who carries the basis risk when your node says 41 and the station says 39? And why would a vegetable vendor in Ahmedabad want USDC she cannot spend at the mandi?\"",
+   "must_fix_top_pick": [
+    "Rent DHT22/BME280; never trigger on one node. Trigger = 2-3 consecutive days above threshold, node readings cross-checked against Open-Meteo/official station, like SEWA. Say 'node confirms, station decides'.",
+    "Make the fiat rail primary: Nessie bank transfer to the worker, USDC only as insurer-to-pool settlement, every simulated step labelled on screen. Members have bank accounts and UPI, not wallets.",
+    "Worker screen: no login, local language, one line: 'Paid \u20b9750 today, because 43\u00b0C for 3 days.' SMS fallback. Nobody opens a dashboard while carrying 40 kg on her head."
+   ],
+   "crypto_verdict": "Bolt-on as written: paying workers in USDC is dishonest for this community; it is only load-bearing if used for auditable insurer-to-pool settlement and the worker still gets rupees in her bank.",
+   "tracks_to_enter": [
+    "Hyphenate",
+    "Best Hardware",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "Capital One Nessie",
+    "MLH Tiger Data",
+    "MLH Solana (settlement only, labelled)"
+   ]
+  },
+  "ifrc_anticipatory_action": {
+   "per_idea": {
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)": {
+     "hackathon_1_10": 9,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 7,
+     "biggest_objection": "SEWA triggers on met-office station data, not a DHT11 with \u00b12\u00b0C error in a painted ping-pong ball; one bad node means a worker loses $8.78 she was promised, and she never trusts you again."
+    },
+    "Upstream (community flood early warning + anticipatory cash)": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 5,
+     "biggest_objection": "I have released cash before floods; the hard part is the trigger, not the node. Three ultrasonic sensors on one creek give you a guess, and two false alarms kill community trust faster than the water does."
+    },
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 5,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 5,
+     "biggest_objection": "Workers don't reapply sunscreen because an app said so; the employer is the customer, the record is a liability, and without the booth UV sensor it is a thermometer with a story."
+    },
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 6,
+     "biggest_objection": "Nails in soil drift within a week, drought cannot be shown in five minutes, and Etherisc already proved the model in Kenya; you would be re-demoing their slide with worse sensors."
+    },
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 5,
+     "biggest_objection": "PurpleAir and AirNow already push the alert; your addition is a memo and a fan, and the whole demo dies on weak venue Wi-Fi."
+    },
+    "QuakeSense (crowd + cheap-node earthquake early warning)": {
+     "hackathon_1_10": 4,
+     "impact_1_10": 4,
+     "buildable_35h_1_10": 4,
+     "startup_1_10": 2,
+     "biggest_objection": "ShakeAlert and MyShake exist, are state-run and free; you cannot demo a quake, and tapping the table is not a P-wave."
+    }
+   },
+   "ranking_best_first": [
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)",
+    "Upstream (community flood early warning + anticipatory cash)",
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)",
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)",
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)",
+    "QuakeSense (crowd + cheap-node earthquake early warning)"
+   ],
+   "top_pick_reason": "Heat kills ~489,000 a year, SEWA proved workers will pay $3.50 and got $340,000 out in 2024, and the tamper-refusal moment is a real demo a judge can run. It fits the most tracks honestly. Upstream is closer to my job but the trigger is a guess in 35 hours.",
+   "attack_at_the_table_on_top_pick": "\"Your sensor is \u00b12\u00b0C and you just moved it with a hand warmer. Who set the 3-hour threshold, did the vendors agree to it, and what happens to the woman whose node is in the shade when her neighbours get paid?\" Answer basis risk and community sign-off or you are done.",
+   "must_fix_top_pick": [
+    "Rent DHT22 or BME280; trigger on the median of at least three nodes cross-checked with Open-Meteo, never one node. Say that on the dashboard.",
+    "Worker screen first, insurer dashboard second. Put the policy terms (threshold, hours, payout amount) on the worker's phone in plain language; state threshold was co-designed with the workers' group, SEWA model.",
+    "Label devnet and replayed data on every screen. Show the Nessie fiat off-ramp live; a street vendor does not hold USDC."
+   ],
+   "crypto_verdict": "Half honest: an auditable, adjuster-free, cross-border payout log is real value for the insurer and donor, but the worker needs mobile money, so show the off-ramp or Solana is a bolt-on.",
+   "tracks_to_enter": [
+    "Hyphenate (Autonomous Systems for Finance)",
+    "Best Hardware",
+    "Best People-First",
+    "Best Planet-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "MLH Solana (payments)",
+    "MLH Tiger Data"
+   ]
+  },
+  "kenyan_smallholder": {
+   "per_idea": {
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 6,
+     "biggest_objection": "My payout came by M-Pesa, not a wallet; a Nairobi vendor has no Solana. And a DHT11 at \u00b12\u00b0C deciding a 1\u00b0C trigger? I would never accept that number as the judge of my money."
+    },
+    "Upstream (community flood early warning + anticipatory cash)": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 8,
+     "startup_1_10": 5,
+     "biggest_objection": "Water in a bucket I can see rise; good. But who funds cash before a flood that may not come? Two false alarms and nobody listens to the siren again."
+    },
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 5,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 4,
+     "biggest_objection": "A gadget telling me to go in the shade at 11:20; the maize does not wait. Nobody pays for it, and it dies if the booth has no UV sensor."
+    },
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 6,
+     "biggest_objection": "This is my Pula pilot again. Nails rust in two weeks, the tilt-switch gauge lies, and judges cannot watch a drought in five minutes. Basis risk is what killed our trust, and you cannot show that at a table."
+    },
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 6,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 4,
+     "biggest_objection": "A website of other people's data on weak Wi-Fi; AirNow already does it. No local sensor means nothing I can see working with my own eyes."
+    },
+    "QuakeSense (crowd + cheap-node earthquake early warning)": {
+     "hackathon_1_10": 4,
+     "impact_1_10": 4,
+     "buildable_35h_1_10": 4,
+     "startup_1_10": 2,
+     "biggest_objection": "Shaking a table is not an earthquake, and the government already runs this with real seismometers. Nothing here is yours."
+    }
+   },
+   "ranking_best_first": [
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)",
+    "Upstream (community flood early warning + anticipatory cash)",
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)",
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)",
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)",
+    "QuakeSense (crowd + cheap-node earthquake early warning)"
+   ],
+   "top_pick_reason": "Heat is the one trigger a judge can feel, fake, and watch be refused in five minutes; SEWA proves 50,000 women already buy this at $3.50. Readings, forecast, decision, money: all visible on one screen. The others either cannot be demoed live or have no honest money in them.",
+   "attack_at_the_table_on_top_pick": "\"Your agent only refuses to pay. In Kenya the station said rain and my field was dust; the system protected the insurer, not me. Show me the case where the official forecast says fine, your nodes say danger, and the agent pays anyway. Otherwise this is a cheaper way to say no.\"",
+   "must_fix_top_pick": [
+    "Rent DHT22/BME280; never trigger on DHT11. Trigger on a 3-hour rolling average confirmed by two neighbour nodes, and print the sensor error band on the dashboard so a judge sees you know it.",
+    "Demo both directions: tamper refused AND basis-risk case where local nodes override the forecast and pay. Agent must show the policy clause it used, in plain words a vendor reads on a phone.",
+    "Payout must land as an SMS/M-Pesa-style message on a phone screen with amount and reason, plus Nessie fiat rail; label 'devnet, simulated money' on every tx link."
+   ],
+   "crypto_verdict": "Load-bearing for the audit trail and no-adjuster payout, bolt-on for the actual worker who has M-Pesa, so it is honest only if you say exactly that and show the fiat path beside it.",
+   "tracks_to_enter": [
+    "Hyphenate",
+    "Best Hardware",
+    "Best People-First",
+    "Best Planet-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "MLH Solana",
+    "MLH Tiger Data"
+   ]
+  },
+  "construction_foreman": {
+   "per_idea": {
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)": {
+     "hackathon_1_10": 9,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 6,
+     "biggest_objection": "You're paying real money off a \u00b12\u00b0C hobby sensor. Any vendor with a lighter beats you. The tamper-refusal is the whole pitch; if that moment flubs live, you've got a weather station and a wallet."
+    },
+    "Upstream (community flood early warning + anticipatory cash)": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 8,
+     "startup_1_10": 5,
+     "biggest_objection": "A bucket and a pump on a table isn't a creek. Real water eats ultrasonic sensors in a season, and Hohonu already sells this to cities. Cash-before-flood is good, but it's the softer finance story."
+    },
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 6,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 5,
+     "biggest_objection": "I'd buy the heat log for OSHA, not the sunburn meter. My guys won't clip anything to a hard hat they didn't choose. And if the booth is out of UV sensors you have nothing by lunch."
+    },
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 5,
+     "biggest_objection": "Drought takes weeks; a judge has five minutes. Two nails in a cup of dirt and a tilt-switch rain gauge will look like a science fair, and Etherisc already did the Kenya story."
+    },
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 6,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 4,
+     "biggest_objection": "Software-first on dead venue Wi-Fi is suicide. PurpleAir and AirNow already push alerts; a fan on a relay doesn't make it hardware. No money angle, no 'moment.'"
+    },
+    "QuakeSense (crowd + cheap-node earthquake early warning)": {
+     "hackathon_1_10": 4,
+     "impact_1_10": 4,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 2,
+     "biggest_objection": "The state already runs ShakeAlert on every phone in California. You can't fake a quake at a table without it looking like you shook a laptop. Dead on arrival."
+    }
+   },
+   "ranking_best_first": [
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)",
+    "Upstream (community flood early warning + anticipatory cash)",
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)",
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)",
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)",
+    "QuakeSense (crowd + cheap-node earthquake early warning)"
+   ],
+   "top_pick_reason": "Heat is the one that killed my guy, SEWA proves the payout model with real numbers, and the demo has physical input, a live stop-work alarm, and an agent that says no. It hits the most tracks without lying about any of them.",
+   "attack_at_the_table_on_top_pick": "\"You scripted the hand-warmer refusal. Let me shade one node and heat a different one slowly over five minutes; does it still pay? And why would any insurer trust a $15 node a vendor can move into the sun?\"",
+   "must_fix_top_pick": [
+    "Get the DHT22 or BME280 from the booth first thing; trigger on two-node agreement plus Open-Meteo, never one node. Show raw vs globe temp on screen.",
+    "Make the foreman screen the hero: WBGT now, stop-work alarm, water/rest schedule, one-click OSHA-style heat log export. That's what I'd actually pay for Monday.",
+    "Every screen and the video say what's real vs replayed; say 'devnet USDC' out loud; justify the 3-hour threshold from SEWA terms, not vibes."
+   ],
+   "crypto_verdict": "Load-bearing enough: auditable, adjuster-free, cross-border payout to thousands is exactly what SEWA needed, but SEWA paid in fiat, so keep Nessie as the honest rail and don't claim the chain is required.",
+   "tracks_to_enter": [
+    "Hyphenate",
+    "Best Hardware",
+    "Best People-First",
+    "Best Planet-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "MLH Solana",
+    "MLH Tiger Data"
+   ]
+  },
+  "city_emergency_manager": {
+   "per_idea": {
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 6,
+     "biggest_objection": "A DHT11 at \u00b12\u00b0C cannot be a payout trigger; SEWA pays off official station temperature, not a vendor's node. Cut scope: heat only, drop the flood ultrasonic, or you ship two half-working products."
+    },
+    "Upstream (community flood early warning + anticipatory cash)": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 8,
+     "startup_1_10": 5,
+     "biggest_objection": "HC-SR04 over moving water lies: foam, debris, rain splash, temperature drift. Your '45 minutes' needs a rating curve and travel-time data you don't have; one false siren and the neighborhood ignores the next one."
+    },
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 6,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 4,
+     "biggest_objection": "Workers don't wear clip-ons, foremen don't read dose charts, and an uncalibrated GUVA sensor gives a 'dose' nobody can defend medically. Dies if the booth is out of UV sensors."
+    },
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 5,
+     "biggest_objection": "Drought takes weeks; a 5-minute table can't show 'before it comes'. Two nails in soil drift daily, and nobody at Cal Hacks has farmed a smallholding, so the Anthropic 'lived problem' story is borrowed."
+    },
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 6,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 3,
+     "biggest_objection": "It's another dashboard. HRRR-Smoke, AirNow, PurpleAir and Watch Duty already do this; weak venue Wi-Fi kills a live-web-data product; no physical input to make someone's job easier on stage."
+    },
+    "QuakeSense (crowd + cheap-node earthquake early warning)": {
+     "hackathon_1_10": 3,
+     "impact_1_10": 3,
+     "buildable_35h_1_10": 4,
+     "startup_1_10": 1,
+     "biggest_objection": "ShakeAlert and MyShake exist, are state-run, and still fight false alerts with thousands of real seismometers. Phones on a table shaken by a judge is a toy, and tamper is the whole problem, not a feature."
+    }
+   },
+   "ranking_best_first": [
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)",
+    "Upstream (community flood early warning + anticipatory cash)",
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)",
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)",
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)",
+    "QuakeSense (crowd + cheap-node earthquake early warning)"
+   ],
+   "top_pick_reason": "Only idea where the demo IS the product: physical input, an agent that refuses a bad payout live, a replayed real heat wave that pays, and a real precedent (SEWA, 46,000 women paid). Fits the most tracks without lying. Upstream is closer to my job but weaker on finance and riskier on false alarms.",
+   "attack_at_the_table_on_top_pick": "\"Your sensor is \u00b12\u00b0C. SEWA's trigger band is about that wide. Who eats the basis risk when your node says 41 and the worker's street is 38, or the reverse? And why would an insurer trust a $15 node a vendor can shade with cardboard to avoid paying premiums?\"",
+   "must_fix_top_pick": [
+    "Swap DHT11 for DHT22/BME280 from the booth; trigger on multi-node median plus Open-Meteo agreement, held 3 hours, never a single node. Say that out loud.",
+    "Heat only. Drop the HC-SR04 flood piece, pump, servo. One index, one trigger, one clean decision log the judge can read.",
+    "Label every screen: 'devnet, simulated pool, replayed Phoenix July 2023 data'. State the false-positive rate you measured overnight, even if it's ugly."
+   ],
+   "crypto_verdict": "Load-bearing only if you say why: unbanked cross-border workers, no adjuster, public audit trail; the Nessie fiat path proves it's a rail choice, so be honest that USDC is one option, not the product.",
+   "tracks_to_enter": [
+    "Hyphenate",
+    "Best Hardware",
+    "Best People-First",
+    "Best Planet-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "MLH Solana",
+    "MLH Tiger Data"
+   ]
+  },
+  "hyphenate_judge": {
+   "per_idea": {
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 6,
+     "biggest_objection": "Your trigger sensor is a \u00b12\u00b0C DHT11 and your threshold is a single degree; I'll put a hand warmer on all three nodes, or unplug one mid-trigger, and your tamper logic dies. Scope creep is the real risk: ten tracks, one working demo."
+    },
+    "Upstream (community flood early warning + anticipatory cash)": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 5,
+     "biggest_objection": "The arrival-time number is invented from two ultrasonic sensors on a tabletop tray; nobody at the table can tell if '45 min' is physics or a constant. Cash-before-flood is the real idea but it's thin on finance for my track."
+    },
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 5,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 4,
+     "biggest_objection": "Whole pitch hinges on a sensor you don't own yet, and the demo is a number creeping up under a lamp. No money moves, no decision gets defended, no 'moment'."
+    },
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 6,
+     "biggest_objection": "Drought is a 30-day index; you cannot show 'before it comes' in five minutes, and two nails in a flowerpot is not a soil probe anyone would underwrite. Same agent as Payout with a worse demo."
+    },
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 6,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 4,
+     "biggest_objection": "This is a PurpleAir wrapper with a fan on a relay; Watch Duty and AirNow already do it. No finance, no physical input that makes a job easier, and weak venue Wi-Fi kills a software-first demo."
+    },
+    "QuakeSense (crowd + cheap-node earthquake early warning)": {
+     "hackathon_1_10": 3,
+     "impact_1_10": 4,
+     "buildable_35h_1_10": 4,
+     "startup_1_10": 2,
+     "biggest_objection": "ShakeAlert exists, is state-run, and you'll demo it by shaking a table. No real data, no finance, no hardware you own. Pass."
+    }
+   },
+   "ranking_best_first": [
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)",
+    "Upstream (community flood early warning + anticipatory cash)",
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)",
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)",
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)",
+    "QuakeSense (crowd + cheap-node earthquake early warning)"
+   ],
+   "top_pick_reason": "Only idea where an agent with limited authority makes a money decision on messy sensor data, logs it, and refuses when something is wrong. SEWA gives you real numbers; a replayed Ahmedabad heat wave gives you real data; the hand-warmer refusal is a genuine 'moment' if it survives my scenario.",
+   "attack_at_the_table_on_top_pick": "I'll heat two of three nodes slowly over four minutes so the rise looks plausible, with the forecast at 33\u00b0C. Does it pay, withhold, or ask? Then I'll ask: who can override the agent, what's its max payout without a human, and show me the log line for the policy it cited.",
+   "must_fix_top_pick": [
+    "Rent DHT22/BME280, co-locate all nodes for 20 min and calibrate offsets; make the trigger a 3-hour rolling mean with hysteresis, not a point threshold. State sensor error on the dashboard.",
+    "Write the policy as a plain text file the agent reads: trigger, hours, max pool draw per cycle, 'escalate to human when' rules, and a stale-data rule (missing node = unknown, never zero). Agent quotes it in the log.",
+    "Label every screen REAL vs SIMULATED: live nodes real, heat wave replayed, devnet USDC simulated money. Cut Nessie, Coinbase, Convex extras unless already working by Saturday noon."
+   ],
+   "crypto_verdict": "Defensible, not bolt-on, only if the on-chain tx hash is the thing the agent's decision log points at and you say 'devnet, play money' out loud; if you can't explain why not Nessie in one sentence, drop it.",
+   "tracks_to_enter": [
+    "Hyphenate",
+    "Best Hardware",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "MLH Solana",
+    "MLH Tiger Data"
+   ]
+  },
+  "solana_judge": {
+   "per_idea": {
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 6,
+     "biggest_objection": "You're trying to ship heat AND flood AND an agent AND two payment rails in 35 hours on weak Wi-Fi; half of it will be half-working at 8:30 AM. Cut flood, cut Nessie, ship the heat loop end to end."
+    },
+    "Upstream (community flood early warning + anticipatory cash)": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 5,
+     "biggest_objection": "HC-SR04 over a pump-filled tub is a solid live demo, but the anticipatory cash is a transfer from one wallet you control to wallets you control; without a trigger the recipient can verify, the chain is decoration."
+    },
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 6,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 4,
+     "biggest_objection": "Depends on a booth sensor you don't yet hold, the live demo is 'number goes up under a lamp', and no money moves, so it's a nice wearable with no finance story and weak track coverage."
+    },
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 6,
+     "biggest_objection": "Drought cannot happen at a table; you'd be pitching a replay, and two nails in a cup of soil is not a soil moisture index anyone would insure against. Etherisc already did the real version."
+    },
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 4,
+     "biggest_objection": "Software-first with confiscated hotspots and weak Wi-Fi means your live data pipeline is the first thing to die; PurpleAir plus AirNow already give parents this, and there is no honest payment anywhere."
+    },
+    "QuakeSense (crowd + cheap-node earthquake early warning)": {
+     "hackathon_1_10": 3,
+     "impact_1_10": 4,
+     "buildable_35h_1_10": 4,
+     "startup_1_10": 2,
+     "biggest_objection": "ShakeAlert is state-run and better; shaking a phone at a table proves nothing about P-wave detection, and your false-positive rate from footsteps would be the whole demo."
+    }
+   },
+   "ranking_best_first": [
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)",
+    "Upstream (community flood early warning + anticipatory cash)",
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)",
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)",
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)",
+    "QuakeSense (crowd + cheap-node earthquake early warning)"
+   ],
+   "top_pick_reason": "Only idea where physical input, a refusal moment, and a payout close one loop in five minutes, with SEWA as a real precedent and real numbers. It covers the most tracks honestly, and heat is reproducible at the table with a hand warmer, unlike drought or quakes.",
+   "attack_at_the_table_on_top_pick": "\"SEWA pays via bank transfer to women who don't have Solana wallets. Why is this on a chain instead of Postgres plus a payments API, and who holds the private keys for the 46,000 workers?\" Also: \"Your DHT11 is \u00b12\u00b0C and your trigger is a 1\u00b0C band. Explain.\"",
+   "must_fix_top_pick": [
+    "Drop flood and Nessie; ship heat only: two to three calibrated nodes, one threshold (WBGT-ish \u2265 N for \u2265 3h), one rail. Get DHT22 or BME280 from the booth; DHT11 error swamps your trigger band.",
+    "Make the chain load-bearing: a devnet program holds the pool, trigger rule is on-chain or signed with node attestations, payout tx is verifiable by the worker and the funder. Agent proposes, program enforces, agent cannot move funds alone.",
+    "Label everything: 'replayed Ahmedabad May 2024 data', 'devnet USDC', 'simulated enrolment'. Pre-cache Open-Meteo for both replay cities; venue Wi-Fi will fail you."
+   ],
+   "crypto_verdict": "Right now it's bolt-on: a server you run sends USDC from a wallet you run, Nessie would do the same. It becomes load-bearing only if the pool and trigger live in a program so NGO, insurer, and workers in different countries need not trust your server or each other.",
+   "tracks_to_enter": [
+    "Hyphenate",
+    "Best Hardware",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "MLH Solana",
+    "MLH Tiger Data",
+    "Convex"
+   ]
+  },
+  "coinbase_judge": {
+   "per_idea": {
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)": {
+     "hackathon_1_10": 9,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 7,
+     "biggest_objection": "A DHT11 at \u00b12\u00b0C cannot honestly decide an $8.78 payout; if your trigger rests on one cheap sensor with no neighbour consensus, the tamper 'moment' is theatre, not a control."
+    },
+    "Upstream (community flood early warning + anticipatory cash)": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 8,
+     "startup_1_10": 6,
+     "biggest_objection": "Ultrasonic over a bucket is a convincing live demo, but the money part is thin: one trigger, one transfer, no claims logic, so finance judges see a weather app with a wallet bolted on."
+    },
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 6,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 5,
+     "biggest_objection": "Whole cancer story dies if the booth has no GUVA sensor; UV dose wearables already exist, and there is no honest payment or agent angle, so it loses half the tracks."
+    },
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 7,
+     "biggest_objection": "You cannot show a drought in five minutes; judges will watch two nails in a cup of dirt and a replayed CSV, and the 'before it comes' promise never appears live."
+    },
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 5,
+     "biggest_objection": "Software-first on confiscated hotspots and weak venue Wi-Fi means your live Bright Data/AirNow pulls fail at the table; PurpleAir and Watch Duty already cover most of this for free."
+    },
+    "QuakeSense (crowd + cheap-node earthquake early warning)": {
+     "hackathon_1_10": 4,
+     "impact_1_10": 5,
+     "buildable_35h_1_10": 4,
+     "startup_1_10": 2,
+     "biggest_objection": "ShakeAlert and MyShake are state-run and better; shaking a phone at a table proves nothing about P-wave detection, and nobody will pay a startup to compete with USGS."
+    }
+   },
+   "ranking_best_first": [
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)",
+    "Upstream (community flood early warning + anticipatory cash)",
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)",
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)",
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)",
+    "QuakeSense (crowd + cheap-node earthquake early warning)"
+   ],
+   "top_pick_reason": "Only candidate where the agent makes a real money decision with real precedent (SEWA, Etherisc), physical input a judge can touch, a visible refusal-and-defend moment, and a payment rail that does work an adjuster would otherwise do. Hits the most tracks without lying about any of them.",
+   "attack_at_the_table_on_top_pick": "\"Your tamper refusal looks scripted. I'll run my own scenario: heat two nodes at once, then unplug the third mid-run. Does the agent still know what to do? And are those Solana links real devnet transactions or strings you printed? Show me the signed tx and the spend cap on the agent's key.\"",
+   "must_fix_top_pick": [
+    "Rent DHT22/BME280; trigger only when WBGT index holds \u2265 threshold for 3 h on \u22652 nodes AND Open-Meteo agrees within 3\u00b0C. Print the rule on the dashboard, not just in the pitch.",
+    "Label every simulated action on screen: 'SIMULATED REPLAY: Ahmedabad May 2024', 'DEVNET USDC', 'Nessie sandbox'. Unlabelled fake payments get you zeroed by me and Hyphenate.",
+    "Agent gets a single hot key with a per-hour payout cap and an append-only decision log (inputs, policy clause, confidence, escalate-to-human flag). Demo one escalation live, not just refusal."
+   ],
+   "crypto_verdict": "Load-bearing if payouts execute from a capped agent wallet to enrolled wallets without a human adjuster and the log is auditable on-chain; devnet is fine when labelled. Enter Coinbase Payment Agents only if every member is 18+ with a verified account, otherwise skip it rather than fudge eligibility.",
+   "tracks_to_enter": [
+    "Hyphenate (Autonomous Systems for Finance)",
+    "Best Hardware",
+    "Best People-First",
+    "Best Planet-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "MLH Solana (payments)",
+    "MLH Tiger Data"
+   ]
+  },
+  "hardware_judge": {
+   "per_idea": {
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 6,
+     "biggest_objection": "You are paying money on a DHT11 with \u00b12\u00b0C error and a 2s response; the trigger threshold is inside the sensor noise. The tamper 'moment' also depends on a slow globe thermometer actually jumping 12\u00b0C in 40s; I doubt it will."
+    },
+    "Upstream (community flood early warning + anticipatory cash)": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 8,
+     "startup_1_10": 5,
+     "biggest_objection": "Best honest hardware of the six: pump raises water in a bucket, HC-SR04 sees it, downstream buzzer fires. But HC-SR04 over splashing water with no temperature compensation gives \u00b12cm garbage, and two nodes on one table is not a watershed."
+    },
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 6,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 5,
+     "biggest_objection": "Whole idea rests on a booth sensor you may not get, and you demo UV dose indoors at 8:30 AM with no UV source; the hard-hat DHT11 reads the wearer's scalp, not the air."
+    },
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 6,
+     "biggest_objection": "Two nails in soil corrode in days and drift with salinity; a tilt-switch rain gauge needs calibration you don't have time for; and nothing visibly happens at the table because drought is the absence of an event."
+    },
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 4,
+     "biggest_objection": "It is an API mashup; the PM2.5 node is optional and you cannot make smoke in the venue, so the fan-as-purifier relay is decorative hardware bolted onto a dashboard. Not a Best Hardware entry."
+    },
+    "QuakeSense (crowd + cheap-node earthquake early warning)": {
+     "hackathon_1_10": 3,
+     "impact_1_10": 5,
+     "buildable_35h_1_10": 4,
+     "startup_1_10": 2,
+     "biggest_objection": "ShakeAlert exists, is state-run, and has seismometers; you have a tilt switch and maybe a booth accelerometer, and the only 'quake' you can show is someone bumping the table."
+    }
+   },
+   "ranking_best_first": [
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)",
+    "Upstream (community flood early warning + anticipatory cash)",
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)",
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)",
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)",
+    "QuakeSense (crowd + cheap-node earthquake early warning)"
+   ],
+   "top_pick_reason": "Only candidate where the sensor node is essential, the readings drive a real money decision, the SEWA precedent is documented, and the live demo has a physical input, a failure the agent catches, and a visible outcome. Covers the most tracks without lying about any of them.",
+   "attack_at_the_table_on_top_pick": "\"Your trigger is 32\u00b0C sustained 3 hours. Your DHT11 is \u00b12\u00b0C. So a worker at 31\u00b0C gets nothing and one at 33\u00b0C gets paid based on a coin flip in the sensor. How do you defend a payout, or a denial, to the person standing in the sun?\"",
+   "must_fix_top_pick": [
+    "Get the DHT22 or BME280 from the booth first thing; keep DHT11 only as a second channel. Print the sensor accuracy on the dashboard next to every reading, and trigger on a 3-node median, never one node.",
+    "Pre-test the hand-warmer attack tonight: time how fast the globe thermistor actually rises. Tune the tamper rule to the measured slew rate, and compensate HC-SR04 flood depth with the air temperature reading.",
+    "Drop the fan 'cooling station'; it is decorative. Keep the buzzer stop-work alarm and the relay only if it does something real. Label on-screen: 'time compressed 60x, devnet USDC, forecast live from Open-Meteo'."
+   ],
+   "crypto_verdict": "Half load-bearing: automatic, auditable, adjuster-free payout is the honest case and matches the SEWA model, but SEWA paid via bank transfer, so say plainly that Solana is the rail for the unbanked and cross-border case and run Nessie beside it, clearly labeled.",
+   "tracks_to_enter": [
+    "Hyphenate",
+    "Best Hardware",
+    "Best People-First",
+    "Best Planet-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "MLH Solana",
+    "MLH Tiger Data"
+   ]
+  },
+  "planet_first_judge": {
+   "per_idea": {
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)": {
+     "hackathon_1_10": 9,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 6,
+     "biggest_objection": "A DHT11 has \u00b12\u00b0C error and your trigger band is about that wide; one DIY node per street is a basis-risk machine. SEWA triggered on certified stations. Heat plus flood plus two rails is two products in 35 hours."
+    },
+    "Upstream (community flood early warning + anticipatory cash)": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 8,
+     "startup_1_10": 5,
+     "biggest_objection": "Right design, honest anticipatory-action logic, but three HC-SR04s on one creek give minutes of lead time, not 45; the '45 min' is mostly Open-Meteo. And who capitalises the cash pool is never answered."
+    },
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 5,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 3,
+     "biggest_objection": "Roofers know they are in the sun; the binding constraint is the employer's rest-break policy, not a dose meter. Dies without the booth UV sensor, and there is no money angle."
+    },
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 6,
+     "biggest_objection": "Biggest real problem, worst table demo: nobody sees drought in five minutes. Nail probes corrode in weeks, and CHIRPS already triggers Kenyan payouts, so the node adds little an insurer would pay for."
+    },
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 6,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 3,
+     "biggest_objection": "PurpleAir, AirNow and every district's Watch Duty feed already do this; it is a dashboard on other people's sensors, and weak venue Wi-Fi kills the live-data story at the table."
+    },
+    "QuakeSense (crowd + cheap-node earthquake early warning)": {
+     "hackathon_1_10": 4,
+     "impact_1_10": 4,
+     "buildable_35h_1_10": 4,
+     "startup_1_10": 2,
+     "biggest_objection": "ShakeAlert and MyShake exist, are free and state-run; shaking a table proves nothing about P-wave detection, and the payout stretch is a stretch."
+    }
+   },
+   "ranking_best_first": [
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)",
+    "Upstream (community flood early warning + anticipatory cash)",
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)",
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)",
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)",
+    "QuakeSense (crowd + cheap-node earthquake early warning)"
+   ],
+   "top_pick_reason": "Heat is the largest climate killer, SEWA proves the exact product with real numbers, and the tamper-refusal is a genuine 'moment' judges can trigger themselves. It reaches the exposed: informal workers, not homeowners. Only pick that scores across hardware, planet, people and finance at once.",
+   "attack_at_the_table_on_top_pick": "\"Two vendors fifty metres apart: one node reads 40.1, the other 38.3, both within DHT11 error. One gets paid, one doesn't. Who eats that basis risk? And $3.50 premiums times 50,000 is $175k; SEWA paid out $340k. Who capitalises your pool: the chain or Swiss Re?\"",
+   "must_fix_top_pick": [
+    "Rent DHT22/BME280, calibrate against Open-Meteo at setup, and trigger on the median of \u22653 nodes plus forecast, sustained N hours; never a single node. Print sensor error and the N-hour rule in the policy text on screen.",
+    "Cut flood. Heat only, one index, one replayed event (Ahmedabad May 2024), one tamper refusal. Flood depth is a second product you will half-build.",
+    "Worker view must work on a $30 phone via SMS or a shared vendor-association screen, not an app store install. Label on every screen: devnet USDC simulated, pool funded by NGO/reinsurer, replayed data."
+   ],
+   "crypto_verdict": "Half-honest: the auditable payout log without an adjuster is real value, but a market vendor in Ahmedabad cannot spend devnet USDC, so show Nessie fiat as the primary rail and Solana as the cross-border, reinsurer-auditable settlement layer, stated plainly.",
+   "tracks_to_enter": [
+    "Hyphenate",
+    "Best Planet-First",
+    "Best People-First",
+    "Best Hardware",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "MLH Tiger Data",
+    "MLH Solana"
+   ]
+  },
+  "anthropic_judge": {
+   "per_idea": {
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)": {
+     "hackathon_1_10": 9,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 7,
+     "biggest_objection": "This is four products: heat, flood, Solana, Nessie, Convex, Tiger. At 35 hours with weak Wi-Fi you ship none of them well. Cut flood and one rail or you'll demo a dashboard of spinners."
+    },
+    "Upstream (community flood early warning + anticipatory cash)": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 5,
+     "biggest_objection": "There's no creek at Cal Hacks; you're pouring a bottle into a bucket. Hohonu and FloodNet already do nodes; anticipatory cash needs a payer who trusts your ultrasonic sensor, and nobody at a city does yet."
+    },
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 6,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 4,
+     "biggest_objection": "Whole cancer story hinges on a sensor the booth 'may' have. Employers won't buy a device that creates OSHA liability records against them, and workers won't wear a clip that reports them. No fintech, no 'moment.'"
+    },
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 5,
+     "biggest_objection": "Drought takes weeks; your demo is a judge watering two nails. Nobody at the table has farmed in Kenya, so 'lived problem' is secondhand, and the tilt-switch rain gauge will read false on every table bump."
+    },
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 4,
+     "biggest_objection": "Software-first on venue Wi-Fi with no hotspots: your live AirNow pull dies mid-pitch. Watch Duty, PurpleAir and IQAir already own this; without the PM node it's a nicer map, not hardware, and no honest finance angle."
+    },
+    "QuakeSense (crowd + cheap-node earthquake early warning)": {
+     "hackathon_1_10": 4,
+     "impact_1_10": 4,
+     "buildable_35h_1_10": 4,
+     "startup_1_10": 2,
+     "biggest_objection": "ShakeAlert and MyShake are state-run and free on every California phone. You can't demo a quake, phone accelerometers at a table are footstep detectors, and you lose Best Hardware without the booth accelerometer."
+    }
+   },
+   "ranking_best_first": [
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)",
+    "Upstream (community flood early warning + anticipatory cash)",
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)",
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)",
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)",
+    "QuakeSense (crowd + cheap-node earthquake early warning)"
+   ],
+   "top_pick_reason": "Only idea with a real precedent (SEWA, 46,000 women paid), a physical input a judge can touch, a Claude agent whose refusal IS the demo, and a payout that visibly makes one job disappear: the adjuster's. Heat is the biggest killer on the list and the sensor can produce it live.",
+   "attack_at_the_table_on_top_pick": "\"Your DHT11 is \u00b12\u00b0C and your trigger is a 1\u00b0C line. SEWA paid on IMD station data, not a ping-pong ball. Why would Swiss Re trust your node? And name one outdoor worker you've talked to. What happens when Claude wrongly withholds a payout from someone who's actually dying of heat?\"",
+   "must_fix_top_pick": [
+    "Cut flood entirely. Heat only, one chain (Solana devnet), Nessie as a stretch slide. Grab DHT22 or BME280 from the booth at opening; DHT11 as backup. Say the \u00b12\u00b0C limit out loud before the judge does.",
+    "Trigger must be a rolling multi-hour WBGT with neighbour-node consensus plus Open-Meteo agreement, not one sensor over a line. Claude never auto-pays on a single node; it withholds, logs, and escalates. Show a false-withhold path with a human override.",
+    "Name the community: Central Valley farmworkers or Fruitvale day laborers, not 'outdoor workers.' Call one org before Sunday. Big on-screen banner: REAL (node, forecast, agent) vs SIMULATED (wallets, pool, heat-wave replay)."
+   ],
+   "crypto_verdict": "Load-bearing only if you argue it: no adjuster, cross-border, auditable payout log is the product; but be honest that SEWA's women got cash via bank/UPI, so USDC is a plausible future rail, not today's.",
+   "tracks_to_enter": [
+    "Hyphenate (Autonomous Systems for Finance)",
+    "Best Hardware",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "MLH Solana (payments)",
+    "MLH Tiger Data",
+    "MLH Gen AI"
+   ]
+  },
+  "calhacks_main_judge": {
+   "per_idea": {
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 6,
+     "biggest_objection": "You are two students pretending to be Swiss Re; the insurer and the capital pool are the product, not the node. Cut flood entirely or you ship two half-demos and the hand-warmer moment falls flat on a DHT11 that lags 30 seconds."
+    },
+    "Upstream (community flood early warning + anticipatory cash)": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 5,
+     "biggest_objection": "Ultrasonic over a bucket you pour water into is a nice table demo, but 'reaches you in 45 min' is invented hydrology; Hohonu and FloodNet already do this and cities buy on procurement cycles, not apps."
+    },
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 5,
+     "buildable_35h_1_10": 8,
+     "startup_1_10": 4,
+     "biggest_objection": "Nobody on a roofing crew wears a clip-on dosimeter Monday, the foreman does not pay for it, and the whole cancer story dies if the booth is out of UV sensors."
+    },
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 5,
+     "biggest_objection": "Drought is a 60-day event and you have 5 minutes; two nails in a cup of dirt cannot show 'before it comes', and Etherisc already proved the model without your node."
+    },
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 4,
+     "biggest_objection": "This is a PurpleAir dashboard with a memo button; school districts already get AirNow alerts, and with no fire burning Saturday your live demo is a replay with no physical input."
+    },
+    "QuakeSense (crowd + cheap-node earthquake early warning)": {
+     "hackathon_1_10": 4,
+     "impact_1_10": 4,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 2,
+     "biggest_objection": "ShakeAlert is free, state-run and on every California phone; shaking a table to trip buzzers proves nothing, and no one will ever pay you for it."
+    }
+   },
+   "ranking_best_first": [
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)",
+    "Upstream (community flood early warning + anticipatory cash)",
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)",
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)",
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)",
+    "QuakeSense (crowd + cheap-node earthquake early warning)"
+   ],
+   "top_pick_reason": "Only idea where physical input, a named real customer (SEWA, 50k women, $3.50 premiums, verified payouts), a visible 'moment' (agent refuses the hand-warmer tamper, then pays the Ahmedabad replay) and a finance track prize line up. It also fits the most tracks without lying about any of them.",
+   "attack_at_the_table_on_top_pick": "\"Who holds the pool, who is the regulated insurer, and why would SEWA swap a Swiss Re satellite trigger for a $12 node a vendor can shade with an umbrella? Also your DHT11 is \u00b12\u00b0C and your payout threshold is one degree wide.\"",
+   "must_fix_top_pick": [
+    "Drop flood and HC-SR04. One peril, heat, one node, one worker persona (Ahmedabad street vendor). Flood is a second half-demo you cannot finish.",
+    "Get DHT22/BME280 from the booth, log the thermistor-globe calibration against it, and set the trigger to a multi-hour rolling mean plus neighbour-node agreement, not a single reading.",
+    "Pitch the customer honestly: 'SEWA and Blue Marble's cheaper, denser trigger layer', not 'we are the insurer'. Show pool balance going down live and one 'real vs simulated' slide."
+   ],
+   "crypto_verdict": "Load-bearing enough: cross-border, no-adjuster, auditable micropayments of $8 is one of the few cases where USDC beats a bank rail, but say devnet out loud and show the Nessie fiat path too, or it reads as prize-chasing.",
+   "tracks_to_enter": [
+    "Hyphenate",
+    "Best Hardware",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "MLH Solana",
+    "MLH Tiger Data",
+    "Capital One Nessie"
+   ]
+  },
+  "climate_fintech_vc": {
+   "per_idea": {
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)": {
+     "hackathon_1_10": 9,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 6,
+     "biggest_objection": "SEWA pays off a gridded reanalysis index, not street nodes, precisely because a $4 sensor is tamperable and uninsurable basis risk. Your wedge is the node; Swiss Re's wedge is the index. Also cut flood; heat alone with two scenarios is already too much for 35 hours."
+    },
+    "Upstream (community flood early warning + anticipatory cash)": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 6,
+     "biggest_objection": "Hohonu and FloodNet already own 'cheap upstream sensor'; your differentiator is the anticipatory-cash trigger, which IFRC does off forecasts without you. Travel-time math from one ultrasonic node over a tabletop trough will get picked apart by anyone who has seen a hydrograph."
+    },
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 6,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 4,
+     "biggest_objection": "Employer-paid wearable with no buyer urgency; OSHA's heat rule is stalled and dosimeter apps exist. Depends on a booth sensor you may not get. No fintech, no 'before it comes'. Fine product, dead distribution."
+    },
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 5,
+     "biggest_objection": "This is Arbol/Etherisc/ACRE with nails in a cup of dirt. Drought is a 30-day index; nothing happens on a table in five minutes, and two students cannot fake a season convincingly. Right market, wrong weekend."
+    },
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 8,
+     "startup_1_10": 4,
+     "biggest_objection": "PurpleAir, AirNow and IQAir already push 'smoke in 3 hours'; a district pays nobody for a memo generator. Easiest build, weakest hardware story, no money moves, and weak venue Wi-Fi makes a web-data-only project risky at the table."
+    },
+    "QuakeSense (crowd + cheap-node earthquake early warning)": {
+     "hackathon_1_10": 4,
+     "impact_1_10": 5,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 2,
+     "biggest_objection": "ShakeAlert and MyShake are free, state-run and on every California phone. Nothing to demo but a shaken table, no business, no sensor you own. Kill it."
+    }
+   },
+   "ranking_best_first": [
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)",
+    "Upstream (community flood early warning + anticipatory cash)",
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)",
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)",
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)",
+    "QuakeSense (crowd + cheap-node earthquake early warning)"
+   ],
+   "top_pick_reason": "Only candidate where physical input, money moving, an agent that refuses, and a real precedent (SEWA, 46,000 paid) all land in one five-minute table demo. Hits the most tracks with the same build. Heat is the why-now: deaths doubled in the US, Open-Meteo is free, and payout rails cost nothing.",
+   "attack_at_the_table_on_top_pick": "\"Swiss Re and SEWA deliberately pay off satellite/station indices because sensors in a vendor's stall are tamperable and create basis-risk disputes. Why would any underwriter accept your node as the trigger, and who actually pays the premium: the worker, the NGO, or a donor who leaves next year?\"",
+   "must_fix_top_pick": [
+    "Drop flood entirely; ship heat only. Node is a tie-breaker and tamper check, trigger stays Open-Meteo/station index. Say so in the pitch; that is the honest insurable design.",
+    "Swap DHT11 for DHT22/BME280 from the booth; \u00b12\u00b0C on a 32\u00b0C threshold is the whole payout. Calibrate the ping-pong globe against the second sensor and show the offset on screen.",
+    "Pre-load everything offline: cached Open-Meteo replay, local Convex/SQLite, pre-signed devnet transactions. Label 'real sensor / replayed heat wave / devnet USDC' on the dashboard itself, not just in the pitch."
+   ],
+   "crypto_verdict": "Load-bearing only if you say why: no adjuster, cross-border to an NGO's worker list, auditable log a donor can inspect; SEWA paid by bank transfer, so keep Nessie as the honest fiat default and USDC as the rail for places without bank reach, otherwise judges will call it a bolt-on.",
+   "tracks_to_enter": [
+    "Hyphenate (Autonomous Systems for Finance)",
+    "Best Hardware",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "MLH Solana",
+    "Capital One Nessie",
+    "MLH Tiger Data"
+   ]
+  },
+  "insurance_regulator": {
+   "per_idea": {
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 5,
+     "biggest_objection": "You are three students with no carrier, no license, no capital behind the pool; a DHT11 at \u00b12\u00b0C cannot be the trigger sensor for anyone's money, and an agent that withholds a claim with no appeal path is an unfair claims practice in every state I know."
+    },
+    "Upstream (community flood early warning + anticipatory cash)": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 4,
+     "biggest_objection": "Anticipatory cash is humanitarian aid, not insurance, which is cleaner legally, but two ultrasonic sensors on a creek you cannot bring to the table means the 'before it comes' arrival time is a simulated curve, and judges will notice."
+    },
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 6,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 5,
+     "biggest_objection": "Depends entirely on a booth sensor you may not get; without it this is a thermometer on a hat, and the employer-liability angle (OSHA records) is the real business but has no fintech or disaster story."
+    },
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 6,
+     "biggest_objection": "Best real-world precedent of the six, but a nails-in-dirt moisture probe is uncalibrated junk for an index, and nobody can watch a drought happen in five minutes at a table."
+    },
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 4,
+     "biggest_objection": "PurpleAir, AirNow and every district already push AQI alerts; a web dashboard with a fan on a relay is not hardware, and weak venue Wi-Fi kills a live-API-dependent demo."
+    },
+    "QuakeSense (crowd + cheap-node earthquake early warning)": {
+     "hackathon_1_10": 4,
+     "impact_1_10": 5,
+     "buildable_35h_1_10": 4,
+     "startup_1_10": 2,
+     "biggest_objection": "ShakeAlert is federal and MyShake is state-run; you cannot demonstrate a quake, you may not get an accelerometer, and no one will hire a competitor to USGS built in 35 hours."
+    }
+   },
+   "ranking_best_first": [
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)",
+    "Upstream (community flood early warning + anticipatory cash)",
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)",
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)",
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)",
+    "QuakeSense (crowd + cheap-node earthquake early warning)"
+   ],
+   "top_pick_reason": "Only idea with a cited real precedent (SEWA, 46,000 paid), a physical trigger judges can touch, a finance agent with a genuine 'refuse and escalate' moment, and sensor-to-payout in one loop. It fits the most tracks. The legal exposure is manageable if they stop calling it insurance.",
+   "attack_at_the_table_on_top_pick": "\"Who is the licensed carrier, who holds the pool, and under whose authority does your agent deny a claim with no appeal? And basis risk: a worker lost wages at 2.5 hours, your trigger says 3; what do you tell her?\"",
+   "must_fix_top_pick": [
+    "Wording: never say 'insurance', 'policy' or 'premium' on slides or site. Say 'parametric payout pilot; simulated pool; not a licensed product; basis risk: trigger can miss real losses.' Put that disclosure in the app.",
+    "Sensor: DHT11 is not trigger-grade. Get DHT22/BME280 from the booth, require 2-of-3 node agreement plus Open-Meteo, N=3 hours, show a calibration table against a reference thermometer.",
+    "Agent must escalate, not deny: tamper flag goes to a human queue with an appeal button and full written reasons; label devnet, replayed Phoenix/Ahmedabad data, and every simulated step on screen."
+   ],
+   "crypto_verdict": "Half load-bearing: the immutable decision log and no-adjuster, cross-border settlement are real arguments (Etherisc/Kenya proved it), but USDC devnet is a demo rail, not a reason the product exists; honest only if labeled simulated and never pitched as avoiding regulation.",
+   "tracks_to_enter": [
+    "Hyphenate (Autonomous Systems for Finance)",
+    "Best Hardware",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "MLH Solana (payments)",
+    "MLH Tiger Data",
+    "Capital One Nessie (fiat rail)"
+   ]
+  },
+  "climate_scientist": {
+   "per_idea": {
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)": {
+     "hackathon_1_10": 8,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 6,
+     "biggest_objection": "A DHT11 is \u00b12\u00b0C and your payout trigger is a 1\u00b0C line; a ping-pong ball is not a 150 mm Vernon globe and there is no wet bulb, so stop saying WBGT. Three nodes in 35 h plus app, site, agent and chain is too much scope."
+    },
+    "Upstream (community flood early warning + anticipatory cash)": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 5,
+     "biggest_objection": "HC-SR04 over water drifts with air temperature and ripples give \u00b12 cm garbage; and 'arrives in 45 min' from two drains with no channel geometry is a guess dressed as hydrology. The pump-in-a-tub demo is honestly the best live physical demo of the six."
+    },
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 6,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 4,
+     "biggest_objection": "GUVA-S12SD outputs a voltage, not erythemal dose; no cosine correction, no calibration, so 'cumulative safe dose' is fiction. Depends entirely on a booth part you may not get, and there is no honest fintech angle."
+    },
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 5,
+     "biggest_objection": "Two nails corrode and drift within hours and a tilt-switch rain gauge is uncalibrated; a drought cannot happen on a table in five minutes. Real precedent (Etherisc) already uses satellite rain, so your node adds nothing judges can see."
+    },
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 4,
+     "biggest_objection": "AirNow, PurpleAir and HRRR-Smoke already do this; with the sensor optional, Best Hardware is gone and you are a dashboard. No fire in October near Berkeley means no live signal and no fintech."
+    },
+    "QuakeSense (crowd + cheap-node earthquake early warning)": {
+     "hackathon_1_10": 4,
+     "impact_1_10": 4,
+     "buildable_35h_1_10": 4,
+     "startup_1_10": 2,
+     "biggest_objection": "ShakeAlert and MyShake are state-run and free; stomping a table is not P-wave detection, and phone accelerometers in a hall only measure footsteps. Drop it."
+    }
+   },
+   "ranking_best_first": [
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)",
+    "Upstream (community flood early warning + anticipatory cash)",
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)",
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)",
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)",
+    "QuakeSense (crowd + cheap-node earthquake early warning)"
+   ],
+   "top_pick_reason": "Only idea with a verifiable precedent (SEWA, 46,000 paid), a physical trigger judges can touch, a 'moment' where the agent refuses to pay, and honest reach across Hyphenate, Hardware, Planet, People, Anthropic and Microsoft. Cut scope hard: heat only, drop the flood sensor.",
+   "attack_at_the_table_on_top_pick": "\"Your sensor error is twice your trigger margin, your globe is a toy, and SEWA pays off IMD station data, not vendor-owned nodes. Why would an insurer ever trust a $12 node a claimant can shade, water or unplug?\" Answer: node consensus plus forecast; the node is evidence, not the oracle.",
+   "must_fix_top_pick": [
+    "Rent DHT22 or BME280; mount in a vented white shield, never bare on the breadboard in lamp light, or you read 5\u00b0C high. Call the output 'heat index with globe proxy', not WBGT.",
+    "Trigger = median of 3 nodes agreeing with Open-Meteo within 2\u00b0C, sustained 3 h on a simulated clock; show real vs replayed data on screen the whole demo.",
+    "Raspberry Pi as local access point so nodes work without venue Wi-Fi; pre-sign Solana devnet transactions as fallback; show the Nessie fiat rail as the realistic path."
+   ],
+   "crypto_verdict": "Bolt-on unless the agent's decision log and trigger hash are written on-chain and you say plainly that SEWA pays through banks; USDC is defensible for cross-border, auditable, adjuster-free settlement, not as the only rail.",
+   "tracks_to_enter": [
+    "Hyphenate",
+    "Best Hardware",
+    "Best Planet-First",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "MLH Solana",
+    "MLH Tiger Data"
+   ]
+  },
+  "cs_teammate": {
+   "per_idea": {
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)": {
+     "hackathon_1_10": 9,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 7,
+     "biggest_objection": "Scope is a trap: three sensors, two rails, agent, app, dashboard, replay. Cut flood/HC-SR04 and Nessie or we ship a dashboard with no working node at 6 AM Sunday."
+    },
+    "Upstream (community flood early warning + anticipatory cash)": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 5,
+     "biggest_objection": "HC-SR04 over a bucket of water on a table is the demo; 'reaches you in 45 min' is one rise-rate formula with no real creek to validate, and judges will know."
+    },
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 6,
+     "buildable_35h_1_10": 8,
+     "startup_1_10": 4,
+     "biggest_objection": "Whole cancer story hangs on a rental-booth UV sensor we may not get; indoors it reads zero, so the live demo is a flashlight on a photodiode."
+    },
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 6,
+     "biggest_objection": "Nail soil probe drifts, tilt-switch rain gauge is a joke, and drought is a 3-week event; nothing happens at the table unless we fake it."
+    },
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 4,
+     "biggest_objection": "It's a software mashup of PurpleAir and AirNow, which already push alerts; venue Wi-Fi dropping live API calls mid-demo kills it, and there's no physical input story."
+    },
+    "QuakeSense (crowd + cheap-node earthquake early warning)": {
+     "hackathon_1_10": 4,
+     "impact_1_10": 5,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 2,
+     "biggest_objection": "ShakeAlert exists, we can't demo a quake, phone DeviceMotion needs HTTPS and permissions on flaky Wi-Fi, and the node needs a sensor we don't own."
+    }
+   },
+   "ranking_best_first": [
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)",
+    "Upstream (community flood early warning + anticipatory cash)",
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)",
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)",
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)",
+    "QuakeSense (crowd + cheap-node earthquake early warning)"
+   ],
+   "top_pick_reason": "Heat is the only one with a 60-second physical demo (hand warmer on node), a verified real-world precedent (SEWA, $8.78 payouts), a refuse-to-pay 'moment' for Hyphenate, and hits the most tracks. Flood is a bolt-on; drop it.",
+   "attack_at_the_table_on_top_pick": "\"Your DHT11 is \u00b12\u00b0C and your trigger is a 1-2\u00b0C band; how many false payouts does that cause per 1,000 nodes, and if the sensor can't be trusted, why not just use Open-Meteo and skip the hardware entirely?\"",
+   "must_fix_top_pick": [
+    "Cut flood/HC-SR04 and Nessie. One node, heat only, Solana devnet only. Get DHT22 or BME280 from the booth; DHT11 \u00b12\u00b0C is indefensible next to a threshold.",
+    "Trigger on the replayed real series (Ahmedabad May 2024, hourly) with node as a plausibility check, not sole source; put rate-of-change and neighbour-consensus thresholds in a policy.json shown on screen.",
+    "Cache forecast and replay data locally on the Pi; node talks to Pi over Pi's own AP, not venue Wi-Fi. Label every screen REAL SENSOR / REPLAYED DATA / DEVNET."
+   ],
+   "crypto_verdict": "Load-bearing and honest only if we say it plainly: SEWA paid via bank in weeks, we pay in seconds with a public audit trail and no adjuster; devnet is simulated money, label it, don't pretend the oracle is decentralised.",
+   "tracks_to_enter": [
+    "Hyphenate",
+    "Best Hardware",
+    "Best People-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "MLH Solana",
+    "MLH Tiger Data",
+    "Convex"
+   ]
+  },
+  "ethicist": {
+   "per_idea": {
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)": {
+     "hackathon_1_10": 9,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 6,
+     "biggest_objection": "A \u00b12\u00b0C DHT11 deciding whether a woman who lost a day's wages gets $8.78 is not insurance, it's a coin flip; and your tamper-refusal demo teaches judges to applaud an AI denying claims to poor people."
+    },
+    "Upstream (community flood early warning + anticipatory cash)": {
+     "hackathon_1_10": 7,
+     "impact_1_10": 8,
+     "buildable_35h_1_10": 7,
+     "startup_1_10": 5,
+     "biggest_objection": "Two ultrasonic sensors on one creek cannot honestly say '45 minutes'; a wrong lead time either strands people or trains them to ignore the siren, and false reassurance kills."
+    },
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)": {
+     "hackathon_1_10": 6,
+     "impact_1_10": 6,
+     "buildable_35h_1_10": 6,
+     "startup_1_10": 4,
+     "biggest_objection": "Per-worker exposure logs owned by the employer are a surveillance and liability record first and a health tool second; the worker gets a nag, the boss gets a dataset."
+    },
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 7,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 5,
+     "biggest_objection": "Nails in a flowerpot do not represent a Kenyan smallholder; nothing happens live, and basis risk on soil moisture is exactly why real programs use satellite indices."
+    },
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)": {
+     "hackathon_1_10": 5,
+     "impact_1_10": 6,
+     "buildable_35h_1_10": 5,
+     "startup_1_10": 4,
+     "biggest_objection": "It is a dashboard over AirNow and PurpleAir, which already exist and are free; weak venue Wi-Fi kills the live-data dependency and the hardware is decorative."
+    },
+    "QuakeSense (crowd + cheap-node earthquake early warning)": {
+     "hackathon_1_10": 3,
+     "impact_1_10": 4,
+     "buildable_35h_1_10": 4,
+     "startup_1_10": 2,
+     "biggest_objection": "ShakeAlert and MyShake are state-run and better; a student knock-off that pushes a false quake alert is worse than nothing, and you cannot demo a real one."
+    }
+   },
+   "ranking_best_first": [
+    "Payout (parametric heat + flood micro-insurance with an AI claims agent)",
+    "Upstream (community flood early warning + anticipatory cash)",
+    "SunDose (UV + heat exposure tracker for outdoor workers; skin-cancer prevention)",
+    "GroundTruth (crop drought/rain parametric insurance node for smallholders)",
+    "AirShield (wildfire smoke early warning for schools and outdoor workers)",
+    "QuakeSense (crowd + cheap-node earthquake early warning)"
+   ],
+   "top_pick_reason": "SEWA proves the model with real numbers, the physical trigger and payout are visible in five minutes, and it fits the most tracks. I rank it first despite my objections, not because of them; fix the ethics or it is a slick demo of denying claims.",
+   "attack_at_the_table_on_top_pick": "\"Your sensor error is \u00b12\u00b0C and your trigger margin is about 1\u00b0C. Show me the case where the heat wave was real and your agent still refused to pay. Who holds the private key for the woman's wallet, and how does she turn USDC into rice in Ahmedabad?\"",
+   "must_fix_top_pick": [
+    "Warnings, stop-work alarm and cooling fan must fire for everyone regardless of enrolment or payment status; never paywall the warning. Say so on the slide.",
+    "Use DHT22/BME280 from the booth, state sensor error, and bias the trigger toward paying: tamper flags escalate to a human in minutes, never silently deny. Show the false-refusal case too.",
+    "Default payout rail is Nessie fiat/mobile money; Solana is the auditable ledger for the insurer, opt-in for payees. Node is site-level, no per-worker identity or location tracking."
+   ],
+   "crypto_verdict": "Honest only as the insurer's public audit trail and cross-border settlement; for the payee it is a bolt-on, since SEWA paid through bank accounts and nobody at a market stall wants a devnet wallet, so say that out loud.",
+   "tracks_to_enter": [
+    "Hyphenate",
+    "Best Hardware",
+    "Best People-First",
+    "Best Planet-First",
+    "Anthropic",
+    "Microsoft Built for the Real World",
+    "Capital One Nessie",
+    "MLH Tiger Data"
+   ]
+  }
+ }
+}
