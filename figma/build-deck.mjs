@@ -236,7 +236,7 @@ const appShotCount = count(appGroups), siteShotCount = count(siteGroups), appPho
 // ───────────────────────────── element helpers ─────────────────────────────
 // Element types (deck.html and plugin/code.js render exactly these): text, rect, ellipse, image, capsule, path.
 // House rule: words are ink (white on dark panels); colour lives only in fills, lines, chips and art.
-const W = 1920, H = 1080, X = 120, TOTAL = 18;
+const W = 1920, H = 1080, X = 120, TOTAL = 20;
 const text = (x, y, w, t, o = {}) => ({ t: 'text', x, y, w, text: t, size: 30, font: 'sans', weight: 400, color: C.ink, lh: 140, ls: 0, align: 'left', ...o });
 const eyebrow = (x, y, t, w = 1200, o = {}) => text(x, y, w, t.toUpperCase(), { font: 'mono', size: 20, weight: 500, ls: 14, color: C.muted, lh: 120, ...o });
 const head = (x, y, w, t, size = 104, o = {}) => text(x, y, w, t, { font: 'serif', size, lh: 100, ls: -1.5, ...o });
@@ -330,6 +330,26 @@ const APP = {
   home: newest('upgrade/a-home-390.webp', 'v3/dashboard.webp'),
   medicines: newest('upgrade/a-medicines-390.webp', 'v2/medicines-phone.webp'),
   ask: newest('upgrade/b-ask-390.webp', 'round3-ask-phone.webp'),
+};
+// Station phases (dev-shots/phases, one shot per phase, newest app pass) and the Gemini checker + follower (dev-shots/gemini).
+// Older passes are listed second only so the deck still builds on a checkout without the newest shots.
+const RAIL_PHONE = { w: 320, cap: 1.8, q: 12 }, TALL_PHONE = { w: 340, cap: 2.2, q: 12 };
+const shot = (spec, ...cands) => {
+  for (const c of cands) if (fs.existsSync(path.join(ROOT, SHOTS, c))) return img(`${SHOTS}/${c}`, spec);
+  throw new Error(`no screenshot among ${cands.join(', ')}`);
+};
+const PHASE_SHOT = {
+  dark: shot(RAIL_PHONE, 'phases/02-dark-390.webp', 'pillmotion-place-phone-checking.webp'),
+  water: shot(RAIL_PHONE, 'phases/03-water-390.webp', 'pillmotion-place-phone.webp'),
+  drop: shot(RAIL_PHONE, 'phases/04-drop-390.webp', 'upgrade/b-place-390.webp'),
+  dissolving: shot(RAIL_PHONE, 'phases/05-dissolving-390.webp', 'pillmotion-run-mid-phone.webp'),
+  settling: shot(RAIL_PHONE, 'phases/06-settling-390.webp', 'upgrade/b-run-390.webp'),
+  verdict: shot(RAIL_PHONE, 'phases/07-verdict-390.webp', 'upgrade/b-evaluation-needslab-390.webp'),
+};
+const GEMINI_SHOT = {
+  steps: shot(TALL_PHONE, 'gemini/checker-steps-390.webp'),
+  report: shot(TALL_PHONE, 'gemini/checker-report-390.webp'),
+  follower: shot(TALL_PHONE, 'gemini/follower-open-390.webp'),
 };
 // Art captured from the live site by capture-art.mjs (figma/art/*.png)
 const ART = {
@@ -516,7 +536,58 @@ S('App screens', [
   }),
 ], 'One web app on the station\'s touchscreen and on any phone. These are the newest build pass; the Design file has every screenshot, grouped by pass and linked to its route.');
 
-// 10 · website
+// 10 · six phases: the station's state machine (pill/pay/src/station.ts), one column per phase
+const phases = [
+  ['Lights off', '3 s', 'LEDs off. The box must read dark; a light leak means the lid is open, and the run stops.', C.dark, C.greyTint, 'dark'],
+  ['Clear water', '10 s', 'Plain water, paddle on. The blank must hold steady (CV under 2\u00a0%) or it retries, up to 3\u00a0times.', C.sky, C.skyTint, 'water'],
+  ['Drop the tablet', '≤ 30 s', 'It waits for the inline reading to fall 6\u00a0%. After 30\u00a0s the screen prompts.', C.violet, C.violetTint, 'drop'],
+  ['Dissolving', '1–2 min', 'The pill fills, the curve falls, the glow rises. Glow flat while blue falls: the amber moment.', C.skyInk, C.skyTint, 'dissolving'],
+  ['Settling', '20 s window', 'Flat for 20\u00a0s (|dA/dt|\u00a0<\u00a0ε) means plateau. No plateau by 180\u00a0s: timeout.', C.grey, C.greyTint, 'settling'],
+  ['Verdict', '7 rules', 'Seven rules, in order. The rule that fired is printed with the word.', C.mint, C.mintTint, 'verdict'],
+];
+const PCOL = (W - 2 * X) / phases.length;
+S('Six phases', [
+  ...chrome('The run, phase by phase'),
+  head(X, 128, 1000, 'Six phases, one run.', 72),
+  body(X + 1060, 132, 620, 'The app follows the station\u2019s own state machine. Each phase has its own time, its own look and its own check; a failed check stops the run and says why.', { size: 19, lh: 140 }),
+  rect(X + 12, 297, W - 2 * X - PCOL + 12, 2, { fill: C.line2 }),
+  ...phases.flatMap(([name, time, desc, dot, tint, key], i) => {
+    const x = Math.round(X + i * PCOL);
+    return [
+      { t: 'ellipse', x, y: 286, w: 24, h: 24, fill: dot, stroke: C.surface, strokeW: 4 },
+      mono(x + 40, 287, 200, String(i + 1).padStart(2, '0'), { size: 17, weight: 500, ls: 10, lh: 130 }),
+      text(x, 334, 256, name, { size: 27, weight: 600, lh: 130 }),
+      ...chip(x, 378, time, tint, { size: 16 }),
+      body(x, 428, 256, desc, { size: 17, lh: 140 }),
+      ...phone(x, 540, 230, PHASE_SHOT[key], 410),
+    ];
+  }),
+], 'A run is six phases, the same ones the station walks through. Lights off for three seconds: the box must be dark, or the lid is open and nothing runs. Ten seconds of clear water as the blank; it must be steady. Drop the tablet; the station waits for the reading to fall six percent. Dissolving: the pill fills and the glow should rise with it. Settling: twenty flat seconds is a plateau. Then the seven rules give the word.');
+
+// 11 · the Gemini checker and the follower
+const checkSteps = [['Read the label', 'gemini vision'], ['Look at the cup', 'gemini vision'], ['Check for a recall', 'openFDA'], ['Check expiry, drug and lot', 'code'], ['Compare with the sensor', 'code'], ['Say it in plain words', 'gemini · filtered']];
+S('Gemini checker', [
+  ...chrome('Gemini checks the sensor'),
+  head(X, 128, 680, 'Gemini checks what the sensor says.', 72),
+  body(X, 300, 640, 'After the run, Gemini reads the label, looks at the cup and checks for a recall, then compares that with the sensor. Six steps, each logged with its own time.', { size: 21, lh: 145 }),
+  ...checkSteps.flatMap(([name, tool], i) => {
+    const y = 470 + i * 56;
+    return [
+      { t: 'ellipse', x: X, y, w: 36, h: 36, fill: C.skyTint },
+      mono(X, y + 7, 36, String(i + 1), { size: 17, weight: 600, color: C.ink, align: 'center', lh: 130 }),
+      text(X + 54, y + 3, 400, name, { size: 21, weight: 600, lh: 140 }),
+      mono(X + 440, y + 8, 200, tool, { size: 16, align: 'right', lh: 130 }),
+    ];
+  }),
+  card(X, 830, 640, 120, { fill: C.mintTint, stroke: 'rgba(95,211,154,0.45)' }),
+  text(X + 28, 852, 584, 'The sensor decides. The checker explains and never changes the word. A pharmacist or doctor decides.', { size: 20, color: C.ink, lh: 140 }),
+  ...[[GEMINI_SHOT.steps, 'Checker · the step log'], [GEMINI_SHOT.report, 'Checker · the report'], [GEMINI_SHOT.follower, 'Follower · on every screen']].flatMap(([id, label], i) => {
+    const x = 820 + i * 330;
+    return [...phone(x, 196, 300, id, 640), mono(x, 852, 300, label, { align: 'center', size: 16, color: C.ink2 })];
+  }),
+], 'After the run, a Gemini agent checks what the sensor says: it reads the label, looks at photos of the cup, checks openFDA for a recall, cross-checks expiry, drug and lot, and compares what the camera saw with the sensor numbers. Every step is logged with its own time. The verdict word comes from the sensor and is never changed. The follower is the same Gemini, docked on every screen, answering questions about what is on it.');
+
+// 12 · website
 S('Website', [
   ...chrome('The website'),
   head(X, 150, 1000, 'pill-site.vercel.app', 80),
@@ -529,7 +600,7 @@ S('Website', [
   mono(1010, 926, 790, 'Payments · the verdict is the invoice'),
 ], 'The website came first and set the tokens the app inherited. A 16-persona panel picked a plain, honest page over a copied storytelling site. All three crops are the live site today, captured headless.');
 
-// 11 · workflow
+// 13 · workflow
 const flow = [
   ['Ideation', ['AI persona panels', 'Web research'], ['FigJam board']],
   ['Prototyping', ['binary-pill.html', 'Phone mock (Vite)'], ['Figma Make prompt']],
@@ -559,7 +630,7 @@ S('Workflow', [
   text(X, 958, 1680, 'Honest order: no Figma was used Friday or Saturday morning. The Figma files are generated from the repo, and the log says so.', { size: 22, color: C.ink2, lh: 140 }),
 ], 'We are a code-first team. Ideation and prototyping happened in markdown, AI panels and HTML. Figma enters as the place the repo is published to: slides, screens, tokens and the ideation board.');
 
-// 12 · design from code
+// 14 · design from code
 const node = (x, y, w, h, k, d, o = {}) => [card(x, y, w, h, { radius: 22, ...o }), text(x + 24, y + 22, w - 48, k, { font: 'mono', size: 21, weight: 600, lh: 130 }), text(x + 24, y + 58, w - 48, d, { size: 17, color: C.ink2, lh: 140 })];
 const fan = [['Slides', 'deck + speaker notes'], ['Design', 'pages + styles'], ['FigJam', 'the ideation board']];
 S('Design from code', [
@@ -584,7 +655,7 @@ S('Design from code', [
   text(X, 912, 1680, 'Why a plugin: the Figma REST API and our Composio connector can read, comment and set variables, but cannot create layers or slides. The Plugin API can.', { size: 21, color: C.ink2, lh: 145 }),
 ], 'The REST API cannot draw, so the repo emits deck.json and a one-file plugin draws it in Slides, Design or FigJam. Composio closes the loop: comments, dev resources back to the code, thumbnails, and tokens back to CSS. Nobody has run it in real Figma yet; that step is marked pending.');
 
-// 13 · stage log table
+// 15 · stage log table
 const stageShort = [
   ['16 AI personas per panel, reference study; FigJam board generated after', 'One model played all 16: agreement inflated (SD 0)', 'PLAN.md decisions, scope, site outline'],
   ['binary-pill.html, phone mock in the site\u2019s JS; Figma Make prompt written', 'Nobody could click it without a code editor', 'APP-PLAN\u2019s 12 screens, the pill fill'],
@@ -611,7 +682,7 @@ S('Stage log', [
   mono(X, 954, 1680, 'PENDING = the Figma step is written but not yet run; its minutes and rating stay blank in the log, not estimated.', { size: 17 }),
 ], 'Four stages, timed from git commit times. Steps not yet run in real Figma say pending; we do not estimate them. The full log, with the Figma Make prompt and a ten-minute reproduce box, is STAGE-LOG.md.');
 
-// 14 · what broke
+// 16 · what broke
 const brokeCards = [
   ['The P6 hold rule', 'The scaffold held money only when the recall lookup was unreachable, so a delivery with no bottle attached could be proposed for release.', 'Caught by a builder\u2019s end-to-end test.'],
   ['A double deploy', 'A `tail -6` cut off Vercel\u2019s output, the deploy looked unfinished and was re-run: two identical production deploys.', 'Read the whole log before re-running.'],
@@ -629,10 +700,10 @@ S('What broke', [
   }),
 ], 'What broke, honestly. A rule bug the tests caught, a deploy we ran twice because the output was cut off, an API that cannot draw, and a hand-copied palette where most tokens drifted. Each one changed how we work.');
 
-// 15 · before / after (filled after measurement)
+// 17 · before / after (filled after measurement)
 S('Before and after', [{ t: 'metrics' }], 'Before numbers are estimates and say so. After numbers are measured on this machine; the real Figma run time is printed by the plugin and goes into LINKS.md.');
 
-// 16 · limits
+// 18 · limits
 S('What PASS does not mean', [
   ...chrome('What PASS does not mean'),
   head(X, 150, 1500, [{ s: 'Pill screens tablets. ' }, { s: 'It does not grade them.', italic: true }], 92),
@@ -645,7 +716,7 @@ S('What PASS does not mean', [
   text(X, 780, 1680, 'Results charts on our site are marked as an illustration until the calibration runs are on the page.', { size: 24, color: C.ink2, lh: 140 }),
 ], 'Say the limits before a judge asks. One reference drug, riboflavin; anything else is UNABLE TO VERIFY, by design. We never call a medicine good or bad.');
 
-// 17 · tracks
+// 19 · tracks
 const tracks = [
   ['Figma · Idea to Demo', C.violet, 'this deck, the plugin, the stage log'], ['Hardware Hack', C.sky, 'the station, on the table'], ['Hyphenate · finance agents', C.sky, 'policy agent: proposes, holds, escalates'],
   ['Coinbase · x402 payment agents', C.violet, '/verify over x402, USDC escrow (TESTNET)'], ['Capital One · Nessie', C.amber, 'hold / release / refund (SANDBOX)'], ['Microsoft · Built for the Real World', C.sky, 'a clinic pharmacist\u2019s delivery check'],
@@ -662,7 +733,7 @@ S('Tracks', [
   }),
 ], 'One build, many judges; only the emphasis changes. Money is SANDBOX or TESTNET on every track.');
 
-// 18 · ask / next
+// 20 · ask / next
 const next = [['1', 'Calibration on the real box', 'Ten riboflavin reference runs and chalk runs, plotted on the site in place of the illustration.'], ['2', 'A second reference drug', 'Each new drug needs its own band. Until then it is UNABLE TO VERIFY, on purpose.'], ['3', 'One pharmacy, one week', 'A procurement officer samples one tablet per delivery; we log every decision and every override.']];
 S('Ask and next', [
   ...chrome('Next'),
@@ -696,7 +767,7 @@ const design = {
       ['Delivery · held', '/delivery/:id', APP.heldTop],
       ['Pay · x402', '/pay', newest('upgrade/pay-awaiting-390.webp', 'upgrade/b-verify-390.webp')],
       ['Dashboard · after', '/', newest('upgrade/a-dashboard-390.webp', 'dashviz-dashboard-phone.webp')],
-    ].map(([name, route, img]) => ({ name, route, img })),
+    ].map(([name, route, img]) => ({ name, route, img, src: IMAGES[img].src })),
   },
 };
 const ideasBefore = [
@@ -832,6 +903,8 @@ body{-webkit-font-smoothing:antialiased;font-feature-settings:"ss01","cv11"}
 .tx{white-space:pre-wrap;overflow-wrap:break-word}
 .notes{width:1920px;font:20px/1.5 Inter,sans-serif;color:#4A4E55;margin-top:-28px}
 body.one .deck{padding:0;gap:0}body.one .notes{display:none}body.one .slide{display:none}body.one .slide.on{display:block}
+@page{size:1920px 1080px;margin:0}
+@media print{html,body{background:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}.deck{display:block;padding:0}.notes{display:none}.slide{display:block!important;transform:none!important;margin:0!important;break-before:page}.slide:first-of-type{break-before:auto}}
 </style></head><body>
 <div class="deck">
 ${slides.map((s, i) => `<section class="slide" id="${s.id}" data-name="${esc(s.name)}" style="background:${s.bg}">\n${s.els.map(elHtml).join('\n')}\n</section>\n<p class="notes"><b>${i + 1}. ${esc(s.name)}</b> · notes: ${esc(s.notes)}</p>`).join('\n')}

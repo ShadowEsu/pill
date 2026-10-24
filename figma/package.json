@@ -1,0 +1,9 @@
+{
+  "name": "pill-figma",
+  "private": true,
+  "type": "module",
+  "description": "Pill → Figma package: deck builder, PPTX fallback, import kit",
+  "dependencies": {
+    "pptxgenjs": "^4.0.1"
+  }
+}

@@ -1,10 +1,10 @@
 {
-  "slides": 18,
+  "slides": 20,
   "perSlideMin": 20,
   "perShotMin": 1,
   "perTokenMin": 1,
-  "screens": 363,
-  "appShots": 255,
+  "screens": 404,
+  "appShots": 296,
   "siteShots": 108,
   "tokenCount": 43,
   "drift": {
@@ -13,17 +13,17 @@
     "missing": 12,
     "siteTotal": 27
   },
-  "imagesConverted": 3,
+  "imagesConverted": 31,
   "realFigmaSec": null,
   "buildCold": 38.1,
   "pluginStubMs": {
-    "slides": 16,
-    "figma": 59,
-    "figjam": 3
+    "slides": 6,
+    "figma": 13,
+    "figjam": 2
   },
   "buildSec": 2.3,
-  "at": "2026-10-24T19:19:40.604Z",
-  "deckBytes": 8143085,
+  "at": "2026-10-24T23:19:10.753Z",
+  "deckBytes": 9300151,
   "stageWords": [
     {
       "stage": "Ideation",
