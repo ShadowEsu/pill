@@ -206,7 +206,7 @@
           <p class="lead">The same screen runs on the Pi touchscreen and on your phone. Green means the curve matched the reference. Warm red means it did not, and the money stays put. Grey means Pill has nothing to compare against, so it asks a person.</p>
           <ul class="list">
             <li><b>P1</b><span><b style="color:var(--pass)">PASS</b> — plateau inside the band and the green glow rose with it.</span></li>
-            <li><b>N1</b><span><b style="color:#E0532E">NEEDS LAB</b> — light dropped but nothing glowed. Something dissolved; it was not riboflavin.</span></li>
+            <li><b>N2</b><span><b style="color:#E0532E">NEEDS LAB</b> — light dropped but nothing glowed. Something dissolved; it was not riboflavin.</span></li>
             <li><b>U1</b><span><b style="color:#A3A8B0">UNABLE TO VERIFY</b> — no reference for this drug, a fault, or the lid opened.</span></li>
           </ul>
         </div>
@@ -421,9 +421,9 @@
               <tr><td>U1</td><td>No reference for this drug on this box</td><td>UNABLE TO VERIFY</td></tr>
               <tr><td>U2</td><td>Any fault: lid open, sensor saturated, LED dead, temperature out of range</td><td>UNABLE TO VERIFY</td></tr>
               <tr><td>U3</td><td>Water temperature more than 3 °C from calibration, or under 30 s of data</td><td>UNABLE TO VERIFY</td></tr>
-              <tr><td>N1</td><td>Light dropped but no green glow</td><td>NEEDS LAB</td></tr>
-              <tr><td>N2</td><td>No plateau before timeout, or below the detection limit</td><td>NEEDS LAB</td></tr>
-              <tr><td>N3</td><td>Plateau outside the reference band</td><td>NEEDS LAB</td></tr>
+              <tr><td>N1</td><td>Plateau below the reference band</td><td>NEEDS LAB</td></tr>
+              <tr><td>N2</td><td>Inline moved but the green glow did not rise</td><td>NEEDS LAB</td></tr>
+              <tr><td>N3</td><td>Plateau above the reference band</td><td>NEEDS LAB</td></tr>
               <tr><td>P1</td><td>Plateau in band and the glow rose with it</td><td>PASS</td></tr>
             </tbody>
           </table>

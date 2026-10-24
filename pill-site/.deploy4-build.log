@@ -1,0 +1,32 @@
+<claude-code-hint v="1" type="plugin" value="vercel@claude-plugins-official" />
+Vercel CLI 65.2.0
+Installing dependencies...
+
+up to date in 273ms
+
+> pill-site@1.0.0 build
+> vite build
+
+vite v8.3.5 building client environment for production...
+transforming...
+✓ 65 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                  41.12 kB │ gzip: 12.13 kB
+dist/assets/index-B0dDHFkW.css   63.78 kB │ gzip: 13.58 kB
+dist/assets/index-CwYzRsp1.js   171.39 kB │ gzip: 59.47 kB
+
+✓ built in 147ms
+{
+  "status": "ok",
+  "outputDir": "/Users/prestonjaysusanto/calhacks-13/pill-site/.vercel/output",
+  "outputDirRelative": ".vercel/output",
+  "target": "production",
+  "message": "Build completed successfully.",
+  "next": [
+    {
+      "command": "vercel deploy",
+      "when": "Deploy the build output"
+    }
+  ]
+}

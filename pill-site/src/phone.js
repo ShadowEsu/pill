@@ -461,7 +461,7 @@ ${verdictView('pass', 'pass', 'Riboflavin 100 mg (1/4 tablet) · lot B2-07',
     ['plateau 0.41 · band 0.36-0.47', 'glow 0.78 · min 0.40'], 'P1')}
 ${verdictView('needslab', 'lab', 'Riboflavin 100 mg (1/4 tablet) · lot TM-02',
     'light dropped but no green glow: not consistent with riboflavin',
-    ['plateau 0.52 · band 0.36-0.47', 'glow 0.03 · min 0.40'], 'N1',
+    ['plateau 0.52 · band 0.36-0.47', 'glow 0.03 · min 0.40'], 'N2',
     `<button type="button" class="pbtn pbtn--fill" tabindex="-1">Hold payment</button>
             <button type="button" class="pbtn pbtn--ghost" tabindex="-1">Draft lab referral</button>`)}
 ${verdictView('unable', 'unable', 'no reference loaded',

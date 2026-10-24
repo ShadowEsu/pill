@@ -1,0 +1,42 @@
+<claude-code-hint v="1" type="plugin" value="vercel@claude-plugins-official" />
+Vercel CLI 65.2.0
+  Inspect         https://vercel.com/shadowesus-projects/pill-site/8idecnu8Zpfd4JjQbgjNA2tKkxHV
+  Production      https://pill-site-df7whdicv-shadowesus-projects.vercel.app
+▲ Aliased         https://pill-site.vercel.app
+{
+  "status": "ok",
+  "deployment": {
+    "id": "dpl_8idecnu8Zpfd4JjQbgjNA2tKkxHV",
+    "url": "https://pill-site-df7whdicv-shadowesus-projects.vercel.app",
+    "productionUrl": "https://pill-site.vercel.app",
+    "inspectorUrl": "https://vercel.com/shadowesus-projects/pill-site/8idecnu8Zpfd4JjQbgjNA2tKkxHV",
+    "readyState": "READY",
+    "target": "production",
+    "deploymentApiUrl": "https://api.vercel.com/v13/deployments/dpl_8idecnu8Zpfd4JjQbgjNA2tKkxHV",
+    "buildMachine": {
+      "cores": 2,
+      "memory": 8192,
+      "machine": "basic",
+      "selectionType": "fixed",
+      "selectionSource": "plan-default"
+    },
+    "deploymentProtection": [
+      "vercel_authentication"
+    ]
+  },
+  "message": "Deployment pill-site-df7whdicv-shadowesus-projects.vercel.app ready. Production URL: https://pill-site.vercel.app",
+  "next": [
+    {
+      "command": "vercel curl https://pill-site.vercel.app",
+      "when": "Verify deployment, including when Deployment Protection is enabled"
+    },
+    {
+      "command": "vercel inspect pill-site-df7whdicv-shadowesus-projects.vercel.app --scope shadowesus-projects",
+      "when": "Inspect deployment"
+    },
+    {
+      "command": "vercel deploy --prod --scope shadowesus-projects",
+      "when": "Promote to production"
+    }
+  ]
+}

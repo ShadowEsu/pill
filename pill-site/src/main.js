@@ -249,7 +249,7 @@ if (!reduced) {
           ${grid}${ticks}
           ${refs.map((d, i) => `<path d="${d}" fill="none" stroke="var(--blue)" stroke-width="1.4" opacity="${0.35 + (i % 3) * 0.12}" data-chart-line/>`).join('')}
           <path d="${tums}" fill="none" stroke="var(--lab)" stroke-width="2" data-chart-line/>
-          <text x="${x(175)}" y="${y(0.07)}" text-anchor="end" font-size="12" fill="var(--lab)" font-family="var(--mono)">chalk tablet · NEEDS LAB · N1</text>
+          <text x="${x(175)}" y="${y(0.07)}" text-anchor="end" font-size="12" fill="var(--lab)" font-family="var(--mono)">chalk tablet · NEEDS LAB · N2</text>
           <text x="${x(175)}" y="${y(0.52)}" text-anchor="end" font-size="12" fill="var(--blue-ink)" font-family="var(--mono)">riboflavin ¼ tablet · PASS · P1</text>
         </svg>
       </div>`;

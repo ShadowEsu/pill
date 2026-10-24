@@ -56,7 +56,7 @@ const art = {
     <path d="M60 238 C 120 236, 150 230, 200 226 S 300 222, 360 222" fill="none" stroke="var(--lab)" stroke-width="2.2" stroke-linecap="round" data-draw/>
     <text x="66" y="92" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">reference band · 10 runs</text>
     <text x="250" y="104" font-family="var(--mono)" font-size="10" fill="var(--blue-ink)">PASS · P1</text>
-    <text x="250" y="258" font-family="var(--mono)" font-size="10" fill="var(--lab)">NEEDS LAB · N1</text>
+    <text x="250" y="258" font-family="var(--mono)" font-size="10" fill="var(--lab)">NEEDS LAB · N2</text>
   `, 'Two curves: a riboflavin run rising into the reference band, a chalk run staying flat'),
 
   delivery: wrap(`
@@ -175,7 +175,7 @@ const DAY = [
   [9, 'B2-01', 'PASS · P1', 'released after the tap', 'pass', 0],
   [10, 'B2-06', 'PASS · P1', 'released after the tap', 'pass', 1],
   [11, 'B2-05', 'UNABLE TO VERIFY · U2', 'escalated · lid opened', 'unable', 0],
-  [13, 'TM-03', 'NEEDS LAB · N1', 'held · lab referral', 'lab', 1],
+  [13, 'TM-03', 'NEEDS LAB · N2', 'held · lab referral', 'lab', 1],
   [15, 'B2-08', 'recall record · P4', 'held, whatever the curve says', 'recall', 0],
   [17, 'B2-11', 'PASS · above cap · P5', 'escalated to a person', 'unable', 1],
 ];
