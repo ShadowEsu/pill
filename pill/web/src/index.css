@@ -1,0 +1,106 @@
+/* Pill app tokens. Light mode (Preston, Sat 01:3x). Words stay ink; colour lives in fills, lines and chips. */
+@font-face { font-family: "Inter"; src: url("/fonts/inter-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Inter"; src: url("/fonts/inter-500.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Inter"; src: url("/fonts/inter-600.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "Instrument Serif"; src: url("/fonts/instrument-serif-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Instrument Serif"; src: url("/fonts/instrument-serif-400-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: "JetBrains Mono"; src: url("/fonts/jetbrains-mono-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+
+:root {
+  --bg: #F7F8F7;
+  --surface: #FFFFFF;
+  --glass: rgba(255, 255, 255, 0.72);
+  --ink: #16181B;
+  --ink-2: #4A4E55;
+  --muted: #7C8188;
+  --line: rgba(22, 24, 27, 0.10);
+  --line-2: rgba(22, 24, 27, 0.18);
+  --sky: #4FB3FF;
+  --sky-ink: #2A8FE0;
+  --sky-tint: rgba(79, 179, 255, 0.14);
+  --mint: #5FD39A;
+  --mint-ink: #2FA874;
+  --mint-tint: rgba(95, 211, 154, 0.16);
+  --amber: #E09A3A;
+  --amber-tint: rgba(224, 154, 58, 0.16);
+  --warm: #E0532E;           /* recall / held only, never a verdict */
+  --warm-tint: rgba(224, 83, 46, 0.12);
+  --grey: #9AA0A6;
+  --grey-tint: rgba(154, 160, 166, 0.18);
+  --cb: #0052FF;             /* payment lines only */
+  --cb-tint: rgba(0, 82, 255, 0.10);
+  --pass: var(--mint);
+  --lab: var(--amber);
+  --unable: var(--grey);
+  --serif: "Instrument Serif", Georgia, serif;
+  --sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --radius: 20px;
+  --radius-sm: 12px;
+  --tap: 56px;               /* minimum button height on the phone; kiosk uses 64 */
+  --shadow: 0 20px 50px -30px rgba(22, 24, 27, 0.35);
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 17px; line-height: 1.45; -webkit-font-smoothing: antialiased; min-height: 100dvh;
+  background-image: radial-gradient(700px 500px at 0% 0%, rgba(79,179,255,.14), transparent 60%), radial-gradient(700px 500px at 100% 100%, rgba(95,211,154,.14), transparent 60%); background-attachment: fixed; }
+h1, h2, h3, h4 { margin: 0; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; }
+p { margin: 0; }
+button { font: inherit; color: inherit; }
+a { color: inherit; }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.serif { font-family: var(--serif); font-weight: 400; }
+.muted { color: var(--muted); }
+.eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+
+/* app frame: a phone column on wide screens, full width on phones; .kiosk is landscape 7-inch */
+.app { max-width: 480px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; position: relative; }
+@media (min-width: 720px) { .app { border-left: 1px solid var(--line); border-right: 1px solid var(--line); background: rgba(255,255,255,.35); } }
+.app.kiosk { max-width: none; }
+.screen { flex: 1; display: flex; flex-direction: column; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); gap: 16px; }
+.screen-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; }
+.screen-title { font-size: 28px; letter-spacing: -0.025em; }
+.kiosk .screen-title { font-size: 40px; }
+
+/* primitives */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
+.card.glass { background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.row { display: flex; align-items: center; gap: 12px; }
+.row.between { justify-content: space-between; }
+.stack { display: flex; flex-direction: column; gap: 10px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: var(--tap); padding: 0 22px; border-radius: 999px; border: 1px solid var(--ink); background: var(--ink); color: #fff; font-weight: 600; font-size: 17px; cursor: pointer; transition: transform .2s var(--ease), opacity .2s, background .2s; width: 100%; }
+.btn:active { transform: scale(.985); }
+.btn:disabled { opacity: .4; cursor: default; }
+.btn.ghost { background: var(--surface); color: var(--ink); border-color: var(--line-2); }
+.btn.sky { background: var(--sky-ink); border-color: var(--sky-ink); }
+.btn.mint { background: var(--mint-ink); border-color: var(--mint-ink); }
+.kiosk .btn { min-height: 64px; font-size: 20px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 11.5px; letter-spacing: .04em; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); white-space: nowrap; }
+.chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--grey); }
+.chip.ok .dot { background: var(--mint); }
+.chip.warn .dot { background: var(--amber); }
+.chip.bad .dot { background: var(--warm); }
+.chip.live .dot { background: var(--sky); box-shadow: 0 0 0 3px var(--sky-tint); }
+.verdict-pass { color: var(--ink); background: var(--mint-tint); border-color: rgba(95,211,154,.5); }
+.verdict-needslab { color: var(--ink); background: var(--amber-tint); border-color: rgba(224,154,58,.5); }
+.verdict-unable { color: var(--ink); background: var(--grey-tint); border-color: rgba(154,160,166,.6); }
+.big-num { font-family: var(--serif); font-size: 64px; line-height: .95; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.kv { display: grid; grid-template-columns: 1fr auto; gap: 6px 14px; font-size: 15px; }
+.kv dt { color: var(--muted); margin: 0; }
+.kv dd { margin: 0; font-family: var(--mono); font-size: 14px; text-align: right; }
+.hr { height: 1px; background: var(--line); border: 0; margin: 4px 0; width: 100%; }
+.footnote { font-size: 13px; color: var(--muted); }
+.src-badge { position: fixed; right: 12px; top: 12px; z-index: 5; }
+input[type="text"], input[type="number"], textarea { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--radius-sm); padding: 12px 14px; width: 100%; min-height: 48px; }
+input:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; }
+
+/* simple, good animations: fade-rise once; disabled with reduced motion */
+.rise { animation: rise .5s var(--ease) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .rise { animation: none; } * { transition-duration: 0s !important; } }
+
+/* bigger type for the personal mode (grandparents): one switch, applied on <html> */
+html.big { font-size: 112%; }
+html.big .btn { min-height: 64px; font-size: 19px; }
