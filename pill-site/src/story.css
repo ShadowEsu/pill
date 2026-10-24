@@ -17,8 +17,8 @@
 /* ---------- hero: the line that types in ---------- */
 .hero-sub { position: relative; margin-top: 22px; font-family: var(--serif); font-style: italic; font-size: clamp(26px, 3vw, 40px); line-height: 1.15; letter-spacing: -0.01em; max-width: 22ch; }
 .hero-sub .hs-ghost { visibility: hidden; }
-.hero-sub .hs-typed { position: absolute; inset: 0; background: linear-gradient(90deg, #2A8FE0, #2FA874); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.hero-sub.typing:not(.done) .hs-typed::after { content: ""; display: inline-block; width: 2px; height: .85em; margin-left: 3px; vertical-align: -.08em; background: #2A8FE0; animation: blink 1s steps(2, start) infinite; }
+.hero-sub .hs-typed { position: absolute; inset: 0; color: var(--ink); }
+.hero-sub.typing:not(.done) .hs-typed::after { content: ""; display: inline-block; width: 2px; height: .85em; margin-left: 3px; vertical-align: -.08em; background: var(--blue); animation: blink 1s steps(2, start) infinite; }
 .no-js .hero-sub .hs-ghost { visibility: visible; color: var(--ink-2); }
 
 /* ---------- nav: current chapter ---------- */
@@ -139,7 +139,7 @@
 .tt-bar .s1 { flex: 1; background: rgba(142,154,166,.55); }
 .tt-bar .s2 { flex: 1.3; background: var(--blue); }
 .tt-bar .s3 { flex: 1; background: var(--c); }
-.tt-v { font-family: var(--mono); font-size: 11.5px; letter-spacing: .02em; color: var(--c); }
+.tt-v { display: inline-block; font-family: var(--mono); font-size: 11px; letter-spacing: .02em; color: var(--dark-text); background: color-mix(in srgb, var(--c) 28%, transparent); border: 1px solid color-mix(in srgb, var(--c) 55%, transparent); border-radius: 999px; padding: 2px 8px; }
 .tt-d { margin-top: 2px; font-size: 13px; line-height: 1.4; color: var(--dark-text); opacity: .85; }
 .tt-key { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 16px; font-family: var(--mono); font-size: 11px; color: var(--dark-muted); }
 .tt-key span { display: inline-flex; align-items: center; gap: 8px; }
