@@ -86,18 +86,21 @@ client = discord.Client(intents=intents)
 watched: set[int] = set()
 
 
-async def ensure_channels(guild: discord.Guild) -> discord.CategoryChannel:
-    cat = discord.utils.get(guild.categories, name=CATEGORY)
-    if cat is None:
-        cat = await guild.create_category(CATEGORY)
-        log(f"created category {CATEGORY} in {guild.name}")
-    existing = {c.name: c for c in cat.text_channels}
+def plain(name: str) -> str:
+    """'💬-inquiries' -> 'inquiries'; routing and say.sh use the plain name."""
+    return re.sub(r"^[^a-z0-9]+", "", name.lower()).strip("-")
+
+
+async def ensure_channels(guild: discord.Guild) -> None:
+    """First run only: if none of our channels exist, create them under CATEGORY. Later runs leave the layout alone
+    (categories and emoji names are managed by hand or by the reorganise script)."""
+    have = {plain(c.name) for c in guild.text_channels}
+    if any(name in have for name, _ in CHANNELS):
+        return
+    cat = discord.utils.get(guild.categories, name=CATEGORY) or await guild.create_category(CATEGORY)
     for name, topic in CHANNELS:
-        if name in existing:
-            continue
         await guild.create_text_channel(name, category=cat, topic=topic)
         log(f"created #{name}")
-    return cat
 
 
 @client.event
@@ -107,15 +110,16 @@ async def on_ready() -> None:
         await client.close()
         return
     for guild in client.guilds:
-        cat = await ensure_channels(guild)
-        for ch in cat.text_channels:
-            watched.add(ch.id)
-            print(f"{guild.name} #{ch.name} id={ch.id}", flush=True)
+        await ensure_channels(guild)
+        for ch in guild.text_channels:
+            if plain(ch.name) in {n for n, _ in CHANNELS}:
+                watched.add(ch.id)
+                print(f"{guild.name} #{ch.name} id={ch.id}", flush=True)
     log(f"ready as {client.user}; watching {len(watched)} channels -> herdr {TARGET}")
     if SETUP_ONLY:
         await client.close()
         return
-    ask = next((c for g in client.guilds for c in g.text_channels if c.name == "inquiries" and c.id in watched), None)
+    ask = next((c for g in client.guilds for c in g.text_channels if plain(c.name) == "inquiries" and c.id in watched), None)
     if ask:
         await ask.send("Pill is online. Ask anything here; drop files in #documents; the plan lives in #plan. I answer in the channel you write in.")
 
@@ -138,7 +142,7 @@ async def on_message(message: discord.Message) -> None:
     if not text and not saved:
         return
     author = message.author.display_name
-    chan = message.channel.name
+    chan = plain(message.channel.name)
     parts = [f"DISCORD #{chan} (id {message.channel.id}) from {author}: {text or '(no text)'}"]
     if saved:
         parts.append("Attachments saved: " + ", ".join(saved))
