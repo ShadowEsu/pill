@@ -43,21 +43,21 @@ const art = {
       <path d="M170 90 h60 M200 90 v30" /><path d="M186 120 h28" />
     </g>
     <g data-draw><path d="M72 161 h110" stroke="var(--blue)" stroke-width="2.4" stroke-linecap="round"/><path d="M214 161 h104" stroke="var(--blue)" stroke-width="2.4" stroke-linecap="round" opacity=".35"/></g>
-    <g data-draw><path d="M200 182 v52" stroke="var(--pass)" stroke-width="2.4" stroke-linecap="round" opacity=".8"/></g>
+    <g data-draw><path d="M200 182 v52" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="2 4" opacity=".7"/></g>
     <rect x="52" y="150" width="20" height="22" rx="4" ${S}/><rect x="318" y="150" width="20" height="22" rx="4" ${S}/><rect x="190" y="234" width="20" height="22" rx="4" ${S}/>
-    <text x="50" y="142" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">blue LED</text>
-    <text x="300" y="142" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">inline · blue filter</text>
-    <text x="216" y="250" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">90° · green filter</text>
-  `, 'A tablet dropping into the chamber; the blue beam crosses one corner, the green glow is read at ninety degrees'),
+    <text x="50" y="142" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">LEDs · B W R</text>
+    <text x="300" y="142" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">inline · A0</text>
+    <text x="216" y="250" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">90° · scatter · A1</text>
+  `, 'A tablet dropping into a small cup; light crosses one corner to the inline sensor, and the side sensor at ninety degrees reads the light that scatters as the water clouds'),
 
   curve: wrap(`
     <g ${G}><line x1="60" y1="240" x2="360" y2="240"/><line x1="60" y1="40" x2="60" y2="240"/><rect x="60" y="96" width="300" height="44" fill="currentColor" stroke="none" opacity=".07"/></g>
     <path d="M60 238 C 120 236, 150 150, 200 122 S 300 112, 360 110" fill="none" stroke="var(--blue)" stroke-width="2.2" stroke-linecap="round" data-draw/>
     <path d="M60 238 C 120 236, 150 230, 200 226 S 300 222, 360 222" fill="none" stroke="var(--lab)" stroke-width="2.2" stroke-linecap="round" data-draw/>
-    <text x="66" y="92" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">reference band · 10 runs</text>
+    <text x="66" y="92" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">reference spread · 3 or more good runs</text>
     <text x="250" y="104" font-family="var(--mono)" font-size="10" fill="var(--blue-ink)">PASS · P1</text>
-    <text x="250" y="258" font-family="var(--mono)" font-size="10" fill="var(--lab)">NEEDS LAB · N2</text>
-  `, 'Two curves: a riboflavin run rising into the reference band, a chalk run staying flat'),
+    <text x="250" y="258" font-family="var(--mono)" font-size="10" fill="var(--lab)">NEEDS LAB · N1</text>
+  `, 'Illustration: two curves, one inside the reference spread and one far below it'),
 
   delivery: wrap(`
     <g ${S} data-draw>
@@ -118,7 +118,7 @@ const partFallback = (label) => `<svg viewBox="0 0 300 300" width="100%" role="i
     ${arrow(655, 118, 695)}
     ${node(695, 70, 190, 96, 'Policy', ['policy.md P1–P6', 'release · hold · escalate', 'spend cap · log line'])}
     ${arrow(885, 118, 925)}
-    ${node(925, 70, 165, 96, 'Money', ['Nessie SANDBOX', 'clinic → escrow →', 'supplier'], 'rgba(47,107,255,0.9)')}
+    ${node(925, 70, 165, 96, 'Money', ['simulated today', 'clinic → escrow →', 'supplier'], 'rgba(47,107,255,0.9)')}
     ${node(255, 196, 240, 56, 'Claude', ['"why" text · log line · bottle fields'])}
     <path d="M375 196 V166" ${D}/>
     ${node(695, 196, 170, 56, 'openFDA', ['recall by lot · cached'])}
@@ -131,13 +131,13 @@ const partFallback = (label) => `<svg viewBox="0 0 300 300" width="100%" role="i
   </svg>`;
 }
 
-// Calibration: ten reference runs make the band
+// Reference profile: three or more runs of a known-good tablet
 art.calibration = wrap(`
   <g ${G}><line x1="60" y1="240" x2="360" y2="240"/><line x1="60" y1="40" x2="60" y2="240"/><rect x="60" y="104" width="300" height="34" fill="currentColor" stroke="none" opacity=".07"/></g>
-  ${Array.from({ length: 10 }, (_, i) => `<path d="M60 238 C 120 ${236 - i * 0.8}, 150 ${152 + (i % 5) * 3}, 200 ${126 + (i % 4) * 2.5} S 300 ${116 + (i % 3) * 3}, 360 ${114 + (i % 5) * 2}" fill="none" stroke="var(--blue)" stroke-width="1.3" stroke-linecap="round" opacity="${0.35 + (i % 4) * 0.12}" data-draw/>`).join('')}
-  <text x="66" y="98" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">band = mean ± 3 SD of 10 runs</text>
-  <text x="210" y="258" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">leave-one-out 10/10 · CV ≤ 15% or no demo</text>
-`, 'Ten riboflavin reference curves overlapping into a narrow band');
+  ${Array.from({ length: 3 }, (_, i) => `<path d="M60 238 C 120 ${236 - i * 0.8}, 150 ${152 + i * 4}, 200 ${126 + i * 3} S 300 ${116 + i * 4}, 360 ${114 + i * 3}" fill="none" stroke="var(--blue)" stroke-width="1.5" stroke-linecap="round" opacity="${0.45 + i * 0.18}" data-draw/>`).join('')}
+  <text x="66" y="98" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">reference profile · 3 or more good runs</text>
+  <text x="210" y="258" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">illustration · first profile not recorded yet</text>
+`, 'Illustration: three runs of a known-good tablet overlapping into a reference profile');
 
 export function artFor(key) { return art[key] || ''; }
 

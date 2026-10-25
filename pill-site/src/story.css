@@ -238,3 +238,29 @@
   .pg-fig { scroll-snap-align: center; }
   .pg-answers b { font-size: 22px; }
 }
+
+/* ---------- Screens: a scroll-snap slideshow of both apps ---------- */
+.ss { margin-top: 44px; }
+.ss-tabs { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid var(--dark-line); border-radius: 999px; background: rgba(255,255,255,.04); }
+.ss-tab { font: 500 14px/1 var(--sans); color: var(--dark-text); background: none; border: 0; border-radius: 999px; padding: 10px 16px; cursor: pointer; }
+.ss-tab[aria-selected="true"] { background: var(--dark-text); color: var(--dark); }
+.ss-tab:focus-visible, .ss-arrow:focus-visible, .ss-track:focus-visible, .ss-dot:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+.ss-deck { margin-top: 24px; }
+.ss-deck[hidden] { display: none; }
+.ss-track { list-style: none; margin: 0; padding: 4px 0 18px; display: grid; grid-auto-flow: column; grid-auto-columns: clamp(220px, 24%, 280px); gap: clamp(16px, 2.4vw, 32px); overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+.ss-slide { scroll-snap-align: start; min-width: 0; }
+.ss-slide img { display: block; width: 100%; height: auto; border-radius: 28px; border: 8px solid #1B2026; background: #F5F6F4; box-shadow: 0 24px 60px -30px rgba(0,0,0,.8); }
+.ss-slide p { margin-top: 14px; font-size: 15px; line-height: 1.45; color: var(--dark-text); }
+.ss-slide p b { font-weight: 600; }
+.ss-ctl { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
+.ss-arrow { width: 44px; height: 44px; flex: none; border-radius: 50%; border: 1px solid var(--dark-line); background: rgba(255,255,255,.06); color: var(--dark-text); font: 500 18px/1 var(--sans); cursor: pointer; }
+.ss-arrow:disabled { opacity: .35; cursor: default; }
+.ss-dots { display: flex; gap: 8px; flex-wrap: wrap; }
+.ss-dot { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; background: rgba(233,238,242,.28); cursor: pointer; transition: width .25s, background .25s; }
+.ss-dot.on { width: 22px; background: var(--dark-text); }
+.ss-count { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--dark-muted); }
+@media (max-width: 700px) { .ss-track { grid-auto-columns: 78%; } }
+/* reduced motion: a static grid, no slideshow chrome */
+.reduced .ss-track { grid-auto-flow: row; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); grid-auto-columns: auto; overflow: visible; scroll-snap-type: none; }
+.reduced .ss-ctl { display: none; }
+.reduced .ss-tab, .reduced .ss-dot { transition: none; }

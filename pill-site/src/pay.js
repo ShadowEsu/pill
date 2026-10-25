@@ -12,18 +12,18 @@ const RAIL = {
     title: 'PASS · P1 · release',
     escrowAmt: '0.00', supplierAmt: '1,240.00', hold: false,
     lines: [
-      ['dim', '00:03:12  verdict PASS  rule P1  plateau 0.41 in band 0.36–0.47  glow ↑'],
+      ['dim', '00:03:12  verdict PASS  rule P1  plateau 0.41 in band 0.36–0.47'],
       ['dim', '00:03:12  policy: release needs PASS · no recall on lot B2-07 · ≤ cap · pharmacist tap'],
       ['ok', '00:03:40  pharmacist tapped RELEASE'],
-      ['ok', '00:03:41  USDC 1,240.00  escrow → supplier  ·  Base Sepolia  tx 0x7f3a…e21c  (TESTNET)'],
-      ['dim', '00:03:41  Nessie SANDBOX mirror: transfer id 68f9…  ·  log line written'],
+      ['ok', '00:03:41  SIMULATED  escrow → supplier  USDC 0.124 (invoice 1,240 at ×0.0001 test scale)  ·  Base Sepolia  ·  nothing moved'],
+      ['dim', '00:03:41  Nessie sandbox mirror: built, runs only if its key lands  ·  log line written'],
     ],
   },
   needslab: {
-    title: 'NEEDS LAB · N2 · hold',
+    title: 'NEEDS LAB · N1 · hold',
     escrowAmt: '1,240.00', supplierAmt: '0.00', hold: true,
     lines: [
-      ['dim', '00:03:12  verdict NEEDS LAB  rule N2  plateau 0.12 below band  no 90° glow'],
+      ['dim', '00:03:12  verdict NEEDS LAB  rule N1  plateau 0.12 below band'],
       ['ok', '00:03:12  policy: HOLD  ·  funds stay in escrow  ·  no tap offered'],
       ['ok', '00:03:13  lab referral drafted: lot B2-07, curve + raw trace attached'],
       ['dim', '00:03:13  supplier notified: payment held pending lab result  (SANDBOX)'],
@@ -56,14 +56,14 @@ function railSvg() {
     <path class="wire" id="wire-b" d="M410 115 H450"/>
     <g id="rail-token" opacity="0"><circle class="token" cx="0" cy="0" r="13"/><text class="token-lbl" y="3">USDC</text></g>
     <text class="sub" x="10" y="205">delivery logged → clinic pays into escrow → tablet tested → policy decides → pharmacist taps</text>
-    <text class="sub" x="10" y="222">amounts are SANDBOX / TESTNET · Base Sepolia · no real money</text>
+    <text class="sub" x="10" y="222">illustration · simulated, nothing moves · Base Sepolia once a CDP key is in</text>
   </svg>`;
 }
 
 export function mountRail(el) {
   el.innerHTML = `
     <div class="rail-head">
-      <p class="caption">the rail · pick a verdict</p>
+      <p class="caption">the rail · pick a verdict · simulated</p>
       <div class="rail-verdicts" role="group" aria-label="Verdict">
         <button type="button" data-v="pass" aria-pressed="true">PASS</button>
         <button type="button" data-v="needslab" aria-pressed="false">NEEDS LAB</button>
@@ -72,7 +72,7 @@ export function mountRail(el) {
     </div>
     ${railSvg()}
     <div class="rail-log" id="rail-log" aria-live="polite"></div>
-    <div class="rail-foot"><span id="rail-title">PASS · P1 · release</span><span>x402 · CDP wallet · Nessie mirror</span></div>`;
+    <div class="rail-foot"><span id="rail-title">PASS · P1 · release</span><span>illustration · simulated, nothing moves</span></div>`;
 
   const log = el.querySelector('#rail-log');
   const token = el.querySelector('#rail-token');
@@ -133,8 +133,8 @@ const X402_LINES = [
   ['c', '  PAYMENT-REQUIRED: {"scheme":"exact","network":"base-sepolia","asset":"USDC","amount":"0.05","payTo":"0x9c1f…a4d2"}'],
   ['c', '  … agent wallet signs 0.05 USDC (CDP wallet, TESTNET) …'],
   ['c', '$ curl https://pill.example/verify -H "X-PAYMENT: <signed>" -d @curve.json'],
-  ['k', '← 200 OK  ·  X-PAYMENT-RESPONSE: settled  tx 0x3b1d…90ff'],
-  ['k', '  {"verdict":"PASS","rule":"P1","plateau":0.41,"band":[0.36,0.47],"run_id":"r-0193","why":"…"}'],
+  ['k', '← 200 OK  ·  pending: lands once the CDP key is in'],
+  ['c', '  expected body: {"verdict":"PASS","rule":"P1","plateau":0.41,"band":[0.36,0.47],"run_id":"…","why":"…"}'],
 ];
 
 export function mountX402(el) {
@@ -142,7 +142,7 @@ export function mountX402(el) {
     <h4>Pay-per-verdict, with x402</h4>
     <p>Another clinic, an NGO, or someone else's box can send a curve and buy a verdict for a few cents. No account, no key exchange: the server answers 402, the wallet pays, the server answers 200.</p>
     <div class="term" id="x402-term" aria-live="polite">${X402_LINES.map(([c, t]) => `<span class="line ${c}">${esc(t)}</span>`).join('')}</div>
-    <div class="row"><button type="button" class="pbtn-call" id="x402-run">Call /verify</button><button type="button" class="pbtn-call alt" id="x402-reset">Reset</button><span class="caption" style="margin:0">testnet · 0.05 USDC · simulated here</span></div>`;
+    <div class="row"><button type="button" class="pbtn-call" id="x402-run">Call /verify</button><button type="button" class="pbtn-call alt" id="x402-reset">Reset</button><span class="caption" style="margin:0">testnet · 0.05 USDC · simulated here · the paid 200 is pending</span></div>`;
   const lines = [...el.querySelectorAll('.line')];
   const run = el.querySelector('#x402-run');
   const reset = el.querySelector('#x402-reset');
@@ -171,11 +171,11 @@ export function mountCalc(el) {
     </div>
     <div class="out">
       <div><b id="calc-month">$60</b><span>per month, proposed clinic plan</span></div>
-      <div><b id="calc-test">$0.13</b><span>per test, including the quarter tablet</span></div>
+      <div><b id="calc-test">$0.21</b><span>per test, including the tablet</span></div>
       <div><b id="calc-tests">540</b><span>tests a month</span></div>
-      <div><b id="calc-lab">215×</b><span>cheaper than one Minilab sample (€25.85)</span></div>
+      <div><b id="calc-lab">132×</b><span>cheaper than one Minilab sample (€25.85)</span></div>
     </div>
-    <p class="note">proposed pricing, not a live offer · tablet cost assumes a $0.10 reference tablet, one quarter per test · Minilab per-sample figure from the GPHF price list · lab tester $20,000–$100,000 not included</p>`;
+    <p class="note">proposed pricing, not a live offer · assumes a $0.10 tablet, one whole tablet per test · Minilab per-sample figure from the 13-country study (PMC9338985), at 1.08 USD per EUR · lab tester $20,000–$100,000 not included</p>`;
   const st = el.querySelector('#calc-st'), td = el.querySelector('#calc-td');
   const o = (id) => el.querySelector('#' + id);
   const fmt = (n, d = 0) => n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -183,7 +183,7 @@ export function mountCalc(el) {
     const s = +st.value, t = +td.value;
     const month = s * 20;
     const tests = s * t * 30;
-    const perTest = month / tests + 0.025;
+    const perTest = month / tests + 0.10;
     const lab = 25.85 * 1.08; // EUR→USD, rounded
     o('calc-st-o').textContent = s; o('calc-td-o').textContent = t;
     o('calc-month').textContent = '$' + fmt(month);

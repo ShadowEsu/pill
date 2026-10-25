@@ -1,4 +1,4 @@
-// "One tablet's three minutes": a pinned, scroll-synced story in six scenes (SomniQ / Apple style),
+// "One tablet, one minute": a pinned, scroll-synced story in six scenes (SomniQ / Apple style),
 // plus the Coinbase flow diagram and the FIG-grid data-flow arrows.
 // Every scene is a pure function of one number p in [0, 6): scene i owns [i, i + 1). The desktop pin drives
 // one stage from the scroll position (anime.js onScroll + sync); phones and reduced motion get the same scenes stacked.
@@ -13,12 +13,12 @@ const inQuad = (t) => t * t;
 const money = (v) => v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 export const SCENES = [
-  { n: '01', name: 'Label', time: '0:00', line: 'It starts with the label, the one part anyone can copy.', cap: 'phone camera · drug, strength, lot, maker, expiry · openFDA recall check' },
-  { n: '02', name: 'Drop', time: '0:40', line: 'A quarter tablet goes into 900 mL of water.', cap: 'lid closed · stirred by hand · water temperature typed in' },
-  { n: '03', name: 'Light', time: '0:40 → 3:00', line: 'Blue light crosses the cup. As riboflavin dissolves, less of it gets through.', cap: 'inline sensor · blue plastic · absorbance = log(blank / now)' },
-  { n: '04', name: 'Glow', time: '0:40 → 3:00', line: 'At 90°, behind green plastic, the water starts to glow. Chalk does not.', cap: '90° sensor · green plastic · riboflavin glows green' },
-  { n: '05', name: 'Curve', time: '3:00', line: 'The curve flattens inside last night’s band.', cap: 'plateau vs ten reference runs on this box · seven rules, in order' },
-  { n: '06', name: 'Verdict', time: '3:12 → 3:41', line: 'PASS proposes release. A pharmacist taps. Only then does the money move.', cap: 'P1 · escrow → supplier · USDC on Base Sepolia · TESTNET' },
+  { n: '01', name: 'Label', time: 'before', line: 'It starts with the label, the one part anyone can copy.', cap: 'phone camera · drug, strength, lot, maker, expiry · openFDA recall check' },
+  { n: '02', name: 'Drop', time: 'tablet in', line: 'One whole tablet goes into a small cup of water.', cap: 'opening the lid marks tablet-in · stirred by hand with a stick' },
+  { n: '03', name: 'Light', time: '0 → 60 s', line: 'Light crosses the cup. A white tablet barely changes its colour.', cap: 'inline sensor · red channel · first aspirin run: 0.035' },
+  { n: '04', name: 'Cloud', time: '0 → 60 s', line: 'At 90°, the side sensor sees the water cloud as the tablet breaks up.', cap: 'side sensor · scatter · first aspirin run: 0.29 against a blank noise of 0.006' },
+  { n: '05', name: 'Match', time: '60 s', line: 'The curve is matched against good tablets of the same product.', cap: 'illustration · the station’s first reference profile is not recorded yet' },
+  { n: '06', name: 'Answer', time: 'after', line: 'A pass proposes release. A pharmacist taps. Only then would the money move.', cap: 'P1 · escrow → supplier · simulated until a CDP key is in' },
 ];
 
 /* ---------- geometry ---------- */
@@ -34,9 +34,9 @@ const BODY_EDGE = 'M14 152 V240 A56 56 0 0 0 126 240 V152';
 const CX0 = 48, CX1 = 392, CY0 = 130, CY1 = 430;
 const cy = (a) => CY1 - (a / 0.6) * (CY1 - CY0);
 const cx = (s) => CX0 + (s / 180) * (CX1 - CX0);
-const CURVE = (() => { let d = ''; for (let s = 0; s <= 180; s += 3) { const a = s < 12 ? 0 : 0.41 * (1 - Math.exp(-0.042 * (s - 12))); d += (s ? 'L' : 'M') + cx(s).toFixed(1) + ' ' + cy(a).toFixed(1) + ' '; } return d; })();
-const GLOWC = (() => { let d = ''; for (let s = 0; s <= 180; s += 3) { const a = s < 14 ? 0 : 0.2 * (1 - Math.exp(-0.04 * (s - 14))); d += (s ? 'L' : 'M') + cx(s).toFixed(1) + ' ' + cy(a).toFixed(1) + ' '; } return d; })();
-const FIELDS = [['drug', 'Riboflavin 100 mg'], ['lot', 'B2-07'], ['maker', 'Nature’s Bounty'], ['expiry', '2027-03']];
+const CURVE = (() => { let d = ''; for (let s = 0; s <= 180; s += 3) { const a = s < 12 ? 0 : 0.29 * (1 - Math.exp(-0.042 * (s - 12))); d += (s ? 'L' : 'M') + cx(s).toFixed(1) + ' ' + cy(a).toFixed(1) + ' '; } return d; })();
+const GLOWC = (() => { let d = ''; for (let s = 0; s <= 180; s += 3) { const a = s < 14 ? 0 : 0.035 * (1 - Math.exp(-0.04 * (s - 14))); d += (s ? 'L' : 'M') + cx(s).toFixed(1) + ' ' + cy(a).toFixed(1) + ' '; } return d; })();
+const FIELDS = [['drug', 'Aspirin 325 mg'], ['lot', 'B2-07'], ['maker', 'Time-Cap Labs'], ['expiry', '2027-03']];
 
 let uidN = 0;
 
@@ -45,10 +45,10 @@ function makeStage() {
   const u = 'st' + (++uidN);
   const L = 'fill="none" stroke="rgba(233,238,242,.62)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"';
   const svgNS = `
-  <svg class="st-svg" viewBox="0 0 640 560" role="img" aria-label="One tablet, six moments: the bottle label read by a phone camera; a quarter tablet dropped into the cup; blue light crossing the cup; the green glow at ninety degrees; the curve entering the reference band while a capsule fills; the PASS card and the payment moving from escrow to the supplier after a pharmacist's tap, on testnet">
+  <svg class="st-svg" viewBox="0 0 640 560" role="img" aria-label="One tablet, six moments: the bottle label read by a phone camera; one whole tablet dropped into a small cup; light crossing the cup with the red channel barely moving; the water clouding as seen by the side sensor at ninety degrees; the cloudiness curve matched against a reference spread (illustration); a PASS card and a simulated payment from escrow to the supplier after a pharmacist's tap">
     <defs>
       <pattern id="${u}-dots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="rgba(140,200,255,.13)"/></pattern>
-      <radialGradient id="${u}-glow"><stop offset="0" stop-color="#7BF0B6" stop-opacity=".95"/><stop offset=".4" stop-color="#5FD39A" stop-opacity=".45"/><stop offset="1" stop-color="#5FD39A" stop-opacity="0"/></radialGradient>
+      <radialGradient id="${u}-glow"><stop offset="0" stop-color="#F4F7FA" stop-opacity=".8"/><stop offset=".45" stop-color="#DDE5EC" stop-opacity=".38"/><stop offset="1" stop-color="#DDE5EC" stop-opacity="0"/></radialGradient>
       <radialGradient id="${u}-led"><stop offset="0" stop-color="#BFE4FF" stop-opacity="1"/><stop offset=".35" stop-color="#4FB3FF" stop-opacity=".6"/><stop offset="1" stop-color="#4FB3FF" stop-opacity="0"/></radialGradient>
       <linearGradient id="${u}-beam" x1="0" x2="1"><stop offset="0" stop-color="#4FB3FF" stop-opacity="1"/><stop offset="1" stop-color="#4FB3FF" stop-opacity="1" data-k="beamEnd"/></linearGradient>
       <clipPath id="${u}-water"><path d="${WATER}"/></clipPath>
@@ -63,9 +63,9 @@ function makeStage() {
       <path d="M138 156 h124 v14 h-124 z" ${L}/>
       <path d="M126 170 h148 v296 a16 16 0 0 1 -16 16 h-116 a16 16 0 0 1 -16 -16 z" ${L}/>
       <rect x="140" y="236" width="120" height="170" rx="6" fill="rgba(233,238,242,.05)" stroke="rgba(233,238,242,.35)"/>
-      <text x="151" y="266" class="st-lbl-big">RIBOFLAVIN</text>
-      <text x="151" y="284" class="st-lbl">100 mg</text>
-      <text x="152" y="302" class="st-lbl">Nature’s Bounty</text>
+      <text x="151" y="266" class="st-lbl-big">ASPIRIN</text>
+      <text x="151" y="284" class="st-lbl">325 mg</text>
+      <text x="152" y="302" class="st-lbl">Time-Cap Labs</text>
       <path d="M152 320 h96 M152 330 h80 M152 340 h88" stroke="rgba(233,238,242,.18)" stroke-width="4" stroke-linecap="round"/>
       <text x="152" y="372" class="st-lbl">LOT B2-07</text>
       <text x="152" y="390" class="st-lbl">EXP 2027-03</text>
@@ -86,47 +86,46 @@ function makeStage() {
 
     <!-- scenes 2-4: the cup, shared -->
     <g data-cup>
-      <rect x="304" y="82" width="32" height="30" rx="4" ${L}/><text x="344" y="101" class="st-t">stir stick</text>
+      <text x="352" y="101" class="st-t">wooden stir stick, by hand</text>
       <path d="M186 150 h268" stroke="rgba(233,238,242,.5)" stroke-width="3" stroke-linecap="round"/>
       <path d="M200 150 L214 480 L426 480 L440 150" ${L}/>
       <path d="${WATER}" fill="rgba(79,179,255,.09)"/>
-      <path d="${WATER}" fill="#F3DA63" data-k="tint" opacity="0"/>
+      <path d="${WATER}" fill="#E9EEF2" data-k="tint" opacity="0"/>
       <g clip-path="url(#${u}-water)"><circle cx="320" cy="400" r="40" fill="url(#${u}-glow)" data-k="bloom" opacity="0"/></g>
       <path d="M${xl(WL).toFixed(1)} ${WL} H${xr(WL).toFixed(1)}" stroke="rgba(79,179,255,.7)" stroke-width="1.5"/>
-      <path d="M${(xl(WL) - 12).toFixed(1)} ${WL} h10" stroke="rgba(233,238,242,.4)"/><text x="${(xl(WL) - 16).toFixed(1)}" y="${WL + 4}" class="st-t" text-anchor="end">900 mL</text>
-      <line x1="320" y1="112" x2="320" y2="344" stroke="rgba(233,238,242,.55)" stroke-width="2"/>
-      <rect data-k="blade" x="294" y="344" width="52" height="18" rx="3" fill="rgba(233,238,242,.12)" stroke="rgba(233,238,242,.6)" stroke-width="1.2"/>
+      <path d="M${(xl(WL) - 12).toFixed(1)} ${WL} h10" stroke="rgba(233,238,242,.4)"/><text x="${(xl(WL) - 16).toFixed(1)}" y="${WL + 4}" class="st-t" text-anchor="end">small cup</text>
+      <g data-k="stick"><line x1="320" y1="96" x2="320" y2="352" stroke="#C9A877" stroke-width="5" stroke-linecap="round"/></g>
       <!-- tablet + bubbles -->
       <g data-k="bubbles" fill="none" stroke="rgba(190,225,255,.55)" stroke-width="1">${[0, 1, 2, 3, 4].map(() => '<circle r="2.5" cx="-20" cy="-20"/>').join('')}</g>
-      <g data-k="tab" transform="translate(380 40)"><path d="M-10 -10 h20 a20 20 0 0 1 -20 20 z" fill="#E9C94A" stroke="#FFF1B8" stroke-width="1"/></g>
-      <g data-k="tabcloud" fill="#E9C94A">${[0, 1, 2, 3, 4, 5].map((k) => `<circle cx="${370 + k * 6}" cy="${462 - (k % 3) * 5}" r="${1.5 + (k % 2)}"/>`).join('')}</g>
+      <g data-k="tab" transform="translate(380 40)"><ellipse cx="0" cy="0" rx="12" ry="7" fill="#F4F6F8" stroke="#B9C2CC" stroke-width="1.2"/><path d="M-6 0 h12" stroke="#B9C2CC" stroke-width="1"/></g>
+      <g data-k="tabcloud" fill="#F4F6F8">${[0, 1, 2, 3, 4, 5].map((k) => `<circle cx="${370 + k * 6}" cy="${462 - (k % 3) * 5}" r="${1.5 + (k % 2)}"/>`).join('')}</g>
       <!-- light path -->
       <circle cx="165" cy="400" r="34" fill="url(#${u}-led)" data-k="ledglow" opacity="0"/>
       <line x1="180" y1="400" x2="${xl(400).toFixed(1)}" y2="400" stroke="#4FB3FF" stroke-width="4" stroke-linecap="round" data-k="beamA" opacity="0"/>
       <line x1="${xl(400).toFixed(1)}" y1="400" x2="${xr(400).toFixed(1)}" y2="400" stroke="url(#${u}-beam)" stroke-width="4" data-k="beamB" opacity="0"/>
       <line x1="${xr(400).toFixed(1)}" y1="400" x2="452" y2="400" stroke="#4FB3FF" stroke-width="4" stroke-linecap="round" data-k="beamC" opacity="0"/>
       <line x1="182" y1="400" x2="452" y2="400" stroke="#E6F4FF" stroke-width="2" stroke-dasharray="2 16" stroke-linecap="round" data-k="photons" opacity="0"/>
-      <rect x="150" y="388" width="30" height="24" rx="4" ${L}/><text x="146" y="380" class="st-t">blue LED</text>
-      <rect x="452" y="386" width="6" height="28" fill="rgba(79,179,255,.55)"/><rect x="460" y="388" width="30" height="24" rx="4" ${L}/><text x="452" y="430" class="st-t">inline</text>
+      <rect x="150" y="388" width="30" height="24" rx="4" ${L}/><text x="146" y="380" class="st-t">LEDs · B W R</text>
+      <rect x="452" y="386" width="6" height="28" fill="rgba(79,179,255,.55)"/><rect x="460" y="388" width="30" height="24" rx="4" ${L}/><text x="452" y="430" class="st-t">inline · A0</text>
       <circle cx="320" cy="500" r="40" fill="url(#${u}-glow)" data-k="halo" opacity="0"/>
-      <rect x="302" y="486" width="36" height="6" fill="rgba(95,211,154,.55)" data-k="gfilter"/>
-      <rect x="305" y="494" width="30" height="24" rx="4" ${L}/><text x="346" y="512" class="st-t">90° · green plastic</text>
+      <rect x="302" y="486" width="36" height="6" fill="rgba(233,238,242,.35)" data-k="gfilter"/>
+      <rect x="305" y="494" width="30" height="24" rx="4" ${L}/><text x="346" y="512" class="st-t">side · 90° · A1</text>
       <!-- readout panel (scenes 3 and 4) -->
       <g data-k="readA" opacity="0">
         <rect x="474" y="150" width="154" height="176" rx="14" class="st-panel"/>
-        <text x="490" y="176" class="st-t">INLINE · A2</text><text x="490" y="194" class="st-t">absorbance</text>
-        <text x="490" y="246" class="st-num" data-k="abs">0.00</text>
+        <text x="490" y="176" class="st-t">INLINE · A0</text><text x="490" y="194" class="st-t">red channel</text>
+        <text x="490" y="246" class="st-num" data-k="abs">0.000</text>
         <text x="490" y="276" class="st-t">light through</text>
         <rect x="490" y="286" width="122" height="8" rx="4" fill="rgba(233,238,242,.1)"/><rect x="490" y="286" width="122" height="8" rx="4" fill="#4FB3FF" data-k="tbar"/>
         <text x="612" y="312" class="st-t" text-anchor="end" data-k="tpct">100 %</text>
       </g>
       <g data-k="readG" opacity="0">
         <rect x="474" y="150" width="154" height="176" rx="14" class="st-panel"/>
-        <text x="490" y="176" class="st-t">90° · A3</text><text x="490" y="194" class="st-t">green glow</text>
-        <text x="490" y="242" class="st-word" data-k="gword">waking</text>
-        <text x="490" y="270" class="st-t">riboflavin</text>
-        <rect x="490" y="278" width="122" height="8" rx="4" fill="rgba(233,238,242,.1)"/><rect x="490" y="278" width="0" height="8" rx="4" fill="#5FD39A" data-k="gbar"/>
-        <text x="490" y="304" class="st-t">chalk</text>
+        <text x="490" y="176" class="st-t">SIDE · A1 · 90°</text><text x="490" y="194" class="st-t">cloudiness</text>
+        <text x="490" y="242" class="st-word" data-k="gword">0.00</text>
+        <text x="490" y="270" class="st-t">this run</text>
+        <rect x="490" y="278" width="122" height="8" rx="4" fill="rgba(233,238,242,.1)"/><rect x="490" y="278" width="0" height="8" rx="4" fill="#E9EEF2" data-k="gbar"/>
+        <text x="490" y="304" class="st-t">blank noise</text>
         <rect x="490" y="310" width="122" height="8" rx="4" fill="rgba(233,238,242,.1)"/><rect x="490" y="310" width="3" height="8" rx="2" fill="#8E9AA6"/>
       </g>
     </g>
@@ -134,22 +133,22 @@ function makeStage() {
     <g data-s="1">
       <g fill="none" stroke="rgba(190,225,255,.8)" stroke-width="1.4">${[0, 1, 2].map(() => `<ellipse cx="380" cy="${WL}" rx="0" ry="0" data-k="rip"/>`).join('')}</g>
       <g fill="#BFE4FF" data-k="splash">${[-1, -0.4, 0.4, 1].map(() => '<circle r="2" cx="-9" cy="-9"/>').join('')}</g>
-      <text x="408" y="52" class="st-t st-t--ink" data-k="tabl">¼ tablet</text>
+      <text x="408" y="52" class="st-t st-t--ink" data-k="tabl">1 tablet</text>
     </g>
 
     <!-- scene 5: curve + capsule -->
     <g data-s="4">
-      <text x="${CX0}" y="${CY0 - 14}" class="st-t">absorbance · inline</text>
+      <text x="${CX0}" y="${CY0 - 14}" class="st-t">cloudiness · side sensor · illustration</text>
       <path d="M${CX0} ${CY0} V${CY1} H${CX1}" fill="none" stroke="rgba(233,238,242,.3)"/>
-      <rect x="${CX0}" y="${cy(0.47)}" width="${CX1 - CX0}" height="${cy(0.36) - cy(0.47)}" fill="rgba(233,238,242,.09)"/>
-      <path d="M${CX0} ${cy(0.47)} H${CX1} M${CX0} ${cy(0.36)} H${CX1}" stroke="rgba(233,238,242,.35)" stroke-dasharray="2 4"/>
-      <text x="${CX0 + 8}" y="${cy(0.47) - 8}" class="st-t">reference band 0.36–0.47 · 10 runs</text>
+      <rect x="${CX0}" y="${cy(0.33)}" width="${CX1 - CX0}" height="${cy(0.25) - cy(0.33)}" fill="rgba(233,238,242,.09)"/>
+      <path d="M${CX0} ${cy(0.33)} H${CX1} M${CX0} ${cy(0.25)} H${CX1}" stroke="rgba(233,238,242,.35)" stroke-dasharray="2 4"/>
+      <text x="${CX0 + 8}" y="${cy(0.33) - 8}" class="st-t">reference spread · 3 or more good runs</text>
       ${[0, 90, 180].map((s) => `<text x="${cx(s)}" y="${CY1 + 22}" class="st-t" text-anchor="middle">${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}</text>`).join('')}
-      <path d="${GLOWC}" fill="none" stroke="#5FD39A" stroke-width="1.4" data-k="gcurve" opacity=".85"/>
+      <path d="${GLOWC}" fill="none" stroke="#8E9AA6" stroke-width="1.4" data-k="gcurve" opacity=".85"/>
       <path d="${CURVE}" fill="none" stroke="#4FB3FF" stroke-width="2.6" stroke-linecap="round" data-k="curve" class="st-curve"/>
       <circle r="5" fill="#4FB3FF" stroke="#0E1216" stroke-width="2" data-k="head"/>
-      <text x="${cx(178)}" y="${cy(0.2) + 22}" class="st-t" text-anchor="end" style="fill:#5FD39A">green glow · 90°</text>
-      <g data-k="plat"><text x="${cx(178)}" y="${cy(0.36) + 20}" class="st-t st-t--ink" text-anchor="end">plateau 0.41 · inside the band</text></g>
+      <text x="${cx(178)}" y="${cy(0.035) - 10}" class="st-t" text-anchor="end">red channel · inline</text>
+      <g data-k="plat"><text x="${cx(178)}" y="${cy(0.25) + 20}" class="st-t st-t--ink" text-anchor="end">inside the reference spread</text></g>
       <g transform="translate(456 112) scale(.95)">
         <path d="M0 0 H140 V300 H0 Z" fill="#4FB3FF" clip-path="url(#${u}-pill)" data-k="liq"/>
         <path d="${CAP}" fill="rgba(233,238,242,.04)" stroke="rgba(233,238,242,.75)" stroke-width="2"/>
@@ -167,8 +166,8 @@ function makeStage() {
         <rect x="172" y="92" width="88" height="30" rx="15" fill="rgba(27,138,90,.22)" stroke="rgba(95,211,154,.75)"/>
         <circle cx="189" cy="107" r="4.5" fill="#5FD39A"/><text x="200" y="112" class="st-pass">PASS</text>
         <text x="468" y="112" class="st-t" text-anchor="end">rule P1</text>
-        <text x="172" y="156" class="st-body">Plateau 0.41, inside the band 0.36–0.47.</text>
-        <text x="172" y="180" class="st-body">The green glow rose with the curve.</text>
+        <text x="172" y="156" class="st-body">Cloudiness matched the good tablets</text>
+        <text x="172" y="180" class="st-body">at every 5 s checkpoint.</text>
         <text x="172" y="204" class="st-body">Lot B2-07 · no record for this lot.</text>
         <path d="M172 222 h296" stroke="rgba(233,238,242,.12)"/>
         <text x="172" y="246" class="st-t">release proposed · needs the pharmacist’s tap</text>
@@ -176,7 +175,7 @@ function makeStage() {
       <rect x="22" y="344" width="148" height="84" rx="14" class="st-node st-node--pass" data-k="n1"/>
       <text x="40" y="374" class="st-nlbl">Verdict</text><text x="40" y="404" class="st-pass">PASS · P1</text>
       <rect x="240" y="344" width="160" height="84" rx="14" class="st-node st-node--esc"/>
-      <text x="258" y="370" class="st-nlbl">Pill escrow</text><text x="258" y="408" class="st-amt" data-k="escAmt">1,240.00</text>
+      <text x="258" y="370" class="st-nlbl">Escrow · simulated</text><text x="258" y="408" class="st-amt" data-k="escAmt">1,240.00</text>
       <rect x="470" y="344" width="148" height="84" rx="14" class="st-node" data-k="n3"/>
       <text x="488" y="370" class="st-nlbl">Supplier</text><text x="488" y="408" class="st-amt" data-k="supAmt">0.00</text>
       <path d="M170 386 H232" class="st-wire" data-k="w1"/><path d="M226 381 l7 5 l-7 5" fill="none" stroke="rgba(233,238,242,.5)"/>
@@ -187,7 +186,7 @@ function makeStage() {
         <text x="380" y="309" class="st-t" text-anchor="end">pharmacist taps</text>
       </g>
       <g data-k="token" opacity="0"><circle r="15" fill="#2775CA" stroke="#fff" stroke-width="2"/><text y="3.5" class="st-tok" text-anchor="middle">USDC</text></g>
-      <text x="320" y="470" class="st-t st-t--ink" text-anchor="middle">USDC · Base Sepolia · TESTNET · mirrored in the Nessie SANDBOX</text>
+      <text x="320" y="470" class="st-t st-t--ink" text-anchor="middle">SIMULATED · USDC on Base Sepolia once a CDP key is in · nothing moves today</text>
       <text x="320" y="492" class="st-t" text-anchor="middle">no tap, no transfer · the model cannot release</text>
     </g>
   </svg>`;
@@ -201,7 +200,7 @@ function makeStage() {
   const cup = svg.querySelector('[data-cup]');
   const k = {
     scan: q('scan'), boxes: [...q('boxes').children], chip: q('chip'), f: FIELDS.map((_, i) => q('f' + i)),
-    tint: q('tint'), bloom: q('bloom'), blade: q('blade'), bubbles: [...q('bubbles').children], tab: q('tab'), tabcloud: q('tabcloud'),
+    tint: q('tint'), bloom: q('bloom'), stick: q('stick'), bubbles: [...q('bubbles').children], tab: q('tab'), tabcloud: q('tabcloud'),
     ledglow: q('ledglow'), beamA: q('beamA'), beamB: q('beamB'), beamC: q('beamC'), beamEnd: svg.querySelector('[data-k="beamEnd"]'), photons: q('photons'),
     halo: q('halo'), gfilter: q('gfilter'), readA: q('readA'), readG: q('readG'), abs: q('abs'), tbar: q('tbar'), tpct: q('tpct'), gword: q('gword'), gbar: q('gbar'),
     rip: qa('rip'), splash: [...q('splash').children], tabl: q('tabl'),
@@ -241,9 +240,8 @@ function makeStage() {
 
     // cup layer (global p, so every stacked instance agrees)
     if (oc > 0) {
-      const ph = p * 9;
-      const bw = Math.max(4, 52 * Math.abs(Math.cos(ph)));
-      k.blade.setAttribute('width', bw.toFixed(1)); k.blade.setAttribute('x', (320 - bw / 2).toFixed(1));
+      // the stick sways a little while the cup is stirred by hand
+      k.stick.setAttribute('transform', `rotate(${(4 * Math.sin(p * 9)).toFixed(2)} 320 96)`);
       // tablet: falls (scene 2), then rests and dissolves (3-4)
       const t2 = local(1, p);
       let ty, rot, sc;
@@ -263,24 +261,24 @@ function makeStage() {
       });
       // light: on from scene 3
       const on = seg(p, 2, 2.1);
-      const A = 0.41 * outCubic(seg(p, 2.08, 2.8));
+      const A = 0.035 * outCubic(seg(p, 2.08, 2.8));
       const T = Math.pow(10, -A);
       op(k.ledglow, on); op(k.beamA, on); op(k.beamB, on * 0.95); op(k.beamC, on * T);
       k.beamEnd.setAttribute('stop-opacity', T.toFixed(3));
       op(k.photons, on * 0.8); k.photons.style.strokeDashoffset = String(-p * 420);
-      op(k.tint, 0.24 * seg(p, 2, 3.6));
+      op(k.tint, 0.14 * seg(p, 3, 3.75));
       op(k.readA, o[2] > 0 ? Math.min(1, seg(p, 2.02, 2.12)) * (1 - seg(p, 2.88, 3)) : 0);
-      k.abs.textContent = A.toFixed(2);
+      k.abs.textContent = A.toFixed(3);
       k.tbar.setAttribute('width', (122 * T).toFixed(1));
       k.tpct.textContent = Math.round(T * 100) + ' %';
-      // glow: scene 4
+      // cloud: scene 4
       const g = outCubic(seg(p, 3.02, 3.75));
       op(k.bloom, g * 0.95); k.bloom.setAttribute('r', (40 + 150 * g).toFixed(1));
       op(k.halo, g); k.halo.setAttribute('r', (16 + 36 * g).toFixed(1));
-      k.gfilter.setAttribute('fill', `rgba(95,211,154,${(0.55 + 0.45 * g).toFixed(3)})`);
+      k.gfilter.setAttribute('fill', `rgba(233,238,242,${(0.35 + 0.5 * g).toFixed(3)})`);
       op(k.readG, seg(p, 3, 3.1));
       k.gbar.setAttribute('width', (122 * 0.82 * g).toFixed(1));
-      k.gword.textContent = g < 0.08 ? 'dark' : g < 0.95 ? 'rising' : 'risen';
+      k.gword.textContent = (0.29 * g).toFixed(2);
     }
 
     // 2 · ripples
@@ -496,4 +494,59 @@ export function mountFigArrows(figs) {
   const schedule = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); };
   new ResizeObserver(schedule).observe(figs);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(schedule);
+}
+
+/* ---------- Screens: tabs + scroll-snap slideshow (arrows, dots, keys) ---------- */
+export function mountScreens(root) {
+  const tabs = [...root.querySelectorAll('.ss-tab')];
+  const decks = [...root.querySelectorAll('.ss-deck')];
+  const dotsEl = root.querySelector('.ss-dots');
+  const count = root.querySelector('.ss-count');
+  const [prev, next] = root.querySelectorAll('.ss-arrow');
+  let deck = decks[0];
+  const track = () => deck.querySelector('.ss-track');
+  const slides = () => [...track().children];
+  const current = () => {
+    const t = track(), x = t.scrollLeft;
+    let best = 0, d = Infinity;
+    slides().forEach((s, i) => { const dd = Math.abs(s.offsetLeft - t.offsetLeft - x); if (dd < d) { d = dd; best = i; } });
+    return best;
+  };
+  const go = (i) => {
+    const s = slides(), t = track();
+    i = Math.max(0, Math.min(s.length - 1, i));
+    t.scrollTo({ left: s[i].offsetLeft - t.offsetLeft, behavior: reduced ? 'auto' : 'smooth' });
+  };
+  const paint = () => {
+    const s = slides(), i = current(), t = track();
+    dotsEl.querySelectorAll('.ss-dot').forEach((d, k) => { d.classList.toggle('on', k === i); d.setAttribute('aria-current', k === i ? 'true' : 'false'); });
+    count.textContent = `${i + 1} / ${s.length}`;
+    prev.disabled = t.scrollLeft <= 2;
+    next.disabled = t.scrollLeft + t.clientWidth >= t.scrollWidth - 2;
+  };
+  const buildDots = () => {
+    dotsEl.innerHTML = slides().map((_, i) => `<button type="button" class="ss-dot" tabindex="-1" aria-label="Screen ${i + 1}"></button>`).join('');
+    dotsEl.querySelectorAll('.ss-dot').forEach((d, i) => d.addEventListener('click', () => go(i)));
+    paint();
+  };
+  const show = (name) => {
+    tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.deck === name)));
+    decks.forEach((d) => { d.hidden = d.dataset.deck !== name; });
+    deck = decks.find((d) => d.dataset.deck === name);
+    buildDots();
+  };
+  tabs.forEach((t) => t.addEventListener('click', () => show(t.dataset.deck)));
+  prev.addEventListener('click', () => go(current() - 1));
+  next.addEventListener('click', () => go(current() + 1));
+  decks.forEach((d) => {
+    const t = d.querySelector('.ss-track');
+    let raf = 0;
+    t.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; paint(); }); }, { passive: true });
+    t.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') { e.preventDefault(); go(current() + 1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); go(current() - 1); }
+    });
+  });
+  addEventListener('resize', paint, { passive: true });
+  show(deck.dataset.deck);
 }

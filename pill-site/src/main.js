@@ -7,7 +7,7 @@ import { mountBinaryPill } from './pill.js';
 import './station.css';
 import './pay.css';
 import { mountRail, mountX402, mountCalc } from './pay.js';
-import { mountStory, mountCoinbase, mountFigArrows } from './story.js';
+import { mountStory, mountCoinbase, mountFigArrows, mountScreens } from './story.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (reduced) document.documentElement.classList.add('reduced');
@@ -216,49 +216,39 @@ if (!reduced) {
   });
 }
 
-/* ---------- results chart (illustration until the real CSV lands) ---------- */
+/* ---------- the first real run: three numbers from runs/REAL_aspirin_first_test.csv ---------- */
 {
   const mount = document.getElementById('chart-mount');
   if (mount) {
-    const W = 1000, H = 420, L = 60, R = 24, T = 24, B = 48;
-    const x = (t) => L + (t / 180) * (W - L - R);
-    const y = (a) => T + (1 - a / 0.6) * (H - T - B);
-    const curve = (A, k, t0, noise = 0) => {
-      let d = '';
-      for (let t = 0; t <= 180; t += 2) {
-        const a = t < t0 ? 0 : A * (1 - Math.exp(-k * (t - t0)));
-        const n = noise ? (Math.sin(t * 1.7) + Math.cos(t * 0.9)) * noise : 0;
-        d += (t === 0 ? 'M' : 'L') + x(t).toFixed(1) + ' ' + y(Math.max(0, a + n)).toFixed(1) + ' ';
-      }
-      return d;
-    };
-    const band = [0.36, 0.47];
-    const refs = Array.from({ length: 10 }, (_, i) => curve(0.395 + (i % 5) * 0.015, 0.045 + (i % 3) * 0.004, 14 + (i % 4), 0.004));
-    const tums = (() => { let d = ''; for (let t = 0; t <= 180; t += 2) { const a = t < 16 ? 0 : 0.05 * (1 - Math.exp(-0.05 * (t - 16))) + (Math.sin(t * 2.1) * 0.006); d += (t === 0 ? 'M' : 'L') + x(t).toFixed(1) + ' ' + y(Math.max(0, a)).toFixed(1) + ' '; } return d; })();
-    const grid = [0, 0.2, 0.4, 0.6].map((a) => `<line x1="${L}" x2="${W - R}" y1="${y(a)}" y2="${y(a)}" stroke="var(--line)"/><text x="${L - 10}" y="${y(a) + 4}" text-anchor="end" class="mono" font-size="12" fill="var(--muted)">${a.toFixed(1)}</text>`).join('');
-    const ticks = [0, 60, 120, 180].map((t) => `<text x="${x(t)}" y="${H - 16}" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="var(--mono)">${t}s</text>`).join('');
+    const ROWS = [
+      ['side sensor (90°) · cloudiness rise', 0.29, 'var(--mint-ink)'],
+      ['inline · red channel change', 0.035, 'var(--blue-ink)'],
+      ['blank noise', 0.006, 'var(--muted)'],
+    ];
+    const W = 1000, L = 300, R = 90, rowH = 64, T = 16;
+    const H = T + ROWS.length * rowH + 30;
+    const x = (v) => L + (v / 0.3) * (W - L - R);
+    const grid = [0, 0.1, 0.2, 0.3].map((v) => `<line x1="${x(v)}" x2="${x(v)}" y1="${T}" y2="${H - 30}" stroke="var(--line)"/><text x="${x(v)}" y="${H - 8}" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="var(--mono)">${v.toFixed(1)}</text>`).join('');
+    const bars = ROWS.map(([label, v, c], i) => {
+      const y = T + i * rowH + 14;
+      return `<text x="${L - 16}" y="${y + 21}" text-anchor="end" font-size="15" fill="var(--ink)" font-family="var(--sans)">${label}</text>
+        <rect x="${L}" y="${y}" width="${Math.max(3, x(v) - L).toFixed(1)}" height="32" rx="8" fill="${c}" data-bar/>
+        <text x="${(Math.max(3, x(v) - L) + L + 12).toFixed(1)}" y="${y + 21}" font-size="15" fill="var(--ink)" font-family="var(--mono)">${v}</text>`;
+    }).join('');
     mount.innerHTML = `
-      <div class="box" style="padding:20px 20px 12px; position:relative">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
-          <p class="caption">absorbance (inline) vs time</p>
-          <p class="caption" style="color:var(--lab)">illustration · replaced by the real runs on Saturday</p>
+      <div class="box" style="padding:20px 20px 12px">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:8px">
+          <p class="caption">first real aspirin run · signal change, as the station app reports it</p>
+          <p class="caption">runs/REAL_aspirin_first_test.csv · measured, not modelled</p>
         </div>
-        <svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Chart: ten riboflavin curves rising into a grey reference band; one chalk tablet curve staying flat near zero">
-          <rect x="${L}" y="${y(band[1])}" width="${W - L - R}" height="${y(band[0]) - y(band[1])}" fill="rgba(22,24,27,0.06)"/>
-          <text x="${W - R - 8}" y="${y(band[1]) - 8}" text-anchor="end" font-size="12" fill="var(--muted)" font-family="var(--mono)">reference band 0.36–0.47 (10 runs)</text>
-          ${grid}${ticks}
-          ${refs.map((d, i) => `<path d="${d}" fill="none" stroke="var(--blue)" stroke-width="1.4" opacity="${0.35 + (i % 3) * 0.12}" data-chart-line/>`).join('')}
-          <path d="${tums}" fill="none" stroke="var(--lab)" stroke-width="2" data-chart-line/>
-          <text x="${x(175)}" y="${y(0.07)}" text-anchor="end" font-size="12" fill="var(--lab)" font-family="var(--mono)">chalk tablet · NEEDS LAB · N2</text>
-          <text x="${x(175)}" y="${y(0.52)}" text-anchor="end" font-size="12" fill="var(--blue-ink)" font-family="var(--mono)">riboflavin ¼ tablet · PASS · P1</text>
-        </svg>
+        <div class="table-scroll"><svg viewBox="0 0 ${W} ${H}" width="100%" style="min-width:560px" role="img" aria-label="Bar chart of the first real aspirin run: the side sensor's cloudiness signal rose by 0.29, the red channel changed by 0.035, and the blank noise was 0.006">
+          ${grid}${bars}
+        </svg></div>
       </div>`;
     if (!reduced) {
-      mount.querySelectorAll('[data-chart-line]').forEach((p, i) => {
-        const len = p.getTotalLength();
-        p.style.strokeDasharray = len; p.style.strokeDashoffset = len;
-        animate(p, { strokeDashoffset: [len, 0], duration: 1800, delay: i * 60, ease: 'inOutSine', autoplay: onScroll({ target: mount, enter: 'bottom-=10% top', repeat: false }) });
-      });
+      const rects = mount.querySelectorAll('[data-bar]');
+      rects.forEach((r) => { r.style.transformBox = 'fill-box'; r.style.transformOrigin = 'left center'; });
+      animate(rects, { scaleX: [0, 1], duration: 1100, delay: stagger(160), ease: 'outCubic', autoplay: onScroll({ target: mount, enter: 'bottom-=10% top', sync: 'play', repeat: false }) });
     }
   }
 }
@@ -302,6 +292,8 @@ if (!reduced) {
   if (cb) mountCoinbase(cb);
   const figs = document.querySelector('#parts .figs');
   if (figs) mountFigArrows(figs);
+  const screens = document.querySelector('#screens [data-ss]');
+  if (screens) mountScreens(screens);
 }
 
 /* ---------- at the table: the Pill Gate phase rail fills phase by phase ---------- */

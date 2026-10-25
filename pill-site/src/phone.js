@@ -54,9 +54,9 @@ export const PHONE_SEQUENCES = {
 };
 
 const CAPTIONS = {
-  scan: (o) => `Station · live scan · lot ${o.lot || 'B2-07'}`,
+  scan: (o) => `Station · replay · lot ${o.lot || 'B2-07'}`,
   pass: () => 'Result · PASS · plateau inside the reference band',
-  needslab: () => 'Result · NEEDS LAB · no glow, payment held',
+  needslab: () => 'Result · NEEDS LAB · no 90° rise, payment held',
   unable: () => 'Result · UNABLE TO VERIFY · no reference on this box',
   delivery: () => 'Clinic · delivery #118 · payment held',
   released: () => 'Clinic · pharmacist tap · payment released · SANDBOX',
@@ -104,7 +104,7 @@ const CAL_LINES = [
 ];
 
 const GLOW = { pass: '27 138 90', needslab: '224 83 46', recall: '236 96 44' };
-const CHECKS = ['LED', 'dark', 'paddle', 'lid'];
+const CHECKS = ['LED', 'dark', 'blank', 'lid'];
 
 const BOTTLE = {
   bottle: { lot: 'B2-07' },
@@ -195,9 +195,9 @@ const scanView = () => `
         <section class="pv pv--scan" data-view="scan">
           <div class="pv__bar">
             <span class="pv__app">PILL · STATION 01</span>
-            <span class="pv__live"><i></i>LIVE SENSOR</span>
+            <span class="pv__live"><i></i>REPLAY</span>
           </div>
-          <h3 class="pv__drug">Riboflavin 100 mg (1/4 tablet) <span class="pv__lot">· lot <b data-k="lot">B2-07</b></span></h3>
+          <h3 class="pv__drug">Riboflavin 100 mg (1 tablet) <span class="pv__lot">· lot <b data-k="lot">B2-07</b></span></h3>
 
           <div class="pv__progress">
             <div class="pv__plabel">dissolving... <b data-k="pct">62</b>% of expected plateau</div>
@@ -232,7 +232,7 @@ const scanView = () => `
             </svg>
             <div class="pv__legend">
               <span><i class="plg plg--abs"></i>absorbance</span>
-              <span><i class="plg plg--glow"></i>90° glow</span>
+              <span><i class="plg plg--glow"></i>90° signal</span>
               <span><i class="plg plg--band"></i>reference band</span>
             </div>
           </div>
@@ -375,7 +375,7 @@ const bottleView = (kind, uid) => {
               <span class="pv__chips"><span data-k="sub" data-type>${alert ? 'payment HELD' : 'live · 2 s'}</span>${alert ? '<span class="pv__chipr">live · 2 s</span>' : ''}</span>
             </span>
           </div>
-          <p class="pv__hint" data-k="hint"><span data-k="hintt" data-type>${alert ? 'scan blocked · recall record on this lot' : 'next · drop 1/4 tablet into the station'}</span></p>
+          <p class="pv__hint" data-k="hint"><span data-k="hintt" data-type>${alert ? 'scan blocked · recall record on this lot' : 'next · drop 1 tablet into the station'}</span></p>
           <div class="pv__actions">
             <button type="button" class="pbtn ${alert ? 'pbtn--off' : 'pbtn--fill'}" data-k="btn" tabindex="-1">Start scan</button>
           </div>
@@ -412,7 +412,7 @@ const calibrationView = () => `
         <section class="pv pv--cal" data-view="calibration">
           <div class="pv__bar">
             <span class="pv__app">PILL · REFERENCE</span>
-            <span class="pv__live"><i></i>LIVE SENSOR</span>
+            <span class="pv__live"><i></i>REPLAY</span>
           </div>
           <h3 class="pv__title" data-k="title">Calibration · station 01</h3>
           <p class="pv__meta" data-k="meta">riboflavin · B2 · ten known-good tablets</p>
@@ -456,12 +456,12 @@ function template(uid) {
   <div class="phone__frame">
     <div class="phone__screen">${STATUS}
       <div class="phone__views">${scanView()}
-${verdictView('pass', 'pass', 'Riboflavin 100 mg (1/4 tablet) · lot B2-07',
-    'consistent with the riboflavin reference: this lot, one tablet',
-    ['plateau 0.41 · band 0.36-0.47', 'glow 0.78 · min 0.40'], 'P1')}
-${verdictView('needslab', 'lab', 'Riboflavin 100 mg (1/4 tablet) · lot TM-02',
-    'light dropped but no green glow: not consistent with riboflavin',
-    ['plateau 0.52 · band 0.36-0.47', 'glow 0.03 · min 0.40'], 'N2',
+${verdictView('pass', 'pass', 'Riboflavin 100 mg (1 tablet) · lot B2-07',
+    'consistent with the reference: this lot, one tablet',
+    ['plateau 0.41 · band 0.36-0.47', '90° 0.78 · min 0.40'], 'P1')}
+${verdictView('needslab', 'lab', 'Riboflavin 100 mg (1 tablet) · lot TM-02',
+    'light dropped but the 90° signal did not rise: not consistent with the reference',
+    ['plateau 0.52 · band 0.36-0.47', '90° 0.03 · min 0.40'], 'N2',
     `<button type="button" class="pbtn pbtn--fill" tabindex="-1">Hold payment</button>
             <button type="button" class="pbtn pbtn--ghost" tabindex="-1">Draft lab referral</button>`)}
 ${verdictView('unable', 'unable', 'no reference loaded',
