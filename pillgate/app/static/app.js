@@ -1361,7 +1361,7 @@ function paintStationCounts(id, raw, mini = true) {
   if (a1 && raw.B_b != null) a1.textContent = mini ? `A1 ${raw.B_b}` : `A1 · ${raw.B_b} (blue on)`;
 }
 const BLUEPRINTS = [["01_wiring_overview", "Wiring overview", "Board, LEDs and both photoresistors"], ["02_breadboard_layout", "Breadboard layout", "Where every jumper goes"], ["03_chamber_cross_sections", "Chamber cross-sections", "Top and side, cut through the beam (design drawing; the build uses a plain lid)"]];
-const STATION_PHOTOS = [["station-19", "The blue LED lit, shining in through the LED box"], ["station-17", "From above: cup of water inside the chamber, LED box at the bottom right"], ["station-191", "LED box: white, blue and red LEDs, diffuser slot on top"], ["station-171", "From above with the blue LED on"], ["station-102", "The station on the bench with the board"]];
+const STATION_PHOTOS = [["station-19", "The blue LED lit, shining in through the LED box"], ["station-17", "From above: cup of water inside the chamber, LED box at the bottom right"], ["station-191", "LED box: white, blue and red LEDs, diffuser slot on top"], ["station-171", "From above with the blue LED on"]];
 function lightbox(src, alt) {
   const w = document.createElement("div");
   w.className = "lightbox"; w.setAttribute("role", "dialog"); w.setAttribute("aria-modal", "true"); w.setAttribute("aria-label", alt);
