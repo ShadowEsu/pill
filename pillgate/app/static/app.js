@@ -360,6 +360,7 @@ async function render() {
   view.classList.remove("page-enter"); void view.offsetWidth; view.classList.add("page-enter");
   view.innerHTML = "";
   renderNav(path);
+  Dock.place(path);
   window.scrollTo(0, 0);
   paintRunBar();
   try { await hit[0](view, ...hit[1].map(decodeURIComponent)); } catch (e) { view.insertAdjacentHTML("beforeend", `<div class="card banner note">Could not load this page: ${esc(e.message)}</div>`); }
@@ -1038,6 +1039,8 @@ route(/^\/result\/([^/]+)$/, async (v, id) => {
 });
 
 // ================================================================ 7. Ask (grounded in the report; voice where the browser allows)
+/** What the model sees: the real exchanges only (local help answers stay out), as {role, content}. */
+const chatHistory = (hist) => hist.filter((m) => !m.local).map(({ role, content }) => ({ role, content }));
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 route(/^\/ask\/([^/]+)$/, async (v, id) => {
   const s = await api("/api/scans/" + encodeURIComponent(id)).catch(() => null);
@@ -1057,14 +1060,14 @@ route(/^\/ask\/([^/]+)$/, async (v, id) => {
   const chat = $("chat");
   const add = (who, text) => { const d = document.createElement("div"); d.className = "msg " + who; d.textContent = text; chat.appendChild(d); chat.scrollTop = 1e9; return d; };
   if (!hist.length) add("bot", s && s.report ? `Ask me anything about this result (${RESULT_TEXT[s.overall] || "still checking"}). I answer only from the report.` : "Ask me anything about this result. I answer only from the report.");
-  for (let i = 0; i < hist.length; i += 2) { add("me", hist[i].content); if (hist[i + 1]) add("bot", hist[i + 1].content); }
+  hist.forEach((m) => add(m.role === "user" ? "me" : "bot", m.content));
   $("speak").onclick = (e) => { PREF.speak = !PREF.speak; e.currentTarget.setAttribute("aria-checked", String(PREF.speak)); };
   const ask = async (q) => {
     q = (q || $("ask-in").value).trim(); if (!q) return;
     $("ask-in").value = ""; add("me", q);
     const typing = add("bot", ""); typing.innerHTML = `<span class="typing" aria-label="Thinking"><i></i><i></i><i></i></span>`;
     try {
-      const r = await post(`/api/scans/${encodeURIComponent(id)}/ask`, { question: q, history: hist });
+      const r = await post(`/api/scans/${encodeURIComponent(id)}/ask`, { question: q, history: chatHistory(hist) });
       hist.push({ role: "user", content: q }, { role: "assistant", content: r.answer });
       typing.textContent = r.answer;
       if (PREF.speak && "speechSynthesis" in window) speechSynthesis.speak(new SpeechSynthesisUtterance(r.answer));
@@ -1258,6 +1261,98 @@ route(/^\/settings$/, (v) => {
   };
 });
 
+// ================================================================ Ask Pill (docked on every page; a sheet with a chat)
+// With a finished scan, free questions go to POST /api/scans/{id}/ask (the latest finished scan, named in the sheet).
+// The help topics always answer from this fixed list, so they never cost a model call; with no scan, everything does.
+const HELP = [
+  { q: "How does a check work?", keys: ["how", "work", "check", "step", "start", "use", "water", "photo", "lid", "stir"],
+    a: () => `Four steps. 1) Photograph the bottle label and one tablet. 2) Fill the cup with clean water to the line, close the lid and press Start: the station checks the water for ${S.config.timing.blank_s} s. 3) When it beeps, drop the tablet in, stir 5 slow circles, close the lid and press Continue. 4) For ${S.config.timing.quick_s} s (quick test) light shines through the cup and the station records how the tablet dissolves. Then you get one of three answers.` },
+  { q: "What do the three answers mean?", keys: ["mean", "answer", "result", "passed", "pass", "lab", "unable", "verify", "three"],
+    a: () => `Passed the screen: the dissolving curve stayed close to this product's reference at the checkpoints. Needs lab testing: it did not, so send a sample to a laboratory or show it to a pharmacist (in Clinic mode the delivery is held). Unable to verify: the station could not compare, most often because there is no reference for that product on this station yet, or the run was too short or unsteady. ${DISCLAIMER}` },
+  { q: "What is a reference profile?", keys: ["reference", "profile", "build", "record", "runs", "calibrat"],
+    a: () => `A reference is how a known-good tablet of the same product dissolves on this station, recorded in 3 good runs. Each new check is compared with it at ${Math.round(S.config.timing.quick_s / 5)} checkpoints (one every 5 s). Without one the answer is "Unable to verify". You can build one on the Profiles page.` },
+  { q: "What can't the station tell me?", keys: ["can't", "cannot", "ingredient", "identify", "dose", "take", "doctor", "medical", "side effect"],
+    a: () => `${DISCLAIMER} It does not tell you what to take or how much. For questions about your medicine, ask a pharmacist or your doctor.` },
+];
+const HELP_FALLBACK = "I only know this app: how a check works, what the three answers mean and what a reference profile is. Try one of the questions below. For anything about your medicine itself, ask a pharmacist.";
+function helpAnswer(q) {
+  const low = q.toLowerCase();
+  let best = null, score = 0;
+  for (const h of HELP) { const n = h.keys.filter((k) => low.includes(k)).length; if (n > score) { score = n; best = h; } }
+  return best ? best.a() : HELP_FALLBACK;
+}
+const Dock = {
+  scan: null, open: false, chats: { help: [] },
+  async latest() {
+    const list = await api("/api/scans").catch(() => []);
+    const done = list.filter((x) => x.done).sort((a, b) => (b.created || 0) - (a.created || 0));
+    this.scan = done[0] || null;
+  },
+  mount() {
+    const b = document.createElement("button");
+    b.type = "button"; b.id = "dock"; b.className = "dock"; b.setAttribute("aria-haspopup", "dialog");
+    b.innerHTML = `<span class="dock-ic" aria-hidden="true"><i></i><i></i></span><span>Ask Pill</span>`;
+    b.onclick = () => this.show();
+    document.body.appendChild(b);
+    const w = document.createElement("div");
+    w.id = "sheet-wrap"; w.className = "sheet-wrap"; w.hidden = true;
+    w.innerHTML = `<div class="sheet-back" data-close></div>
+      <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+        <div class="sheet-grab" aria-hidden="true"></div>
+        <div class="row between"><div><p class="eyebrow"><span class="eb-dot"></span><span id="sheet-about">help</span></p><h2 class="serif" id="sheet-title">Ask Pill</h2></div>
+          <button type="button" class="btn ghost icon" data-close aria-label="Close">✕</button></div>
+        <div class="chat" id="d-chat" aria-live="polite"></div>
+        <div class="suggest" id="d-suggest">${HELP.map((h, i) => `<button type="button" class="chip" data-h="${i}">${esc(h.q)}</button>`).join("")}</div>
+        <div class="ask-bar"><input id="d-in" placeholder="Ask a question" aria-label="Your question"><span></span><button type="button" class="btn" id="d-go">Ask</button></div>
+        <p class="footnote" id="d-note"></p>
+      </section>`;
+    document.body.appendChild(w);
+    w.querySelectorAll("[data-close]").forEach((x) => (x.onclick = () => this.hide()));
+    w.addEventListener("keydown", (e) => { if (e.key === "Escape") this.hide(); });
+    w.querySelectorAll("[data-h]").forEach((x) => (x.onclick = () => this.ask(HELP[+x.dataset.h].q, true)));
+    $("d-go").onclick = () => this.ask($("d-in").value);
+    $("d-in").addEventListener("keydown", (e) => { if (e.key === "Enter") this.ask($("d-in").value); });
+  },
+  /** Hidden on Welcome and on the full Ask page (that page already is the chat). */
+  place(path) { const b = $("dock"); if (!b) return; const off = path === "/welcome" || /^\/ask\//.test(path); b.hidden = off; document.body.classList.toggle("has-dock", !off); if (off && this.open) this.hide(); },
+  key() { return this.scan ? this.scan.id : "help"; },
+  async show() {
+    this.open = true; $("sheet-wrap").hidden = false; document.body.classList.add("sheet-open");
+    this.opener = document.activeElement;
+    await this.latest();
+    const s = this.scan;
+    $("sheet-about").textContent = s ? `latest scan · ${s.drug || "unnamed"} · ${RESULT_TEXT[s.overall] || "no result"}` : "help · no finished scan yet";
+    $("d-note").textContent = s ? `Typed questions are answered by ${S.config.ai ? S.config.model || "the AI" : "templates (AI off on this server)"} from scan ${s.id} only. The questions above answer from this app's help.` : "No finished scan yet, so I answer only from this app's help. I only know this app.";
+    const chat = $("d-chat"); chat.innerHTML = "";
+    const hist = this.scan ? (S.chats[this.scan.id] = S.chats[this.scan.id] || []) : this.chats.help;
+    if (!hist.length) this.add("bot", s ? `Ask me about your latest result (${s.drug || "scan " + s.id}: ${RESULT_TEXT[s.overall] || "no result"}), or about how the station works.` : "Hi. I can explain how a check works, what the three answers mean and what a reference profile is.");
+    hist.forEach((m) => this.add(m.role === "user" ? "me" : "bot", m.content));
+    setTimeout(() => $("d-in").focus(), 50);
+  },
+  hide() {
+    this.open = false; $("sheet-wrap").hidden = true; document.body.classList.remove("sheet-open");
+    if ("speechSynthesis" in window) speechSynthesis.cancel();
+    if (this.opener && this.opener.focus) this.opener.focus();
+  },
+  add(who, text) { const chat = $("d-chat"), d = document.createElement("div"); d.className = "msg " + who; d.textContent = text; chat.appendChild(d); chat.scrollTop = 1e9; return d; },
+  speak(text) { if (PREF.speak && "speechSynthesis" in window) { speechSynthesis.cancel(); speechSynthesis.speak(new SpeechSynthesisUtterance(text)); } },
+  async ask(q, local = false) {
+    q = String(q || "").trim(); if (!q) return;
+    $("d-in").value = ""; this.add("me", q);
+    const s = this.scan, hist = s ? (S.chats[s.id] = S.chats[s.id] || []) : this.chats.help;
+    if (local || !s) {
+      const a = helpAnswer(q); hist.push({ role: "user", content: q, local: true }, { role: "assistant", content: a, local: true });
+      const d = this.add("bot", a); d.classList.add("local"); this.speak(a); return;
+    }
+    const typing = this.add("bot", ""); typing.innerHTML = `<span class="typing" aria-label="Thinking"><i></i><i></i><i></i></span>`;
+    try {
+      const r = await post(`/api/scans/${encodeURIComponent(s.id)}/ask`, { question: q, history: chatHistory(hist) });
+      hist.push({ role: "user", content: q }, { role: "assistant", content: r.answer });
+      typing.textContent = r.answer; this.speak(r.answer);
+    } catch (e) { typing.textContent = "Sorry, " + e.message; }
+  },
+};
+
 // ================================================================ boot
 async function boot() {
   try {
@@ -1265,6 +1360,7 @@ async function boot() {
     Object.assign(S.config, c); if (!c.timing) S.config.timing = { blank_s: 10, min_s: 120, max_s: 600, quick_s: 60 };
     $("appName").textContent = c.app_name; document.title = c.app_name;
   } catch {}
+  Dock.mount();
   render();
   tick(); setInterval(tick, 500);
 }
