@@ -72,6 +72,9 @@ CUTS = [
     dict(id="C11", name="Result: Unable to verify", src=(164.00, 170.20), fx="push", join=("fade", DISS),
          caps=[(164.10, "As the timer runs out,"), (166.78, "it's going to check."),
                (168.10, "And oh no: it's unable to verify.")]),
+    # the reveal (owner, 01:3x: "don't cut that out"): continuous source between C11 and C12, his words verbatim
+    dict(id="C11R", name="Reveal: a different medicine in the bottle", src=(170.20, 173.30), fx="push", join=("cut", CUT_D),
+         caps=[(170.34, "Because guess what,"), (171.32, "I put morphine in here instead of aspirin.")]),
     dict(id="C12", name="Close: swallow the right pills", src=(173.30, 179.20), fx="push", join=("cut", CUT_D), seated=True,
          caps=[(174.04, "So watch out."), (176.76, "Please swallow the right pills."), (178.14, "Thank you.")]),
 ]
@@ -154,7 +157,10 @@ LIST_END = cut_end(3)
 ANS_HEAD = (at("C11", 167.10, "check"), "06 · THE ANSWER")
 ANSWERS = [("Passed the screen", "&H00559E2E&"), ("Needs lab testing", "&H00048ED9&"), ("Unable to verify", "&H008A8A8A&")]
 ANS_LIFT = at("C11", 169.30, "unable")
-ANS_END = cut_end(11) + 1.2  # held into "So watch out"
+ANS_END = at("C11R", 170.34, "because")  # the answers give way to the reveal card on "because"
+REVEAL = at("C11R", 170.34, "because")
+REVEAL_END = cut_end([c["id"] for c in CUTS].index("C11R")) + 1.2  # held into "So watch out"
+REVEAL_TXT = ("THE REVEAL", "A different tablet in the Aspirin 81 bottle", "no match, no pass: Unable to verify")
 HOOK_TITLE = at("C1", 45.58, "pill")
 
 # ── captions.ass ──────────────────────────────────────────────────────────────────────────────────
@@ -238,6 +244,11 @@ for k, (txt, col) in enumerate(ANSWERS):
     dlg(3, a0, ANS_END, "Rule", rf"\an7\move({X0 - 24},{y + 12},{X0},{y + 12},0,200)\fad(200,160)\1c{col}" + dim,
         r"{\p1}m 0 0 l 22 0 22 22 0 22{\p0}")
     soft(4, a0, ANS_END, "Answer", rf"\an7\move({X0 + 16},{y},{X0 + 40},{y},0,200)\fad(200,160)" + dim, txt, dy=2)
+# the reveal: header + line + sub on one panel, same place as the answers list
+card(REVEAL, REVEAL_END, 1150, REVEAL_TXT[0], with_panel=False)
+panel(REVEAL, REVEAL_END, 1150 - PAD, max(textw(REVEAL_TXT[1], 36), textw(REVEAL_TXT[2], 28)), (1258 + 34) - 1150 + 2 * PAD)
+soft(4, REVEAL, REVEAL_END, "Reveal", rf"\an7\move({X0 - 24},{1208},{X0},{1208},0,200)\fad(200,160)", REVEAL_TXT[1], dy=2)
+soft(4, REVEAL, REVEAL_END, "RevealSub", rf"\an7\move({X0 - 24},{1258},{X0},{1258},0,200)\fad(200,160)", REVEAL_TXT[2], dy=2)
 # end card text (v2, unchanged)
 for (dy_, txt, st, d0) in ((880, "The box measures. Pill explains.", "CardSerif", 0.4),
                            (1500, "pill-site.vercel.app", "Card", 1.2), (1590, "github.com/ShadowEsu/pill", "Card", 1.4)):
@@ -259,6 +270,8 @@ Style: Hook,Instrument Serif,200,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,0,0
 Style: Label,Inter SemiBold,30,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,4,0,1,0,0,7,0,0,0,1
 Style: ListHead,Inter SemiBold,24,&H33FFFFFF,&H33FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,6,0,1,0,0,7,0,0,0,1
 Style: Answer,Inter Medium,40,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
+Style: Reveal,Inter Medium,36,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
+Style: RevealSub,Inter Medium,28,&H26FFFFFF,&H26FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 Style: Rule,Inter Medium,20,&H00FF5C7C,&H00FF5C7C,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 Style: CardSerif,Instrument Serif,96,&H00111111,&H00111111,&H00E6EFF4,&H00000000,0,1,0,0,100,100,0,0,1,0,0,5,60,60,0,1
 Style: Card,Inter,58,&H00111111,&H00111111,&H00E6EFF4,&H00000000,-1,0,0,0,100,100,0,0,1,0,0,5,60,60,0,1
@@ -335,7 +348,7 @@ for j, (name, x, y, h, st, dur) in enumerate(END_POPS):
     vcur = f"[o{j}]"
 fc.append(f"{vcur}ass=captions.ass:fontsdir=fonts,format=yuv420p[vout]")
 # audio: voice ladder + v2's score, 3 dB lower and ducked under the voice + a soft whoosh on each card entry; -16 LUFS
-whooshes = sorted({round(a, 3) for a, _ in CARDS} | {round(LIST_HEAD[0], 3), round(a0, 3)})
+whooshes = sorted({round(a, 3) for a, _ in CARDS} | {round(LIST_HEAD[0], 3), round(a0, 3), round(REVEAL, 3)})
 iWH = iHW + 1 + len(END_POPS)
 fc.append(f"{pa}asplit=2[vo][vsc]")
 fc.append(f"[{iMUS}:a]atrim=0:{TOTAL},asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,"

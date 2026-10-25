@@ -2,11 +2,11 @@
 
 Source: `pitch/video-raw/preston-pitch-raw.mp4`: 179.42 s, h264 1024×576 with a −90° rotation side-data tag (displays **portrait 576×1024**), 600/19 fps (31.58), AAC 44.1 kHz stereo; video and audio streams both start at 0.000 s (no A/V offset to compensate). Output: **1080×1920**, 30 fps, h264 CRF 20, AAC 192k, faststart, loudnorm −16 LUFS.
 
-**Status: v3 rendered** to `pitch/video/pill-pitch-90s.mp4` (2026-10-25 01:19). v3 is the response to the owner's note at 01:1x: "it's a bit delayed, fix it; make it more professional with text, not like sticker text; overall better vid." Everything is in `pitch/video/edit/` and generated from one cut list in `make_edit.py`.
+**Status: v4 rendered** to `pitch/video/pill-pitch-90s.mp4` (2026-10-25 01:4x: v3 plus the restored reveal line; video 86.47 s, audio 86.50 s; reveal frame viewed at 75.6 s). v3 is the response to the owner's note at 01:1x: "it's a bit delayed, fix it; make it more professional with text, not like sticker text; overall better vid." Everything is in `pitch/video/edit/` and generated from one cut list in `make_edit.py`.
 
 ```
 bash pitch/video/edit/build.sh --preview   # seconds 0–10 → pitch/video/pill-pitch-preview10.mp4
-bash pitch/video/edit/build.sh             # full 83.40 s → pitch/video/pill-pitch-90s.mp4
+bash pitch/video/edit/build.sh             # full 86.47 s → pitch/video/pill-pitch-90s.mp4
 bash pitch/video/edit/build.sh --check     # graph dry run, 0.1 s to the null muxer
 ```
 
@@ -19,7 +19,7 @@ Retime anything: edit `CUTS` / `CARDS` in `make_edit.py` and run `python3 pitch/
 - **v3:** no word pops. Each caption phrase starts on the whisper onset of its first word (floored to the centisecond, no fade-in, so it is already visible on the onset frame). Every card starts on the onset of its cue word ("FDA", "several", "pharmacy", "final", "prescription", "looks", "3D", "water", "push", "countdown", "Arduino", "red", "three", "check", "unable"). The words on screen come from the Gemini transcript where whisper mishears ("aspirin 81", "main head").
 - Checked in the preview: at the "Why" onset (out 4.41 s) the frame at 4.44 s already shows "Why are we talking about pills?" with his mouth on the word.
 
-## Cut list: 12 cuts + end card = 83.40 s (≤ 90 s)
+## Cut list: 13 cuts + end card = 86.47 s (≤ 90 s)
 
 | # | Out in–out | Source in–out | Dur | Transition in | Captions (phrase starts on the first word's onset) |
 |---|---|---|---|---|---|
@@ -34,15 +34,16 @@ Retime anything: edit `CUTS` / `CARDS` in `make_edit.py` and run `python3 pitch/
 | C9 Box: the hardware | 0:50.83–1:03.08 | 1:52.30–2:04.55 | 12.25 | cut | As you see in this hardware, / we use an Arduino UNO Q for the main head and CPU. / It uses red, blue and white lights, / as well as a photoresistor at the back. |
 | C10 Box: three colours, one measurement | 1:03.05–1:08.05 | 2:08.80–2:13.80 | 5.00 | cut | We use these three colours to find a good measurement. |
 | C11 Result: Unable to verify | 1:07.78–1:13.98 | 2:44.00–2:50.20 | 6.20 | dissolve 8 fr | As the timer runs out, / it's going to check. / And oh no: it's unable to verify. |
-| C12 Close: swallow the right pills | 1:13.95–1:19.85 | 2:53.30–2:59.20 | 5.90 | cut | So watch out. / Please swallow the right pills. / Thank you. |
-| END card | 1:19.40–1:23.40 | generated | 4.00 | dip to black 0.45 s | The box measures. Pill explains. / pill-site.vercel.app / github.com/ShadowEsu/pill |
+| C11R Reveal: a different medicine in the bottle | 1:13.95–1:17.05 | 2:50.20–2:53.30 | 3.10 | cut | Because guess what, / I put morphine in here instead of aspirin. |
+| C12 Close: swallow the right pills | 1:17.02–1:22.92 | 2:53.30–2:59.20 | 5.90 | cut | So watch out. / Please swallow the right pills. / Thank you. |
+| END card | 1:22.47–1:26.47 | generated | 4.00 | dip to black 0.45 s | The box measures. Pill explains. / pill-site.vercel.app / github.com/ShadowEsu/pill |
 
 "cut" = a one-frame xfade (it keeps the whole chain one xfade/acrossfade ladder). The audio crossfades over the same duration at every join. I moved four boundaries off words whisper showed being clipped: C1 ends before "where" (48.58), C7 starts at "as I click" (80.28), C8 ends after "countdown" (108.05), C10 runs 128.80–133.80 so "here." finishes, and C12 runs to 179.20 so "Thank you." gets its full second.
 
 **Left out on purpose**
 - 0:36–0:44, "1.3 million people get injured from the right prescriptions, as well as 98,000 Americans": it doesn't match its sources (StatsVerify, `pitch/stats-verify.md`: 1.3M is injuries from medication *errors*, WHO 2017; 98,000 is the top of a 44,000–98,000 range of deaths from *all* medical errors in US hospitals, IOM 1999).
 - 0:02–0:08 "highest exports and imports…": no source for the claim.
-- 2:50.34–2:53.04 "because guess what, I put morphine in here instead of aspirin": cut, no caption.
+- (Restored in v4 at the owner's request, 01:3x: "Don't cut that out please.") 2:50.20–2:53.30 is back as C11R, between "unable to verify" and "So watch out", captioned in his words. The source runs continuously from C11 into C12, so no other cut moved. **Reveal card** on "because" (1:14.09), in the answers' place and held into "So watch out": THE REVEAL / A different tablet in the Aspirin 81 bottle / sub "no match, no pass: Unable to verify". The sub doesn't claim the station spotted the swap: it gave Unable to verify because it had no reference profile for the product and the run was cut short. The answers list now gives way to the reveal card on "because". Main's one-line label is split into a header and a line because it doesn't fit 1080 px in one line.
 - Caption trims, for reading speed only: "we're going to use" → "we use", "I'm going to push" → "I push", leading "So"/"And" dropped from some lines, "from what you see here" dropped from C10. Wording fix: "Arduino Uno" → "Arduino UNO Q" (the board on the station is an UNO Q).
 
 ## v3 style
