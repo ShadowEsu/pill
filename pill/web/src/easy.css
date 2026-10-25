@@ -13,7 +13,7 @@ html.easy .title { font-size: 42px; }
 @media (min-width: 900px) { html.easy .title { font-size: 54px; } }
 html.easy .btn { min-height: 68px; font-size: 21px; border-width: 2px; }
 html.easy .btn.ghost { border-color: var(--ink); }
-html.easy .chip { font-size: 14px; padding: 8px 12px; color: var(--ink); border-color: var(--line-2); }
+html.easy .chip { font-size: 14px; padding: 8px 12px; color: var(--ink); border-color: var(--line-2); max-width: 100%; white-space: normal; }
 html.easy .chip .dot { width: 10px; height: 10px; }
 html.easy .eyebrow { font-size: 13px; color: var(--ink-2); }
 html.easy .footnote { font-size: 16px; color: var(--ink-2); }
