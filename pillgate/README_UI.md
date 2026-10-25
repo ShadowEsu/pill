@@ -28,7 +28,8 @@ Inside `app.js`:
 Choose a mode on Welcome; it is stored in `localStorage.pillgate.mode`. The mode changes the words, the home page and the nav labels, never the API calls.
 
 - **Clinic**: home is "Today's gate", with today's counts and the last five checks. A "Needs lab testing" result is also marked **held**, and the delivery is held.
-- **Personal**: home is a "Check my medicine" hero, your last check and a "how it works" strip. A result other than "Passed the screen" says to show it to a pharmacist.
+- **Personal** (written for older people): home is a "Check my medicine" hero, your last check, the next dose, a big **Easy mode** button and a "how it works" strip. The nav is Home · Check · Medicines · Schedule · More. A result other than "Passed the screen" says to show it to a pharmacist.
+- **Easy mode** (`localStorage.pillgate.easy`, Settings or the Personal home button): the page, the Ask Pill sheet and the run bar at 125 % (CSS `zoom`), stronger ink and lines, and answers read aloud unless read-aloud was switched off.
 - **Check**: `#/` goes straight to the stepper.
 
 Result strings are always exactly "Passed the screen", "Needs lab testing" or "Unable to verify". The device chip shows `REPLAY (not live) · <file>` whenever `status.mode` starts with `replay`.
@@ -48,12 +49,19 @@ Result strings are always exactly "Passed the screen", "Needs lab testing" or "U
 | `#/history` | Checks as capsules (open Result) and the runs list | `GET /api/scans`, `GET /api/runs` |
 | `#/profiles` | Profile list (DEMO and SIMULATED labels shown exactly as the backend gives them), the reference builder (tick runs, choose what changes when it dissolves) and the calibration builder | `GET /api/profiles`, `GET /api/runs`, `POST /api/profiles/reference`, `POST /api/profiles/calibration` |
 | `#/atlas` | 3D graph. The library loads on first open and the graph is destroyed when you leave, so no other page runs WebGL. | `GET /api/atlas` |
-| `#/settings` | Mode switch, sounds, read-aloud, reset local prefs, server info | `GET /api/config` |
+| `#/settings` | Mode switch, Easy mode, sounds, read-aloud, reset local prefs (the schedule stays), server info | `GET /api/config` |
+| `#/medicines` | Every drug read off a label, grouped by name + strength: latest result chip, recall chip, "Tested N times", Latest result, Add to my schedule | `GET /api/scans`, then `GET /api/scans/{id}` for the newest 40 |
+| `#/schedule` | Today's doses as big rows with **I took it** / Undo and a log; add or remove medicines and times; reminders through the Notification API while a tab is open; **Add to calendar** downloads an `.ics` with a daily event and an alarm for each time. Stored only in this browser (`pillgate.schedule`, `pillgate.takelog`). | none |
+| `#/more` | History, Profiles, Atlas, Settings, Ask Pill and Change mode as tiles | none |
 
-The guided run keeps going if you open another page during a measurement. `Run` lives outside the pages and is driven by the global `/api/live` poll, so the auto stop and the scan still happen.
+The guided run keeps going if you open another page during a measurement. `Run` lives outside the pages and is driven by the single global `/api/live` poll (2×/s), so `POST /api/run/stop` (once, guarded by `Run.stopping`) and `POST /api/scans` happen the moment `guide.stop` is true, whatever page is open. Every other page shows a sticky bar ("Run in progress · Dissolving 0:42 · ↩ back to the run"), then "Result ready · Open result →" if the scan was made while you were elsewhere (you are only taken to the result automatically while you're still in the check flow). Coming back to Measure re-attaches to the live phase (the 10-s countdown keeps its original start). After a reload, `sessionStorage.pillgate.run` plus `status.recording` let the same tab adopt its run again, and the photos come back from IndexedDB.
+
+**Result, no reference:** when the label was read (`label.drug_name`) but no profile matched and the result is "Unable to verify", the stamp card says "We read **<drug> <strength>** from the label. Unable to verify means there is no reference for <drug> on this station yet: record 3 good runs to build one (Profiles →)".
+
+**Ask Pill** is docked on every page except Welcome and the full Ask page. With a finished scan, typed questions go to `POST /api/scans/{latest done}/ask` (the sheet names the scan). The four help questions always answer from a fixed local list, as does everything when there is no finished scan; the assistant says it only knows this app.
 
 ## Checking it
 
 - `cd app && .venv/bin/python -m pytest -q tests`
 - Replay server: `PORT=8001 REPLAY_FILE=../runs/REAL_aspirin_first_test.csv MOCK_AI=1 .venv/bin/python server.py`
-- Screenshots and the headless proof: `pillgate/dev-shots/ui/`, which holds `<page>-390.png` and `<page>-1280.png`, `flow-*.png`, `flow-proof.json` and `pages-proof.json`.
+- Screenshots and the headless proof: `pillgate/dev-shots/ui/` (round 1) and `pillgate/dev-shots/ui2/` (round 2), which holds `<page>-390.png` and `<page>-1280.png`, `flow-*.png`, `flow-proof.json` and `pages-proof.json`.
