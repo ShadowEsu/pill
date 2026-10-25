@@ -5,13 +5,13 @@ Two apps, one story. **The station app (Pill Gate)** runs live at the table on t
 Stage directions in *italics* are not spoken. Numbers come only from DEVPOST-FINAL's research line; don't round them and don't add any.
 
 **Before the judge arrives**
-- Station app open at `:8000`, Quick mode selected, cup filled to the line, lid closed, a tablet from the reference bottle in your hand. Top bar must say `live`; if it says `REPLAY (not live)`, say "this is a replay of our real run" out loud.
+- Station app open at `:8000`, Quick mode selected, the small cup filled to the line, lid closed, one whole tablet in your hand, the wooden stick ready. Top bar must say `live`; if it says `REPLAY (not live)`, say "this is a replay of our real run" out loud.
 - Phone open on the clinic app's held delivery (`/delivery/d-1042`, NEEDS LAB, $480 held · SANDBOX).
-- If no reference profile has been built (`[FILL 6]`), the answer will be **Unable to verify**. Use line **B** at the reveal, not line **A**.
+- **Path B is the default.** As of Sat evening `pillgate/app/data/profiles/` holds only demo and template profiles, no recorded reference, so the station will answer **Unable to verify**. Use path **A** only after three or more reference runs are recorded and Profiles → Build reference has been done for the tablet in your hand.
 
 ---
 
-## 90-second version (word for word, about 180 words on either path)
+## 90-second version (word for word, about 205 words on either path)
 
 *Hold up the bottle, take the photo in the station app.*
 
@@ -27,16 +27,16 @@ Clean water first, ten seconds, lid closed. Every second the board turns every L
 
 *Lift the lid, drop the tablet, stir five circles, close the lid, press Continue.*
 
-Tablet in. One sensor looks through the cup, one from the side. For sixty seconds we compare how it starts to dissolve with a reference recorded from known-good tablets on this same box.
+Tablet in: one whole tablet, stirred by hand. One sensor looks through the cup, one from the side. For sixty seconds it compares how the tablet starts to dissolve with a reference, when this box has one for the product.
 
 *While it runs, look at the judge.*
 
-WHO estimates 1 in 10 medical products in low- and middle-income countries is substandard or falsified. A lab dissolution tester costs twenty to a hundred thousand dollars. A clinic pharmacist has neither, just an invoice to pay today.
+WHO estimates 1 in 10 medical products in low- and middle-income countries is substandard or falsified. A new lab dissolution tester typically costs twenty to a hundred thousand dollars. A clinic pharmacist has neither, just an invoice to pay today.
 
 *Point at the answer.*
 
-**A:** Passed the screen: inside the reference. It only ever says three things: Passed the screen, Needs lab testing, Unable to verify.
-**B:** Unable to verify: no reference for this product, so it refuses to guess.
+**A:** This box has one: twelve checkpoints, one every five seconds, against known-good runs. Passed the screen: inside the reference. It only ever says three things: Passed the screen, Needs lab testing, Unable to verify.
+**B:** Today it doesn't have one for this product yet, so watch what it does. Unable to verify: no reference, so it refuses to guess. It only ever says three things: Passed the screen, Needs lab testing, Unable to verify.
 
 *Pick up the phone.*
 
@@ -46,11 +46,11 @@ Try to make it pass something it shouldn't.
 
 ---
 
-## 30-second version (70 words)
+## 30-second version (76 words)
 
 *Tablet already in; point at the live curve.*
 
-One tablet, clean water, sixty seconds. Every second the board takes a dark reading, so room light cancels, and two sensors watch the tablet dissolve against a reference from known-good tablets on this box. It only says three things: Passed the screen, Needs lab testing, Unable to verify. *Phone.* Then the money waits: in a clinic, anything but a pass holds the supplier's payment until a pharmacist decides. Sandbox money today.
+One whole tablet, clean water, sixty seconds. Every second the board takes a dark reading, so room light cancels, and two sensors watch the tablet dissolve. With a reference for the product it checks the curve every five seconds against known-good runs; without one, like today, it says Unable to verify instead of guessing. *Phone.* Then the money waits: in a clinic, anything but a pass holds the supplier's payment until a pharmacist decides. Sandbox money today.
 
 ---
 
