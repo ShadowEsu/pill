@@ -1,4 +1,5 @@
-// Personal mode: my bottles, what each is for, the one tested tablet, recall status, a reminder, and one-tap Taken.
+// Personal mode: the medicines I test on the station app (GET /gate/station-scans, one row per drug + strength: tests, latest
+// verdict, recall, last tested), then my bottles: what each is for, the one tested tablet, recall status, a reminder, one-tap Taken.
 // Motion: cards cascade in, each drug's pill floats and draws its outline, the bell draws in and swings when a reminder is set,
 // Taken draws a check and counts the time in, a saved reminder glows softly once, and "Add" slides a sheet up from the bottom.
 import { useEffect, useState } from 'react';
@@ -13,9 +14,83 @@ import { useCountUp } from '../lib/count';
 import { DRUGS } from '../data/reference';
 import type { Bottle } from '../lib/types';
 import CalendarButton from '../components/CalendarButton';
+import { useStationScans } from '../components/StationScans';
+import type { StationScan } from '../lib/api';
+import { dayLabel, hm } from '../lib/when';
 import '../story.css';
 
 const clock = (t: number) => new Date(t).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+/** Pill Gate's recall_status in plain words; red only when this lot is recalled. */
+const SCAN_RECALL: Record<string, [string, string]> = {
+  LOT_RECALLED: ['bad', 'RECALL · this lot'],
+  PRODUCT_HAS_RECALLS_OTHER_LOTS: ['warn', 'recalls on other lots, not this one'],
+  NO_RECALL_FOUND: ['ok', 'no recall record'],
+  NOT_CHECKED: ['', 'recall not checked'],
+};
+const norm = (s: string) => s.toLowerCase().replace(/\s+/g, ' ').trim();
+/** A bottle and a station scan are the same medicine when one drug name contains the other ("Aspirin" ~ "aspirin 325"). */
+const sameDrug = (a: string, b: string) => { const x = norm(a), y = norm(b); return !!x && !!y && (x.includes(y) || y.includes(x)); };
+
+interface Tested { key: string; drug: string; strength: string | null; scans: StationScan[] }
+
+/** The medicines tested on the station app (GET /gate/station-scans, polled every 10 s), one row per drug and strength,
+ *  newest test first, with the bottles on this phone that hold the same drug. */
+function TestedList({ bottles }: { bottles: Bottle[] }) {
+  const { scans, error } = useStationScans(10_000);
+  const groups: Tested[] = [];
+  for (const s of scans ?? []) {
+    const key = `${norm(s.drug)}|${norm(s.strength ?? '')}`;
+    const g = groups.find((x) => x.key === key);
+    if (g) g.scans.push(s);
+    else groups.push({ key, drug: s.drug, strength: s.strength, scans: [s] });
+  }
+  for (const g of groups) g.scans.sort((a, b) => b.receivedAt - a.receivedAt);
+  groups.sort((a, b) => b.scans[0].receivedAt - a.scans[0].receivedAt);
+  return (
+    <section className="stack" style={{ gap: 10 }} aria-label="Medicines tested at the station" data-tested>
+      <div className="panel-head"><h2 className="serif" style={{ fontWeight: 400, fontSize: '1.7rem' }}>Medicines I test</h2><span className="eyebrow">station app · every 10 s</span></div>
+      {scans === null && !error && <p className="footnote">Asking the station app…</p>}
+      {(groups.length === 0 && (scans !== null || error)) && (
+        <div className="card stack" style={{ gap: 6, padding: 20 }} data-tested-empty>
+          <p style={{ fontSize: 20, fontWeight: 600 }}>No station tests yet: run one on the station app</p>
+          {error && <p className="footnote">The station app's list is not reachable right now ({error}).</p>}
+        </div>
+      )}
+      {groups.length > 0 && (
+        <ul className="stack cascade" style={{ listStyle: 'none', margin: 0, padding: 0, gap: 10 }}>
+          {groups.map((g, i) => {
+            const last = g.scans[0];
+            const [cls, words] = SCAN_RECALL[last.recallStatus] ?? ['', last.recallStatus.toLowerCase().replace(/_/g, ' ')];
+            const mine = bottles.filter((b) => sameDrug(b.drug, g.drug));
+            return (
+              <li key={g.key} className="card stack tested-row" style={{ gap: 10, '--i': Math.min(i, 6) } as React.CSSProperties} data-tested-row={g.drug}>
+                <div className="med-head">
+                  <MedIcon drug={g.drug} size={52} />
+                  <div style={{ minWidth: 0 }}>
+                    <h3 className="med-name">{DRUGS[norm(g.drug)]?.name ?? g.drug}{g.strength ? <span style={{ color: 'var(--ink-2)', fontWeight: 400 }}> {g.strength}</span> : null}</h3>
+                    <p style={{ color: 'var(--ink-2)', marginTop: 2 }}>Tested {g.scans.length === 1 ? 'once' : `${g.scans.length} times`} · last tested {dayLabel(last.receivedAt).toLowerCase()} at {hm(last.receivedAt)}</p>
+                  </div>
+                </div>
+                <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>
+                  <VerdictChip verdict={last.verdict} />
+                  <span className={'chip ' + cls}><span className="dot" />{words}</span>
+                </div>
+                {last.headline && <p className="footnote" style={{ color: 'var(--ink-2)' }}>{last.headline}</p>}
+                {mine.length > 0 && (
+                  <p className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
+                    <span style={{ fontSize: 15 }}>On this phone:</span>
+                    {mine.map((b) => <span key={b.id} className="chip"><span className="dot" style={{ background: 'var(--mint)' }} />{b.strength} · lot {b.lot}</span>)}
+                  </p>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+  );
+}
 
 function RecallChip({ b }: { b: Bottle }) {
   if (b.recall === 'recall') return <span className="chip bad"><span className="dot" />RECALL</span>;
@@ -111,6 +186,9 @@ export default function Medicines() {
         <span>Measuring a dose needs the station. This list does not re-test.</span>
       </p>
 
+      <TestedList bottles={bottles} />
+
+      <div className="panel-head"><h2 className="serif" style={{ fontWeight: 400, fontSize: '1.7rem' }}>My bottles</h2></div>
       {bottles.length === 0 ? (
         <div className="card stack reveal-in" style={{ textAlign: 'center', padding: 28, justifyItems: 'center' }}>
           <Glyph name="bottle" size={72} />

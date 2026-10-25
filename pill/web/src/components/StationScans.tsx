@@ -1,22 +1,22 @@
 // Verdicts handed over by the Pill Gate station app (pill-pay GET /gate/station-scans). A record only: these never change a
-// delivery's verdict, policy clause or money. Polled every 5 s while a screen that shows them is mounted.
+// delivery's verdict, policy clause or money. Polled every 5 s (Medicines: 10 s) while a screen that shows them is mounted.
 import { useEffect, useState } from 'react';
 import VerdictChip from './VerdictChip';
 import { PAY_URL, stationScans, type StationScan } from '../lib/api';
 
 const time = (ms: number) => new Date(ms).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' });
 
-/** null while the first answer is pending; `error` when the service is not reachable. */
-export function useStationScans(): { scans: StationScan[] | null; error: string | null } {
+/** null while the first answer is pending; `error` when the service is not reachable. Polls every `every` ms. */
+export function useStationScans(every = 5000): { scans: StationScan[] | null; error: string | null } {
   const [state, setState] = useState<{ scans: StationScan[] | null; error: string | null }>({ scans: null, error: PAY_URL ? null : 'no VITE_PAY_URL' });
   useEffect(() => {
     if (!PAY_URL) return;
     let alive = true;
     const load = () => void stationScans().then((r) => { if (alive) setState(Array.isArray(r) ? { scans: r, error: null } : (s) => ({ scans: s.scans, error: r.error })); });
     load();
-    const id = window.setInterval(load, 5000);
+    const id = window.setInterval(load, every);
     return () => { alive = false; clearInterval(id); };
-  }, []);
+  }, [every]);
   return state;
 }
 
