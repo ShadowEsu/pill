@@ -18,6 +18,7 @@ import { PEOPLE } from '../data/history';
 import type { Delivery as D, LogLine } from '../lib/types';
 import CalendarButton from '../components/CalendarButton';
 import { PAY_URL, nessieAccounts, type NessieAccounts, type NessieTransfer } from '../lib/api';
+import { StationLine } from '../components/StationScans';
 import '../components/cinema.css';
 
 const usd = (n: number) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -272,6 +273,8 @@ export default function Delivery() {
           <p style={{ color: 'var(--ink-2)' }}>No tablet from this lot has been measured. Money stays held until one is.</p>
         </section>
       )}
+
+      {PAY_URL && <StationLine lot={d.lot} />}
 
       {/* policy */}
       {proposed && d.clause && (

@@ -249,3 +249,9 @@
   .cn-stamp-wait { opacity: 1; }
   .cn-hero.moment .cn-wash { transform: none; }
 }
+
+/* kiosk: exactly one screen tall on the station panel (1024×600) and 1280×800; tighter frame so nothing scrolls */
+@media (min-width: 900px) {
+  .app.kiosk .screen { box-sizing: border-box; height: 100dvh; min-height: 0; padding: 18px 32px 18px; gap: 12px; }
+  .app.kiosk .screen > .cn-kiosk { min-height: 0; }
+}

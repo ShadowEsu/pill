@@ -150,3 +150,22 @@ export interface CheckRequest {
 }
 
 export const runChecker = (req: CheckRequest) => aiPost<CheckReport>('/api/check', req, 70_000);
+
+// ---- GET /gate/station-scans (verdicts handed over by the Pill Gate station app; a record, never a release) ----
+
+export interface StationScan {
+  id: string; source: 'pill-gate'; scanId: string; drug: string; strength: string | null; lot: string | null; maker: string | null;
+  expiry: string | null; verdict: Verdict; recallStatus: string; headline: string | null; receivedAt: number;
+}
+
+export async function stationScans(): Promise<StationScan[] | Unavailable> {
+  if (!PAY_URL) return { mode: 'unavailable', error: 'no VITE_PAY_URL' };
+  try {
+    const res = await fetch(`${PAY_URL}/gate/station-scans`, { signal: AbortSignal.timeout(8_000) });
+    if (!res.ok) return { mode: 'unavailable', error: `HTTP ${res.status}` };
+    const j = (await res.json()) as { scans?: StationScan[] };
+    return Array.isArray(j.scans) ? j.scans : { mode: 'unavailable', error: 'no scans list in the answer' };
+  } catch (e) {
+    return { mode: 'unavailable', error: (e as Error).message };
+  }
+}

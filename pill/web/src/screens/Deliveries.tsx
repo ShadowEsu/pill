@@ -10,6 +10,7 @@ import StatusRail from '../components/StatusRail';
 import ActorAvatar from '../components/ActorAvatar';
 import Glyph from '../components/Glyph';
 import { useStore } from '../lib/store';
+import StationStrip from '../components/StationScans';
 import { useCountUp } from '../lib/count';
 import { DRUGS } from '../data/reference';
 import type { Delivery, Verdict } from '../lib/types';
@@ -53,6 +54,7 @@ export default function Deliveries() {
     <Screen title="Deliveries" tone="violet" eyebrow="Medical · incoming lots" back="/"
       art={<span className="runs-art" aria-hidden="true"><Glyph name="supplier" size={52} /><Glyph name="escrow" size={40} delay={200} /></span>}
       right={<Link to="/log" className="chip" style={{ textDecoration: 'none' }}>Log</Link>}>
+      <StationStrip />
       <div className="wide-2">
         <section className="card panel" aria-label="Pipeline">
           <div className="panel-head"><h2>Pipeline</h2><span className="eyebrow">{deliveries.length} lots · SANDBOX</span></div>

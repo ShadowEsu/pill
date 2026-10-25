@@ -20,6 +20,7 @@ import { calendarStatus, createEvent, type CalendarEventInput } from './calendar
 import { CLAUDE_MODEL, GEMINI_MODEL, aiHas, ask, escrowLog, explainWhy, parseAsk, parseEscrow, parseWhy } from './ai.ts';
 import { nessieAccounts, nessieMode, nessieTransfer, setupNessie } from './nessie.ts';
 import { MAX_SPEAK_CHARS, speak, speechMode } from './speech.ts';
+import { parseStationScan, recordStationScan, stationScans } from './gate.ts';
 import { initTiger, insertSamples, parseSamples, plateauCurve, tigerMode, tigerStatus } from './tiger.ts';
 import { station, stationRouter } from './station.ts';
 import { assistHandler, tipRoute } from '../../web/api/_lib/follower.ts';
@@ -49,6 +50,8 @@ app.use((req, res, next) => {
 
 // Parse every body as JSON regardless of content type (`curl -d` sends form-urlencoded by default). 1.6 MB cap: the Gemini
 // checker sends a label photo and up to 3 frames (each ≤ 300 KB, downscaled in the app); its own guard caps it at 1.5 MB.
+// Pill Gate station scans get their own 256 KB cap; the general parser below then skips the already-parsed body.
+app.use('/gate/station-scan', express.json({ type: () => true, limit: '256kb' }));
 app.use(express.json({ type: () => true, limit: '1.6mb' }));
 
 // Every real x402 settlement (cdp and public-facilitator modes; simulated never settles) also lands in the checkout list
@@ -182,6 +185,16 @@ app.post('/speak', async (req, res) => {
 
 app.get('/nessie/accounts', async (_req, res) => { res.json(await nessieAccounts()); });
 
+// ---- Pill Gate station app → clinic gate (a record only: the policy agent's inputs and every verdict stay as they are) ----
+app.post('/gate/station-scan', (req, res) => {
+  const p = parseStationScan(req.body, req.query.scanId);
+  if ('errors' in p) { res.status(400).json({ ok: false, errors: p.errors }); return; }
+  const entry = recordStationScan(p);
+  console.log(`[gate] station scan ${entry.scanId} ${entry.verdict} ${entry.drug} lot ${entry.lot ?? '—'} recall ${entry.recallStatus}`);
+  res.json({ ok: true, entry, note: 'recorded only; no verdict or payment changed' });
+});
+app.get('/gate/station-scans', (_req, res) => { res.json({ scans: stationScans() }); });
+
 app.get('/escrow/accounts', async (_req, res, next) => {
   try { res.json({ ...(await accounts()), verify_mode: mode }); } catch (e) { next(e); }
 });
@@ -250,7 +263,7 @@ app.post('/verify', (_req, res) => {
 });
 
 app.use((err: Error & { status?: number; type?: string }, _req: Request, res: Response, _next: NextFunction) => {
-  if (err.type === 'entity.too.large') { res.status(413).json({ mode: 'unavailable', error: 'body over 1 MB; send a smaller image' }); return; }
+  if (err.type === 'entity.too.large') { const limit = 'limit' in err && typeof err.limit === 'number' ? `${err.limit} byte` : 'size'; res.status(413).json({ mode: 'unavailable', error: `body over the ${limit} limit for this route` }); return; }
   const status = err.type === 'entity.parse.failed' ? 400 : err.status ?? 500;
   if (status >= 500) console.error(err);
   res.status(status).json({ mode, error: status === 400 ? 'body is not JSON; no payment asked' : err.message });
@@ -265,5 +278,6 @@ app.listen(PORT, () => {
   console.log(`  models        claude ${aiHas().claude ? CLAUDE_MODEL : 'unavailable'} · gemini ${aiHas().gemini ? GEMINI_MODEL : 'unavailable'} · speech ${speechMode()}`);
   void setupNessie().then((r) => console.log(`  nessie        ${r ? `SANDBOX customer ${r.customer}` : nessieMode()}`));
   void initTiger().then((r) => console.log(`  tiger         ${r.mode === 'live' ? 'live (samples hypertable ready)' : `unavailable (${r.reason})`}`));
-  console.log(`  station       ${station.mode === 'no_station' ? 'no_station (scanning /dev/cu.usbmodem* and /dev/cu.usbserial* every 3 s)' : `${station.mode} ${station.status().port}`}`);
+  const serial = process.env.SERIAL_PORT?.trim();
+  console.log(`  station       ${station.mode !== 'no_station' ? `${station.mode} ${station.status().port}` : serial && serial !== 'off' ? `no_station (waiting for ${serial === 'auto' ? '/dev/cu.usbmodem* or /dev/cu.usbserial*' : serial}, retried every 3 s)` : 'no_station (SERIAL_PORT unset: the USB port is left alone; SERIAL_PORT=auto|/dev/…|sim to use it)'}`);
 });
