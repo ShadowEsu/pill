@@ -2,203 +2,32 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7F8F7">
 <title>Pill Gate</title>
-<link rel="stylesheet" href="/static/style.css">
-<script src="/static/vendor/chart-4.5.0.umd.min.js"></script>
+<link rel="preload" href="/static/fonts/instrument-serif-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/design.css?v=ui1">
+<link rel="stylesheet" href="/static/style.css?v=ui1">
+<script src="/static/vendor/chart-4.5.0.umd.min.js" defer></script>
 </head>
-<body>
-<header class="top">
-  <div class="brand"><span class="logo" aria-hidden="true"></span><span id="appName">Pill Gate</span></div>
-  <div id="devicePill" class="pill">device…</div>
-</header>
-
-<nav class="tabs" role="tablist">
-  <button class="tab active" data-view="check">Check</button>
-  <button class="tab" data-view="history">History</button>
-  <button class="tab" data-view="profiles">Profiles</button>
-  <button class="tab" data-view="atlas">Atlas</button>
-</nav>
-
-<main>
-<!-- ============================================================ CHECK -->
-<section id="view-check" class="view active">
-  <ol class="steps" id="stepper">
-    <li data-step="1" class="on">Bottle</li><li data-step="2">Tablet</li><li data-step="3">Measure</li><li data-step="4">Result</li>
-  </ol>
-
-  <div class="card step" id="step-1">
-    <h2>1 · Photograph the bottle</h2>
-    <p class="muted">Label facing the camera. Personal details (your name, pharmacy, Rx number) are removed before anything is stored.</p>
-    <label class="drop"><input type="file" accept="image/*" capture="environment" id="bottleFile"><span>Take or choose a photo</span></label>
-    <img id="bottlePrev" class="prev" alt="">
-    <div class="row"><button class="ghost" data-go="2">Skip</button><button class="primary" data-go="2">Next</button></div>
-  </div>
-
-  <div class="card step hidden" id="step-2">
-    <h2>2 · Photograph one tablet</h2>
-    <p class="muted">Close up, on a plain background, so the imprint (letters or numbers stamped on it) is readable.</p>
-    <label class="drop"><input type="file" accept="image/*" capture="environment" id="imprintFile"><span>Take or choose a photo</span></label>
-    <img id="imprintPrev" class="prev" alt="">
-    <div class="row"><button class="ghost" data-go="1">Back</button><button class="ghost" data-go="3">Skip</button><button class="primary" data-go="3">Next</button></div>
-  </div>
-
-  <div class="card step hidden" id="step-3">
-    <h2>3 · Measure</h2>
-    <fieldset class="modes" id="modeBox">
-      <legend>Test length</legend>
-      <label class="mode"><input type="radio" name="mode" value="quick" id="modeQuick" checked><span><b>Quick demo</b><small>1 minute after the tablet goes in</small></span></label>
-      <label class="mode"><input type="radio" name="mode" value="full" id="modeFull"><span><b>Full test</b><small>2–10 min, stops when the curve flattens</small></span></label>
-    </fieldset>
-    <label class="field">Product profile
-      <select id="profileSel"><option value="">Auto-match from the bottle label (needs the API key)</option></select>
-    </label>
-    <div class="guide" id="guideBox">
-      <div class="gstep" id="gStep">Step 1 of 3</div>
-      <div class="gphase" id="gPhase">Clean water first</div>
-      <div class="gtext" id="gText">Fill the clear cup with clean water to the marked line, put it in the chamber and close the lid. Then press <b>Start</b>.</div>
-      <div class="bar"><div id="gBar"></div></div>
-      <ul class="gchecks" id="gChecks"></ul>
-      <div class="row wrap">
-        <button class="primary" id="btnStart">Start</button>
-        <button class="accent hidden" id="btnContinue">Tablet is in — Continue</button>
-        <button class="ghost hidden" id="btnStopNow">Stop now &amp; analyze</button>
-        <button class="ghost hidden" id="btnCancel">Cancel</button>
+<body data-mode="">
+<div class="ambient" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i></div>
+<div class="frame">
+  <nav class="nav" id="nav" aria-label="Sections" hidden></nav>
+  <div class="app">
+    <header class="topbar" id="topbar">
+      <a href="#/" class="brand" aria-label="Home"><span class="serif" id="appName">Pill Gate</span></a>
+      <div class="row top-right">
+        <span id="devicePill" class="chip" role="status" aria-live="polite"><span class="dot"></span><span class="dp-text">device…</span></span>
+        <a href="#/settings" class="btn ghost icon top-gear" aria-label="Settings">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/></svg>
+        </a>
       </div>
-    </div>
-    <div class="live">
-      <div class="stat"><span id="liveSec">0</span><small>seconds</small></div>
-      <div class="stat"><span id="liveN">0</span><small>samples</small></div>
-      <div class="stat"><span id="liveIn">–</span><small>tablet in at</small></div>
-    </div>
-    <div id="liveChartWrap" class="hidden">
-      <div class="chartbox"><canvas id="liveChart"></canvas></div>
-      <p class="muted small">Lines show absorbance (0 = clear water). Blue rising faster than red means colour. The purple line is the side sensor: it rises when the water turns cloudy (white tablets like aspirin).</p>
-    </div>
-    <details class="alt">
-      <summary>No live connection? Paste data or reuse a run</summary>
-      <textarea id="pasteBox" rows="5" placeholder="Paste the Arduino Serial Monitor text here (Ctrl+A, Ctrl+C in the Serial Monitor)"></textarea>
-      <div class="row wrap">
-        <button class="ghost" id="btnPaste">Use pasted data</button>
-        <select id="oldRunSel"><option value="">…or pick a saved run</option></select>
-        <button class="ghost" id="btnOldRun">Use this run</button>
-      </div>
-    </details>
-    <div class="row"><button class="ghost" data-go="2">Back</button></div>
+    </header>
+    <main id="view" class="page" tabindex="-1"></main>
   </div>
-
-  <div class="step hidden" id="step-4">
-    <div class="card verdict" id="verdictCard">
-      <div class="vlabel" id="vLabel">Analyzing…</div>
-      <div class="vhead" id="vHead"></div>
-      <ul class="reasons" id="vReasons"></ul>
-      <div class="kpis" id="kpis"></div>
-      <p class="banner hidden" id="mockNote">Mock mode: the AI is off (no ANTHROPIC_API_KEY on the server), so the bottle and tablet photos were NOT read, and the app can't auto-match a profile. Pick the profile by hand on the Measure step, or set the key and restart the app.</p>
-    </div>
-
-    <div class="card">
-      <h3>Evidence engine</h3>
-      <div class="chips" id="stageChips"></div>
-      <div id="reportBox" class="report"></div>
-      <div id="recallBanner" class="banner hidden"></div>
-      <h4>Sources</h4>
-      <ol id="sources" class="sources"></ol>
-      <p class="muted small" id="guardNote"></p>
-    </div>
-
-    <div class="card">
-      <h3>Dissolution curve</h3>
-      <div class="chartbox"><canvas id="resultChart"></canvas></div>
-      <details><summary>Quality checks</summary><ul id="gates" class="gates"></ul></details>
-      <details><summary>What the label and tablet photos said</summary><pre id="fields" class="pre"></pre></details>
-    </div>
-
-    <div class="card">
-      <h3>Ask about this result</h3>
-      <div id="chat" class="chat"></div>
-      <div class="row ask">
-        <input id="askInput" placeholder="e.g. What does this recall mean for me?">
-        <button class="ghost icon" id="micBtn" title="Speak">🎤</button>
-        <button class="primary" id="askBtn">Ask</button>
-      </div>
-      <label class="small check"><input type="checkbox" id="speakToggle"> Read answers aloud</label>
-      <p class="muted small" id="voiceNote"></p>
-    </div>
-
-    <div class="card">
-      <h3>Report a suspicious medicine</h3>
-      <div class="grid2">
-        <label class="field">Where bought (shop / seller)<input id="issSeller"></label>
-        <label class="field">City<input id="issCity"></label>
-        <label class="field">When<input id="issWhen" placeholder="e.g. Oct 2026"></label>
-        <label class="field">Anything else<input id="issNotes"></label>
-      </div>
-      <button class="ghost" id="btnDraft">Draft the report</button>
-      <textarea id="issText" rows="5" class="hidden"></textarea>
-      <div class="row"><button class="primary hidden" id="btnSubmitIssue">Submit</button></div>
-      <p class="muted small" id="issMsg">Nothing is sent until you tap Submit. Your identity is never stored.</p>
-    </div>
-
-    <div class="row"><button class="primary" id="btnNew">New check</button></div>
-    <p class="muted small disclaimer">Screening only — this does not identify ingredients or certify a medicine. Results that need lab testing should go to a qualified laboratory or pharmacist.</p>
-  </div>
-</section>
-
-<!-- ============================================================ HISTORY -->
-<section id="view-history" class="view">
-  <div class="card"><h2>Checks</h2><ul id="scanList" class="list"></ul></div>
-  <div class="card"><h2>Runs</h2><ul id="runList" class="list"></ul></div>
-</section>
-
-<!-- ============================================================ PROFILES -->
-<section id="view-profiles" class="view">
-  <div class="card"><h2>Product profiles</h2>
-    <p class="muted">A profile tells the app what a good tablet looks like. <b>Reference</b> = 3+ runs of a known-good tablet. <b>Calibration</b> = solutions of known strength, so the app can estimate the dose released.</p>
-    <ul id="profList" class="list"></ul>
-  </div>
-  <div class="card"><h3>Build a reference profile</h3>
-    <div class="grid2">
-      <label class="field">Profile id<input id="refId" placeholder="aspirin_ref"></label>
-      <label class="field">Name<input id="refName" placeholder="Aspirin 325 mg uncoated, brand X"></label>
-      <label class="field">Label words that match it<input id="refMatch" placeholder="aspirin"></label>
-      <label class="field">What changes when it dissolves?
-        <select id="refSignal">
-          <option value="scatter">Cloudiness, side sensor (white tablet, e.g. plain aspirin) - recommended</option>
-          <option value="colour">Colour (yellow water, e.g. riboflavin / B-complex)</option>
-          <option value="cloud">Cloudiness, straight-through red light (weaker signal)</option>
-        </select>
-      </label>
-    </div>
-    <p class="small muted">Tick 3 or more runs of the same known-good tablet:</p>
-    <ul id="refRuns" class="list checks"></ul>
-    <button class="primary" id="btnRef">Build reference</button>
-    <pre id="refOut" class="pre"></pre>
-  </div>
-  <div class="card"><h3>Build a calibration</h3>
-    <p class="small muted">One run per standard (include plain water = 0). Each run: cup with the standard, lid on, record ~60 s.</p>
-    <div class="grid2">
-      <label class="field">Profile id<input id="calId" placeholder="riboflavin_ref"></label>
-      <label class="field">Name<input id="calName"></label>
-      <label class="field">Label words<input id="calMatch" placeholder="riboflavin"></label>
-      <label class="field">Label dose (mg per tablet)<input id="calMg" type="number" step="any"></label>
-      <label class="field">Water volume (mL)<input id="calVol" type="number" value="145"></label>
-    </div>
-    <div id="calRows"></div>
-    <div class="row"><button class="ghost" id="btnCalRow">Add standard</button><button class="primary" id="btnCal">Build calibration</button></div>
-    <pre id="calOut" class="pre"></pre>
-  </div>
-</section>
-
-<!-- ============================================================ ATLAS -->
-<section id="view-atlas" class="view">
-  <div class="card"><h2>Atlas</h2>
-    <p class="muted">Medicines, lots, manufacturers, recalls and the sellers named in reports. Sellers show a report count, never who reported.</p>
-    <div class="legend" id="legend"></div>
-    <div id="atlasBox" class="atlas"></div>
-  </div>
-</section>
-</main>
-
-<script src="/static/app.js"></script>
+</div>
+<script src="/static/app.js?v=ui1" defer></script>
 </body>
 </html>
