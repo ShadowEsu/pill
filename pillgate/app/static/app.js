@@ -1322,7 +1322,7 @@ function stationTop({ id = "st-top", mini = false, on = "both", tablet = false }
       <path class="st-lead" d="M${cx + 38} 282 H262"/><text x="266" y="278" class="st-t">LED box</text><text x="266" y="294" class="st-n">white · blue · red</text>
       <path class="st-lead" d="M${cx + 62} ${cy + 56} L268 214"/><text x="272" y="212" class="st-t">clear cup</text><text x="272" y="228" class="st-n">of clean water</text>
       <path class="st-lead" d="M${cx - 92} ${cy + 66} L-6 254"/><text x="-66" y="262" class="st-t">chamber</text><text x="-66" y="278" class="st-n">printed, dark inside</text>
-      <text x="${cx - 6}" y="${cy - 54}" class="st-n" transform="rotate(-90 ${cx - 6} ${cy - 54})">beam</text>`}
+      <text x="${cx - 6}" y="${cy - 54}" class="st-n st-in" transform="rotate(-90 ${cx - 6} ${cy - 54})">beam</text>`}
   </svg>`;
 }
 /** Side view cut through the beam: lid with its one hole, cup and water line, LED box low on the wall. */
@@ -1338,12 +1338,12 @@ function stationSide() {
     <path class="st-flow" d="M256 205 H78"/>
     <g class="st-ledbox"><rect x="260" y="172" width="44" height="72" rx="5"/><path d="M268 180 H296" class="st-slot"/>${LED_DOTS.map(([, c], i) => `<circle cx="${270 + i * 12}" cy="${205}" r="4.5" fill="${c}" class="st-led${i === 1 ? " glow" : ""}"/>`).join("")}</g>
     <g class="st-sensor on"><rect x="44" y="186" width="16" height="24" rx="4"/><circle cx="56" cy="198" r="4.5" class="st-ldr"/></g>
-    <g class="st-sensor on"><circle cx="160" cy="166" r="9" class="st-face"/><circle cx="160" cy="166" r="4" class="st-ldr"/></g>
+    <g class="st-sensor on"><circle cx="160" cy="202" r="9" class="st-face"/><circle cx="160" cy="202" r="4" class="st-ldr"/></g>
     <path class="st-lead" d="M160 44 V20 H200"/><text x="204" y="18" class="st-t">lid</text><text x="204" y="32" class="st-n">one small hole</text>
     <path class="st-lead" d="M224 118 H330"/><text x="306" y="110" class="st-t" text-anchor="end">water line</text>
     <path class="st-lead" d="M282 244 V258"/><text x="300" y="264" class="st-n" text-anchor="end">LED box, low on the wall</text>
     <path class="st-lead" d="M44 198 H10"/><text x="-56" y="194" class="st-t">in-line</text><text x="-56" y="208" class="st-n">sensor A0</text>
-    <path class="st-lead" d="M151 166 H40 V150 H10"/><text x="-56" y="146" class="st-t">90° sensor</text><text x="-56" y="160" class="st-n">A1, facing you</text>
+    <path class="st-lead st-lead-in" d="M160 193 V150 H10"/><text x="-56" y="146" class="st-t">90° sensor</text><text x="-56" y="160" class="st-n">A1, facing you</text>
   </svg>`;
 }
 /** Measure's small top view: which sensor this step reads, lit, with its live count beside it. */

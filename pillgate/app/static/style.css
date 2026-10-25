@@ -522,3 +522,4 @@ body.easy .chip { border-color: var(--line-2); }
 .sm-list li.on .sm-dot { background: #FFD66B; box-shadow: 0 0 0 3px rgba(255,214,107,.3); }
 @media (max-width: 380px) { .st-mini { grid-template-columns: 104px minmax(0, 1fr); } .st-mini .st-svg { width: 104px; } }
 .st-link { color: inherit; text-decoration: none; } .st-link:hover { text-decoration: underline; }
+.st-svg .st-in { fill: #fff; } .st-svg .st-lead-in { stroke: rgba(255,255,255,.7); }
