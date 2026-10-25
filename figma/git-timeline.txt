@@ -1,7 +1,7 @@
 0b1bc5d Sat 08:34 pill app v2 base: week of seeded history + named activity feed, responsive frame (tab bar / sidebar), palette tokens, new routes (dashboard, runs, schedule, activity), vercel.json SPA rewrites
 2b402df Sat 08:32 COINBASE-TRACK: the brief verbatim, our angle, architecture, real-payment build plan, demo, submission checklist
 6b4372f Sat 01:45 pill app v1: onboarding, home (medical/personal), bottle, place, run with pill fill, evaluation, deliveries + delivery (policy, release tap), medicines, log, calibration, verify (x402), ask slot, kiosk
-05ad56f Sat 01:28 APP-PLAN draft 2: Preston's direction (light, pill fill, onboarding, modes, AI slot), traction research
+05ad56f Sat 01:28 APP-PLAN draft 2: the owner's direction (light, pill fill, onboarding, modes, AI slot), traction research
 1ac4156 Sat 01:26 pill app: scaffold (Vite+React+TS, light tokens, types, 7 rules, replay stream, store, routes, shell, stub screens)
 2c621af Sat 01:19 APP-PLAN draft 1: process, 12 screens, design direction, inspiration, stack, build order, 5 decisions
 297e2da Sat 01:03 pill-site v4: words back to ink (colour in backgrounds/lines only); Payments section for the Coinbase x402 track (interactive rail, x402 call, proposed pricing + calculator); plan: payment rails 4b, tracks
@@ -27,7 +27,7 @@ dcdcbd8 Fri 23:10 Bridge: emoji categories, plain-name routing
 34a0a5f Fri 23:09 PLAN.md: master plan v1
 df9a3be Fri 23:08 Bridge: 14 PILL channels, per-channel routing to Desk and Debate panes
 ea73b35 Fri 22:53 Restore Discord bridge
-c9c0e5f Fri 22:50 Remove chat bridge (Preston: nevermind)
+c9c0e5f Fri 22:50 Remove chat bridge (owner: nevermind)
 d1aafb1 Fri 22:44 Discord bridge: PILL category with 10 channels, auto-setup, bot-identity replies
 1fa670a Fri 22:13 Name: Pill
 5873de3 Fri 22:11 Discord bridge: channel -> herdr pane prompts, webhook replies, attachments to inbox

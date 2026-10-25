@@ -20,7 +20,7 @@ Everything below is ready in `~/calhacks-13/figma/` except what needs your Figma
 
 | Devpost spot | Marker to replace | Link |
 |---|---|---|
-| Links · "Repo" (line 17) | `[pending: Preston makes it public]` | GitHub repo, after making it public |
+| Links · "Repo" (line 17) | `[pending: the owner makes it public]` | GitHub repo, after making it public |
 | Links · "Demo video" (line 18) | `[pending: YouTube URL]` | YouTube link from step 11 |
 | Links · "Figma stage log + Slides + prototype" (line 19) | `[pending: Figma links, shared to "Anyone"]` | Slides file link (step 6) · Stage log page link (step 6) · Present link (step 4) |
 | Track · Figma paragraph (line 149) | `[pending: link to the Figma stage log]` | Stage log page link (or the Design file link) |

@@ -14,7 +14,7 @@ A $40 box that tests one tablet before the supplier is paid
 ## Links
 - Website: https://pill-site.vercel.app
 - App: https://pill-app-delta.vercel.app (booth laptop with the full stack: http://127.0.0.1:5183)
-- Repo: https://github.com/ShadowEsu/pill `[pending: Preston makes it public]`
+- Repo: https://github.com/ShadowEsu/pill `[pending: the owner makes it public]`
 - Demo video (≤ 3 min): `[pending: YouTube URL]`
 - Figma stage log + Slides + prototype: `[pending: Figma links, shared to "Anyone"]`
 
