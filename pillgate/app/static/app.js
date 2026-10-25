@@ -827,6 +827,9 @@ function modeLine(v) {
   if (m === "personal") return v === "PASSED_SCREEN" ? `Passed this screen. It checks how the tablet dissolves; it does not identify ingredients.` : `Show this to a pharmacist before taking more of it.`;
   return v === "NEEDS_LAB" ? "Send a sample for lab testing." : "";
 }
+// every value evidence.recall_status() returns; anything else is shown verbatim
+const RECALL_TEXT = { LOT_RECALLED: "This lot matches an FDA recall record", PRODUCT_HAS_RECALLS_OTHER_LOTS: "Other lots of this product have recalls", NO_RECALL_FOUND: "No FDA recall found for this product", NOT_CHECKED: "Recall databases not checked" };
+const RECALL_CLASS = { LOT_RECALLED: "bad", PRODUCT_HAS_RECALLS_OTHER_LOTS: "warn", NO_RECALL_FOUND: "ok", NOT_CHECKED: "" };
 const kpiCell = (label, val) => `<div><dt>${esc(label)}</dt><dd>${esc(val)}</dd></div>`;
 const kvList = (o) => Object.entries(o || {}).filter(([, x]) => x !== null && x !== undefined && x !== "" && typeof x !== "object").map(([k, x]) => `<dt>${esc(k.replace(/_/g, " "))}</dt><dd>${esc(x)}</dd>`).join("");
 
@@ -836,7 +839,7 @@ route(/^\/result\/([^/]+)$/, async (v, id) => {
     <section class="card stamp-card" id="stamp"><span class="stamp pending">Checking…</span><p class="muted">The run is in. Reading the photos, looking up recalls and writing the report.</p></section>
     <div class="wide-2">
       <section class="card stack"><div class="row between"><h2 class="h">What the app is doing</h2><span class="chip" id="r-stage-chip"><span class="dot"></span>working</span></div><ul class="stagelog" id="stages"></ul></section>
-      <section class="card stack"><div class="row between"><h2 class="h">Report</h2><span class="footnote" id="r-by"></span></div><div class="report" id="report"><p class="skeleton">Writing the first report from the database lookups…</p></div>
+      <section class="card stack"><div class="row between"><h2 class="h">Report</h2><span class="footnote" id="r-by"></span></div><p class="writing hidden" id="r-writing" role="status"><span class="typing" aria-hidden="true"><i></i><i></i><i></i></span>Claude is writing the final report</p><div class="report" id="report"><p class="skeleton">Writing the first report from the database lookups…</p></div>
         <h3 class="h" style="font-size:14px;margin-top:6px">Sources</h3><ol class="sources" id="sources"><li class="muted">No sources yet.</li></ol><p class="footnote" id="guard"></p></section>
     </div>
     <div class="wide-2">
@@ -887,16 +890,19 @@ route(/^\/result\/([^/]+)$/, async (v, id) => {
     // report
     const r = s.report;
     if (r) {
+      const num = {}; (r.sources || []).forEach((x, i) => (num[x.id] = i + 1));
       $("report").innerHTML = `<p>${esc(r.plain_summary)}</p><p class="what">${esc(r.what_to_do)}</p>` +
-        (r.evidence || []).map((e) => `<p class="ev">${esc(e.claim)}${(e.source_ids || []).map((i) => `<button type="button" class="sup" data-src="${esc(i)}">${esc(i)}</button>`).join("")}</p>`).join("");
-      $("r-by").textContent = `${s.report_stage === "final" ? "final report" : "first report, still researching…"} · ${r.generated_by}`;
-      $("sources").innerHTML = (r.sources || []).map((x) => `<li id="src-${esc(x.id)}"><b>${esc(x.id)}</b><span>${esc(x.kind)} · <a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}</a></span></li>`).join("") || "<li class='muted'>No sources yet.</li>";
+        (r.evidence || []).map((e) => `<p class="ev">${esc(e.claim)}${(e.source_ids || []).map((i) => `<button type="button" class="sup" data-src="${esc(i)}" aria-label="Source ${esc(num[i] || i)}">${esc(num[i] || i)}</button>`).join("")}</p>`).join("");
+      $("r-by").textContent = `${s.report_stage === "final" ? "final report" : "first report"} · ${r.generated_by === "template" ? "template" : "written by " + r.generated_by}`;
+      $("sources").innerHTML = (r.sources || []).map((x, i) => `<li id="src-${esc(x.id)}"><b>${i + 1}</b><span>${x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)} ↗</a>` : esc(x.title)}<small class="src-kind">${esc(x.kind)}</small></span></li>`).join("") || "<li class='muted'>No sources yet.</li>";
       $("guard").textContent = (r.guardrail_fixes || []).length ? "Guardrail corrections: " + r.guardrail_fixes.join(" ") : "";
       $("report").querySelectorAll("[data-src]").forEach((b) => (b.onclick = () => { const t = document.getElementById("src-" + b.dataset.src); if (t) t.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "center" }); }));
     }
+    // Claude pulse: from the template report until the model's report lands (or the scan finishes)
+    $("r-writing").classList.toggle("hidden", !(S.config.ai && r && r.generated_by === "template" && !s.done));
     // recall + fields
-    if (s.recall_status === "LOT_RECALLED") $("recall").innerHTML = `<p class="banner held">This lot matches an FDA recall record.${mode() === "clinic" ? " Delivery held." : ""}</p>`;
-    else if (s.recall_status) $("recall").innerHTML = `<span class="chip"><span class="dot"></span>recall: ${esc(String(s.recall_status).toLowerCase().replace(/_/g, " "))}</span>`;
+    if (s.recall_status === "LOT_RECALLED") $("recall").innerHTML = `<p class="banner held">${RECALL_TEXT.LOT_RECALLED}.${mode() === "clinic" ? " Delivery held." : ""}</p>`;
+    else if (s.recall_status) { const [txt, cls] = s.recall_status in RECALL_TEXT ? [RECALL_TEXT[s.recall_status], RECALL_CLASS[s.recall_status]] : [s.recall_status, ""]; $("recall").innerHTML = `<span class="chip ${cls}"><span class="dot"></span>${esc(txt)}</span>`; }
     $("fields").innerHTML = kvList(s.label) + kvList(s.imprint) || `<dt>photos</dt><dd>none read yet</dd>`;
     $("mock").classList.toggle("hidden", !((s.label && s.label.mock) || (s.imprint && s.imprint.mock)));
     // curve vs reference (once)
