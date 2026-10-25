@@ -13,3 +13,5 @@ pillgate/app/data/water_ref.json
 pillgate/runs/check_run_*.csv
 pillgate/.ngrok-test.log
 pillgate/figma/
+pillgate/app/.serve*.log
+**/__pycache__/
