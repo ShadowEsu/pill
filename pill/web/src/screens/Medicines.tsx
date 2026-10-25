@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { Action, Screen } from '../components/Shell';
 import VerdictChip from '../components/VerdictChip';
 import MedIcon from '../components/MedIcon';
+import ReadAloud from '../components/ReadAloud';
 import Glyph from '../components/Glyph';
 import { actions, useStore } from '../lib/store';
 import { useCountUp } from '../lib/count';
@@ -38,6 +39,7 @@ interface Tested { key: string; drug: string; strength: string | null; scans: St
  *  newest test first, with the bottles on this phone that hold the same drug. */
 function TestedList({ bottles }: { bottles: Bottle[] }) {
   const { scans, error } = useStationScans(10_000);
+  const easy = useStore((s) => s.easy);
   const groups: Tested[] = [];
   for (const s of scans ?? []) {
     const key = `${norm(s.drug)}|${norm(s.strength ?? '')}`;
@@ -77,6 +79,7 @@ function TestedList({ bottles }: { bottles: Bottle[] }) {
                   <span className={'chip ' + cls}><span className="dot" />{words}</span>
                 </div>
                 {last.headline && <p className="footnote" style={{ color: 'var(--ink-2)' }}>{last.headline}</p>}
+                {easy && <ReadAloud text={`${g.drug}${g.strength ? ` ${g.strength}` : ''}. Tested ${g.scans.length === 1 ? 'once' : `${g.scans.length} times`} at the station. Latest result: ${last.verdict}. ${words}.`} size={56} />}
                 {mine.length > 0 && (
                   <p className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
                     <span style={{ fontSize: 15 }}>On this phone:</span>

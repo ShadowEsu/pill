@@ -13,6 +13,7 @@ import { useCountUp } from '../lib/count';
 import { doseItems, myBottles, nextUp, takenToday, type NextDose } from '../lib/doses';
 import { DAY, dayStart, hm, useNow } from '../lib/when';
 import EmptyState, { SettingsLink } from '../components/EmptyState';
+import EasyToggle from '../components/EasyToggle';
 import type { Bottle, Delivery, Run } from '../lib/types';
 import '../components/viz.css';
 import '../story.css';
@@ -184,6 +185,7 @@ function Personal() {
           <SettingsLink />
         </div>
       </header>
+      <EasyToggle />
       <NextCard next={nextUp(planned, now)} now={now} />
 
       <section className="stack" style={{ gap: 12 }} aria-label="My bottles">

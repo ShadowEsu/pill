@@ -1,8 +1,9 @@
-// Settings (/settings): who I am, big text, sound, the follower assistant and its voice replies, the Google Calendar bridge status (live from pill-pay), the station,
+// Settings (/settings): who I am, Easy mode, big text, sound, the follower assistant and its voice replies, the Google Calendar bridge status (live from pill-pay), the station,
 // reset the demo data, the build, and credits & sources (the website first, so the site and the app read as one product).
 // Groups carry a hand-drawn glyph each; switches spring their thumb.
 import { useState } from 'react';
 import { useCalendarStatus } from '../components/CalendarButton';
+import { setEasyMode } from '../components/EasyToggle';
 import { Link } from 'react-router-dom';
 import { Screen } from '../components/Shell';
 import Glyph, { type GlyphName } from '../components/Glyph';
@@ -38,6 +39,7 @@ function GroupHead({ glyph, title, i }: { glyph: GlyphName; title: string; i: nu
 export default function Settings() {
   const mode = useStore((s) => s.mode);
   const bigText = useStore((s) => s.bigText);
+  const easy = useStore((s) => s.easy);
   const station = useStore((s) => s.station);
   const live = useStationStatus();   // the pay service's /station/status: serial · simulated · no station
   const sound = useSound();
@@ -65,6 +67,10 @@ export default function Settings() {
               <span><span className="lbl">Who I am</span>
                 <span className="sub">{mode === 'medical' ? 'Medical · a hospital, clinic or medical center' : mode === 'personal' ? 'Personal · for myself or my family' : 'Not chosen yet'}</span></span>
               <Link to="/welcome" className="btn ghost" style={{ textDecoration: 'none' }}>Change</Link>
+            </div>
+            <div className="set-row" data-easy-row>
+              <span><span className="lbl">Easy mode</span><span className="sub">Words 25 % larger, stronger contrast, bigger buttons, and reading aloud on: sound on, the assistant reads its answers, big rows get a Read aloud button.</span></span>
+              <Switch on={easy} label="Easy mode" onToggle={() => setEasyMode(!easy)} />
             </div>
             <div className="set-row">
               <span><span className="lbl">Big text</span><span className="sub">Larger words and buttons everywhere.</span></span>
