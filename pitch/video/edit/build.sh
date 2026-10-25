@@ -7,7 +7,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 SRC=../../video-raw/preston-pitch-raw.mp4
-MUSIC=../../film/work/music.wav   # the film's own generated score (96 BPM pad/bass/pluck), no licence needed
+MUSIC=${MUSIC:-work/music-fun.wav}   # original upbeat score synthesised by make_music.py (116 BPM), no licence needed
 FF=${FFMPEG:-bin/ffmpeg}          # needs libass (the 'ass' filter); Homebrew's ffmpeg 8.1.2 has none
 if ! "$FF" -hide_banner -filters 2>/dev/null | grep ' ass ' >/dev/null; then
   echo "fetching a static ffmpeg with libass into bin/ (martin-riedl.de, macOS arm64)"
@@ -15,7 +15,7 @@ if ! "$FF" -hide_banner -filters 2>/dev/null | grep ' ass ' >/dev/null; then
   (cd bin && unzip -o -q ffmpeg.zip && rm ffmpeg.zip && chmod +x ffmpeg && xattr -c ffmpeg 2>/dev/null || true)
   FF=bin/ffmpeg
 fi
-[ -f "$MUSIC" ] || { echo "missing $MUSIC (pitch/film/work is untracked; re-run pitch/film/render.mjs or set MUSIC=)"; exit 1; }
+[ -f "$MUSIC" ] && [ -f sfx/pop.wav ] || { echo "missing $MUSIC or sfx/: run .venv/bin/python make_music.py 90"; exit 1; }
 MODE=${1:-full}
 case "$MODE" in
   --preview) OUTARGS=(-t 10 -c:v libx264 -preset veryfast -crf 23 -pix_fmt yuv420p -c:a aac -b:a 160k -movflags +faststart ../pill-pitch-preview10.mp4) ;;
@@ -40,17 +40,40 @@ esac
   -f lavfi -t 4.0 -i "anullsrc=r=48000:cl=stereo" \
   -i "$MUSIC" \
   -ss 125.100 -t 2.925 -i "$SRC" \
+  -loop 1 -framerate 30 -t 1.80 -i stickers/pop-think.png \
+  -loop 1 -framerate 30 -t 20.28 -i stickers/pop-fda.png \
+  -loop 1 -framerate 30 -t 16.62 -i stickers/pop-checked.png \
+  -loop 1 -framerate 30 -t 12.52 -i stickers/pop-pharmacy.png \
   -loop 1 -framerate 30 -t 3.20 -i stickers/pill.png \
-  -loop 1 -framerate 30 -t 7.20 -i stickers/chip-box.png \
-  -loop 1 -framerate 30 -t 6.40 -i stickers/chip-explains.png \
+  -loop 1 -framerate 30 -t 7.75 -i stickers/pop-last.png \
+  -loop 1 -framerate 30 -t 4.15 -i stickers/pop-swap.png \
+  -loop 1 -framerate 30 -t 3.00 -i stickers/pop-step1.png \
+  -loop 1 -framerate 30 -t 4.31 -i stickers/pop-step2.png \
+  -loop 1 -framerate 30 -t 3.80 -i stickers/pop-3d.png \
+  -loop 1 -framerate 30 -t 5.05 -i stickers/pop-step3.png \
+  -loop 1 -framerate 30 -t 2.00 -i stickers/pop-drop.png \
   -loop 1 -framerate 30 -t 2.60 -i stickers/arrow.png \
+  -loop 1 -framerate 30 -t 3.39 -i stickers/pop-step4.png \
+  -loop 1 -framerate 30 -t 2.00 -i stickers/pop-eyes.png \
+  -loop 1 -framerate 30 -t 20.27 -i stickers/pop-step5.png \
   -loop 1 -framerate 30 -t 3.20 -i stickers/ring.png \
-  -loop 1 -framerate 30 -t 6.00 -i stickers/chip-unoq.png \
+  -loop 1 -framerate 30 -t 2.60 -i stickers/pop-timer.png \
+  -loop 1 -framerate 30 -t 5.20 -i stickers/chip-unoq.png \
+  -loop 1 -framerate 30 -t 6.60 -i stickers/pop-lights.png \
+  -loop 1 -framerate 30 -t 4.55 -i stickers/pop-measure.png \
+  -loop 1 -framerate 30 -t 2.60 -i stickers/pop-eyes.png \
+  -loop 1 -framerate 30 -t 2.03 -i stickers/pop-step6.png \
   -loop 1 -framerate 30 -t 4.60 -i stickers/answer-passed.png \
   -loop 1 -framerate 30 -t 4.45 -i stickers/answer-lab.png \
   -loop 1 -framerate 30 -t 4.30 -i stickers/answer-unable.png \
+  -loop 1 -framerate 30 -t 3.00 -i stickers/pop-grimace.png \
+  -loop 1 -framerate 30 -t 2.40 -i stickers/pill.png \
   -loop 1 -framerate 30 -t 3.70 -i stickers/pill.png \
-  -loop 1 -framerate 30 -t 3.10 -i stickers/chip-402.png \
+  -loop 1 -framerate 30 -t 3.10 -i stickers/pop-end.png \
+  -i sfx/pop.wav \
+  -i sfx/whoosh.wav \
+  -i sfx/ding.wav \
+  -i sfx/uhoh.wav \
   -/filter_complex graph.txt \
   -map "[vout]" -map "[aout]" "${OUTARGS[@]}"
 [ "$MODE" = --check ] || ls -la ../pill-pitch-*.mp4
