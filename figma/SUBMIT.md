@@ -6,7 +6,7 @@ Everything below is ready in `~/calhacks-13/figma/` except what needs your Figma
 |---|---|---|---|---|---|
 | ☐ | 1 | **Edu verify** | 1 | [figma.com/education/apply](https://www.figma.com/education/apply) → Student → school email or proof ([Figma for Education](https://help.figma.com/hc/en-us/articles/360041061214-Figma-for-Education)). Once approved, create an Education team "Pill". Still pending? Carry on in **Drafts**; nothing below needs to wait. | |
 | ☐ | 2 | **Import the plugin** | 1 | Figma **desktop app** → any file → menu → Plugins → Development → **Import plugin from manifest…** → `figma/plugin/manifest.json` | |
-| ☐ | 3 | **Slides build** | 2 | Home → New → **Slides deck**, name "Pill — deck" → Plugins → Development → **Pill → Figma** → choose `figma/deck.json` → **Build**. Expect 20 slides with notes and "Done in N s". | N → `figma/LINKS.md` row 1 |
+| ☐ | 3 | **Slides build** | 2 | Home → New → **Slides deck**, name "Pill — deck" → Plugins → Development → **Pill → Figma** → choose `figma/deck.json` → **Build**. Expect 21 slides with notes and "Done in N s". | N → `figma/LINKS.md` row 1 |
 | ☐ | 4 | **Design build + Prototype** | 2 | New **Design file** "Pill — design" → same plugin → `figma/deck.json` → Build (pages Deck, Prototype, App screens, Website, Tokens, Stage log). Open page **Prototype** → ▶ **Present** (flow "Pill · judge flow") → click through the 8 screens once → in the presentation view **Share → Anyone with the link → Copy link**: that is the **Present link**. | N → row 2; Present link → row 4 note + STAGE-LOG Stage 2 |
 | ☐ | 5 | **FigJam build** | 1 | New **FigJam board** "Pill — ideation" → same plugin → Build. | N → row 3 |
 | ☐ | 6 | **Share each to Anyone** | 1 | In each of the three files: **Share → "Anyone with the link" → "can view" → Copy link**. Stage log link: in the Design file, right-click page **Stage log** → Copy link to page. | |
@@ -33,10 +33,10 @@ Everything below is ready in `~/calhacks-13/figma/` except what needs your Figma
 Figma Slides imports PowerPoint on any plan ([Figma Learn](https://help.figma.com/hc/en-us/articles/30601628883607-Import-PowerPoint-files-to-Figma-Slides)), browser or desktop:
 
 1. figma.com file browser → **Import** (or **Create** ▾ → **Import**) → **Import from computer** → `figma/pill-deck.pptx` → **Open** → **Done**.
-2. Open it, rename "Pill — deck", check 20 slides with presenter notes. Text arrives as Inter (Figma's import rule); headings are pre-sized for that.
+2. Open it, rename "Pill — deck", check 21 slides with presenter notes. Text arrives as Inter (Figma's import rule); headings are pre-sized for that.
 3. **Share → Anyone with the link → can view → Copy link** → `figma/LINKS.md` row 1 ("Plan B: PPTX import" as the build time) and the Devpost Slides spots above.
 
-No Design file? The prototype can be rebuilt by hand from `figma/import-kit/prototype/*.png` and the Tokens page from `figma/import-kit/tokens.json` (RUN.md, Plan C). Last resort for any "deck" field: upload `figma/pill-deck.pdf` (20 pages, 1920×1080).
+No Design file? The prototype can be rebuilt by hand from `figma/import-kit/prototype/*.png` and the Tokens page from `figma/import-kit/tokens.json` (RUN.md, Plan C). Last resort for any "deck" field: upload `figma/pill-deck.pdf` (21 pages, 1920×1080).
 
 ## Figma Make prompt (step 8; same text as `figma/STAGE-LOG.md` Appendix A)
 

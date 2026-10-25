@@ -51,7 +51,7 @@ Result (email, handle and id masked here; nothing else removed):
    $C execute FIGMA_CREATE_DEV_RESOURCES $A -d @figma/dev-resources.json
    ```
    Replace `<owner>/<repo>` with the public repo once it exists; until then use the live app URL plus the route (`https://<app>.vercel.app` + route) as `url`. If the file JSON at depth 2 does not reach the frames, rerun step 1 with `"depth":3`.
-4. Thumbnails for Devpost (the 20 deck frames on the "Deck" page, PNG at 1×):
+4. Thumbnails for Devpost (the 21 deck frames on the "Deck" page, PNG at 1×):
    ```sh
    node -e '
    const m=require("./figma/file-meta.json"); const out=[];

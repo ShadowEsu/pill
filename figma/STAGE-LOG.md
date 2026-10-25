@@ -65,7 +65,7 @@ Four stages, ≤ 200 words each. Minutes come from commit times in `figma/git-ti
 > 1. `node figma/build-deck.mjs` (Node 22+, ffmpeg optional). Prints slide count and `deck.json` size. ~1 min warm, longer cold.
 > 2. Optional, to refresh the site art: in a headless Chromium tab, run `figma/capture-art.mjs` against `https://pill-site.vercel.app` (usage in the file header), then step 1 again. ~1 min.
 > 3. Figma desktop → any file → Plugins → Development → Import plugin from manifest → `figma/plugin/manifest.json`. ~1 min.
-> 4. New Slides file → run **Pill → Figma** → pick `figma/deck.json` → Build. 20 slides with speaker notes. ~2 min.
+> 4. New Slides file → run **Pill → Figma** → pick `figma/deck.json` → Build. 21 slides with speaker notes. ~2 min.
 > 5. New Design file → same plugin → pages Deck, App screens, Website, Tokens, Stage log. ~3 min.
 > 6. New FigJam board → same plugin → the ideation board. ~1 min.
 > 7. Write the three links and the "Done in N s" times into `figma/LINKS.md`.
@@ -84,7 +84,7 @@ Nothing in the recipe is Pill-specific except the slide content in `build-deck.m
 
 ## Before / after (adoptability)
 
-Measured numbers live in `figma/metrics.json` (rewritten on every build) and on slide 17. Before = estimate (slides × 20 min, screenshots × 1 min, tokens × 1 min; our assumption, not a measurement). After = measured on this machine: the cold build, the plugin's own work against a stub Figma API in Node, and the real Figma run time the plugin prints ([fill after running]).
+Measured numbers live in `figma/metrics.json` (rewritten on every build) and on slide 18. Before = estimate (slides × 20 min, screenshots × 1 min, tokens × 1 min; our assumption, not a measurement). After = measured on this machine: the cold build, the plugin's own work against a stub Figma API in Node, and the real Figma run time the plugin prints ([fill after running]).
 
 ## Appendix A · Figma Make prompt (Prototyping, not yet run)
 
