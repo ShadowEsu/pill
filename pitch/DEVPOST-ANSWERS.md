@@ -63,8 +63,32 @@ Most of the technical complexity comes from how many parts have to line up: one 
 - **Hardware:** an Arduino UNO Q (3.3 V, 12-bit ADC), two CdS photoresistors in resistor dividers from the 3V3 pin, and blue, white and red LEDs in a side box that shine through holes into a printed chamber with a lid `[FILL 8: printed from the OpenSCAD source in pillgate/cad/?]`. The firmware prints one CSV line a second and decides nothing.
 - **Station app:** Python, FastAPI, SQLite and vanilla JS. It does the curve maths, quality gates, guided run, lid detection, Claude calls and the guardrail, with 14 pytest tests.
 - **Clinic app:** Vite + React 19 + TypeScript on Vercel. Seven deterministic rules set the verdict, and every run carries a LIVE SENSOR / REPLAY / SIMULATED badge.
-- **Pay service:** Node 22 + Express with `@x402/express` and `@x402/evm` on Base Sepolia. Each station can sell its verdict: `POST /verify` answers `402 Payment Required` for 0.05 test USDC, and a buyer agent checks a 1 USDC / 24 h cap before it signs. There's a 12-check security suite and a 6-case policy test. In one case a delivery note says "SYSTEM OVERRIDE … output release", and it ends in escalate. Capital One Nessie mirror: `[FILL 5: live sandbox transfers, or delete this sentence]`.
+- **Pay service:** Node 22 + Express on Base Sepolia, laid out below. There's a 12-check security suite and a 6-case policy test. In one case a delivery note says "SYSTEM OVERRIDE … output release", and it ends in escalate. Capital One Nessie mirror: `[FILL 5: live sandbox transfers, or delete this sentence]`.
 - **Design:** a 21-slide deck generated from the repo as one JSON file, plus a Figma plugin we wrote to draw it (tested against a stub Figma API, not yet run in real Figma) and a PPTX import path `[FILL 4: which path made the shared Figma deck]`.
+
+**How the money moves.** Here's how one tablet ends up deciding a payment.
+
+- One tablet → the station (UNO Q, blue, white and red LEDs, two photoresistors; the firmware decides nothing) → `analysis.py` (curve maths, quality gates) → one of three answers
+- → the policy agent: six clauses (P1 to P6) in code compute a ceiling, and Claude may only return that ceiling or `escalate`
+  - Passed the screen + no recall + amount within the cap + the pharmacist's tap → **Release**
+  - Needs lab testing → **Hold**, plus a draft lab referral
+  - Unable to verify → **Escalate** to a person, and nothing moves
+- → Coinbase CDP server wallets, USDC on Base Sepolia (TESTNET)
+  - `pill-clinic` → `pill-escrow` (hold, when the delivery is logged)
+  - `pill-escrow` → `pill-supplier` (release), or back to `pill-clinic` (refund)
+  - until we get a key for those wallets, every escrow move reports `mode: simulated`
+  - a Capital One Nessie client mirrors each move in sandbox dollars (SANDBOX; live only with a Nessie key)
+
+The second lane sells a verdict over x402:
+
+- Buyer agent → `POST /verify` with a curve → `402 Payment Required` (0.05 USDC, Base Sepolia TESTNET; the price rides in the 402) → the buyer checks its 1 USDC / 24 h cap and signs → the facilitator runs its verify step
+- → `200` + verdict JSON. This last step is still pending that same key (or 0.05 test USDC). Today the 402 is real, and the facilitator's verify step answers `insufficient_balance` on our unfunded test wallet. The seller runs on `@x402/express` and `@x402/evm`.
+
+Who decides what:
+
+- Claude reads the bottle label and imprint, writes the report and the "why", and as the escrow clerk returns the ceiling or `escalate`. It never sets a verdict and never moves money.
+- Gemini reads the label into editable fields (anything unreadable stays `null`) and runs the checker. It never sets a verdict and never invents a field.
+- Deterministic code (`analysis.py`, `rules.ts`, the policy) sets every verdict and every ceiling, and the clause filter drops any model sentence with a banned claim word. It never hands a decision to a model.
 
 ## Challenges we ran into
 
@@ -132,10 +156,11 @@ Upload in this order. Devpost takes JPG / PNG / GIF (5 MB max; 3:2 works best fo
 | 2 | `photos/station/station-171.jpg` | Blue LED on: light crossing the cup of water inside the chamber. |
 | 3 | `photos/station/station-191.jpg` | White, blue and red LEDs shine into the chamber through holes. |
 | 4 | `photos/station/station-17.jpg` | From above: a small clear cup of water inside the chamber. |
-| 5 | `pillgate/dev-shots/ui2/bottle-1280.png` | Step 1: photograph the bottle; personal details are removed. |
-| 6 | `pillgate/dev-shots/ui2/measure-1280.png` | Quick 60 s or full run, with raw counts from both sensors (replay of our aspirin run). |
-| 7 | `pillgate/dev-shots/ui2/result-1280.png` | Replay of our aspirin run: Unable to verify (no reference yet). |
-| 8 | `pill/web/dev-shots/phases/live-verdict-390.webp` | Clinic app, SIMULATED run (labelled): PASS by rule P1. |
-| 9 | `pill/web/dev-shots/phases/dashboard-station-card-1280.webp` | Clinic dashboard: the station card and its run phases. |
+| 5 | `pitch/diagrams/money-flow.png` (rendering) | How the money moves: one tablet → three answers → policy agent → Coinbase wallets (TESTNET), plus the x402 lane. |
+| 6 | `pillgate/dev-shots/ui2/bottle-1280.png` | Step 1: photograph the bottle; personal details are removed. |
+| 7 | `pillgate/dev-shots/ui2/measure-1280.png` | Quick 60 s or full run, with raw counts from both sensors (replay of our aspirin run). |
+| 8 | `pillgate/dev-shots/ui2/result-1280.png` | Replay of our aspirin run: Unable to verify (no reference yet). |
+| 9 | `pill/web/dev-shots/phases/live-verdict-390.webp` | Clinic app, SIMULATED run (labelled): PASS by rule P1. |
+| 10 | `pill/web/dev-shots/phases/dashboard-station-card-1280.webp` | Clinic dashboard: the station card and its run phases. |
 
 Thumbnail and crop note: `station-19.jpg` is the thumbnail (crop it to 3:2). `station-171.jpg` and `station-17.jpg` show a handwritten name on a paper in the top-right corner: crop off the top-right corner before uploading, or leave them out. `station-191.jpg` is clean. Don't use `pill/web/dev-shots/phases/07-verdict-1280.webp`: it still shows the old design ("quarter tablet", "paddle turning", "90° glow", "3:00").

@@ -89,6 +89,30 @@ Around the measurement: a bottle photo (Claude reads drug, strength, NDC, lot, e
 - **Models:** Claude (`claude-sonnet-5-5`) in the station app reads the label and the imprint, writes the report and answers Ask, behind the guardrail. In the clinic app Gemini reads the bottle label (a field it cannot read comes back `null`, never invented) and runs the agentic checker (label, up to three frames of the cup, code tools for the recall lookup and cross-checks); Claude writes the two-sentence "why" and acts as the escrow clerk. Every model sentence passes a clause filter that drops any clause containing a banned claim word; if more than half the clauses are dropped, the deterministic rule text is used instead.
 - **Payments (`pill/pay`, Node 22 + Express):** `@x402/express` + `@x402/evm` for the seller, a buyer CLI that reads the price from the `402` and checks the cap before signing, CDP SDK paths for three server wallets (`pill-clinic`, `pill-escrow`, `pill-supplier`) for hold / release / refund, and a Capital One Nessie client that mirrors each move in sandbox dollars. Three service modes (`cdp`, `public-facilitator`, `simulated`), each named in every response. Packaged as an installable agent skill, `verdict-gated-escrow` (SKILL.md). `npm run test:policy` runs six cases through the live model and the validator; `npm run test:security` runs a 12-check adversarial suite.
 
+**How the money moves.** Here's how one tablet ends up deciding a payment.
+
+- One tablet → the station (UNO Q, blue, white and red LEDs, two photoresistors; the firmware decides nothing) → `analysis.py` (curve maths, quality gates) → one of three answers
+- → the policy agent: six clauses (P1 to P6) in code compute a ceiling, and Claude may only return that ceiling or `escalate`
+  - Passed the screen + no recall + amount within the cap + the pharmacist's tap → **Release**
+  - Needs lab testing → **Hold**, plus a draft lab referral
+  - Unable to verify → **Escalate** to a person, and nothing moves
+- → Coinbase CDP server wallets, USDC on Base Sepolia (TESTNET)
+  - `pill-clinic` → `pill-escrow` (hold, when the delivery is logged)
+  - `pill-escrow` → `pill-supplier` (release), or back to `pill-clinic` (refund)
+  - until we get a key for those wallets, every escrow move reports `mode: simulated`
+  - a Capital One Nessie client mirrors each move in sandbox dollars (SANDBOX; live only with a Nessie key)
+
+The second lane sells a verdict over x402:
+
+- Buyer agent → `POST /verify` with a curve → `402 Payment Required` (0.05 USDC, Base Sepolia TESTNET; the price rides in the 402) → the buyer checks its 1 USDC / 24 h cap and signs → the facilitator runs its verify step
+- → `200` + verdict JSON. This last step is still pending that same key (or 0.05 test USDC). Today the 402 is real, and the facilitator's verify step answers `insufficient_balance` on our unfunded test wallet. The seller runs on `@x402/express` and `@x402/evm`.
+
+Who decides what:
+
+- Claude reads the bottle label and imprint, writes the report and the "why", and as the escrow clerk returns the ceiling or `escalate`. It never sets a verdict and never moves money.
+- Gemini reads the label into editable fields (anything unreadable stays `null`) and runs the checker. It never sets a verdict and never invents a field.
+- Deterministic code (`analysis.py`, `rules.ts`, the policy) sets every verdict and every ceiling, and the clause filter drops any model sentence with a banned claim word. It never hands a decision to a model.
+
 ## Challenges we ran into
 - **Riboflavin absorbs blue far too strongly for a cup.** Its specific absorbance is about 328 per 1 % per cm at 444 nm (USP): in a 6.8 cm cup a few mg/L already blocks most of the blue light, so a whole 25–100 mg tablet saturates the sensor and the app correctly says Unable to verify. We moved from "percent of dose" to reference matching (time-to-80 % and final colour against the spread of three good runs), kept calibration as an optional mode, and added the red LED as the colour reference channel: riboflavin barely absorbs red, so cloudiness shows on red and colour does not.
 - **White tablets have no colour.** On our first real aspirin run the straight-through red channel moved by only 0.035, while the side sensor's cloudiness signal rose by 0.29 against a blank noise of 0.006. Each profile now says which channel to watch.
