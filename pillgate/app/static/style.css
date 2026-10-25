@@ -323,3 +323,9 @@ table.raw tbody th small { color: var(--muted); font-size: 10px; margin-left: 4p
 .sources li b { font-family: var(--mono); font-size: 11.5px; text-align: center; min-width: 24px; }
 .sources li a { font-weight: 500; }
 .src-kind { display: block; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+/* ---------- round 2: clinic home tiles ---------- */
+.st-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; margin: 0; border-radius: 12px; overflow: hidden; background: rgba(255,255,255,.08); }
+.st-stats > div { background: rgba(14,18,22,.6); padding: 9px 11px; min-width: 0; }
+.st-stats dt { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: rgba(242,245,247,.55); }
+.st-stats dd { margin: 2px 0 0; font-family: var(--mono); font-size: 15px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

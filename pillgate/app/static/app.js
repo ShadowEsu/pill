@@ -481,6 +481,12 @@ route(/^\/$/, async (v) => {
   const scans = await api("/api/scans").catch(() => []);
   scans.sort((a, b) => (b.created || 0) - (a.created || 0));
   if (m === "clinic") {
+    const [profiles, runs] = await Promise.all([api("/api/profiles").catch(() => []), api("/api/runs").catch(() => [])]);
+    const lastRun = runs.length ? await api("/api/runs/" + encodeURIComponent(runs[0].id)).catch(() => null) : null;
+    const refs = profiles.filter((p) => p.reference);
+    const words = refs.flatMap((p) => (p.match_names || []).map((w) => w.toLowerCase()));
+    const drugs = [...new Set(scans.map((x) => x.drug).filter(Boolean))];
+    const missing = drugs.filter((d) => !words.some((w) => d.toLowerCase().includes(w)));
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const todays = scans.filter((s) => (s.created || 0) * 1000 >= today.getTime());
     const n = (k) => todays.filter((s) => s.overall === k).length;
@@ -493,13 +499,19 @@ route(/^\/$/, async (v) => {
       <div class="wide-2">
         <section class="card stack rise" style="--i:3"><div class="row between"><h2 class="h">Last checks</h2><a class="footnote" href="#/history">History →</a></div>
           <div class="capsules">${scans.slice(0, 5).map(capsule).join("") || `<p class="muted">No checks yet. Start one: it takes about two minutes.</p>`}</div></section>
+        <div class="stack">
         <section class="card ink-panel station rise" style="--i:4">
-          <p class="eyebrow">Station</p>
-          <canvas class="bpill" style="width:100%;height:150px" role="img" aria-label="Pill printed in ones and zeros"></canvas>
+          <div class="row between"><p class="eyebrow">Station</p><span class="lines">quick ${S.config.timing.quick_s} s · full ${mmss(S.config.timing.min_s)}–${mmss(S.config.timing.max_s)}</span></div>
+          <canvas class="bpill" style="width:100%;height:120px" role="img" aria-label="Pill printed in ones and zeros"></canvas>
           <div class="row wrap">${deviceChip()}</div>
-          <p class="lines">lines read <span data-lines>–</span> · quick test ${S.config.timing.quick_s} s · full ${mmss(S.config.timing.min_s)}–${mmss(S.config.timing.max_s)}</p>
-          <a class="btn ghost" href="#/check/bottle">Start a check</a>
+          <dl class="st-stats"><div><dt>lines read</dt><dd data-lines>–</dd></div><div><dt>last run</dt><dd>${lastRun && lastRun.created ? esc(timeAgo(lastRun.created)) : "none yet"}</dd></div><div><dt>runs saved</dt><dd>${runs.length}</dd></div></dl>
         </section>
+        <section class="card stack tile rise" style="--accent:var(--violet);--i:5">
+          <div class="row between"><h2 class="h">Reference profiles</h2><a class="footnote" href="#/profiles">Profiles →</a></div>
+          <p><span class="num" style="font-size:34px" data-n="${refs.length}">0</span> <span class="muted">with a reference · ${profiles.length} in total${refs.some((p) => p.demo) ? ` · ${refs.filter((p) => p.demo).length} simulated demo` : ""}</span></p>
+          ${missing.map((d) => `<p class="banner note">${esc(d)} has no reference profile yet: record 3 runs to build one.</p>`).join("")}
+        </section>
+        </div>
       </div>
       <p class="disclaimer">${esc(DISCLAIMER)} In Clinic mode a "Needs lab testing" result holds the delivery.</p>`;
     v.querySelectorAll("[data-n]").forEach((el) => countUp(el, +el.dataset.n));
@@ -1021,8 +1033,7 @@ route(/^\/issue\/([^/]+)$/, async (v, id) => {
 // ================================================================ 9. History
 route(/^\/history$/, async (v) => {
   const [sc, rs] = await Promise.all([api("/api/scans").catch(() => []), api("/api/runs").catch(() => [])]);
-  sc.sort((a, b) => (b.created || 0) - (a.created || 0));
-  rs.reverse();
+  sc.sort((a, b) => (b.created || 0) - (a.created || 0));   // runs already come newest first
   v.innerHTML = `${head({ eyebrow: `${sc.length} checks · ${rs.length} runs`, title: "History", tone: "sky", side: `<a class="btn ghost" href="#/check/bottle">New check</a>` })}
     <div class="wide-2">
       <section class="card stack"><h2 class="h">Checks</h2><div class="capsules">${sc.map(capsule).join("") || `<p class="muted">No checks yet.</p>`}</div></section>
