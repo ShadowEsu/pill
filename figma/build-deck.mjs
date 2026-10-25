@@ -376,18 +376,18 @@ S('Title', [
   ...logo(X, 64, 1.1),
   eyebrow(X, 250, 'Cal Hacks 13.0 · Idea to Demo · Figma'),
   head(X, 300, 870, [{ s: 'The box measures.\n' }, { s: 'Pill explains.', italic: true }], 140, { lh: 96 }),
-  body(X, 620, 780, 'A $40 lab-in-a-box. One tablet, about three minutes, one of three answers. In a clinic, that answer decides whether the supplier gets paid.', { size: 32 }),
+  body(X, 620, 780, 'A box of hobby parts around an Arduino UNO Q. One whole tablet in a small cup, a 60-second quick run, one of three answers. In a clinic, that answer decides whether the supplier gets paid.', { size: 32 }),
   ...chipRow(X, 860, ['PASS', 'NEEDS LAB', 'UNABLE TO VERIFY'].map((v) => vchip(v))),
   image(1000, 170, 800, 657, ART.pill, { radius: 40, fit: 'cover' }),
   mono(1000, 850, 800, 'Art · the site\u2019s binary pill (pill.js), captured from pill-site.vercel.app'),
-], 'Pill is a forty-dollar box. One quarter tablet, about three minutes, two channels that must agree. It says three things only: PASS, NEEDS LAB, UNABLE TO VERIFY.');
+], 'Pill is a box of hobby parts around an Arduino UNO Q. One whole tablet in a small cup, a sixty-second quick run, two light sensors. It says three things only: PASS, NEEDS LAB, UNABLE TO VERIFY.');
 
 // 2 · the moment
 const MX = X + 50, MY = 390; // chart origin; coordinates below are the pitch deck's 960×560 chart
 S('The moment', [
   ...chrome('The moment · delivery d-1042 · replay TM-02'),
   head(X, 150, 1500, [{ s: 'Same label. ' }, { s: 'Chalk inside.', italic: true }], 104),
-  body(X, 280, 1300, 'The bottle says vitamin B2. The blue line drops into the reference band, so a one-sensor tester would call it a pass. The green glow never moves.', { size: 28 }),
+  body(X, 280, 1300, 'Clinic app replay of its simulated two-channel design. The bottle says vitamin B2. The blue line drops into the reference band, so a one-sensor tester would call it a pass. The 90° channel never moves.', { size: 28 }),
   card(X, 400, 1060, 560),
   rect(MX + 80, MY + 170, 840, 76, { fill: C.skyTint }),
   line([[MX + 80, MY + 170], [MX + 920, MY + 170]], C.sky, { w: 2, head: false, dash: [8, 8] }),
@@ -397,18 +397,18 @@ S('The moment', [
   curve(MX, MY, 960, 560, 'M 80 486 C 300 485 600 484 920 483', C.mint, { w: 7 }),
   mono(MX + 520, MY + 132, 400, 'reference band 0.36–0.47', { size: 19, color: C.ink, align: 'right' }),
   text(MX + 560, MY + 262, 380, 'blue inline: in the band', { size: 24, weight: 600 }),
-  text(MX + 560, MY + 420, 380, 'green 90° glow: flat', { size: 24, weight: 600 }),
+  text(MX + 560, MY + 420, 380, '90° channel: flat', { size: 24, weight: 600 }),
   mono(MX + 80, MY + 504, 200, '0 s'), mono(MX + 720, MY + 504, 200, '180 s', { align: 'right' }),
   mono(X, 972, 1060, 'Illustration · the shape of replay TM-02, redrawn; not live sensor data.', { size: 16 }),
   card(1240, 400, 560, 560, { fill: C.amberTint, stroke: 'rgba(224,154,58,0.40)' }),
-  eyebrow(1280, 440, 'Rule N2 · inline moved, glow did not rise', 480, { color: C.ink2, size: 15, ls: 6 }),
+  eyebrow(1280, 440, 'Rule N2 · inline moved, 90° did not rise', 480, { color: C.ink2, size: 15, ls: 6 }),
   head(1280, 488, 480, 'NEEDS LAB', 96),
   body(1280, 608, 480, 'A one-sensor tester would have passed it.', { size: 26, color: C.ink }),
   rect(1280, 708, 480, 2, { fill: C.amber }),
   eyebrow(1280, 736, 'Policy P2 · hold, draft the lab referral', 480, { color: C.ink2, size: 17, ls: 10 }),
   text(1280, 780, 480, '$480.00 held', { font: 'mono', size: 52, weight: 500, lh: 110 }),
   ...chip(1280, 876, 'SANDBOX · REPLAY', C.greyTint),
-], 'This bottle says vitamin B2. Inside is chalk. The blue line drops right into the reference band, so a one-sensor tester would call that a pass, but the green line never moves. Pill says NEEDS LAB and the supplier\'s four hundred and eighty dollars stays held, lab referral drafted. Sandbox money; this is a replay, and we say so.');
+], 'This is the clinic app replaying its simulated two-channel design. The bottle says vitamin B2; inside is chalk. The blue line drops right into the reference band, so a one-sensor tester would call that a pass, but the 90-degree channel never moves. Pill says NEEDS LAB and the supplier\'s four hundred and eighty dollars stays held, lab referral drafted. Sandbox money; this is a replay, and we say so.');
 
 // 3 · one in ten
 const stats = [
@@ -493,11 +493,11 @@ S('The station app', [
 ], 'The station has its own app, Pill Gate, on the laptop beside the box. Prepare checks the lid and the light path, ten seconds of clean water make the blank, the lid opening marks the tablet going in, sixty seconds of dissolving, then the result. It compares the run with a reference profile from three or more runs of a known-good tablet, and it says one of three things: Passed the screen, Needs lab testing, or Unable to verify.');
 
 // 6 · how a run works
-const fills = [[0, 'blank', '0:20 · dark, then blank. Lid open? No run.'], [0.22, 'dissolving', '0:40 · one tablet in. The paddle turns.'], [0.53, 'dissolving', 'Blue light fades as the tablet dissolves.'], [0.86, 'settling', 'The curve starts to flatten.'], [1, 'plateau', '3:00 · seven rules, in order. The rule that fired is printed.']];
+const fills = [[0, 'blank', '0:00 · dark, then 10 s of clean water. Lid open? No run.'], [0.22, 'dissolving', 'One whole tablet in; stirred by hand.'], [0.53, 'dissolving', 'The light through the cup changes as it dissolves.'], [0.86, 'settling', 'The curve starts to flatten.'], [1, 'done', '1:00 · compared with the reference.']];
 S('How a run works', [
   ...chrome('How a run works'),
-  head(X, 150, 1500, 'Three minutes, start to verdict.', 96),
-  body(X, 270, 1500, 'The app draws the run as a pill filling to last night\u2019s reference plateau (ten reference runs make the band). At 100% the curve has flattened and the seven rules run.', { size: 26 }),
+  head(X, 150, 1500, '60 seconds, start to answer.', 96),
+  body(X, 270, 1500, 'Quick mode stops 60\u00a0s after the tablet goes in; full mode runs 2\u201310\u00a0min until the curve is flat. The station app compares the run with a reference profile (three or more good runs); the clinic app draws it as a pill filling to its reference plateau.', { size: 26 }),
   ...fills.flatMap(([lvl, word, d], i) => {
     const cx = X + i * 336, px = cx + 93, done = lvl === 1;
     return [capsule(px, 360, 150, 370, lvl, { fill: done ? C.mint : C.sky, stroke: done ? C.mint : C.sky, strokeW: 5 }),
@@ -507,12 +507,12 @@ S('How a run works', [
       text(cx + 18, 852, 300, d, { size: 20, color: C.ink2, lh: 140, align: 'center' })];
   }),
   mono(X, 966, 1680, 'Illustration · example levels; the app draws them live from the sensor stream.', { size: 16 }),
-], 'One quarter tablet, about three minutes. The pill fills to last night\'s reference plateau; at 100% the seven rules run in order and the rule that fired is printed. Claude explains the result in plain English but never sets a verdict.');
+], 'One whole tablet in a small cup, stirred by hand. Quick mode is sixty seconds after the tablet goes in; full mode runs two to ten minutes until the curve is flat. The run is compared with a reference, and the answer is one of three. A model explains the result in plain English but never sets it.');
 
 // 7 · three answers
 const answers = [
-  ['PASS', APP.pass, 'Plateau in the reference band and the glow rose with it (P1).'],
-  ['NEEDS LAB', APP.needsLab, 'Light dropped with no glow, no plateau, or a plateau outside the band (N1–N3).'],
+  ['PASS', APP.pass, 'Plateau in the reference band and the 90° channel rose with it (P1).'],
+  ['NEEDS LAB', APP.needsLab, 'Light dropped with no rise at 90°, no plateau, or a plateau outside the band (N1–N3).'],
   ['UNABLE TO VERIFY', APP.unable, 'No reference for this drug, a fault, or too little data (U1–U3).'],
 ];
 S('Three answers', [
@@ -525,7 +525,7 @@ S('Three answers', [
       text(x, 366, 500, why, { size: 21, color: C.ink2, lh: 140 }),
       ...phone(x, 452, 320, id, 512)];
   }),
-], 'It says three things only: PASS, NEEDS LAB, UNABLE TO VERIFY. Never a fourth. PASS means this tablet\'s curve matched last night\'s riboflavin references on this box; it does not mean right drug, right dose or contaminant-free.');
+], 'It says three things only: PASS, NEEDS LAB, UNABLE TO VERIFY. Never a fourth. In the clinic app PASS means this tablet\'s curve matched the reference band; it does not mean right drug, right dose or contaminant-free.');
 
 // 8 · clinic mode: the money rail
 const rail = [['Clinic', 'wallet · USDC on Base', 'pays into escrow when the delivery is logged', X, 320, C.surface, C.line], ['Escrow', 'Pill escrow', 'holds it until a PASS and a pharmacist\u2019s tap', X + 450, 340, C.skyTint, 'rgba(79,179,255,0.40)'], ['Supplier', 'wallet · USDC on Base', 'paid only on release', X + 920, 320, C.surface, C.line]];
@@ -533,7 +533,7 @@ const outcomes = [['PASS', '+ the pharmacist\u2019s tap \u2192 escrow pays the s
 S('Clinic mode', [
   ...chrome('Clinic mode · the payment gate'),
   head(X, 150, 1250, 'The verdict holds the payment.', 92),
-  ...chipRow(X, 270, [['SANDBOX · NESSIE', C.amberTint, { dot: C.amber }], ['TESTNET · BASE SEPOLIA', C.violetTint, { dot: C.violet }]]),
+  ...chipRow(X, 270, [['ESCROW SIMULATED', C.greyTint, { dot: C.grey }], ['TESTNET · BASE SEPOLIA', C.violetTint, { dot: C.violet }]]),
   body(X, 340, 1180, 'A clinic samples one tablet from each delivery. The policy agent reads the verdict, the recall check and the spend cap, and proposes. Only a pharmacist\u2019s tap releases money.', { size: 26 }),
   ...rail.flatMap(([k, sub, d, x, w, fill, stroke]) => [card(x, 490, w, 190, { fill, stroke, radius: 24 }),
     text(x + 28, 514, w - 56, k, { size: 30, weight: 600, lh: 120 }), mono(x + 28, 558, w - 56, sub),
@@ -547,10 +547,10 @@ S('Clinic mode', [
   }),
   ...phone(1440, 150, 360, APP.heldTop, 800),
   mono(1440, 962, 360, 'app · delivery held under P2', { align: 'center', size: 16 }),
-], 'And it decides the money. A policy agent holds the payment in escrow and proposes release only on a PASS; a pharmacist taps to approve. Claude explains the result and keeps the log, but never sets a verdict and never moves money. Sandbox and testnet money today.');
+], 'And it decides the money. A policy agent holds the payment in escrow and proposes release only on a PASS; a pharmacist taps to approve. Claude explains the result and keeps the log, but never sets a verdict and never moves money. Escrow is simulated until a CDP key; testnet only.');
 
 // 9 · coinbase
-const x402 = [['402', 'The server answers \u201cPayment Required\u201d: 0.05 USDC on Base Sepolia.'], ['sign', 'The buyer\u2019s wallet signs that exact payment; over its spend cap, it refuses.'], ['settle', 'The facilitator settles it on Base Sepolia. TESTNET USDC only.'], ['200', 'The server answers with the verdict and the rule id that fired.']];
+const x402 = [['402', 'The server answers \u201cPayment Required\u201d: 0.05 USDC on Base Sepolia.'], ['sign', 'The buyer\u2019s wallet signs that exact payment; over its spend cap, it refuses.'], ['settle', 'PENDING · the facilitator settles it on Base Sepolia (needs 0.05 test USDC or a CDP key).'], ['200', 'PENDING · the server answers with the verdict and the rule id that fired.']];
 const roles = [['Pay', 'Escrow \u2192 supplier in USDC, only after PASS and a pharmacist\u2019s tap.'], ['Buy', 'No local reference? Buy a verdict from another station over x402, capped per day.'], ['Earn', 'Every station can sell /verify to other clinics.']];
 S('Coinbase', [
   rect(0, 0, W, H, { fill: C.violetTint }),
@@ -570,35 +570,35 @@ S('Coinbase', [
   }),
   ...phone(1450, 150, 350, APP.verify, 800),
   mono(1450, 962, 350, 'app · /verify over x402', { align: 'center', size: 16 }),
-], 'Other clinics can buy a verdict for five cents over x402: the server answers 402, the wallet signs, the facilitator settles, and the server answers 200 with the verdict and the rule id. Testnet USDC on Base Sepolia; nothing here is real money.', '#FFFFFF');
+], 'Other clinics can buy a verdict for five cents over x402. The server really answers 402 and the facilitator checks the signed payment; settle and the paid 200 are still pending, waiting on 0.05 test USDC or a CDP key. Testnet USDC on Base Sepolia; nothing here is real money.', '#FFFFFF');
 
 // 10 · app screens, 6 × 2
 const grid = [['welcome', APP.welcome], ['bottle', APP.bottle], ['place', APP.place], ['run', APP.run], ['PASS', APP.pass], ['NEEDS LAB', APP.needsLab],
   ['held · P2', APP.held], ['released', APP.released], ['/verify · x402', APP.verify], ['home', APP.home], ['medicines', APP.medicines], ['ask', APP.ask]];
 S('App screens', [
   ...chrome('The app', { footer: false }),
-  head(X, 128, 1100, 'One app: the touchscreen and the phone.', 64),
-  body(X + 1130, 128, 550, `20 routes in React. All ${appShotCount} app screenshots go into the Design file, one frame each, labelled with their route. These twelve are the newest pass.`, { size: 19, lh: 140 }),
+  head(X, 128, 1100, 'The clinic app: on a laptop and a phone.', 64),
+  body(X + 1130, 128, 550, `25 routes in React. All ${appShotCount} app screenshots go into the Design file, one frame each, labelled with their route. These twelve are the newest pass.`, { size: 19, lh: 140 }),
   ...grid.flatMap(([label, id], i) => {
     const x = X + (i % 6) * 285, y = 236 + Math.floor(i / 6) * 410;
     return [...phone(x, y, 254, id, 352), mono(x, y + 362, 254, label, { align: 'center', size: 16, color: C.ink2 })];
   }),
-], 'One web app on the station\'s touchscreen and on any phone. These are the newest build pass; the Design file has every screenshot, grouped by pass and linked to its route.');
+], 'The clinic app is one web app on a laptop and on any phone. These are the newest build pass; the Design file has every screenshot, grouped by pass and linked to its route.');
 
-// 11 · six phases: the station's state machine (pill/pay/src/station.ts), one column per phase
+// 11 · six phases: the clinic app's run phases (pill/pay/src/station.ts drives its simulated station), one column per phase
 const phases = [
   ['Lights off', '3 s', 'LEDs off. The box must read dark; a light leak means the lid is open, and the run stops.', C.dark, C.greyTint, 'dark'],
-  ['Clear water', '10 s', 'Plain water, paddle on. The blank must hold steady (CV under 2\u00a0%) or it retries, up to 3\u00a0times.', C.sky, C.skyTint, 'water'],
+  ['Clear water', '10 s', 'Plain water. The blank must hold steady (CV under 2\u00a0%) or it retries, up to 3\u00a0times.', C.sky, C.skyTint, 'water'],
   ['Drop the tablet', '≤ 30 s', 'It waits for the inline reading to fall 6\u00a0%. After 30\u00a0s the screen prompts.', C.violet, C.violetTint, 'drop'],
-  ['Dissolving', '1–2 min', 'The pill fills, the curve falls, the glow rises. Glow flat while blue falls: the amber moment.', C.skyInk, C.skyTint, 'dissolving'],
+  ['Dissolving', '1–2 min', 'The pill fills, the curve falls, the 90° channel rises. Flat at 90° while blue falls: the amber moment.', C.skyInk, C.skyTint, 'dissolving'],
   ['Settling', '20 s window', 'Flat for 20\u00a0s (|dA/dt|\u00a0<\u00a0ε) means plateau. No plateau by 180\u00a0s: timeout.', C.grey, C.greyTint, 'settling'],
   ['Verdict', '7 rules', 'Seven rules, in order. The rule that fired is printed with the word.', C.mint, C.mintTint, 'verdict'],
 ];
 const PCOL = (W - 2 * X) / phases.length;
 S('Six phases', [
-  ...chrome('The run, phase by phase'),
+  ...chrome('The clinic app, phase by phase'),
   head(X, 128, 1000, 'Six phases, one run.', 72),
-  body(X + 1060, 132, 620, 'The app follows the station\u2019s own state machine. Each phase has its own time, its own look and its own check; a failed check stops the run and says why.', { size: 19, lh: 140 }),
+  body(X + 1060, 132, 620, 'The clinic app\u2019s run, live against its simulated station. Each phase has its own time, its own look and its own check; a failed check stops the run and says why.', { size: 19, lh: 140 }),
   rect(X + 12, 297, W - 2 * X - PCOL + 12, 2, { fill: C.line2 }),
   ...phases.flatMap(([name, time, desc, dot, tint, key], i) => {
     const x = Math.round(X + i * PCOL);
@@ -611,7 +611,7 @@ S('Six phases', [
       ...phone(x, 540, 230, PHASE_SHOT[key], 410),
     ];
   }),
-], 'A run is six phases, the same ones the station walks through. Lights off for three seconds: the box must be dark, or the lid is open and nothing runs. Ten seconds of clear water as the blank; it must be steady. Drop the tablet; the station waits for the reading to fall six percent. Dissolving: the pill fills and the glow should rise with it. Settling: twenty flat seconds is a plateau. Then the seven rules give the word.');
+], 'The clinic app shows a run as six phases, played here against its simulated station. Lights off for three seconds: the box must be dark, or the lid is open and nothing runs. Ten seconds of clear water as the blank; it must be steady. Drop the tablet; it waits for the reading to fall six percent. Dissolving: the pill fills and the 90-degree channel should rise with it. Settling: twenty flat seconds is a plateau. Then the seven rules give the word.');
 
 // 12 · the Gemini checker and the follower
 const checkSteps = [['Read the label', 'gemini vision'], ['Look at the cup', 'gemini vision'], ['Check for a recall', 'openFDA'], ['Check expiry, drug and lot', 'code'], ['Compare with the sensor', 'code'], ['Say it in plain words', 'gemini · filtered']];
@@ -754,10 +754,10 @@ S('Before and after', [{ t: 'metrics' }], 'Before numbers are estimates and say 
 
 // 19 · limits, then real vs simulated (rows from pitch/DEVPOST-FINAL.md "Real vs simulated")
 const realRows = [
-  ['Station hardware', 'REAL', C.mintTint, C.mint, 'Arduino UNO Q, 2 photoresistors, blue/white/red LEDs; one CSV line a second. One real aspirin run recorded Saturday. Reference profile not yet recorded.'],
+  ['Station hardware', 'REAL', C.mintTint, C.mint, 'Arduino UNO Q, 2 photoresistors, blue/white/red LEDs; one CSV line a second. One real aspirin run recorded Saturday. Reference profile not yet recorded; water-only control not yet run.'],
   ['Station app', 'REAL', C.mintTint, C.mint, 'Analysis, guided run, lid detection, guardrail; 14 tests pass. Live Claude scan ran Sat 19:19 on scan_1024_191752_f0c2 (replay of the real aspirin run): Unable to verify, no reference profile yet.'],
   ['Clinic app curves', 'REPLAY', C.skyTint, C.sky, 'Synthetic curves (B2-07, TM-02, B2-LID, AMX-01), labelled REPLAY on screen; the week of history is fixture data.'],
-  ['Escrow · money', 'SIMULATED', C.greyTint, C.grey, 'Hold / release / refund simulated until a CDP key; the x402 402 and its signature check are real. SANDBOX / TESTNET only.'],
+  ['Money', 'SIMULATED', C.greyTint, C.grey, 'USDC escrow simulated until a CDP key. x402: real 402 and signature check; paid 200 pending. Nessie mirror built, not run. SANDBOX / TESTNET only.'],
 ];
 S('What PASS does not mean', [
   ...chrome('Limits · real vs simulated'),
@@ -776,14 +776,14 @@ S('What PASS does not mean', [
       ...chip(X + 300, y - 3, word, tint, { dot, size: 15 }),
       text(X + 520, y, 1160, d, { size: 18, color: C.ink2, lh: 140 })];
   }),
-], 'Say the limits before a judge asks. PASS, or Passed the screen in the station app, means this tablet dissolved like the reference runs; it never calls a medicine good or bad. Then what is real today: the UNO Q station and its app are real, and a live Claude scan ran Saturday at 19:19 on a replay of our real aspirin run; there is no reference profile yet, so it said Unable to verify. The clinic app replays labelled synthetic curves, and escrow is simulated until a CDP key. All money is SANDBOX or TESTNET.');
+], 'Say the limits before a judge asks. PASS, or Passed the screen in the station app, means this tablet dissolved like the reference runs; it never calls a medicine good or bad. Then what is real today: the UNO Q station and its app are real, and a live Claude scan ran Saturday at 19:19 on a replay of our real aspirin run; there is no reference profile yet, so it said Unable to verify, and the water-only control has not run. The clinic app replays labelled synthetic curves, escrow is simulated until a CDP key, and the paid x402 200 is pending. All money is SANDBOX or TESTNET.');
 
 // 20 · tracks
 const tracks = [
   ['Figma · Idea to Demo', C.violet, 'this deck, the plugin, the stage log'], ['Hardware Hack', C.sky, 'the station, on the table'], ['Hyphenate · finance agents', C.sky, 'policy agent: proposes, holds, escalates'],
-  ['Coinbase · x402 payment agents', C.violet, '/verify over x402, USDC escrow (TESTNET)'], ['Capital One · Nessie', C.amber, 'hold / release / refund (SANDBOX)'], ['Microsoft · Built for the Real World', C.sky, 'a clinic pharmacist\u2019s delivery check'],
-  ['Anthropic · Claude', C.mint, 'the plain-English why; can only downgrade'], ['People-First', C.mint, 'personal mode, read aloud'], ['Most Technically Complex', C.sky, 'two-channel optics + rules + payments'],
-  ['MLH · Gemini API', C.mint, 'reads the bottle label'], ['MLH · ElevenLabs', C.mint, 'reads the verdict aloud'], ['MLH · Gen AI', C.mint, 'models explain; rules decide'],
+  ['Coinbase · x402 payment agents', C.violet, '/verify over x402, USDC escrow (TESTNET)'], ['Capital One · Nessie', C.amber, 'sandbox mirror only if the key lands'], ['Microsoft · Built for the Real World', C.sky, 'a clinic pharmacist\u2019s delivery check'],
+  ['Anthropic · Claude', C.mint, 'the plain-English why; can only downgrade'], ['People-First', C.mint, 'personal mode, read aloud'], ['Most Technically Complex', C.sky, 'two-sensor optics + rules + payments'],
+  ['MLH · Gemini API', C.mint, 'reads the bottle label'], ['MLH · Gen AI', C.mint, 'models explain; rules decide'],
 ];
 S('Tracks', [
   ...chrome('Tracks'),
@@ -796,7 +796,7 @@ S('Tracks', [
 ], 'One build, many judges; only the emphasis changes. Money is SANDBOX or TESTNET on every track.');
 
 // 21 · ask / next
-const next = [['1', 'Calibration on the real box', 'Ten riboflavin reference runs and chalk runs, plotted on the site in place of the illustration.'], ['2', 'A second reference drug', 'Each new drug needs its own band. Until then it is UNABLE TO VERIFY, on purpose.'], ['3', 'One pharmacy, one week', 'A procurement officer samples one tablet per delivery; we log every decision and every override.']];
+const next = [['1', 'A reference profile on the real box', 'Three or more runs of a known-good aspirin tablet, then the water-only control against it.'], ['2', 'A second reference drug', 'Each new drug needs its own profile. Until then it is UNABLE TO VERIFY, on purpose.'], ['3', 'One pharmacy, one week', 'A procurement officer samples one tablet per delivery; we log every decision and every override.']];
 S('Ask and next', [
   ...chrome('Next'),
   head(X, 150, 1500, [{ s: 'Next: ' }, { s: 'real runs, one clinic.', italic: true }], 104),
@@ -813,7 +813,7 @@ if (slides.length !== TOTAL) throw new Error(`TOTAL is ${TOTAL} but ${slides.len
 // ───────────────────────────── design pages + board ─────────────────────────────
 const design = {
   appScreens: { title: 'App screens', note: `Every app screenshot from pill/web/dev-shots (${appShotCount}), grouped by build pass in the order they were taken. Phone frames are 390 wide; each frame name is "App · <file>" and maps to a route.`, groups: appGroups },
-  website: { title: 'Website', note: `Every site screenshot from pill-site/dev-shots (${siteShotCount}; Peel-era shots excluded). Live: https://pill-site.vercel.app`, groups: siteGroups },
+  website: { title: 'Website', note: `Every site screenshot from pill-site/dev-shots (${siteShotCount}; shots of the first design excluded). Live: https://pill-site.vercel.app`, groups: siteGroups },
   tokens: { title: 'Tokens', note: `From pill/web/src/index.css :root (${appVars.length} declarations, ${tokens.length} unique tokens: ${tokenColors.length} colours → paint styles + COLOR variables, ${tokenNumbers.length} sizes → FLOAT variables). The app copied them by hand from pill-site/src/styles.css: ${drift.identical} of ${siteVars.length} arrived identical, ${drift.changed.length} changed value, ${drift.missing.length} were renamed or dropped.`, items: tokens, drift },
   stageLog: { title: 'Stage log', columns: stages.map((s) => s.name), rows: [['Tools', 'tools'], ['Minutes', 'minutes'], ['Rating (1–5)', 'rating'], ['What we did', 'did'], ['What broke', 'broke'], ['Into the project', 'forward']].map(([label, k]) => ({ label, cells: stages.map((s) => s[k]) })) },
   // Clickable prototype: the shipped screens (newest build pass) wired in order; the last screen returns to the first.

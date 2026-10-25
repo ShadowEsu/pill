@@ -52,7 +52,7 @@ Four stages, ≤ 200 words each. Minutes come from commit times in `figma/git-ti
 
 **Rating:** 4/5
 
-**What we did:** The app (20 routes), the x402/Nessie payment service and the Claude and Gemini wiring were generated against written plans. Then the repo generated its Figma: `build-deck.mjs` turns screenshots, site art, CSS tokens, debate JSON and this log into `deck.json`; the plugin draws the Slides deck, the Design pages and the FigJam board.
+**What we did:** The clinic app (25 routes), the x402 payment service (a Nessie sandbox mirror is built, not run) and the Claude and Gemini wiring were generated against written plans. Then the repo generated its Figma: `build-deck.mjs` turns screenshots, site art, CSS tokens, debate JSON and this log into `deck.json`; the plugin draws the Slides deck, the Design pages and the FigJam board.
 
 **What broke:** The scaffold's P6 rule held money only when the recall lookup was unreachable, so a delivery with no bottle attached could be proposed for release; a builder's end-to-end test caught it. A `tail -6` cut off Vercel's output, the deploy was re-run, and we got two identical production deploys. The REST API cannot create nodes, hence a plugin.
 
