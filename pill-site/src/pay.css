@@ -116,7 +116,7 @@
 .cbx-flow { display: grid; grid-template-columns: minmax(0,1fr) 56px minmax(0,1fr) 56px minmax(0,1fr) 56px minmax(0,1fr); gap: 6px; align-items: center; margin-top: 16px; }
 .cbx-step { min-width: 0; min-height: 176px; padding: 18px; border: 1px solid var(--cb2-25); border-radius: 18px; background: rgba(255,255,255,.72); }
 .cbx-step b { display: block; font-family: var(--mono); font-size: 30px; font-weight: 500; line-height: 1.1; letter-spacing: -0.01em; color: var(--cb2-ink); }
-.cbx-step:last-child b { color: var(--pass); }
+.cbx-step:last-child b { color: var(--pass-ink); }
 .cbx-sn { display: block; margin-top: 4px; font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .cbx-step p { margin-top: 10px; font-size: 14.5px; line-height: 1.45; color: var(--ink-2); }
 .cbx-arrow { width: 56px; height: 24px; overflow: visible; justify-self: center; }

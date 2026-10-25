@@ -180,6 +180,7 @@
 
 /* ---------- stats band sparks ---------- */
 .spark { margin-top: 16px; max-width: 250px; min-height: 84px; }
+.spark--none { min-height: 0; margin: 0; } /* the row keeps its height only where a card beside it has a chart */
 .spark svg { width: 100%; height: auto; overflow: visible; }
 .spark svg * { transform-box: fill-box; transform-origin: 50% 100%; }
 .sp-bar { fill: rgba(79,179,255,.38); }
@@ -188,7 +189,7 @@
 .sp-axis { stroke: rgba(22,24,27,.2); stroke-width: 1; }
 .sp-range { fill: rgba(79,179,255,.2); stroke: rgba(42,143,224,.6); stroke-width: 1; }
 .sp-mark { stroke: var(--ink); stroke-width: 1.4; }
-.sp-dot { fill: var(--lab); stroke: #fff; stroke-width: 2; }
+.sp-dot { fill: var(--ink); stroke: #fff; stroke-width: 2; }
 .sp-area { fill: rgba(95,211,154,.2); }
 .sp-line { fill: none; stroke: var(--mint-ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .spark-note { margin-top: 6px; font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em; color: var(--muted); }

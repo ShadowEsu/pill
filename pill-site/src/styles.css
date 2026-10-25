@@ -22,6 +22,7 @@
   --mint-tint: rgba(95, 211, 154, 0.14);
   --glass: rgba(255, 255, 255, 0.55);
   --pass: #2FB577;
+  --pass-ink: #1C7A50; /* --pass as text on light: 5.3:1 */
   --lab: #D4652E;
   --unable: #7C8188;
   --dark: #0E1216;
@@ -177,7 +178,7 @@ button { font: inherit; }
 .phone-slot { width: min(100%, 330px); margin-inline: auto; }
 .card .tag { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 13px; letter-spacing: .1em; font-weight: 500; }
 .card .tag i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
-.card.pass .tag { color: var(--pass); } .card.pass .tag i { background: var(--pass); }
+.card.pass .tag { color: var(--pass-ink); } .card.pass .tag i { background: var(--pass); }
 .card.lab .tag { color: var(--lab); } .card.lab .tag i { background: var(--lab); }
 .card.unable .tag { color: var(--unable); } .card.unable .tag i { background: var(--unable); }
 .card .kv { font-family: var(--mono); font-size: 13px; color: var(--ink-2); display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; }
@@ -327,3 +328,6 @@ html { scroll-padding-top: 76px; }
 /* no one-word last lines on headings */
 .h2, .h3, h3, h4 { text-wrap: balance; }
 .eyebrow + .h2 { margin-top: 8px; }
+
+/* on dark sections every muted label uses the dark muted grey (the light one is 3.2:1 there) */
+.dark { --muted: var(--dark-muted); }

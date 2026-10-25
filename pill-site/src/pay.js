@@ -128,11 +128,11 @@ export function mountRail(el) {
 
 /* ---------- x402: paying for a verdict ---------- */
 const X402_LINES = [
-  ['c', '$ curl https://pill.example/verify -d @curve.json'],
+  ['c', '$ curl -X POST localhost:8402/verify -d @curve.json'],
   ['k', '← 402 Payment Required'],
   ['c', '  PAYMENT-REQUIRED: {"scheme":"exact","network":"base-sepolia","asset":"USDC","amount":"0.05","payTo":"0x9c1f…a4d2"}'],
   ['c', '  … agent wallet signs 0.05 USDC (CDP wallet, TESTNET) …'],
-  ['c', '$ curl https://pill.example/verify -H "X-PAYMENT: <signed>" -d @curve.json'],
+  ['c', '$ curl -X POST localhost:8402/verify -H "X-PAYMENT: <signed>" -d @curve.json'],
   ['k', '← 200 OK  ·  pending: lands once the CDP key is in'],
   ['c', '  expected body: {"verdict":"PASS","rule":"P1","plateau":0.41,"band":[0.36,0.47],"run_id":"…","why":"…"}'],
 ];
