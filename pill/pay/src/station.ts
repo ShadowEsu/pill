@@ -145,6 +145,7 @@ class Station {
 
   start() {
     const want = process.env.SERIAL_PORT?.trim();
+    if (want === 'off') return; // another program owns the USB serial port (e.g. the Pill Gate Python app)
     if (want === 'sim') { this.src = new SimStation((s) => this.onText(s)); return; }
     let opening = false;
     const tryOpen = async () => {
