@@ -1,0 +1,199 @@
+1
+00:00:00,600 --> 00:00:03,952
+This bottle says vitamin B2. Inside is chalk.
+
+2
+00:00:03,972 --> 00:00:07,564
+Watch the blue line: the water clouds, the light drops,
+
+3
+00:00:07,584 --> 00:00:09,229
+right into the reference band.
+
+4
+00:00:09,249 --> 00:00:12,013
+A one-sensor tester would call that a pass.
+
+5
+00:00:12,200 --> 00:00:14,002
+But the green line never moves.
+
+6
+00:00:14,022 --> 00:00:18,567
+Pill says NEEDS LAB, and the supplier’s $480 stays held,
+
+7
+00:00:18,587 --> 00:00:21,950
+sandbox money, with a lab referral already drafted.
+
+8
+00:00:30,850 --> 00:00:34,067
+One tablet, one cup, 60 seconds.
+
+9
+00:00:34,067 --> 00:00:37,926
+The board streams light readings once a second; the app decides.
+
+10
+00:00:37,926 --> 00:00:46,650
+Three answers only: Passed the screen · Needs lab testing · Unable to verify
+
+11
+00:00:48,000 --> 00:00:52,837
+WHO estimates 1 in 10 medical products in low- and middle-income countries
+
+12
+00:00:52,857 --> 00:00:54,250
+is substandard or falsified.
+
+13
+00:00:54,270 --> 00:00:58,378
+A new lab dissolution tester costs $20,000 to $100,000,
+
+14
+00:00:58,398 --> 00:01:01,299
+and lab results take 7 to 10 business days.
+
+15
+00:01:01,319 --> 00:01:03,437
+A clinic pharmacist has neither.
+
+16
+00:01:05,000 --> 00:01:06,840
+Pill is a $40 box.
+
+17
+00:01:06,860 --> 00:01:11,304
+One quarter tablet, about three minutes, two channels that must agree.
+
+18
+00:01:11,324 --> 00:01:13,929
+Riboflavin absorbs blue and glows green.
+
+19
+00:01:13,949 --> 00:01:15,680
+Chalk only blocks light.
+
+20
+00:01:17,000 --> 00:01:18,565
+It says three things only:
+
+21
+00:01:18,585 --> 00:01:21,579
+PASS, NEEDS LAB, UNABLE TO VERIFY.
+
+22
+00:01:21,599 --> 00:01:22,678
+Never a fourth.
+
+23
+00:01:22,698 --> 00:01:27,308
+Seven fixed rules set the verdict; Claude only writes the two-sentence why.
+
+24
+00:01:28,600 --> 00:01:31,143
+Here is the app, replaying the chalk run.
+
+25
+00:01:31,163 --> 00:01:34,784
+The pill fills against the reference, the glow bar stays dark,
+
+26
+00:01:34,804 --> 00:01:37,677
+and the card stamps NEEDS LAB, rule N2.
+
+27
+00:01:39,600 --> 00:01:42,595
+A riboflavin lot passes, rule P1.
+
+28
+00:01:42,615 --> 00:01:44,979
+The policy agent proposes release,
+
+29
+00:01:44,999 --> 00:01:47,977
+and only the pharmacist’s press-and-hold moves the money.
+
+30
+00:01:47,997 --> 00:01:50,222
+Every decision is one log line.
+
+31
+00:01:52,600 --> 00:01:55,422
+In clinic mode, the invoice waits in escrow.
+
+32
+00:01:55,442 --> 00:01:57,946
+NEEDS LAB holds it and drafts a lab referral.
+
+33
+00:01:57,966 --> 00:02:00,655
+UNABLE TO VERIFY escalates to a person.
+
+34
+00:02:00,675 --> 00:02:03,090
+A PASS and a pharmacist’s tap release it.
+
+35
+00:02:03,110 --> 00:02:05,650
+It’s all sandbox and testnet money today.
+
+36
+00:02:06,700 --> 00:02:10,104
+Every station sells its verdict over x402.
+
+37
+00:02:10,124 --> 00:02:13,875
+Ask without paying, and you get a 402 with the price:
+
+38
+00:02:13,895 --> 00:02:17,093
+5 cents of test USDC on Base Sepolia.
+
+39
+00:02:17,113 --> 00:02:18,988
+Pay it, and you get the verdict;
+
+40
+00:02:19,008 --> 00:02:22,175
+our paid call is waiting on a test-USDC key.
+
+41
+00:02:22,195 --> 00:02:25,700
+Our agent buys verdicts too, under a $1 daily cap.
+
+42
+00:02:26,950 --> 00:02:31,681
+Live today: Gemini reading the label, Claude’s sentences and escrow clerk,
+
+43
+00:02:31,701 --> 00:02:34,520
+the seven rules, and the real 402.
+
+44
+00:02:34,540 --> 00:02:38,791
+Simulated or pending: the escrow transfers, the paid 200,
+
+45
+00:02:38,811 --> 00:02:41,738
+the station hardware, and these replayed curves.
+
+46
+00:02:41,758 --> 00:02:43,465
+Every screen says which.
+
+47
+00:02:44,950 --> 00:02:48,986
+Our workflow runs from code: the repo writes one deck.json,
+
+48
+00:02:49,006 --> 00:02:51,573
+and our Figma plugin turns it into Slides.
+
+49
+00:02:51,593 --> 00:02:54,097
+Each stage is in our Figma stage log.
+
+50
+00:02:55,150 --> 00:02:58,098
+Pill. Try to make it say PASS on the chalk.

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pill · "At the table" segment layers</title>
+<!--
+  Still layers for the Pill Gate segment, screenshotted by gate.mjs and composited over the phone recording with ffmpeg.
+  ?layer=bg&step=N  paper, chrome, right-hand step list with step N current (opaque)
+  ?layer=frame      rounded phone corners + hairline (transparent elsewhere)
+  ?layer=cap&i=N    burned caption N (transparent)
+  ?layer=chip&text= small chip for sped-up spans (transparent)
+-->
+<style>
+  @font-face { font-family: 'Instrument Serif'; src: url(fonts/instrument-serif-400.woff2) format('woff2'); }
+  @font-face { font-family: 'Inter'; src: url(fonts/inter-400.woff2) format('woff2'); font-weight: 400; }
+  @font-face { font-family: 'Inter'; src: url(fonts/inter-500.woff2) format('woff2'); font-weight: 500; }
+  @font-face { font-family: 'JetBrains Mono'; src: url(fonts/jetbrains-mono-400.woff2) format('woff2'); }
+  html, body { margin: 0; background: transparent; }
+  #s { position: relative; width: 1920px; height: 1080px; overflow: hidden; color: #16181B; }
+  .bg { background: #F7F8F7; }
+  .logo { position: absolute; left: 72px; top: 44px; font: 38px 'Instrument Serif'; }
+  .lab { position: absolute; left: 136px; top: 64px; font: 14px 'JetBrains Mono'; letter-spacing: 2px; color: #6B7177; }
+  .chip { position: absolute; display: inline-flex; align-items: center; gap: 10px; height: 30px; padding: 0 15px; border: 1.2px solid #DADFE3; border-radius: 15px; background: #fff; font: 14px 'JetBrains Mono'; letter-spacing: .6px; white-space: nowrap; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .col { position: absolute; left: 1010px; top: 250px; width: 760px; }
+  .eye { font: 14px 'JetBrains Mono'; letter-spacing: 2px; color: #6B7177; }
+  .title { font: 76px/1.02 'Instrument Serif'; margin: 18px 0 44px; }
+  .step { display: flex; align-items: baseline; gap: 22px; padding: 16px 0; border-top: 1px solid #DADFE3; opacity: .38; }
+  .step:last-child { border-bottom: 1px solid #DADFE3; }
+  .step.on { opacity: 1; }
+  .step.done { opacity: .62; }
+  .n { font: 15px 'JetBrains Mono'; width: 28px; color: #6B7177; }
+  .w { font: 500 26px 'Inter'; width: 170px; }
+  .d { font: 16px 'JetBrains Mono'; color: #6B7177; }
+  .bar { width: 4px; align-self: stretch; border-radius: 2px; background: transparent; margin-left: -14px; }
+  .step.on .bar { background: var(--c); }
+  .cap { position: absolute; left: 0; right: 0; top: 982px; text-align: center; font: 40px 'Instrument Serif'; }
+</style>
+</head>
+<body>
+<div id="s"></div>
+<script>
+const q = new URLSearchParams(location.search);
+const layer = q.get('layer');
+const s = document.getElementById('s');
+const PH = { x: 520, y: 118, w: 397, h: 860, r: 34 };
+const STEPS = [
+  ['Bottle', 'Claude reads the label', '#4FB3FF'],
+  ['Tablet', 'imprint, colour, shape', '#4FB3FF'],
+  ['Water', 'clean-water check, lid closed', '#4FB3FF'],
+  ['Dissolving', 'light read once a second', '#5FD39A'],
+  ['Result', 'one of three answers', '#E09A3A'],
+];
+const CAPS = [
+  'One tablet, one cup, 60 seconds.',
+  'The board streams light readings once a second; the app decides.',
+  'Three answers only: Passed the screen · Needs lab testing · Unable to verify',
+];
+if (layer === 'bg') {
+  const step = +q.get('step');
+  s.className = 'bg';
+  s.innerHTML = `<div class="logo">Pill</div><div class="lab">AT THE TABLE</div>
+    <span class="chip" style="right:72px;top:57px"><span class="dot" style="background:#E09A3A"></span>PILL GATE · STATION APP · REPLAY (NOT LIVE)</span>
+    <div style="position:absolute;left:${PH.x}px;top:${PH.y}px;width:${PH.w}px;height:${PH.h}px;border-radius:${PH.r}px;background:#fff;box-shadow:0 30px 60px -30px rgba(22,24,27,.25)"></div>
+    <div class="col"><div class="eye">THE STATION'S OWN APP · ARDUINO UNO Q + LAPTOP</div>
+    <div class="title">Pill Gate</div>
+    ${STEPS.map(([w, d, c], i) => `<div class="step ${i === step ? 'on' : i < step ? 'done' : ''}" style="--c:${c}"><span class="bar"></span><span class="n">0${i + 1}</span><span class="w">${w}</span><span class="d">${d}</span></div>`).join('')}
+    </div>
+    <span class="chip" style="left:${PH.x}px;top:${PH.y + PH.h + 22}px;display:none"></span>`;
+} else if (layer === 'frame') {
+  // paper outside a rounded rect, a hairline on its edge; transparent inside
+  s.innerHTML = `<svg width="1920" height="1080" style="position:absolute;left:0;top:0"><defs><mask id="m"><rect width="1920" height="1080" fill="#fff"/><rect x="${PH.x}" y="${PH.y}" width="${PH.w}" height="${PH.h}" rx="${PH.r}" fill="#000"/></mask></defs>
+    <rect x="${PH.x - 40}" y="${PH.y - 40}" width="${PH.w + 80}" height="${PH.h + 80}" fill="#F7F8F7" mask="url(#m)"/>
+    <rect x="${PH.x + 0.6}" y="${PH.y + 0.6}" width="${PH.w - 1.2}" height="${PH.h - 1.2}" rx="${PH.r}" fill="none" stroke="#DADFE3" stroke-width="1.4"/></svg>`;
+} else if (layer === 'cap') {
+  s.innerHTML = `<div class="cap">${CAPS[+q.get('i')]}</div>`;
+} else if (layer === 'chip') {
+  s.innerHTML = `<span class="chip" style="left:${PH.x}px;top:${PH.y + PH.h + 20}px"><span class="dot" style="background:#4FB3FF"></span>${q.get('text')}</span>`;
+}
+window.READY = document.fonts.ready.then(() => Promise.all(["40px 'Instrument Serif'", "500 26px 'Inter'", "14px 'JetBrains Mono'"].map((f) => document.fonts.load(f))));
+</script>
+</body>
+</html>

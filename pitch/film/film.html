@@ -780,7 +780,10 @@ window.seek = async (t) => {
 
 // ───────────────────────── soundtrack (OfflineAudioContext → WAV) ─────────────────────────
 // Soft, 96 BPM: a low pad, a sine bass on the bar, a quiet pluck on the beat, a tick at each scene change.
-window.renderAudio = async () => {
+// opts.duration / opts.ticks override the length and tick times (the v2 edit inserts a segment and re-times them).
+window.renderAudio = async (opts = {}) => {
+  const DURATION = opts.duration || window.DURATION;
+  const TICKS = opts.ticks || SCENES.slice(1).map((sc) => sc.t0);
   const sr = 44100, len = Math.ceil(sr * DURATION);
   const ctx = new OfflineAudioContext(2, len, sr);
   let seed = 7; const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
@@ -824,8 +827,7 @@ window.renderAudio = async () => {
     }
   }
   // tick at each scene change
-  for (const sc of SCENES.slice(1)) {
-    const tt = sc.t0;
+  for (const tt of TICKS) {
     const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = 1760;
     const g = ctx.createGain(); g.gain.setValueAtTime(0, tt); g.gain.linearRampToValueAtTime(0.05, tt + 0.003); g.gain.exponentialRampToValueAtTime(0.0004, tt + 0.07);
     o.connect(g); g.connect(master); g.connect(verb); o.start(tt); o.stop(tt + 0.1);
