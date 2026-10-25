@@ -11,6 +11,7 @@ The three answers, said exactly: **Passed the screen**, **Needs lab testing**, *
 - [ ] Safari tab 1: http://localhost:8000 (the real deal, live board)
 - [ ] Safari tab 2: http://localhost:8001 (the demo, a replay of our real aspirin run)
 - [ ] Safari tab 3: https://pill-app-delta.vercel.app/demo (clinic app)
+- [ ] Second terminal, for the Coinbase demo: `cd ~/calhacks-13/pill/pay && npm run serve` (port 8402).
 - [ ] Tab 1 badge says `live` and the lines read counter is going up.
 - [ ] Black tape on the three light leaks. Lid closed.
 - [ ] A cup of clean water filled to the line, sitting in the chamber.
