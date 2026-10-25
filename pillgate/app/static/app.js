@@ -60,9 +60,15 @@ const PREF = {
   set mode(v) { localStorage.setItem("pillgate.mode", v); },
   get sound() { return localStorage.getItem("pillgate.sound") !== "off"; },
   set sound(v) { localStorage.setItem("pillgate.sound", v ? "on" : "off"); },
-  get speak() { return localStorage.getItem("pillgate.speak") === "on"; },
+  get speak() { const v = localStorage.getItem("pillgate.speak"); return v ? v === "on" : PREF.easy; },   // Easy mode reads aloud unless switched off
+  get easy() { return localStorage.getItem("pillgate.easy") === "on"; },
+  set easy(v) { localStorage.setItem("pillgate.easy", v ? "on" : "off"); document.body.classList.toggle("easy", !!v); },
   set speak(v) { localStorage.setItem("pillgate.speak", v ? "on" : "off"); },
-  reset() { Object.keys(localStorage).filter((k) => k.startsWith("pillgate.")).forEach((k) => localStorage.removeItem(k)); },
+  reset() {   // preferences only: the schedule and its log are the person's data and stay
+    const keep = ["pillgate.schedule", "pillgate.takelog", "pillgate.remind", "pillgate.notified"];
+    Object.keys(localStorage).filter((k) => k.startsWith("pillgate.") && !keep.includes(k)).forEach((k) => localStorage.removeItem(k));
+    document.body.classList.remove("easy");
+  },
 };
 const MODES = {
   clinic: { name: "Clinic", tone: "sky", lab: "held", who: "Pharmacist at the station: each delivery is held or released at the gate." },
@@ -300,14 +306,18 @@ const ICONS = {
   history: "M3 18c3 0 4-11 7-11s3 7 5 7 2-3 6-3",
   profiles: "M5 6h14M5 12h14M5 18h9",
   atlas: "M12 4a3 3 0 1 1 0 .1zM5 17a2.5 2.5 0 1 1 0 .1zM19 17a2.5 2.5 0 1 1 0 .1zM10.6 6.6l-4 8.2M13.4 6.6l4 8.2M7.5 17.5h9",
+  medicines: "M8.5 3h7v3.2h-7zM7 6.2h10V19a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2zM9.8 13.6h4.4M12 11.4v4.4",
+  schedule: "M12 3.5a8.5 8.5 0 1 1 0 17 8.5 8.5 0 0 1 0-17zM12 7.6V12l3 2",
+  more: "M5 10.8a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4zM12 10.8a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4zM19 10.8a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z",
   settings: "M12 8.8a3.2 3.2 0 1 1 0 6.4 3.2 3.2 0 0 1 0-6.4zM12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7",
 };
 const NAV = {
   clinic: [["/", "Gate", "gate"], ["/check/bottle", "Check", "check"], ["/history", "History", "history"], ["/profiles", "Profiles", "profiles"], ["/atlas", "Atlas", "atlas"]],
-  personal: [["/", "Home", "home"], ["/check/bottle", "Check", "check"], ["/history", "History", "history"], ["/atlas", "Atlas", "atlas"], ["/settings", "Settings", "settings"]],
+  personal: [["/", "Home", "home"], ["/check/bottle", "Check", "check"], ["/medicines", "Medicines", "medicines"], ["/schedule", "Schedule", "schedule"], ["/more", "More", "more"]],
   check: [["/check/bottle", "Check", "check"], ["/history", "History", "history"], ["/profiles", "Profiles", "profiles"], ["/atlas", "Atlas", "atlas"], ["/settings", "Settings", "settings"]],
 };
-const navKey = (path) => (/^\/(check|result|ask|issue)\b/.test(path) ? "/check/bottle" : path);
+const navKey = (path) => (/^\/(check|result|ask|issue)\b/.test(path) ? "/check/bottle"
+  : mode() === "personal" && /^\/(history|profiles|atlas|settings)$/.test(path) ? "/more" : path);
 let navMode = null, navArmed = false;
 function renderNav(path) {
   const nav = $("nav"), m = mode();
@@ -459,7 +469,8 @@ function paintRunBar() {
     show("runbar" + (Run.phase === "add" ? " urgent" : ""), `<span class="rb-dot" aria-hidden="true"></span><span class="rb-text"><b>Run in progress</b> · ${esc(what)}</span><a class="rb-go" href="#/check/measure">↩ back to the run</a>`);
     return;
   }
-  if (Run.readyScan && !onPath(new RegExp("^/result/" + Run.readyScan.replace(/[^\w-]/g, "") + "$"))) {
+  if (Run.readyScan && onPath(new RegExp("^/result/" + Run.readyScan.replace(/[^\w-]/g, "") + "$"))) Run.readyScan = null;   // seen it
+  if (Run.readyScan) {
     show("runbar ready", `<span class="rb-dot" aria-hidden="true"></span><span class="rb-text" role="status"><b>Result ready</b> · your check finished</span><a class="rb-go" href="#/result/${encodeURIComponent(Run.readyScan)}">Open result →</a>`);
     return;
   }
@@ -600,7 +611,7 @@ route(/^\/$/, async (v) => {
     S.leave.push(mountBinaryPill(v.querySelector(".station canvas"), { dark: true, cell: 7, scale: 1.7 }));
     return;
   }
-  const last = scans[0];
+  const last = scans[0], nextDose = Sched.next();
   v.innerHTML = `${head({ eyebrow: dateEyebrow(), title: "Check my medicine", tone: "mint" })}
     <section class="card hero-light tone-mint rise" style="background:linear-gradient(160deg, var(--mint-tint), #fff 70%)">
       <div class="stack"><p class="eyebrow">About two minutes</p><h2>Is this tablet dissolving the way it should?</h2>
@@ -608,14 +619,21 @@ route(/^\/$/, async (v) => {
         <div class="actions"><a class="btn" href="#/check/bottle">Check my medicine</a></div></div>
       <div class="row" style="justify-content:center">${glyph("bottle", 96)}${glyph("tablet", 80)}</div>
     </section>
-    <section class="card stack rise" style="--i:1"><div class="row between"><h2 class="h">Your last check</h2><a class="footnote" href="#/history">History →</a></div>
-      ${last ? `<div class="capsules">${capsule(last)}</div>` : `<p class="muted">Nothing checked yet.</p>`}</section>
+    <div class="wide-2">
+      <section class="card stack rise" style="--i:1"><div class="row between"><h2 class="h">Your last check</h2><a class="footnote" href="#/medicines">My medicines →</a></div>
+        ${last ? `<div class="capsules">${capsule(last)}</div>` : `<p class="muted">Nothing checked yet.</p>`}</section>
+      <section class="card stack tile rise" style="--accent:var(--sky);--i:2"><div class="row between"><h2 class="h">Next dose</h2><a class="footnote" href="#/schedule">Schedule →</a></div>
+        ${nextDose ? `<p class="next-dose"><span class="mono">${esc(fmtTime(nextDose.t))}</span><b>${esc(nextDose.m.name)}</b>${nextDose.m.dose ? `<small>${esc(nextDose.m.dose)}</small>` : ""}</p>` : `<p class="muted">${Sched.meds.length ? "All of today's doses are marked." : "Add your medicines and times to get a daily list and reminders."}</p>`}</section>
+    </div>
+    <button type="button" class="card easy-btn rise" style="--i:3" id="easy-btn" aria-pressed="${PREF.easy}"><span class="easy-aa" aria-hidden="true">Aa</span>
+      <span><b>${PREF.easy ? "Easy mode is on" : "Turn on Easy mode"}</b><small>Bigger text, stronger contrast, answers read aloud.${PREF.easy ? " Tap to turn it off." : ""}</small></span></button>
     <section class="stack"><h2 class="h">How it works</h2><div class="how">
       ${[["bottle", "Bottle", "A photo of the label. Your name and pharmacy details are removed."], ["tablet", "Tablet", "A close photo of one tablet so the imprint is readable."],
          ["cup", "Measure", "One tablet in clean water. Light through the cup shows how it dissolves."], ["pharmacist", "Result", "One of three answers, with the reasons and the sources."]]
         .map(([g, t, p], i) => `<div class="card rise" style="--i:${i + 2}">${glyph(g, 44)}<span class="step-n">0${i + 1}</span><h3>${t}</h3><p>${p}</p></div>`).join("")}
     </div></section>
     <p class="disclaimer">${esc(DISCLAIMER)} If the result is not "Passed the screen", show it to a pharmacist.</p>`;
+  $("easy-btn").onclick = () => { PREF.easy = !PREF.easy; toast(PREF.easy ? "Easy mode on" : "Easy mode off"); render(); };
 });
 
 // ================================================================ check flow: shared pieces
@@ -1241,7 +1259,8 @@ route(/^\/settings$/, (v) => {
       </section>
       <section class="card stack"><h2 class="h">This device</h2>
         <div class="set-row"><span><b>Sounds</b><small>Beeps when it's time to add the tablet and when the run stops.</small></span>${sw("s-sound", PREF.sound, "Sounds")}</div>
-        <div class="set-row"><span><b>Read answers aloud</b><small>On the Ask page.</small></span>${sw("s-speak", PREF.speak, "Read answers aloud")}</div>
+        <div class="set-row"><span><b>Easy mode</b><small>Bigger text (125 %), stronger contrast, answers read aloud.</small></span>${sw("s-easy", PREF.easy, "Easy mode")}</div>
+        <div class="set-row"><span><b>Read answers aloud</b><small>On the Ask page and in Ask Pill.</small></span>${sw("s-speak", PREF.speak, "Read answers aloud")}</div>
         <div class="set-row"><span><b>Reset local preferences</b><small>Forgets the mode and these switches on this browser only.</small></span><button type="button" class="btn ghost sm" id="s-reset">Reset</button></div>
       </section>
       <section class="card stack span-2"><h2 class="h">Server</h2>
@@ -1254,11 +1273,187 @@ route(/^\/settings$/, (v) => {
   v.querySelectorAll("[data-mode]").forEach((b) => (b.onclick = () => { PREF.mode = b.dataset.mode; navMode = null; render(); toast(MODES[b.dataset.mode].name + " mode"); }));
   $("s-sound").onclick = (e) => { PREF.sound = !PREF.sound; e.currentTarget.setAttribute("aria-checked", String(PREF.sound)); if (PREF.sound) beep(1); };
   $("s-speak").onclick = (e) => { PREF.speak = !PREF.speak; e.currentTarget.setAttribute("aria-checked", String(PREF.speak)); };
+  $("s-easy").onclick = (e) => { PREF.easy = !PREF.easy; e.currentTarget.setAttribute("aria-checked", String(PREF.easy)); $("s-speak").setAttribute("aria-checked", String(PREF.speak)); toast(PREF.easy ? "Easy mode on" : "Easy mode off"); };
   $("s-reset").onclick = (e) => {
     const b = e.currentTarget;
     if (b.dataset.armed) { PREF.reset(); navMode = null; location.hash = "#/welcome"; return; }
     b.dataset.armed = "1"; b.textContent = "Tap again to reset";
   };
+});
+
+// ================================================================ Personal: My medicines (every drug read off a label, grouped by name + strength)
+const normName = (x) => String(x || "").trim().replace(/\s+/g, " ");
+const recallChip = (rs) => (!rs ? "" : `<span class="chip ${RECALL_CLASS[rs] ?? ""}"><span class="dot"></span>${esc(RECALL_TEXT[rs] || rs)}</span>`);
+route(/^\/medicines$/, async (v) => {
+  v.innerHTML = `${head({ eyebrow: "From your checks", title: "My medicines", tone: "mint", side: `<a class="btn" href="#/check/bottle">Check a medicine</a>` })}<div id="meds" class="stack"><p class="skeleton">Reading your checks…</p></div>`;
+  const list = (await api("/api/scans").catch(() => [])).sort((a, b) => (b.created || 0) - (a.created || 0));
+  const recent = list.slice(0, 40);                                  // details carry the strength and the recall status
+  const full = (await Promise.all(recent.map((x) => api("/api/scans/" + encodeURIComponent(x.id)).catch(() => null)))).filter(Boolean);
+  const groups = new Map(); let unread = 0;
+  for (const s of full) {
+    const L = s.label || {}; const name = normName(L.drug_name);
+    if (!name || L.mock) { unread++; continue; }
+    const strength = normName(L.strength);
+    const k = (name + "|" + strength).toLowerCase();
+    if (!groups.has(k)) groups.set(k, { name, strength, maker: L.manufacturer || "", scans: [] });
+    groups.get(k).scans.push(s);                                       // newest first, so scans[0] is the latest
+  }
+  const G = [...groups.values()];
+  if (!$("meds")) return;
+  $("meds").innerHTML = G.length ? `<div class="med-grid">${G.map((g, i) => {
+    const s = g.scans[0], n = g.scans.length, label = `${g.name}${g.strength ? " " + g.strength : ""}`;
+    return `<article class="card med rise" style="--i:${i}">
+      <div class="med-top">${glyph("bottle", 48)}<div class="med-name"><h2>${esc(g.name)}</h2><p class="muted">${esc(g.strength || "strength not read")}${g.maker ? " · " + esc(g.maker) : ""}</p></div></div>
+      <div class="row wrap">${resultChips(s.overall, s.done)}${recallChip(s.recall_status)}</div>
+      <p class="med-n"><b>Tested ${n} time${n === 1 ? "" : "s"}</b> · last ${s.created ? esc(timeAgo(s.created)) : "–"}</p>
+      <div class="row wrap"><a class="btn ghost sm" href="#/result/${encodeURIComponent(s.id)}">Latest result</a><a class="btn ghost sm" href="#/schedule?add=${encodeURIComponent(label)}">Add to my schedule</a></div>
+    </article>`;
+  }).join("")}</div>` : `<section class="card stack"><p class="serif" style="font-size:26px">No medicines yet</p><p class="muted">Each medicine whose label the app reads during a check appears here, with its latest result.</p><div class="actions"><a class="btn" href="#/check/bottle">Check my first medicine</a></div></section>`;
+  $("meds").insertAdjacentHTML("beforeend", `${unread ? `<p class="footnote">${unread} check${unread === 1 ? "" : "s"} had no label read, so ${unread === 1 ? "it isn't" : "they aren't"} listed here. <a href="#/history">History →</a></p>` : ""}
+    ${list.length > recent.length ? `<p class="footnote">Showing medicines from your latest ${recent.length} checks.</p>` : ""}<p class="disclaimer">${esc(DISCLAIMER)}</p>`);
+});
+
+// ================================================================ Personal: Schedule (this browser only: localStorage, no backend)
+const Sched = {
+  get meds() { try { return JSON.parse(localStorage.getItem("pillgate.schedule") || "[]"); } catch { return []; } },
+  set meds(x) { localStorage.setItem("pillgate.schedule", JSON.stringify(x)); },
+  get log() { try { return JSON.parse(localStorage.getItem("pillgate.takelog") || "[]"); } catch { return []; } },
+  set log(x) { localStorage.setItem("pillgate.takelog", JSON.stringify(x.slice(-200))); },
+  day: (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`,
+  mins: (hhmm) => { const [h, m] = String(hhmm).split(":").map(Number); return h * 60 + (m || 0); },
+  /** Today's doses, one per medicine × time, with whether each was marked taken today. */
+  today() {
+    const day = this.day(), log = this.log;
+    return this.meds.flatMap((m) => m.times.map((t) => ({ m, t, taken: log.find((e) => e.med === m.id && e.slot === t && e.day === day) })))
+      .sort((a, b) => this.mins(a.t) - this.mins(b.t));
+  },
+  next() { const now = new Date(), n = now.getHours() * 60 + now.getMinutes(); return this.today().find((d) => !d.taken && this.mins(d.t) >= n - 30) || null; },
+};
+const fmtTime = (hhmm) => { const [h, m] = hhmm.split(":").map(Number); const d = new Date(); d.setHours(h, m || 0, 0, 0); return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }); };
+// Reminders: checked every 30 s while the app is open in a tab; one notification per dose per day.
+const Reminders = {
+  get on() { return localStorage.getItem("pillgate.remind") === "on"; },
+  set on(v) { localStorage.setItem("pillgate.remind", v ? "on" : "off"); },
+  supported: () => "Notification" in window,
+  check() {
+    if (!Reminders.on || !Reminders.supported() || Notification.permission !== "granted") return;
+    const now = new Date(), n = now.getHours() * 60 + now.getMinutes(), day = Sched.day();
+    let sent = {}; try { sent = JSON.parse(localStorage.getItem("pillgate.notified") || "{}"); } catch {}
+    if (sent.day !== day) sent = { day, keys: [] };
+    for (const d of Sched.today()) {
+      const key = d.m.id + "@" + d.t, due = Sched.mins(d.t);
+      if (d.taken || sent.keys.includes(key) || n < due || n > due + 30) continue;
+      sent.keys.push(key);
+      try {
+        const note = new Notification(`Time for ${d.m.name}`, { body: `${d.m.dose ? d.m.dose + " · " : ""}${fmtTime(d.t)}. Open Pill Gate and tap "I took it".`, tag: key });
+        note.onclick = () => { window.focus(); location.hash = "#/schedule"; note.close(); };
+      } catch {}
+    }
+    localStorage.setItem("pillgate.notified", JSON.stringify(sent));
+  },
+};
+/** One daily repeating event per medicine × time, with an alarm at the time. Floating local times (no time zone). */
+function scheduleIcs(meds) {
+  const icsEsc = (x) => String(x || "").replace(/[\\;,]/g, (c) => "\\" + c).replace(/\n/g, "\\n");
+  const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
+  const day = Sched.day().replace(/-/g, "");
+  const ev = meds.flatMap((m) => m.times.map((t) => [
+    "BEGIN:VEVENT", `UID:${m.id}-${t.replace(":", "")}@pillgate.local`, `DTSTAMP:${stamp}`,
+    `DTSTART:${day}T${t.replace(":", "")}00`, "DURATION:PT10M", "RRULE:FREQ=DAILY",
+    `SUMMARY:${icsEsc("Take " + m.name + (m.dose ? " (" + m.dose + ")" : ""))}`,
+    `DESCRIPTION:${icsEsc("From your Pill Gate schedule." + (m.note ? " " + m.note : ""))}`,
+    "BEGIN:VALARM", "ACTION:DISPLAY", `DESCRIPTION:${icsEsc("Take " + m.name)}`, "TRIGGER:PT0M", "END:VALARM", "END:VEVENT"].join("\r\n")));
+  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Pill Gate//Schedule//EN", "CALSCALE:GREGORIAN", ...ev, "END:VCALENDAR", ""].join("\r\n");
+}
+route(/^\/schedule$/, (v) => {
+  const q = new URLSearchParams(location.hash.split("?")[1] || "");
+  v.innerHTML = `${head({ eyebrow: dateEyebrow(), title: "My schedule", tone: "sky" })}<div id="sc-body" class="stack" style="gap:16px"></div>`;
+  const body = $("sc-body");
+  let first = true;                                   // rows rise in once; later redraws (a tap) don't replay it
+  const draw = () => {
+    const meds = Sched.meds, today = Sched.today(), log = Sched.log;
+    const now = new Date(), n = now.getHours() * 60 + now.getMinutes();
+    const state = (d) => d.taken ? "taken" : Sched.mins(d.t) <= n + 15 && Sched.mins(d.t) >= n - 60 ? "due" : Sched.mins(d.t) < n ? "late" : "later";
+    const perm = !Reminders.supported() ? "unsupported" : Notification.permission;
+    body.innerHTML = `<section class="card stack"><div class="row between wrap"><h2 class="h">Today</h2><span class="footnote">${today.filter((d) => d.taken).length} of ${today.length} taken</span></div>
+        ${today.length ? `<ol class="doses">${today.map((d, i) => { const st = state(d); return `<li class="dose dose-${st}${first ? " rise" : ""}" style="--i:${i}">
+          <span class="dose-t">${esc(fmtTime(d.t))}</span>
+          <span class="dose-w"><b>${esc(d.m.name)}</b><small>${esc(d.m.dose || "")}${st === "taken" ? ` · taken at ${esc(new Date(d.taken.at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }))}` : st === "due" ? " · now" : st === "late" ? " · not marked yet" : ""}</small></span>
+          ${st === "taken" ? `<button type="button" class="btn ghost sm" data-undo="${esc(d.m.id)}|${esc(d.t)}" aria-label="Undo ${esc(d.m.name)} at ${esc(fmtTime(d.t))}"><span class="tick ok">${tickSvg}</span>Undo</button>`
+            : `<button type="button" class="btn took" data-took="${esc(d.m.id)}|${esc(d.t)}">I took it</button>`}</li>`; }).join("")}</ol>`
+          : `<p class="muted">No doses yet. Add a medicine below${meds.length ? "" : ", or start from one you checked on My medicines"}.</p>`}
+      </section>
+      <div class="wide-2">
+        <section class="card stack"><h2 class="h">${q.get("add") ? "Add to your schedule" : "Add a medicine"}</h2>
+          <form id="sc-form" class="stack" autocomplete="off">
+            <label class="field">Medicine<input id="sc-name" required maxlength="80" value="${esc(q.get("add") || "")}" placeholder="e.g. Aspirin 325 mg"></label>
+            <label class="field">How much<input id="sc-dose" maxlength="60" placeholder="e.g. 1 tablet with food"></label>
+            <fieldset class="sc-times"><legend>Times each day</legend><div id="sc-times" class="row wrap"><input type="time" value="08:00" aria-label="Time 1" required></div>
+              <button type="button" class="btn ghost sm" id="sc-more">+ another time</button></fieldset>
+            <button type="submit" class="btn">Save to my schedule</button>
+          </form>
+          ${meds.length ? `<ul class="sc-list">${meds.map((m) => `<li><span><b>${esc(m.name)}</b><small>${esc(m.dose || "")}${m.dose ? " · " : ""}${m.times.map(fmtTime).map(esc).join(", ")}</small></span><button type="button" class="btn ghost sm" data-del="${esc(m.id)}">Remove</button></li>`).join("")}</ul>` : ""}
+        </section>
+        <section class="card stack"><h2 class="h">Reminders</h2>
+          <div class="set-row"><span><b>Remind me at each time</b><small>${perm === "unsupported" ? "This browser can't show notifications. Use Add to calendar instead." : perm === "denied" ? "Notifications are blocked for this site in the browser settings. Use Add to calendar instead." : "Works while Pill Gate is open in a browser tab. For reminders when it's closed, add the schedule to your calendar."}</small></span>
+            <button type="button" class="switch" role="switch" id="sc-remind" aria-checked="${Reminders.on && perm === "granted"}" aria-label="Remind me at each time"${perm === "unsupported" || perm === "denied" ? " disabled" : ""}></button></div>
+          <div class="set-row"><span><b>Add to calendar</b><small>Downloads a calendar file with a daily event and an alarm for each time. Your calendar app keeps the reminders.</small></span>
+            <button type="button" class="btn ghost sm" id="sc-ics"${meds.length ? "" : " disabled"}>Add to calendar</button></div>
+          <h3 class="h" style="font-size:14px;margin-top:8px">Recent log</h3>
+          ${log.length ? `<ol class="sc-log">${log.slice(-12).reverse().map((e) => `<li><span class="mono small">${esc(new Date(e.at).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" }))}</span><span>${esc(e.name)}${e.dose ? " · " + esc(e.dose) : ""}</span></li>`).join("")}</ol>` : `<p class="muted">Each "I took it" tap is logged here, on this browser only.</p>`}
+        </section>
+      </div>
+      <p class="disclaimer">Your schedule and log stay in this browser. They are not sent to the station. Follow the dose on your prescription label.</p>`;
+    first = false;
+    body.querySelectorAll("[data-took]").forEach((b) => (b.onclick = () => {
+      const [id, slot] = b.dataset.took.split("|"), m = Sched.meds.find((x) => x.id === id); if (!m) return;
+      Sched.log = [...Sched.log, { med: id, slot, day: Sched.day(), at: Date.now(), name: m.name, dose: m.dose }];
+      beep(1); toast(`${m.name} marked as taken`); draw();
+    }));
+    body.querySelectorAll("[data-undo]").forEach((b) => (b.onclick = () => {
+      const [id, slot] = b.dataset.undo.split("|"), day = Sched.day();
+      Sched.log = Sched.log.filter((e) => !(e.med === id && e.slot === slot && e.day === day)); draw();
+    }));
+    body.querySelectorAll("[data-del]").forEach((b) => (b.onclick = () => {
+      if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Tap again"; return; }
+      Sched.meds = Sched.meds.filter((x) => x.id !== b.dataset.del); draw();
+    }));
+    $("sc-more").onclick = () => { const box = $("sc-times"); if (box.children.length >= 6) return; box.insertAdjacentHTML("beforeend", `<input type="time" aria-label="Time ${box.children.length + 1}">`); box.lastElementChild.focus(); };
+    $("sc-form").onsubmit = (e) => {
+      e.preventDefault();
+      const times = [...new Set([...$("sc-times").querySelectorAll("input")].map((i) => i.value).filter((x) => /^\d\d:\d\d$/.test(x)))].sort();
+      const name = normName($("sc-name").value); if (!name || !times.length) return;
+      Sched.meds = [...Sched.meds, { id: "m" + Date.now().toString(36), name, dose: normName($("sc-dose").value), times }];
+      if (q.get("add")) history.replaceState(null, "", "#/schedule");
+      q.delete("add"); toast(`${name} added`); draw();
+    };
+    $("sc-remind").onclick = async (e) => {
+      const b = e.currentTarget;
+      if (Reminders.on && Notification.permission === "granted") { Reminders.on = false; b.setAttribute("aria-checked", "false"); return; }
+      const p = Notification.permission === "default" ? await Notification.requestPermission() : Notification.permission;
+      Reminders.on = p === "granted"; if (p !== "granted") toast("Notifications weren't allowed"); draw();
+      if (p === "granted") Reminders.check();
+    };
+    $("sc-ics").onclick = () => {
+      const url = URL.createObjectURL(new Blob([scheduleIcs(Sched.meds)], { type: "text/calendar" }));
+      const a = document.createElement("a"); a.href = url; a.download = "pill-gate-schedule.ics"; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    };
+  };
+  draw();
+  const t = setInterval(() => { const f = $("sc-form"); if (f && !f.contains(document.activeElement)) draw(); }, 60000);   // keeps "now" fresh, never while typing
+  S.leave.push(() => clearInterval(t));
+});
+
+// ================================================================ Personal: More (the rest of the app, one tap away)
+route(/^\/more$/, (v) => {
+  const items = [["/history", "history", "History", "Every check, newest first"], ["/profiles", "profiles", "Profiles", "Reference runs for each medicine"],
+    ["/atlas", "atlas", "Atlas", "Recalls and lots as a 3D map"], ["/settings", "settings", "Settings", "Easy mode, sounds, mode"]];
+  v.innerHTML = `${head({ eyebrow: MODES[mode()] ? MODES[mode()].name + " mode" : "", title: "More", tone: "grey" })}
+    <section class="more-grid">${items.map(([to, ic, t, p], i) => `<a class="card more-tile rise" style="--i:${i}" href="#${to}"><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path d="${ICONS[ic]}"/></svg><b>${t}</b><small>${p}</small></a>`).join("")}
+      <button type="button" class="card more-tile rise" style="--i:4" id="more-ask"><span class="dock-ic" aria-hidden="true"><i></i><i></i></span><b>Ask Pill</b><small>Questions about a result or the app</small></button>
+      <a class="card more-tile rise" style="--i:5" href="#/welcome"><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg><b>Change mode</b><small>Clinic, Personal or Check</small></a></section>`;
+  $("more-ask").onclick = () => Dock.show();
 });
 
 // ================================================================ Ask Pill (docked on every page; a sheet with a chat)
@@ -1360,8 +1555,10 @@ async function boot() {
     Object.assign(S.config, c); if (!c.timing) S.config.timing = { blank_s: 10, min_s: 120, max_s: 600, quick_s: 60 };
     $("appName").textContent = c.app_name; document.title = c.app_name;
   } catch {}
+  document.body.classList.toggle("easy", PREF.easy);
   Dock.mount();
   render();
   tick(); setInterval(tick, 500);
+  Reminders.check(); setInterval(Reminders.check, 30000);
 }
 boot();
