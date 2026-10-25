@@ -14,7 +14,7 @@ const money = (v) => v.toLocaleString('en-US', { minimumFractionDigits: 2, maxim
 
 export const SCENES = [
   { n: '01', name: 'Label', time: '0:00', line: 'It starts with the label, the one part anyone can copy.', cap: 'phone camera · drug, strength, lot, maker, expiry · openFDA recall check' },
-  { n: '02', name: 'Drop', time: '0:40', line: 'A quarter tablet goes into 900 mL of water.', cap: 'lid closed · paddle at the same speed every run · water about 25 °C' },
+  { n: '02', name: 'Drop', time: '0:40', line: 'A quarter tablet goes into 900 mL of water.', cap: 'lid closed · stirred by hand · water temperature typed in' },
   { n: '03', name: 'Light', time: '0:40 → 3:00', line: 'Blue light crosses the cup. As riboflavin dissolves, less of it gets through.', cap: 'inline sensor · blue plastic · absorbance = log(blank / now)' },
   { n: '04', name: 'Glow', time: '0:40 → 3:00', line: 'At 90°, behind green plastic, the water starts to glow. Chalk does not.', cap: '90° sensor · green plastic · riboflavin glows green' },
   { n: '05', name: 'Curve', time: '3:00', line: 'The curve flattens inside last night’s band.', cap: 'plateau vs ten reference runs on this box · seven rules, in order' },
@@ -86,7 +86,7 @@ function makeStage() {
 
     <!-- scenes 2-4: the cup, shared -->
     <g data-cup>
-      <rect x="296" y="82" width="48" height="30" rx="4" ${L}/><text x="352" y="101" class="st-t">stepper</text>
+      <rect x="304" y="82" width="32" height="30" rx="4" ${L}/><text x="344" y="101" class="st-t">stir stick</text>
       <path d="M186 150 h268" stroke="rgba(233,238,242,.5)" stroke-width="3" stroke-linecap="round"/>
       <path d="M200 150 L214 480 L426 480 L440 150" ${L}/>
       <path d="${WATER}" fill="rgba(79,179,255,.09)"/>
@@ -439,13 +439,11 @@ export function mountCoinbase(section) {
 /* ---------- FIG grid: curved data-flow arrows between the cards (desktop, three columns) ---------- */
 // [from, to, label, side]: indexes into .figs children; h = horizontal neighbours, v = stacked
 const FLOWS = [
-  [1, 0, 'blue light in', 'h'],
+  [1, 0, 'light in', 'h'],
   [1, 2, 'what gets through', 'h'],
-  [0, 3, 'in the water', 'v'],
-  [2, 5, 'A2 · A3', 'v'],
-  [5, 4, 'same speed', 'h'],
-  [5, 6, '1 JSON line/s', 'v'],
-  [6, 7, 'to the backend', 'v'],
+  [2, 5, 'A0 · A1', 'v'],
+  [5, 6, '1 CSV line/s', 'v'],
+  [6, 7, 'to the software', 'v'],
 ];
 export function mountFigArrows(figs) {
   const ns = 'http://www.w3.org/2000/svg';

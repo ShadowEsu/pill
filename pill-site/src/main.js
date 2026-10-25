@@ -304,6 +304,16 @@ if (!reduced) {
   if (figs) mountFigArrows(figs);
 }
 
+/* ---------- at the table: the Pill Gate phase rail fills phase by phase ---------- */
+{
+  const rail = document.querySelector('#table .pg-rail');
+  if (rail && !reduced) {
+    const bars = rail.querySelectorAll('.pg-bar i');
+    utils.set(bars, { scaleX: 0 });
+    animate(bars, { scaleX: [0, 1], duration: 700, delay: stagger(420, { start: 300 }), ease: 'inOutSine', autoplay: onScroll({ target: rail, enter: 'bottom-=15% top', sync: 'play', repeat: false }) });
+  }
+}
+
 /* ---------- stats band: a small chart under each number ---------- */
 document.querySelectorAll('#problem .stat').forEach((stat, i) => {
   const big = stat.querySelector('.big');

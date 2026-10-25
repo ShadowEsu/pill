@@ -461,11 +461,11 @@ const CONT_TILT = -7 * RAD;
 
 const LABELS = [
   { id: 'lid', no: '01', title: 'PHONE ON LID', sub: 'camera reads the pill through the window', at: [[-5.9, 10.6, 12.6], 'phone'], x: 40, y: 92, side: 'L' },
-  { id: 'stepper', no: '02', title: '28BYJ-48 + ULN2003', sub: 'stepper turns a fan-blade paddle', at: [[3.0, 3.6, 13.85], 'stepper'], x: 655, y: 92, side: 'R' },
-  { id: 'container', no: '03', title: '946 mL CHAMBER', sub: 'fill line · thermistor in the water', at: [[[3.46, 3.46, 0.3], 'container'], [[-2.0, -3.0, 3.1], 'thermistor']], x: 640, y: 770, side: 'R' },
-  { id: 'optics', no: '04', title: 'OPTICS', sub: 'blue LED → LDR · LDR at 90°, green', at: [[LED_AT, 'led'], [LDR_AT, 'ldr'], [LDR90_AT, 'ldr90']], x: 820, y: 690, side: 'R' },
-  { id: 'esp32', no: '05', title: 'ESP32 FEATHER V2', sub: 'reads sensors · streams to Pi', at: [[-9.0, 8.2, 0.3], 'esp32'], x: 40, y: 252, side: 'L' },
-  { id: 'pi', no: '06', title: 'RASPBERRY PI 3', sub: '7" touchscreen plots the reading', at: [[PI_BASE.x, PI_BASE.y1 + 1, PI_BASE.zb + 3], 'pi'], x: 960, y: 440, side: 'R' },
+  { id: 'stepper', no: '02', title: 'STIRRER · NEXT', sub: 'today: stirred by hand, wooden stick', at: [[3.0, 3.6, 13.85], 'stepper'], x: 655, y: 92, side: 'R' },
+  { id: 'container', no: '03', title: '946 mL CHAMBER', sub: 'fill line · thermistor is next', at: [[[3.46, 3.46, 0.3], 'container'], [[-2.0, -3.0, 3.1], 'thermistor']], x: 640, y: 770, side: 'R' },
+  { id: 'optics', no: '04', title: 'OPTICS', sub: 'blue · white · red LEDs → LDR · LDR at 90°', at: [[LED_AT, 'led'], [LDR_AT, 'ldr'], [LDR90_AT, 'ldr90']], x: 820, y: 690, side: 'R' },
+  { id: 'esp32', no: '05', title: 'ARDUINO UNO Q', sub: '3.3 V · 12-bit · 1 CSV line/s', at: [[-9.0, 8.2, 0.3], 'esp32'], x: 40, y: 252, side: 'L' },
+  { id: 'pi', no: '06', title: 'PILL GATE APP', sub: 'laptop: curves · reference · answer', at: [[PI_BASE.x, PI_BASE.y1 + 1, PI_BASE.zb + 3], 'pi'], x: 960, y: 440, side: 'R' },
 ];
 
 /* ───────────────────────── mount ───────────────────────── */
@@ -493,7 +493,7 @@ export function mountStation(host, opts = {}) {
   const svg = el('svg', {
     viewBox: `0 0 ${VB_W} ${VB_H}`,
     role: 'img',
-    'aria-label': opts.label || 'Exploded line drawing of the Pill station: dark box, deli container, lid with phone window, stepper paddle, LED and light sensors, thermistor, ESP32 board streaming readings to a Raspberry Pi touchscreen.',
+    'aria-label': opts.label || 'Exploded line drawing of the Pill station: dark box, deli container, lid with phone window, LEDs and light sensors, an Arduino UNO Q streaming readings to the Pill Gate app; the stirrer paddle and thermistor are drawn as next steps.',
   });
   const root = el('g', { class: 'st-root' }, svg);
   const guides = el('g', { class: 'st-guides' }, root);

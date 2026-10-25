@@ -30,7 +30,7 @@ const art = {
     <g ${S} data-draw><rect x="318" y="150" width="22" height="22" rx="4"/><path d="M280 161 h38" stroke-dasharray="2 3"/></g>
     <text x="58" y="142" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">LED off → dark</text>
     <text x="238" y="142" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">water → blank</text>
-    <text x="150" y="235" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">lid closed · paddle on · CV &lt; 2%</text>
+    <text x="150" y="235" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">lid closed · steady for 10 s</text>
   `, 'The chamber with plain water: a dark reading, then a blank reading'),
 
   drop: wrap(`
@@ -110,7 +110,7 @@ const partFallback = (label) => `<svg viewBox="0 0 300 300" width="100%" role="i
     </g>`;
   const arrow = (x1, y, x2) => `<path d="M${x1} ${y} H${x2 - 8}" ${W} class="flow" data-draw/><path d="M${x2 - 8} ${y - 4} l8 4 l-8 4" ${W}/>`;
   art.pipeline = `<svg viewBox="0 0 1100 270" width="100%" role="img" aria-label="Data path: station to backend to verdict to policy to sandbox bank and pharmacist">
-    ${node(10, 70, 185, 96, 'Station', ['ESP32 · 1 JSON line/s', 'adc0 · adc90 · temp · dark', 'blank · fault'])}
+    ${node(10, 70, 185, 96, 'Station', ['UNO Q · 1 CSV line/s', 'dark · blue · white · red', 'two photoresistors'])}
     ${arrow(195, 118, 235)}
     ${node(235, 70, 215, 96, 'Backend', ['absorbance = log(blank/now)', 'plateau · t80 · scatter', '7 rules, in order'])}
     ${arrow(450, 118, 490)}

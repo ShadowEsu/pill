@@ -24,6 +24,7 @@
       <a href="#problem">Problem</a>
       <a href="#how">How it works</a>
       <a href="#story">Story</a>
+      <a href="#table">At the table</a>
       <a href="#verdicts">Verdicts</a>
       <a href="#clinic">Clinic</a>
       <a href="#payments">Payments</a>
@@ -76,14 +77,14 @@
         </div>
         <p class="stage-hint">scroll to explode</p>
       </div>
-      <div class="station" id="station-mount" aria-label="Line drawing of the Pill station: a dark box with a clear container, a paddle motor on the lid, LEDs and light sensors across one corner, a thermistor, an ESP32 board and a Raspberry Pi with a touchscreen"></div>
+      <div class="station" id="station-mount" aria-label="Line drawing of the Pill station: a dark box with a clear container, blue, white and red LEDs and two light sensors across one corner, an Arduino UNO Q board and the laptop app that shows the curve; the stirrer and thermistor on the drawing are next, not built yet"></div>
       <div class="stage-labels">
         <div><p class="caption">01 · Chamber</p><p>A clear 1-quart container inside a light-tight box. 900 mL of water, the same volume the pharmacopeia uses.</p></div>
-        <div><p class="caption">02 · Paddle</p><p>A stepper motor turns a paddle at the same speed every run, so runs compare.</p></div>
-        <div><p class="caption">03 · Light path</p><p>A blue LED and a sensor across one corner. Riboflavin absorbs blue; as the tablet dissolves, less light gets through.</p></div>
-        <div><p class="caption">04 · Glow sensor</p><p>A second sensor at 90° behind a green filter. Riboflavin glows green; chalk does not.</p></div>
-        <div><p class="caption">05 · Thermistor</p><p>Water temperature on every reading, because dissolution speed depends on it.</p></div>
-        <div><p class="caption">06 · Brains</p><p>An ESP32 streams one reading a second. A Raspberry Pi touchscreen, or your phone, shows the curve.</p></div>
+        <div><p class="caption">02 · Stirring</p><p>Today the cup is stirred by hand with a wooden stick. A stirrer motor is next, so stirring stops depending on the hand.</p></div>
+        <div><p class="caption">03 · Light path</p><p>Blue, white and red LEDs and one photoresistor in line with the beam: how much light gets through the cup.</p></div>
+        <div><p class="caption">04 · Side sensor</p><p>A second photoresistor at 90° to the beam: how much light scatters sideways, the cloudiness a white tablet makes.</p></div>
+        <div><p class="caption">05 · Temperature</p><p>Typed in for each run today. A thermistor in the water is next.</p></div>
+        <div><p class="caption">06 · Brains</p><p>An Arduino UNO Q takes a dark reading every second, then one per colour, and streams one CSV line. The firmware decides nothing; the laptop app does the maths.</p></div>
       </div>
     </div>
   </section>
@@ -131,13 +132,13 @@
     <div class="wrap">
       <div class="figs">
         <div class="fig reveal"><p class="caption">Fig 0.1</p><div class="art" data-part="container"></div><h4>Chamber</h4><p>A clear quart container, 900 mL fill line, light path across one corner.</p><p class="spec">946 mL · fill line 900 mL · path 1.5 cm · USP 〈711〉 volume</p></div>
-        <div class="fig reveal"><p class="caption">Fig 0.2</p><div class="art" data-part="led"></div><h4>Blue LED</h4><p>5 mm, 465–475 nm. Riboflavin absorbs here at about 85% of its peak.</p><p class="spec">220 Ω · GPIO 13 · pulsed only while reading</p></div>
-        <div class="fig reveal"><p class="caption">Fig 0.3</p><div class="art" data-part="ldr"></div><h4>Two light sensors</h4><p>One inline behind blue plastic, one at 90° behind green plastic.</p><p class="spec">CdS photoresistor · 10 kΩ divider · A2 inline · A3 at 90°</p></div>
-        <div class="fig reveal"><p class="caption">Fig 0.4</p><div class="art" data-part="thermistor"></div><h4>Thermistor</h4><p>In the water. Every reading carries its temperature.</p><p class="spec">10 kΩ NTC · Steinhart–Hart · A4 · fault above 40 °C</p></div>
-        <div class="fig reveal"><p class="caption">Fig 0.5</p><div class="art" data-part="stepper"></div><h4>Stepper paddle</h4><p>28BYJ-48 and its driver. The same speed every run.</p><p class="spec">ULN2003 · ~12 rpm · fan blade half in the water</p></div>
-        <div class="fig reveal"><p class="caption">Fig 0.6</p><div class="art" data-part="esp32"></div><h4>ESP32 Feather</h4><p>Reads the sensors, streams one JSON line a second. It decides nothing.</p><p class="spec">HUZZAH32 V2 · USB serial, Wi-Fi backup · dark reading before every sweep</p></div>
-        <div class="fig reveal fig-row"><div class="art" data-part="pi"></div><div><p class="caption">Fig 0.7</p><h4>Raspberry Pi + touchscreen</h4><p>The station face. The same web app also runs on any phone, so the Pi is optional: a laptop or a phone on the lid works too.</p><p class="spec">Pi 3 · 7-inch · Chromium kiosk · hotspot "PILL" when venue Wi-Fi is weak · ESP32 stays on USB so measuring never needs Wi-Fi</p></div></div>
-        <div class="fig reveal fig-wide"><p class="caption">Fig 0.8 · Data path</p><div class="art" data-part="pipeline"></div><h4>Sensor → curve → verdict → decision</h4><p>The ESP32 measures. The backend owns the maths, the seven rules and the payment policy. Claude writes the plain-English "why" and the log line; it never sets a verdict or moves money.</p><p class="spec">JSON line/s · absorbance = log(blank/now) · plateau · 7 rules · policy.md · Nessie sandbox</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.2</p><div class="art" data-part="led"></div><h4>Blue, white and red LEDs</h4><p>5 mm, lit in turn once a second. Red is the colour reference: it separates cloudiness from colour.</p><p class="spec">D5–D8 · active-low through one 330 Ω resistor to 5 V · LOW means on</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.3</p><div class="art" data-part="ldr"></div><h4>Two light sensors</h4><p>One in line with the beam, one at 90° to it. The same cup, watched from two angles.</p><p class="spec">CdS photoresistor · 10 kΩ divider from 3V3 · A0 across the cup · A1 at 90°</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.4 · Next</p><div class="art" data-part="thermistor"></div><h4>Next: a thermistor</h4><p>Not on the station yet. Today the water temperature is typed in for each run.</p><p class="spec">what’s next · temperature on every reading instead of once per run</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.5 · Next</p><div class="art" data-part="stepper"></div><h4>Next: a stirrer</h4><p>Not on the station yet. Today the cup is stirred by hand with a wooden stick.</p><p class="spec">what’s next · the same stir every run, without the hand</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.6</p><div class="art" data-part="esp32"></div><h4>Arduino UNO Q</h4><p>Reads the sensors and streams one CSV line a second. The firmware decides nothing.</p><p class="spec">3.3 V · 12-bit ADC · dark reading before every sweep · 115200 baud</p></div>
+        <div class="fig reveal fig-row"><div class="art" data-part="pi"></div><div><p class="caption">Fig 0.7</p><h4>Pill Gate, the station app</h4><p>The station face, on the laptop the UNO Q plugs into. It builds the curves, spots the moment the tablet went in from the lid opening, matches the run against a reference profile and gives one of three answers.</p><p class="spec">Python · FastAPI · SQLite · 14 tests · says REPLAY (not live) when it replays a CSV</p></div></div>
+        <div class="fig reveal fig-wide"><p class="caption">Fig 0.8 · Data path</p><div class="art" data-part="pipeline"></div><h4>Sensor → curve → verdict → decision</h4><p>The UNO Q measures. The software owns the maths, the rules and the payment policy. Claude writes the plain-English "why" and the log line; it never sets a verdict or moves money.</p><p class="spec">CSV line/s · absorbance = log(blank/now) · reference match · 7 rules · policy.md · Nessie sandbox</p></div>
       </div>
     </div>
   </section>
@@ -152,7 +153,7 @@
         <div class="t">night before → 3:00</div>
         <div>
           <div class="step reveal">
-            <div><p class="caption">Night before</p><h3 class="h3">Ten reference runs make the band.</h3><p class="body">Same cup, same fill line, same paddle speed, water at about 25 °C. Ten riboflavin quarter-tablets, three chalk tablets, two unknowns. The pass band is the mean ± 3 SD of the ten plateaus, checked leave-one-out. If the runs disagree by more than 15%, there is no demo, and we say so.</p></div>
+            <div><p class="caption">Night before</p><h3 class="h3">Ten reference runs make the band.</h3><p class="body">Same cup, same fill line, the same stir, water at about 25 °C. Ten riboflavin quarter-tablets, three chalk tablets, two unknowns. The pass band is the mean ± 3 SD of the ten plateaus, checked leave-one-out. If the runs disagree by more than 15%, there is no demo, and we say so.</p></div>
             <div class="art-slot" data-art="calibration"></div>
           </div>
           <div class="step reveal">
@@ -164,7 +165,7 @@
             <div class="art-slot" data-art="blank"></div>
           </div>
           <div class="step reveal">
-            <div><p class="caption">0:40</p><h3 class="h3">Drop one tablet. The paddle turns.</h3><p class="body">The inline sensor watches blue light fade as riboflavin dissolves. The 90° sensor watches the green glow grow. The thermistor logs the water.</p></div>
+            <div><p class="caption">0:40</p><h3 class="h3">Drop one tablet. Stir.</h3><p class="body">The inline sensor watches blue light fade as riboflavin dissolves. The 90° sensor watches the light that comes out sideways. The water temperature goes in with the run.</p></div>
             <div class="art-slot" data-art="drop"></div>
           </div>
           <div class="step reveal">
@@ -196,10 +197,48 @@
     <div class="wrap story-stack"></div>
   </section>
 
+  <!-- 6c. At the table: the Pill Gate station app -->
+  <section class="section" id="table">
+    <div class="wrap">
+      <div class="chapter reveal"><span class="ch-n">06</span><span class="ch-t">What the judges see.</span></div>
+      <p class="eyebrow reveal">Fig 2c · Pill Gate, the station app</p>
+      <h2 class="h2">At the table.</h2>
+      <p class="lead reveal" style="margin-top:22px">The box on the table runs Pill Gate: a guided check that walks one tablet from clean water to an answer in five phases, with the time each one takes on the rail.</p>
+      <ol class="pg-rail reveal" aria-label="The five phases of a check">
+        <li class="pg-ph" style="--w:1.1"><span class="pg-bar" aria-hidden="true"><i></i></span><b>Prepare</b><span class="pg-t">checks</span><span class="pg-d">Clean water in the cup, lid closed, LED reaching the sensor.</span></li>
+        <li class="pg-ph" style="--w:1"><span class="pg-bar" aria-hidden="true"><i></i></span><b>Clean water</b><span class="pg-t">10 s</span><span class="pg-d">The reading has to stay steady for 10 s before a tablet goes in.</span></li>
+        <li class="pg-ph" style="--w:1"><span class="pg-bar" aria-hidden="true"><i></i></span><b>Tablet in</b><span class="pg-t">≈ 10 s</span><span class="pg-d">Open the lid, drop the tablet, close it. The lid opening is the tablet-in mark; open past 25 s, the run says Unable to verify.</span></li>
+        <li class="pg-ph" style="--w:2.2"><span class="pg-bar" aria-hidden="true"><i></i></span><b>Dissolving</b><span class="pg-t">60 s</span><span class="pg-d">Quick mode: 60 s after the tablet goes in. Full mode stops when the curve flattens, 2–10 min.</span></li>
+        <li class="pg-ph" style="--w:1"><span class="pg-bar" aria-hidden="true"><i></i></span><b>Result</b><span class="pg-t">auto</span><span class="pg-d">Matched against the reference profile; one of three answers.</span></li>
+      </ol>
+      <div class="pg-phones">
+        <figure class="pg-fig reveal"><div class="pg-frame"><img src="/station/measure-390.webp" width="474" height="1024" loading="lazy" decoding="async" alt="Pill Gate, Measure step: the phase rail at Prepare, with Quick 60 s and Full 2:00–10:00 modes and the instruction to fill the cup with clean water and close the lid"></div><figcaption><span class="pg-n">01</span>Measure: the phase rail and the clean-water check</figcaption></figure>
+        <figure class="pg-fig reveal"><div class="pg-frame"><img src="/station/flow-06-result-390.webp" width="474" height="1024" loading="lazy" decoding="async" alt="Pill Gate, end of the guided flow: the screening result card with time to 80 percent, final level and run length"></div><figcaption><span class="pg-n">02</span>The guided flow lands on the result card</figcaption></figure>
+        <figure class="pg-fig reveal"><div class="pg-frame"><img src="/station/result-390.webp" width="474" height="1024" loading="lazy" decoding="async" alt="Pill Gate result: Unable to verify, because no reference profile was matched; the delivery stays at the gate until the test is repeated"></div><figcaption><span class="pg-n">03</span>Result: Unable to verify, and the delivery stays at the gate</figcaption></figure>
+      </div>
+      <p class="caption pg-cap reveal">Screens from Pill Gate, replaying a recorded run (the top bar says REPLAY (not live))</p>
+      <div class="split pg-split">
+        <div class="reveal">
+          <p class="eyebrow">The station</p>
+          <p class="pg-body">An Arduino UNO Q runs at 3.3 V with a 12-bit ADC. Once a second it turns every LED off and reads both photoresistors (the dark reading, which cancels room light), then lights blue, white and red in turn and reads again: one photoresistor in line with the beam, one at 90° to it. It prints one CSV line and decides nothing. Pill Gate, on the laptop, builds the curves and matches the run against a reference profile recorded from known-good tablets on the same box.</p>
+        </div>
+        <div class="reveal">
+          <p class="eyebrow">Three answers, one product</p>
+          <ul class="pg-answers">
+            <li><span class="pg-chip pg-pass" aria-hidden="true"></span><b>Passed the screen</b><span class="pg-cl">PASS</span></li>
+            <li><span class="pg-chip pg-lab" aria-hidden="true"></span><b>Needs lab testing</b><span class="pg-cl">NEEDS LAB</span></li>
+            <li><span class="pg-chip pg-unable" aria-hidden="true"></span><b>Unable to verify</b><span class="pg-cl">UNABLE TO VERIFY</span></li>
+          </ul>
+          <p class="pg-one">The station says it in words; the clinic app writes the same three answers as PASS / NEEDS LAB / UNABLE TO VERIFY.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- 7. Verdicts + phone -->
   <section class="section dark" id="verdicts">
     <div class="wrap">
-      <div class="chapter"><span class="ch-n">06</span><span class="ch-t">What it says back.</span></div>
+      <div class="chapter"><span class="ch-n">07</span><span class="ch-t">What it says back.</span></div>
       <div class="split">
         <div>
           <p class="eyebrow">Fig 3 · The app</p>
@@ -249,7 +288,7 @@
   <!-- 9. Clinic mode -->
   <section class="section dark" id="clinic">
     <div class="wrap">
-      <div class="chapter reveal"><span class="ch-n">07</span><span class="ch-t">Where the answer holds the money.</span></div>
+      <div class="chapter reveal"><span class="ch-n">08</span><span class="ch-t">Where the answer holds the money.</span></div>
       <div class="split" style="align-items:start">
         <div class="phone-slot" id="phone-clinic"></div>
         <div>
@@ -294,7 +333,7 @@
   <!-- 9b. Payments: Coinbase x402 track -->
   <section class="section pay" id="payments">
     <div class="wrap">
-      <div class="chapter reveal"><span class="ch-n">08</span><span class="ch-t">How the money moves.</span></div>
+      <div class="chapter reveal"><span class="ch-n">09</span><span class="ch-t">How the money moves.</span></div>
       <div class="cb-badge reveal"><span class="sq" aria-hidden="true"></span>Coinbase · x402 · payment agents</div>
       <p class="eyebrow reveal" style="margin-top:22px">Payments</p>
       <h2 class="h2">The verdict is the invoice.</h2>
@@ -377,7 +416,7 @@
   <!-- 10. Personal mode -->
   <section class="section" id="personal">
     <div class="wrap">
-      <div class="chapter reveal"><span class="ch-n">09</span><span class="ch-t">At home, one bottle at a time.</span></div>
+      <div class="chapter reveal"><span class="ch-n">10</span><span class="ch-t">At home, one bottle at a time.</span></div>
       <div class="split" style="align-items:start">
         <div>
           <p class="eyebrow reveal">Personal mode</p>
@@ -405,7 +444,7 @@
   <!-- 11. Limits -->
   <section class="section" id="limits" style="padding-top:0">
     <div class="wrap">
-      <div class="chapter reveal"><span class="ch-n">10</span><span class="ch-t">What it will not claim.</span></div>
+      <div class="chapter reveal"><span class="ch-n">11</span><span class="ch-t">What it will not claim.</span></div>
       <p class="eyebrow reveal">Fig 5 · What PASS does not mean</p>
       <h2 class="h2">Pill screens tablets. It does not certify them.</h2>
       <div class="split" style="margin-top:40px; align-items:start">
@@ -464,7 +503,7 @@
             <li><b>NOT</b><span>The verdict, the seven rules, the pass band, and every money movement are deterministic code. The model can only downgrade to "escalate".</span></li>
           </ul>
           <p class="caption" style="margin-top:28px">built with</p>
-          <p class="mono" style="color:var(--dark-muted); margin-top:8px">ESP32 · Raspberry Pi · anime.js · React · Node + Express · Claude · Gemini · Coinbase CDP + x402 · Capital One Nessie sandbox · openFDA · Google Calendar</p>
+          <p class="mono" style="color:var(--dark-muted); margin-top:8px">Arduino UNO Q · Python · FastAPI · SQLite · anime.js · React · Node + Express · Claude · Gemini · Coinbase CDP + x402 · Capital One Nessie sandbox · openFDA · Google Calendar</p>
           <div class="cta" style="margin-top:28px; display:flex; gap:12px; flex-wrap:wrap">
             <a class="btn" href="https://pill-app-delta.vercel.app/welcome" target="_blank" rel="noopener">Open the app <span class="arrow" aria-hidden="true">→</span></a>
             <a class="btn ghost" href="#" id="link-devpost">Devpost</a>
@@ -473,7 +512,7 @@
           </div>
         </div>
         <div>
-          <p class="eyebrow">Bill of materials</p>
+          <p class="eyebrow">Bill of materials · first design</p>
           <table class="bom" style="margin-top:16px">
             <tbody>
               <tr><td>ESP32 Feather V2</td><td>$22</td></tr>
@@ -484,7 +523,7 @@
               <tr><td><b>Total</b></td><td><b>$40</b></td></tr>
             </tbody>
           </table>
-          <p class="src" style="margin-top:12px">Pi 3 + touchscreen optional; the app runs on any phone.</p>
+          <p class="src" style="margin-top:12px">The first design, on an ESP32 with a stepper and a thermistor. The station at the table runs on an Arduino UNO Q, stirred by hand, with the stirrer and thermistor next.</p>
         </div>
       </div>
     </div>

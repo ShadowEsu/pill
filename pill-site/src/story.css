@@ -199,3 +199,42 @@
 .fa-l rect { fill: #0E1216; stroke: rgba(95,211,154,.5); }
 .fa-l text { font-family: var(--mono); font-size: 10.5px; letter-spacing: .03em; fill: #BFF2D8; }
 .reduced .fig-arrows .fa-p { animation: none; }
+
+/* ---------- At the table: Pill Gate, the station app ---------- */
+.pg-rail { list-style: none; margin: 48px 0 0; padding: 0; display: flex; gap: 10px; }
+.pg-ph { flex: var(--w) 1 0; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.pg-bar { display: block; height: 14px; border-radius: 999px; background: rgba(22,24,27,.08); overflow: hidden; margin-bottom: 10px; }
+.pg-bar i { display: block; height: 100%; width: 100%; border-radius: inherit; transform-origin: left; background: var(--mint); }
+.pg-ph:nth-child(2) .pg-bar i, .pg-ph:nth-child(3) .pg-bar i { background: var(--blue); }
+.pg-ph:nth-child(4) .pg-bar i { background: repeating-linear-gradient(-45deg, var(--blue) 0 8px, #7CC6FF 8px 16px); }
+.pg-ph:nth-child(5) .pg-bar i { background: var(--ink); }
+.pg-ph b { font-weight: 600; font-size: 16px; color: var(--ink); }
+.pg-t { font-family: var(--mono); font-size: 13px; color: var(--ink); }
+.pg-d { margin-top: 6px; font-size: 14px; line-height: 1.45; color: var(--ink-2); }
+.pg-phones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(20px, 4vw, 56px); margin-top: 64px; }
+.pg-fig { margin: 0; min-width: 0; }
+.pg-frame { width: min(100%, 280px); margin-inline: auto; padding: 9px; border-radius: 40px; background: #16181B; box-shadow: 0 30px 70px -36px rgba(22,24,27,.55), inset 0 0 0 1px rgba(255,255,255,.08); }
+.pg-frame img { display: block; width: 100%; height: auto; border-radius: 31px; background: var(--paper); }
+.pg-fig figcaption { display: flex; gap: 10px; justify-content: center; align-items: baseline; max-width: 30ch; margin: 18px auto 0; font-size: 15px; line-height: 1.45; color: var(--ink); text-align: left; }
+.pg-n { flex: none; font-family: var(--mono); font-size: 11px; padding: 2px 7px; border-radius: 999px; border: 1px solid rgba(79,179,255,.5); background: var(--sky-tint); color: var(--ink); }
+.pg-cap { margin-top: 22px; text-align: center; }
+.pg-split { margin-top: 72px; align-items: start; }
+.pg-body { margin-top: 14px; font-size: 17px; line-height: 1.6; color: var(--ink); max-width: 60ch; }
+.pg-answers { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 10px; }
+.pg-answers li { display: grid; grid-template-columns: 14px 1fr auto; align-items: center; gap: 14px; padding: 14px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--glass); }
+.pg-answers b { font-family: var(--serif); font-weight: 400; font-size: 26px; line-height: 1.1; color: var(--ink); }
+.pg-cl { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; color: var(--ink); padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: #fff; white-space: nowrap; }
+.pg-chip { width: 14px; height: 14px; border-radius: 50%; }
+.pg-pass { background: var(--pass); box-shadow: 0 0 0 4px rgba(47,181,119,.18); }
+.pg-lab { background: var(--lab); box-shadow: 0 0 0 4px rgba(212,101,46,.18); }
+.pg-unable { background: var(--unable); box-shadow: 0 0 0 4px rgba(124,129,136,.2); }
+.pg-one { margin-top: 16px; font-size: 16px; line-height: 1.5; color: var(--ink); }
+@media (max-width: 900px) {
+  .pg-rail { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  .pg-ph { display: grid; grid-template-columns: 112px 1fr; column-gap: 14px; row-gap: 2px; }
+  .pg-bar { grid-column: 1 / -1; margin-bottom: 4px; width: calc(var(--w) / 2.2 * 100%); }
+  .pg-d { grid-column: 1 / -1; margin-top: 0; }
+  .pg-phones { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 72%; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; padding-bottom: 14px; -webkit-overflow-scrolling: touch; }
+  .pg-fig { scroll-snap-align: center; }
+  .pg-answers b { font-size: 22px; }
+}
