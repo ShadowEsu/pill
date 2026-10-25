@@ -453,7 +453,7 @@ S('The station', [
     return [{ t: 'ellipse', x: X, y: y + 9, w: 18, h: 18, fill: dot },
       text(X + 36, y, 700, k, { size: 25, weight: 600, lh: 130 }), text(X + 36, y + 38, 700, d, { size: 18, color: C.ink2, lh: 140 })];
   }),
-  ...[[STATION_PHOTO.ledBox, 'Photo · the purple 3D-printed chamber with a clear cup of water; the side box holds white, blue and red LEDs; a sensor holder on the chamber wall; the UNO Q at left.'],
+  ...[[STATION_PHOTO.ledBox, 'Photo · purple 3D-printed chamber, clear cup of water; side box with white, blue and red LEDs; the UNO Q at left.'],
     [STATION_PHOTO.blueCup, 'Photo · from above: blue light inside the cup, the LED box below it, the UNO Q at lower left.']].flatMap(([id, cap], i) => {
     const x = 920 + i * 450;
     return [image(x, 150, 430, 352, id, { radius: 20, fit: 'cover' }), mono(x, 516, 430, cap, { size: 16 })];
