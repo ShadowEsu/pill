@@ -26,14 +26,24 @@ lsof -ti :8000 2>/dev/null | xargs -r kill 2>/dev/null || true
 IP="$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo '<laptop-ip>')"
 echo
 echo "  Laptop:  http://localhost:8000"
-echo "  Phone (same Wi-Fi): http://$IP:8000"
+if [ "$MODE" = "online" ]; then echo "  Phones: use the public link below (the server listens on localhost only in online mode)"; else echo "  Phone (same Wi-Fi): http://$IP:8000"; fi
 echo
 
 if [ "$MODE" = "online" ]; then
-  read -r -p "PIN for the public link, 8+ characters (judges type user pill + the PIN): " PIN
-  while [ ${#PIN} -lt 8 ]; do read -r -p "8 characters or more: " PIN; done
-  ( sleep 2; ngrok http 8000 --basic-auth "pill:$PIN" --log=stdout --log-format=logfmt 2>/dev/null \
-      | grep -o 'url=https://[^ ]*' | head -1 | sed 's/url=/  Public:  /' ) &
+  # Security review 2026-10-24: online = localhost + ngrok basic auth; profiles backed up (anyone with the PIN could rebuild one);
+  # the PIN lives in a 600 config file, not on the command line; the URL comes from ngrok's local API, not a buffered pipe.
+  read -r -s -p "PIN for the public link, 8+ characters (judges type user pill + the PIN): " PIN; echo
+  while [ ${#PIN} -lt 8 ]; do read -r -s -p "8 characters or more: " PIN; echo; done
+  STAMP="$(date +%Y%m%d-%H%M%S)"
+  cp -R data/profiles "data/profiles.bak-$STAMP" && echo "  profiles backed up to app/data/profiles.bak-$STAMP (restore after judging)"
+  NGCFG="$HOME/.config/preston-secrets/ngrok-pill.yml"
+  umask 077; printf 'version: 3\ntunnels:\n  pill:\n    proto: http\n    addr: 127.0.0.1:8000\n    basic_auth:\n      - "pill:%s"\n' "$PIN" > "$NGCFG"; umask 022
+  pkill -x ngrok 2>/dev/null || true
+  ngrok start pill --config "$HOME/Library/Application Support/ngrok/ngrok.yml" --config "$NGCFG" --log=stdout --log-format=logfmt > .ngrok.log 2>&1 &
+  NGPID=$!
+  trap 'kill $NGPID 2>/dev/null; pkill -x ngrok 2>/dev/null; rm -f "$NGCFG"' EXIT INT TERM
+  ( for i in $(seq 1 30); do sleep 1; U=$(curl -s localhost:4040/api/tunnels | python3 -c "import json,sys; t=json.load(sys.stdin).get('tunnels',[]); print(t[0]['public_url'] if t else '')" 2>/dev/null); [ -n "$U" ] && { echo; echo "  Public:  $U   (user pill + your PIN; keep this up only while judges look)"; echo; break; }; done; grep -q "lvl=eror" .ngrok.log 2>/dev/null && grep "lvl=eror" .ngrok.log | head -2 ) &
+  export HOST=127.0.0.1
 fi
 
 if [ "$MODE" = "replay" ]; then
