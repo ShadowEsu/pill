@@ -337,7 +337,7 @@
   pointer-events: none;
 }
 .pbtn--fill { background: var(--blue); color: #fff; }
-.pv--needslab .pbtn--fill { background: var(--lab-red); }
+.pv--needslab .pbtn--fill { background: #B9401F; } /* darker hold red: white text 5.5:1 */
 .pbtn--ghost { background: transparent; color: var(--dark-text); border-color: var(--dark-line); }
 .pbtn--off { background: rgba(255, 255, 255, 0.05); color: rgba(233, 231, 226, 0.35); border-color: rgba(255, 255, 255, 0.06); }
 
