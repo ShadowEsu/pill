@@ -360,3 +360,10 @@ table.raw tbody th small { color: var(--muted); font-size: 10px; margin-left: 4p
 .runbar .rb-text b { font-weight: 600; }
 .runbar .rb-go { flex: none; color: var(--ink); background: #fff; text-decoration: none; font-weight: 600; font-size: 13px; padding: 7px 12px; border-radius: 999px; white-space: nowrap; }
 @media (min-width: 900px) { .runbar { top: 12px; margin: 10px 36px 0; max-width: 1048px; align-self: center; width: calc(100% - 72px); } }
+
+/* ---------- round 3: "we read X, there is no reference yet" ---------- */
+.noref { display: flex; gap: 12px; align-items: flex-start; max-width: 640px; padding: 12px 14px; border-radius: 14px;
+  background: rgba(255,255,255,.78); border: 1px solid var(--line); box-shadow: inset 3px 0 0 var(--sky); font-size: 15px; line-height: 1.45; animation: rise .4s var(--ease) .25s backwards; }
+.noref .g-ic { flex: none; }
+.noref p { margin: 0; }
+.noref a { color: var(--ink); font-weight: 600; white-space: nowrap; }

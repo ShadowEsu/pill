@@ -950,6 +950,16 @@ route(/^\/result\/([^/]+)$/, async (v, id) => {
   $("r-new").onclick = () => { resetCheck(); location.hash = "#/check/bottle"; };
   S.leave.push(() => { left = true; clearTimeout(timer); if (chart) chart.destroy(); });
 
+  const profiles = await api("/api/profiles").catch(() => []);
+  /** The label was read but there's nothing on this station to compare it with: say so plainly (the reading itself was fine). */
+  const noRefLine = (s, verdict) => {
+    const L = s.label || {};
+    if (verdict !== "UNABLE_TO_VERIFY" || s.profile_id || !L.drug_name || L.mock) return "";
+    const name = String(L.drug_name).trim(), low = name.toLowerCase();
+    const prof = profiles.find((p) => (p.match_names || []).some((m) => m && low.includes(String(m).toLowerCase())));
+    const what = `${name}${L.strength ? " " + String(L.strength).trim() : ""}`;
+    return `<div class="noref"><span class="g-ic">${glyph("bottle", 30)}</span><p>We read <b>${esc(what)}</b> from the label. <b>Unable to verify</b> means there is no reference for ${esc(name)} on this station yet${prof && !prof.reference ? ` (the ${esc(prof.name)} profile has no reference runs)` : ""}: record 3 good runs to build one. <a href="#/profiles">Profiles →</a></p></div>`;
+  };
   const render1 = (s) => {
     const a = s.analysis, verdict = s.overall || (a && a.result);
     const title = verdict ? "Result" : "Checking…";
@@ -967,6 +977,7 @@ route(/^\/result\/([^/]+)$/, async (v, id) => {
         k.push(kpiCell("run after tablet in", Math.round(n.run_s_after_drop) + " s"));
       }
       st.innerHTML = `<p class="eyebrow">Screening result</p><span class="stamp" role="status">${esc(RESULT_TEXT[verdict])}</span>
+        ${noRefLine(s, verdict)}
         <p class="headline" id="r-headline"></p>
         <ul class="reasons">${(a ? a.reasons : []).map((r) => `<li>${esc(r)}</li>`).join("")}</ul>
         ${modeLine(verdict) ? `<p class="mode-line">${modeLine(verdict)}</p>` : ""}
