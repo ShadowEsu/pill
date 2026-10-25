@@ -20,6 +20,7 @@
   <div class="wrap">
     <a class="brand" href="#top"><span class="dot" aria-hidden="true"></span>Pill</a>
     <nav class="nav-links" aria-label="Chapters">
+      <a href="#film">Film</a>
       <a href="#station">Station</a>
       <a href="#problem">Problem</a>
       <a href="#how">How it works</a>
@@ -64,6 +65,21 @@
         <img src="/photos/station-19.webp" width="768" height="884" fetchpriority="high" decoding="async" alt="The Pill station on a table: a purple 3D-printed cylinder with a clear cup of water inside, the purple LED box on its side with white, blue and red LEDs wired in, a photoresistor holder on the left wall, and an Arduino UNO Q with jumper wires in front">
         <div class="hero-draw" data-hero-draw aria-hidden="true"></div>
         <figcaption class="caption">the station as built · lid off · the drawing is the same chamber, from the CAD</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 1b. The pitch film: portrait, plays only on a tap (preload none, so the 12 MB file loads only if played) -->
+  <section class="section dark film" id="film" aria-labelledby="film-title">
+    <div class="wrap">
+      <p class="eyebrow reveal">Film · Saturday night</p>
+      <h2 class="h2" id="film-title">The pitch, 87 seconds</h2>
+      <figure class="film-frame">
+        <video controls playsinline preload="none" poster="/video/pill-pitch-poster.jpg" width="720" height="1280" aria-describedby="film-cap">
+          <source src="/video/pill-pitch.mp4" type="video/mp4">
+          <a href="/video/pill-pitch.mp4">Download the pitch video (12 MB)</a>
+        </video>
+        <figcaption class="caption" id="film-cap">Filmed at the Palace of Fine Arts, Saturday night. The station says Unable to verify: the bottle said aspirin, the tablet inside wasn't, and there was no matching reference.</figcaption>
       </figure>
     </div>
   </section>
@@ -623,6 +639,7 @@
       <a href="https://www.psi-inc.org/incident-trends" target="_blank" rel="noopener">PSI incident trends</a>
       <a href="https://open.fda.gov/apis/drug/enforcement/" target="_blank" rel="noopener">openFDA recalls</a>
       <a href="https://cal-hacks-13-0.devpost.com/" target="_blank" rel="noopener">Cal Hacks 13.0</a>
+      <a href="/video/pill-pitch.mp4" download>Download the pitch video (12 MB)</a>
     </div>
   </div>
 </footer>

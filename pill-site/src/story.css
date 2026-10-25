@@ -315,3 +315,12 @@
 .pill-divider { padding: clamp(48px, 7vw, 88px) var(--gutter) 0; text-align: center; }
 .pill-divider canvas { display: block; width: min(420px, 80%); height: auto; margin-inline: auto; }
 .pill-divider .caption { margin-top: 6px; }
+
+/* ---------- #film: the portrait pitch video ---------- */
+.film { padding-bottom: clamp(24px, 4vw, 48px); }
+.film .eyebrow, .film .h2 { text-align: center; }
+.film .h2 { margin-bottom: 28px; }
+.film-frame { margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.film-frame video { display: block; height: min(72vh, 1280px); max-width: 100%; aspect-ratio: 720 / 1280; width: auto; object-fit: contain; border-radius: 24px; border: 1px solid rgba(233,238,242,.16); background: #0b0e11; box-shadow: 0 40px 80px -48px rgba(0,0,0,.8); }
+.film-frame .caption { max-width: 560px; text-align: center; color: var(--dark-muted); text-transform: none; letter-spacing: 0; font-family: inherit; font-size: 15px; line-height: 1.5; }
+@media (max-width: 520px) { .film-frame video { height: auto; width: 100%; max-height: 72vh; } }
