@@ -1,0 +1,85 @@
+{
+  "match_names": [
+    "riboflavin",
+    "vitamin b2"
+  ],
+  "label_mg": 1.2,
+  "volume_ml": 150,
+  "analyte_color": "B",
+  "reference_color": "R",
+  "expect_color": true,
+  "t80_max_s": 240,
+  "name": "DEMO riboflavin - quick 60 s (SIMULATED data - not real)",
+  "calibration": {
+    "slope": 0.04277909509462305,
+    "intercept": 0.00030062492224997017,
+    "r2": 1.0,
+    "lod": 0.26,
+    "points": [
+      {
+        "conc_mg_per_l": 0,
+        "A": -0.0001
+      },
+      {
+        "conc_mg_per_l": 2,
+        "A": 0.0861
+      },
+      {
+        "conc_mg_per_l": 4,
+        "A": 0.1714
+      },
+      {
+        "conc_mg_per_l": 8,
+        "A": 0.3431
+      },
+      {
+        "conc_mg_per_l": 12,
+        "A": 0.5132
+      }
+    ]
+  },
+  "reference": {
+    "window_s": 60,
+    "n_runs": 3,
+    "curve": {
+      "t": [
+        15.0,
+        20.0,
+        25.0,
+        30.0,
+        35.0,
+        40.0,
+        45.0,
+        50.0,
+        55.0,
+        60.0
+      ],
+      "A": [
+        0.0875,
+        0.1202,
+        0.1396,
+        0.1608,
+        0.182,
+        0.198,
+        0.2141,
+        0.2278,
+        0.24,
+        0.251
+      ],
+      "sd": [
+        0.0021,
+        0.0014,
+        0.0024,
+        0.0031,
+        0.0017,
+        0.0029,
+        0.0022,
+        0.0019,
+        0.0038,
+        0.0028
+      ]
+    },
+    "tol_frac": 0.25
+  },
+  "notes": "Simulated. Replace with a profile built from 3 of YOUR quick-mode runs before judging."
+}

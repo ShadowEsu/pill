@@ -1,0 +1,13 @@
+{
+  "name": "Riboflavin tablet - REFERENCE (fill from your runs)",
+  "match_names": [
+    "riboflavin",
+    "vitamin b2"
+  ],
+  "analyte_color": "B",
+  "reference_color": "R",
+  "expect_color": true,
+  "volume_ml": 145,
+  "min_run_s": 120,
+  "notes": "Create with the app: Profiles -> 'Build reference from runs' after 3+ runs of a known-good tablet."
+}

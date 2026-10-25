@@ -1,0 +1,59 @@
+{
+  "match_names": [
+    "riboflavin",
+    "vitamin b2"
+  ],
+  "label_mg": 1.2,
+  "volume_ml": 150,
+  "analyte_color": "B",
+  "reference_color": "R",
+  "expect_color": true,
+  "t80_max_s": 240,
+  "name": "DEMO riboflavin - full test (SIMULATED data - not real)",
+  "calibration": {
+    "slope": 0.04277909509462305,
+    "intercept": 0.00030062492224997017,
+    "r2": 1.0,
+    "lod": 0.26,
+    "points": [
+      {
+        "conc_mg_per_l": 0,
+        "A": -0.0001
+      },
+      {
+        "conc_mg_per_l": 2,
+        "A": 0.0861
+      },
+      {
+        "conc_mg_per_l": 4,
+        "A": 0.1714
+      },
+      {
+        "conc_mg_per_l": 8,
+        "A": 0.3431
+      },
+      {
+        "conc_mg_per_l": 12,
+        "A": 0.5132
+      }
+    ]
+  },
+  "reference": {
+    "t80_s": 84.0,
+    "plateau_A": 0.3459,
+    "t80_tol": 0.25,
+    "plateau_tol": 0.2,
+    "n_runs": 3,
+    "t80_runs": [
+      85.0,
+      87.0,
+      80.0
+    ],
+    "plateau_runs": [
+      0.345,
+      0.3483,
+      0.3444
+    ]
+  },
+  "notes": "Simulated. Replace with a profile built from 3 of YOUR full-mode runs before judging."
+}

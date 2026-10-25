@@ -4,3 +4,7 @@ tools/discord-bridge/bridge.log
 discord-inbox/
 .DS_Store
 tools/discord-bridge/.channels.json
+pillgate/app/.venv/
+pillgate/app/data/app.db
+pillgate/app/.env
+pillgate/app/__pycache__/

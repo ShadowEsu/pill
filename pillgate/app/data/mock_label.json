@@ -1,0 +1,3 @@
+{"drug_name": null, "strength": null, "dosage_form": null, "ndc": null,
+ "lot": null, "expiry": null, "manufacturer": null, "quantity": null, "confidence": 0.0,
+ "note": "MOCK MODE - no ANTHROPIC_API_KEY, so the bottle photo was NOT read. Pick a profile by hand or set the key."}
