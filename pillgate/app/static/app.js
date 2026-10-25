@@ -1343,7 +1343,7 @@ function stationSide() {
     <path class="st-lead" d="M224 118 H330"/><text x="306" y="110" class="st-t" text-anchor="end">water line</text>
     <path class="st-lead" d="M282 244 V258"/><text x="300" y="264" class="st-n" text-anchor="end">LED box, low on the wall</text>
     <path class="st-lead" d="M44 198 H10"/><text x="-56" y="194" class="st-t">in-line</text><text x="-56" y="208" class="st-n">sensor A0</text>
-    <path class="st-lead st-lead-in" d="M160 193 V150 H10"/><text x="-56" y="146" class="st-t">90° sensor</text><text x="-56" y="160" class="st-n">A1, facing you</text>
+    <path class="st-lead st-lead-in" d="M160 193 V150 H72"/><path class="st-lead" d="M60 150 H10"/><text x="-56" y="146" class="st-t">90° sensor</text><text x="-56" y="160" class="st-n">A1, facing you</text>
   </svg>`;
 }
 /** Measure's small top view: which sensor this step reads, lit, with its live count beside it. */
