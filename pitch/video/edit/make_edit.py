@@ -17,10 +17,13 @@ CUT_D = 1 / FPS  # a "cut" is a one-frame xfade so the whole chain is one xfade/
 # src in/out in seconds of preston-pitch-raw.mp4; caps = (src_start, src_end, text) from the transcript
 # (gemini-3.5-flash-lite, cross-checked against gemini-2.5-flash), lightly trimmed; join = transition INTO this cut.
 CUTS = [
-    dict(id="C1", name="Hook: what we built is Pill (hardware glow)", src=(44.30, 49.10), fx="glow", join=None,
-         caps=[(44.43, 45.72, "So what we built… it's PILL."), (46.37, 49.04, "Pill is a hardware and software device")]),
+    # J-cut: audio is 0:44.30–0:49.10 throughout; video shows him for `head` s ("So what we built"), then at "it's Pill"
+    # cuts to the station (2:05.10, inside his hardware walk-through: purple chamber + UNO Q board) slowed to 0.75×.
+    dict(id="C1", name="Hook: what we built is Pill (J-cut to hardware glow)", src=(44.30, 49.10), fx="glow", join=None,
+         jcut=dict(head=0.90, src=125.10, speed=0.75),
+         caps=[(44.43, 45.72, "What we built… it's PILL."), (46.37, 49.04, "Pill is a hardware and software device")]),
     dict(id="C2", name="Problem: why pills", src=(8.20, 13.60), fx="grade", join=("fadewhite", 0.25),
-         caps=[(8.31, 9.92, "So why are we talking about pills?"),
+         caps=[(8.31, 9.92, "Why are we talking about pills?"),
                (10.38, 13.44, "Pills go through a very intense process with the FDA.")]),
     dict(id="C3", name="Problem: pharmacy shelf, aspirin bottle", src=(13.80, 23.25), fx="grade", join=("cut", CUT_D),
          caps=[(13.92, 18.53, "They go through this process several times before a normal pharmacy,"),
@@ -44,13 +47,13 @@ CUTS = [
                (117.87, 124.39, "Red, blue and white lights, and a photoresistor at the back.")]),
     dict(id="C10", name="Box: three colours, one measurement", src=(128.70, 133.50), fx="punch", join=("cut", CUT_D),
          caps=[(128.82, 133.34, "We use these three colors to find a good measurement.")]),
-    dict(id="C11", name="Result: Unable to verify", src=(164.00, 178.50), fx="grade", join=("smoothleft", 0.22),
+    dict(id="C11", name="Result: Unable to verify", src=(164.00, 170.20), fx="grade", join=("smoothleft", 0.22),
          caps=[(164.12, 167.39, "As the timer runs out, it's going to check."),
-               (168.12, 170.16, "And oh no: UNABLE TO VERIFY."),
-               (170.38, 172.41, "Because I put morphine in here instead of aspirin."),
-               (173.31, 174.27, "So watch out."),
-               (176.00, 177.26, "Please swallow the right pills."),
-               (177.73, 178.34, "Thank you.")]),
+               (168.12, 170.16, "And oh no: UNABLE TO VERIFY.")]),
+    dict(id="C12", name="Close: swallow the right pills", src=(173.30, 178.45), fx="grade", join=("cut", CUT_D),
+         caps=[(173.31, 174.27, "So watch out."),
+               (175.74, 177.50, "Please swallow the right pills."),
+               (177.73, 178.40, "Thank you.")]),
 ]
 END_JOIN = ("fadeblack", 0.45)
 EMPHASIS = {"PILL", "UNABLE", "TO", "VERIFY"}  # rendered in Instrument Serif italic, larger
@@ -62,16 +65,16 @@ STK = {'answer-passed': (900, 204, 62, 410), 'answer-lab': (900, 204, 62, 410), 
        'arrow': (500, 500, 262, 262)}
 # pop-ups: (cut id or "END", src time (or seconds into end card), sticker, on-screen width, x, y, dur, alpha)
 POPS = [
-    ("C1", 44.45, "ring", 980, 50, 560, 4.4, 1.0),
+    ("C1", 45.25, "ring", 980, 50, 560, 3.8, 1.0),
     ("C3", 19.90, "pill", 300, 720, 330, 3.2, 1.0),
     ("C5", 56.00, "chip-box", 640, 60, 300, 7.2, 1.0),
     ("C5", 56.80, "chip-explains", 520, 480, 480, 6.4, 1.0),
     ("C6", 74.80, "arrow", 360, 640, 760, 2.6, 1.0),
     ("C8", 104.30, "ring", 900, 90, 620, 3.2, 1.0),
     ("C9", 112.60, "chip-unoq", 600, 240, 300, 6.0, 1.0),
-    ("C11", 168.10, "answer-passed", 760, 160, 300, 5.6, 0.45),
-    ("C11", 168.25, "answer-lab", 760, 160, 480, 5.45, 0.45),
-    ("C11", 168.40, "answer-unable", 860, 110, 660, 5.3, 1.0),
+    ("C11", 168.10, "answer-passed", 760, 160, 300, 4.6, 0.45),
+    ("C11", 168.25, "answer-lab", 760, 160, 480, 4.45, 0.45),
+    ("C11", 168.40, "answer-unable", 860, 110, 660, 4.3, 1.0),
     ("END", 0.30, "pill", 420, 330, 360, 3.7, 1.0),
     ("END", 0.90, "chip-402", 860, 110, 1240, 3.1, 1.0),
 ]
@@ -142,7 +145,7 @@ for k, (a, b, body) in enumerate(groups):  # one caption position: a group ends 
     events.append(f"Dialogue: 1,{ass_t(a)},{ass_t(b)},Cap,,0,0,0,,{body}")
 
 # hook title: giant serif "Pill" with soft purple glow (layer 0 = blurred halo, layer 1 = ink on paper)
-hk0 = to_out("C1", 45.05)
+hk0 = CUTS[0]["jcut"]["head"]  # lands on the cut to the hardware ("it's Pill")
 for layer, tags in ((0, rf"\bord26\blur14\3c{PURPLE}\1c{PURPLE}\alpha&H40&"), (2, rf"\bord10\blur1\3c{PAPER}\1c{INK}")):
     events.append(f"Dialogue: {layer},{ass_t(hk0)},{ass_t(CUTS[0]['dur'] - 0.1)},Hook,,0,0,0,,"
                   r"{\an5\pos(540,420)\fad(60,120)\fscx40\fscy40\t(0,140,\fscx118\fscy118)\t(140,260,\fscx100\fscy100)\frz-4"
@@ -182,18 +185,23 @@ NC = len(CUTS)
 iEND, iSIL, iMUS = NC, NC + 1, NC + 2
 inputs += [f'-f lavfi -t {END_DUR} -i "color=c=0xF4EFE6:s={W}x{H}:r={FPS}"',
            f'-f lavfi -t {END_DUR} -i "anullsrc=r=48000:cl=stereo"', '-i "$MUSIC"']
+iHW = NC + 3  # the hook's hardware shot (J-cut video)
+JC = CUTS[0]["jcut"]
+inputs.append(f'-ss {JC["src"]:.3f} -t {(CUTS[0]["dur"] - JC["head"]) * JC["speed"]:.3f} -i "$SRC"')
 GRADE = "eq=contrast=1.05:saturation=1.10:gamma=1.04"
 BASE = f"fps={FPS},scale={W}:{H}:flags=lanczos,setsar=1"
 for i, c in enumerate(CUTS):
-    if c["fx"] == "glow":
-        fc.append(f"[{i}:v]fps={FPS},scale={2 * W}:{2 * H}:flags=bicubic,"
+    if c["fx"] == "glow":  # head on the speaker (graded), then the slowed hardware shot with glow + push-in + vignette
+        fc.append(f"[{i}:v]trim=0:{JC['head']:.3f},setpts=PTS-STARTPTS,{BASE},{GRADE},format=yuv420p,settb=1/{FPS}[hd]")
+        fc.append(f"[{iHW}:v]setpts=(PTS-STARTPTS)/{JC['speed']},fps={FPS},scale={2 * W}:{2 * H}:flags=bicubic,"
                   f"zoompan=z='min(1+0.0030*on\\,1.30)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s={W}x{H}:fps={FPS},"
                   f"setsar=1,format=gbrp,split=3[h0][h1][h2]")
         fc.append("[h1]gblur=sigma=34,colorchannelmixer=rr=0.85:gg=0.62:bb=1.30[hg]")
         fc.append("[h2]edgedetect=low=0.06:high=0.18:mode=wires,negate,gblur=sigma=1.1[he]")
         fc.append("[h0][hg]blend=all_mode=screen:all_opacity=0.62[hs]")
         fc.append("[hs][he]blend=all_mode=multiply:all_opacity=0.35[hc]")
-        fc.append(f"[hc]eq=contrast=1.14:saturation=1.30,vignette=angle=PI/3.2,format=yuv420p,settb=1/{FPS}[v{i}]")
+        fc.append(f"[hc]eq=contrast=1.14:saturation=1.30,vignette=angle=PI/3.2,format=yuv420p,settb=1/{FPS}[hw]")
+        fc.append(f"[hd][hw]concat=n=2:v=1:a=0,trim=0:{c['dur']:.3f},settb=1/{FPS}[v{i}]")
     elif c["fx"] == "punch":  # static 8% punch-in ("zoom cut")
         fc.append(f"[{i}:v]fps={FPS},scale={round(W * 1.08 / 2) * 2}:{round(H * 1.08 / 2) * 2}:flags=lanczos,"
                   f"crop={W}:{H},setsar=1,{GRADE},format=yuv420p,settb=1/{FPS}[v{i}]")
@@ -215,7 +223,7 @@ vcur = pv
 # pop-up stickers
 pop_inputs = []
 for j, (cid, st, name, wd, x, y, dur, alpha) in enumerate(POPS):
-    idx = iMUS + 1 + j
+    idx = iHW + 1 + j
     T0 = round(to_out(cid, st), 3)
     cw, ch, ox, oy = STK[name]
     pop_inputs.append(f'-loop 1 -framerate {FPS} -t {dur:.2f} -i stickers/{name}.png')
@@ -294,9 +302,9 @@ cues = []
 for c in CUTS:
     for (s0, s1, text) in c["caps"]:
         cues.append((max(c["out"], to_out(c["id"], s0)), min(c["out"] + c["dur"], to_out(c["id"], s1)), text))
-cues.append((END_START + 0.4, TOTAL, "pill-site.vercel.app"))
+cues.append((END_START + 0.9, TOTAL, "pill-site.vercel.app"))
 with open(os.path.join(HERE, "captions.srt"), "w") as f:
     for k, (a, b, text) in enumerate(cues, 1):
         nxt = cues[k][0] if k < len(cues) else TOTAL
-        b = min(max(b, a + 0.85), nxt)  # >= 0.85 s where the gap allows, never overlapping the next cue
+        b = min(max(b, a + 0.9), nxt)  # >= 0.9 s where the gap allows, never overlapping the next cue
         f.write(f"{k}\n{srt_t(a)} --> {srt_t(b)}\n{wrap(text)}\n\n")
