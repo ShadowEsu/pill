@@ -1463,7 +1463,7 @@ route(/^\/station$/, (v) => {
     ["cup", "Cup of water", "A clear plastic cup of clean water fills the beam. The station checks the water is steady before the tablet goes in."],
     ["station", "Lid", "Flat, with one small hole. Closed, it keeps the inside dark; lift it only to drop the tablet in and stir."],
   ];
-  v.innerHTML = `${head({ eyebrow: "Hardware", title: "The station", tone: "violet", back: "#/", side: `<div class="row wrap" style="gap:8px">${deviceChip()}<span class="chip"><span class="dot"></span>lines read&nbsp;<span class="mono" data-lines>–</span></span></div>` })}
+  v.innerHTML = `${head({ eyebrow: "Hardware", title: "The station", tone: "violet", back: "#/", side: `<span class="chip"><span class="dot"></span>lines read&nbsp;<span class="mono" data-lines>–</span></span>` })}
     <figure class="card st-hero rise"><img src="/static/photos/station-19.webp" alt="The real station: a purple printed chamber with a cup of water inside, the LED box on its side with the blue LED lit, wired to the board" width="1067" height="1172">
       <figcaption><b>The real build.</b> Purple printed chamber, cup of clean water inside, LED box on the wall with the blue LED on.</figcaption></figure>
     <div class="wide-2">

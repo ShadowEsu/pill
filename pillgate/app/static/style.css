@@ -488,7 +488,7 @@ body.easy .chip { border-color: var(--line-2); }
 .st-hero img { width: 100%; height: auto; max-height: 520px; object-fit: cover; object-position: 50% 62%; display: block; }
 .st-hero figcaption { padding: 12px 16px; font-size: 14px; color: var(--ink-2); }
 .st-hero figcaption b { color: var(--ink); }
-@media (min-width: 900px) { .st-hero { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: end; } .st-hero img { max-height: 440px; } .st-hero figcaption { padding: 22px; font-size: 16px; } }
+@media (min-width: 900px) { .st-hero img { max-height: 460px; object-position: 50% 74%; } .st-hero figcaption { padding: 14px 22px; font-size: 16px; } }
 .parts { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
 @media (min-width: 900px) { .parts { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; } }
 .parts li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; align-items: start; padding: 10px 0; border-top: 1px solid var(--line); }
