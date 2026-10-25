@@ -159,7 +159,7 @@
 .fs-card b { font-size: 15px; font-weight: 600; color: var(--ink); }
 .fs-card b.mono { font-family: var(--mono); font-size: 14px; }
 .fs-card span { font-size: 13px; line-height: 1.4; color: var(--ink-2); }
-.fs-chipcard { border-radius: 999px; font-family: var(--mono); }
+.fs-chipcard { border-radius: 14px; font-family: var(--mono); }
 .fs-chipcard span { font-family: var(--mono); font-size: 12px; }
 .fs-dash { border-style: dashed; }
 .fs-station { background: rgba(124, 110, 230, 0.18); }
@@ -175,7 +175,7 @@
 .fs-via { margin: 8px 0 0; font-family: var(--mono); font-size: 12px; color: var(--ink); }
 .fs-via--big { margin: 6px 0; text-align: center; font-size: 18px; }
 .fs-chips { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
-.fs-chips li { padding: 6px 10px; border: 1px solid var(--ink); border-radius: 999px; font-size: 13px; color: var(--ink); background: #fff; }
+.fs-chips li { padding: 6px 10px; border: 1px solid var(--ink); border-radius: 14px; font-size: 13px; color: var(--ink); background: #fff; }
 .fs-chips small { color: var(--ink-2); font-size: 12px; }
 .fl-models { width: 100%; margin-top: 28px; border-collapse: collapse; font-size: 14px; line-height: 1.45; }
 .fl-models caption { text-align: left; font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); padding-bottom: 8px; }
@@ -186,6 +186,7 @@
 @media (max-width: 700px) {
   .fl-models, .fl-models tbody, .fl-models tr, .fl-models td, .fl-models tbody th { display: block; width: 100%; }
   .fl-models thead { display: none; }
+  .fl-models caption { display: block; width: 100%; }
   .fl-models tr { border-top: 1px solid var(--ink); padding: 8px 0; }
   .fl-models td, .fl-models tbody th { border-top: 0; padding: 4px 0; white-space: normal; }
   .fl-models td:nth-of-type(1)::before { content: "Does: "; font-weight: 600; }

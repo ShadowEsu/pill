@@ -272,7 +272,7 @@
 .hero-draw svg { display: block; width: 100%; height: 100%; }
 .hero-photo .caption { margin-top: 12px; text-align: center; }
 @media (max-width: 960px) {
-  .hero-photo { order: -1; max-width: 520px; margin-inline: auto; width: 100%; }
+  .hero-photo { max-width: 520px; margin-inline: auto; width: 100%; }
   .hero-draw { left: 10px; bottom: 44px; width: 34%; }
 }
 

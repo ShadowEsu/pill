@@ -496,6 +496,11 @@ export function mountStation(host, opts = {}) {
     return { L, g, t, t1, t2, t3, anchors, leaders, dots, end, typed: -1 };
   });
   host.appendChild(svg);
+  // phones hide the SVG labels (the numbered list under the figure carries them), so frame the assembly alone
+  const narrow = typeof matchMedia === 'function' ? matchMedia('(max-width: 700px)') : null;
+  const frameView = () => svg.setAttribute('viewBox', narrow && narrow.matches ? '250 150 700 520' : `0 0 ${VB_W} ${VB_H}`);
+  frameView();
+  if (narrow) narrow.addEventListener('change', frameView);
 
   const st = {
     yaw: 0, elev: 0, zoom: 1, panX: 0, panY: -70,
@@ -705,6 +710,7 @@ export function mountStation(host, opts = {}) {
       destroyed = true;
       if (amb) cancelAnimationFrame(amb);
       if (io) io.disconnect();
+      if (narrow) narrow.removeEventListener('change', frameView);
       tl.pause();
       svg.remove();
       host.classList.remove('station', 'station--static');

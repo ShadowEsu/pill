@@ -44,19 +44,19 @@ function railSvg() {
   return `
   <svg class="rail-svg" viewBox="0 0 640 230" role="img" aria-label="Clinic wallet, Pill escrow and supplier wallet, with the amount moving between them by verdict">
     <g class="w1"><rect class="node" x="10" y="60" width="180" height="110" rx="16"/>
-      <text class="lbl" x="28" y="92">Clinic</text><text class="sub" x="28" y="110">wallet · USDC on Base</text>
+      <text class="lbl" x="28" y="92">Clinic</text><text class="sub" x="28" y="110">pill-clinic · invoice units</text>
       <text class="amt" x="28" y="150" id="rail-clinic">8,760.00</text></g>
     <g class="w2"><rect class="node escrow" id="rail-escrow-node" x="230" y="60" width="180" height="110" rx="16"/>
       <text class="lbl" x="248" y="92">Pill escrow</text><text class="sub" x="248" y="110" id="rail-escrow-sub">holds until verdict + tap</text>
       <text class="amt" x="248" y="150" id="rail-escrow">1,240.00</text></g>
     <g class="w3"><rect class="node" x="450" y="60" width="180" height="110" rx="16"/>
-      <text class="lbl" x="468" y="92">Supplier</text><text class="sub" x="468" y="110">wallet · USDC on Base</text>
+      <text class="lbl" x="468" y="92">Supplier</text><text class="sub" x="468" y="110">pill-supplier · invoice units</text>
       <text class="amt" x="468" y="150" id="rail-supplier">0.00</text></g>
     <path class="wire" id="wire-a" d="M190 115 H230"/>
     <path class="wire" id="wire-b" d="M410 115 H450"/>
     <g id="rail-token" opacity="0"><circle class="token" cx="0" cy="0" r="13"/><text class="token-lbl" y="3">USDC</text></g>
     <text class="sub" x="10" y="205">delivery logged → clinic pays into escrow → tablet tested → policy decides → pharmacist taps</text>
-    <text class="sub" x="10" y="222">illustration · simulated, nothing moves · Base Sepolia once a CDP key is in</text>
+    <text class="sub" x="10" y="222">illustration in invoice units · on chain ×0.0001 test USDC · simulated, nothing moves</text>
   </svg>`;
 }
 

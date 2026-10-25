@@ -126,7 +126,9 @@ button { font: inherit; }
 .callout .h3 { margin-top: 8px; }
 @media (max-width: 560px) { .facts > div { grid-template-columns: 1fr; } .facts .src { grid-column: 1; } }
 .stage-head { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 28px; }
-.stage-labels { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px 32px; margin-top: 36px; }
+.stage-labels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 32px; margin-top: 36px; }
+@media (max-width: 900px) { .stage-labels { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .stage-labels { grid-template-columns: 1fr; } }
 .stage-labels div { border-top: 1px solid var(--dark-line); padding-top: 12px; }
 .stage-labels .caption { color: var(--dark-muted); }
 .stage-labels p { font-size: 15px; color: var(--dark-text); opacity: .85; margin-top: 6px; }
