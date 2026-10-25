@@ -523,6 +523,248 @@ route(/^\/$/, async (v) => {
     <p class="disclaimer">${esc(DISCLAIMER)} If the result is not "Passed the screen", show it to a pharmacist.</p>`;
 });
 
+// ================================================================ check flow: shared pieces
+const STEPS = ["Bottle", "Tablet", "Measure", "Result"];
+const stepsRail = (on) => `<ol class="steps" aria-label="Check steps">${STEPS.map((s, i) => `<li class="${i < on ? "done" : i === on ? "on" : ""}"${i === on ? ' aria-current="step"' : ""}><i></i>${s}</li>`).join("")}</ol>`;
+function viewfinderPage(v, { key, step, title, eyebrow, tone, tips, next, back, hint }) {
+  const has = !!S.check[key];
+  v.innerHTML = `${head({ eyebrow, title, tone, back })}${stepsRail(step)}
+    <div class="vf-wrap">
+      <label class="vf${has ? " has-photo" : ""}" for="file-${key}">
+        <input type="file" accept="image/*" capture="environment" id="file-${key}">
+        ${has ? `<img alt="Your photo" src="${esc(S.check[key + "Url"])}">` : ""}
+        <span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span>
+        <span class="scan" aria-hidden="true"></span>
+        <span class="vf-hint"><span class="eyebrow">Tap to open the camera</span><b>${esc(hint)}</b></span>
+        ${has ? `<span class="chip ok vf-tag"><span class="dot"></span>photo ready</span>` : ""}
+      </label>
+      <section class="card stack tone-${tone}">
+        <ul class="tips">${tips.map((t) => `<li><span>${t}</span></li>`).join("")}</ul>
+        <div class="actions">
+          <label class="btn ghost" for="file-${key}">${has ? "Retake" : "Take or choose a photo"}</label>
+          <a class="btn" href="#${next}" id="vf-next">${has ? "Use this photo" : "Next"}</a>
+        </div>
+        <button type="button" class="btn ghost sm" id="vf-skip" style="align-self:flex-start">Skip this photo</button>
+      </section>
+    </div>
+    <p class="disclaimer">${esc(DISCLAIMER)}</p>`;
+  v.querySelector(`#file-${key}`).addEventListener("change", (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    if (S.check[key + "Url"]) URL.revokeObjectURL(S.check[key + "Url"]);
+    S.check[key] = f; S.check[key + "Url"] = URL.createObjectURL(f);
+    viewfinderPage(v, { key, step, title, eyebrow, tone, tips, next, back, hint });
+  });
+  v.querySelector("#vf-skip").onclick = () => {
+    if (S.check[key + "Url"]) URL.revokeObjectURL(S.check[key + "Url"]);
+    S.check[key] = null; S.check[key + "Url"] = ""; location.hash = "#" + next;
+  };
+}
+
+// ================================================================ 3. Bottle
+route(/^\/check\/bottle$/, (v) => viewfinderPage(v, {
+  key: "bottle", step: 0, tone: "sky", eyebrow: "Step 1 of 4 · the bottle", title: "Photograph the bottle", hint: "Label facing the camera",
+  back: mode() === "check" ? null : "#/", next: "/check/tablet",
+  tips: ["Label facing the camera, the whole label in the frame.", "Drug name, strength, lot and expiry are read from it.",
+         "<b>Privacy:</b> personal details (your name, pharmacy, Rx number) are removed before anything is stored."],
+}));
+
+// ================================================================ 4. Tablet
+route(/^\/check\/tablet$/, (v) => viewfinderPage(v, {
+  key: "imprint", step: 1, tone: "mint", eyebrow: "Step 2 of 4 · one tablet", title: "Photograph one tablet", hint: "One tablet, imprint up",
+  back: "#/check/bottle", next: "/check/measure",
+  tips: ["One tablet on a plain background, close up.", "The imprint (letters or numbers stamped on it) should be readable.",
+         "Marked on both sides? Photograph the side with more marks first; the photo describes imprint, colour and shape, it does not guess the drug."],
+}));
+
+// ================================================================ 5. Measure (the guided run as a phase rail)
+const LINE = { A_B: "#4FB3FF", A_W: "#9AA0A6", A_G: "#5FD39A", A_R: "#E09A3A", A_side: "#7A5CFF", A_specific: "#16181B" };
+const SERIES = [["A_B", "blue"], ["A_W", "white"], ["A_G", "green"], ["A_R", "red (reference)"], ["A_side", "cloudiness (side sensor)"], ["A_specific", "colour only (blue − red)"]];
+const checkpointPlugin = {
+  id: "checkpoints",
+  afterDatasetsDraw(chart, _a, opts) {
+    const xs = opts && opts.at; if (!xs || !xs.length) return;
+    const { ctx, chartArea: a, scales: { x } } = chart;
+    ctx.save(); ctx.strokeStyle = "rgba(22,24,27,.16)"; ctx.setLineDash([2, 3]); ctx.fillStyle = "#16181B";
+    xs.forEach((t) => { const px = x.getPixelForValue(t); if (px < a.left || px > a.right) return; ctx.beginPath(); ctx.moveTo(px, a.top); ctx.lineTo(px, a.bottom); ctx.stroke(); ctx.beginPath(); ctx.arc(px, a.top + 3, 2.2, 0, Math.PI * 2); ctx.fill(); });
+    ctx.restore();
+  },
+};
+function makeChart(canvas, { checkpoints = null, xTitle = "seconds after tablet in" } = {}) {
+  if (!window.Chart) return null;
+  const mono = { family: "JetBrains Mono, ui-monospace, Menlo, monospace", size: 10.5 };
+  return new Chart(canvas, {
+    type: "line", data: { datasets: [] }, plugins: [checkpointPlugin],
+    options: {
+      animation: false, maintainAspectRatio: false, parsing: false, normalized: true,
+      scales: {
+        x: { type: "linear", title: { display: true, text: xTitle, color: "#7C8188", font: mono }, ticks: { color: "#7C8188", font: mono }, grid: { color: "rgba(22,24,27,.06)" }, border: { color: "rgba(22,24,27,.12)" } },
+        y: { title: { display: true, text: "absorbance", color: "#7C8188", font: mono }, ticks: { color: "#7C8188", font: mono }, grid: { color: "rgba(22,24,27,.06)" }, border: { color: "rgba(22,24,27,.12)" } },
+      },
+      plugins: { legend: { labels: { color: "#16181B", boxWidth: 10, boxHeight: 2, padding: 8, font: { family: "Inter, system-ui, sans-serif", size: 11 } } }, checkpoints: { at: checkpoints }, tooltip: { enabled: false } },
+      elements: { point: { radius: 0 }, line: { borderWidth: 2, tension: 0.25 } },
+    },
+  });
+}
+function setCurve(chart, curve, extra = []) {
+  if (!chart) return;
+  const t = curve.t || [];
+  chart.data.datasets = SERIES.filter(([k]) => curve[k]).map(([k, label]) => ({
+    label: k === "A_specific" && curve.signal === "cloud" ? "cloudiness (red light)" : k === "A_specific" && curve.signal === "scatter" ? "cloudiness (side sensor)" : label,
+    borderColor: LINE[k], backgroundColor: LINE[k], borderDash: k === "A_specific" ? [6, 4] : [],
+    data: t.map((x, i) => ({ x, y: curve[k][i] })).filter((p) => p.y !== null && p.y !== undefined),
+  })).concat(extra);
+  chart.update();
+}
+const tickSvg = `<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.4l2.3 2.3 4.7-5" pathLength="1"/></svg>`;
+const ringHtml = (id, color) => `<div class="ring" id="${id}" style="--rc:${color}"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="track" cx="60" cy="60" r="52"/><circle class="glow" cx="60" cy="60" r="52" pathLength="100" stroke-dashoffset="100"/><circle class="val" cx="60" cy="60" r="52" pathLength="100" stroke-dashoffset="100"/></svg><div class="ring-txt"><span class="num">0</span><small></small></div></div>`;
+function setRing(el, frac, big, small) {
+  if (!el) return;
+  const off = String(100 - Math.max(0, Math.min(1, frac)) * 100);
+  el.querySelectorAll(".val, .glow").forEach((c) => c.setAttribute("stroke-dashoffset", off));
+  el.querySelector(".num").textContent = big; el.querySelector("small").textContent = small;
+}
+const PHASES = [["prep", "Prepare", "checks"], ["water", "Water", null], ["add", "Tablet in", "≈ 10 s"], ["dissolve", "Dissolving", null], ["stop", "Result", "auto"]];
+const PHASE_INDEX = { idle: 0, water: 1, add: 2, dissolving: 3, analyzing: 4 };
+const PHASE_TITLE = { idle: "Prepare", water: "Clean water", add: "Add the tablet", dissolving: "Dissolving", analyzing: "Analyzing" };
+
+route(/^\/check\/measure$/, async (v) => {
+  const T = S.config.timing;
+  const [profiles, runs] = await Promise.all([api("/api/profiles").catch(() => []), api("/api/runs").catch(() => [])]);
+  const usable = profiles.filter((p) => p.calibration || p.reference);
+  let chart = null, countdown = null;
+  const dissolveLabel = () => (S.check.runMode === "quick" ? `${T.quick_s} s` : `${mmss(T.min_s)}–${mmss(T.max_s)}`);
+  v.innerHTML = `<div id="m-head"></div>${stepsRail(2)}
+    <section class="card rail" aria-label="Run phases">
+      <div class="rail-top"><span class="row" style="gap:12px;align-items:baseline"><span class="eyebrow" id="r-n"></span><span class="serif" id="r-name"></span></span>
+        <span class="mono small" id="r-time"></span></div>
+      <ol class="rail-list" id="r-list"></ol>
+    </section>
+    <div class="wide-2">
+      <section class="card scene" id="scene" aria-live="polite"></section>
+      <div class="stack">
+        <section class="card stack" id="chart-card" hidden>
+          <div class="row between"><h2 class="h">Live curve</h2><span class="chip live beat"><span class="dot"></span>recording</span></div>
+          <div class="chartbox"><canvas id="live-chart"></canvas></div>
+          <p class="legend-note">Absorbance (0 = clear water). Blue rising faster than red means colour; the violet side-sensor line rises when the water turns cloudy (white tablets like aspirin).${S.check.runMode === "quick" ? " Dots mark the 12 checkpoints compared with the reference." : ""}</p>
+        </section>
+        <section class="card stack">
+          <div class="row between wrap"><h2 class="h">Device</h2>${deviceChip()}</div>
+          <dl class="live-stats"><div><dt>seconds</dt><dd id="l-sec">–</dd></div><div><dt>samples</dt><dd id="l-n">–</dd></div><div><dt>lines read</dt><dd data-lines>–</dd></div></dl>
+          <p class="footnote" id="l-in"></p>
+        </section>
+        <details class="card alt">
+          <summary>No live connection? Paste data or reuse a run</summary>
+          <div class="stack">
+            <textarea id="paste" rows="5" placeholder="Paste the Arduino Serial Monitor text here (Ctrl+A, Ctrl+C in the Serial Monitor)"></textarea>
+            <button type="button" class="btn ghost sm" id="btn-paste">Use pasted data</button>
+            <select id="old-run" aria-label="Saved run"><option value="">…or pick a saved run</option>${runs.map((r) => `<option value="${esc(r.id)}">${esc(r.label)} · ${r.samples} samples · ${esc(r.id)}</option>`).join("")}</select>
+            <button type="button" class="btn ghost sm" id="btn-old">Use this run</button>
+          </div>
+        </details>
+      </div>
+    </div>
+    <p class="disclaimer">${esc(DISCLAIMER)}</p>`;
+
+  const drawRail = () => {
+    const i = PHASE_INDEX[Run.phase];
+    $("m-head").innerHTML = head({ eyebrow: "Step 3 of 4 · measure", title: PHASE_TITLE[Run.phase], tone: ["mint", "sky", "violet", "sky", "grey"][i], back: Run.recording ? null : "#/check/tablet" });
+    $("r-n").textContent = `${i + 1} of 5`; $("r-name").textContent = PHASE_TITLE[Run.phase];
+    $("r-list").innerHTML = PHASES.map(([k, name, tm], j) => `<li class="p-${k} ${j < i ? "done" : j === i ? "on" : ""}"${j === i ? ' aria-current="step"' : ""}>
+      <span class="bar">${j < i ? tickSvg : ""}</span><span class="nm">${name}</span><span class="tm">${tm || (k === "water" ? `${T.blank_s} s` : dissolveLabel())}</span></li>`).join("");
+  };
+  const scene = $("scene");
+  const drawScene = () => {
+    clearInterval(countdown);
+    const p = Run.phase;
+    $("chart-card").hidden = p !== "dissolving";
+    if (p !== "dissolving" && chart) { chart.destroy(); chart = null; }
+    if (p === "idle") {
+      scene.innerHTML = `${glyph("cup", 84)}
+        <p class="serif big">Clean water first</p>
+        <p class="lead">Fill the clear cup with clean water to the marked line, put it in the chamber and close the lid. Then press <b>Start</b>.</p>
+        <div class="mode-pick" role="group" aria-label="Test length" style="width:100%;max-width:520px">
+          <button type="button" class="mode-opt" data-run="quick" aria-pressed="${S.check.runMode === "quick"}"><b>Quick · ${T.quick_s} s</b><small>${T.quick_s} s after the tablet goes in</small></button>
+          <button type="button" class="mode-opt" data-run="full" aria-pressed="${S.check.runMode === "full"}"><b>Full · ${mmss(T.min_s)}–${mmss(T.max_s)}</b><small>stops when the curve flattens</small></button>
+        </div>
+        <label class="field" style="width:100%;max-width:520px;text-align:left">Product profile
+          <select id="profile"><option value="">Auto-match from the bottle label${S.config.ai ? "" : " (needs the AI key)"}</option>
+          ${usable.map((p) => `<option value="${esc(p.id)}"${p.id === S.check.profileId ? " selected" : ""}>${p.demo ? "[DEMO - simulated] " : ""}${esc(p.name)}${p.mode === "any" ? "" : " · " + esc(p.mode)}</option>`).join("")}</select></label>
+        ${S.config.ai ? "" : `<p class="banner note" style="max-width:520px;text-align:left">AI is in mock mode on this server: the photos are not read and the profile can't be matched automatically, so pick one here.</p>`}
+        <div class="row wrap" style="justify-content:center">
+          <span class="chip ${S.check.bottle ? "ok" : ""}"><span class="dot"></span>bottle ${S.check.bottle ? "photo ready" : "skipped"}</span>
+          <span class="chip ${S.check.imprint ? "ok" : ""}"><span class="dot"></span>tablet ${S.check.imprint ? "photo ready" : "skipped"}</span>
+        </div>
+        <button type="button" class="btn" id="btn-start" style="min-width:220px">Start</button>`;
+      scene.querySelectorAll("[data-run]").forEach((b) => (b.onclick = () => { S.check.runMode = b.dataset.run; drawRail(); drawScene(); }));
+      $("profile").onchange = (e) => (S.check.profileId = e.target.value);
+      $("btn-start").onclick = async (e) => { e.target.disabled = true; try { await Run.start(); } catch (err) { toast("Could not start: " + err.message); e.target.disabled = false; } };
+    }
+    if (p === "water") {
+      scene.innerHTML = `${ringHtml("ring", "var(--sky)")}<p class="serif big">Checking the water…</p>
+        <p class="lead" id="w-text">Keep the lid closed and don't touch the box.</p><ul class="checks" id="w-checks"></ul>
+        <div class="row wrap" style="justify-content:center"><button type="button" class="btn hidden" id="btn-anyway">Continue anyway</button><button type="button" class="btn ghost" id="btn-cancel">Cancel</button></div>`;
+      setRing($("ring"), 0, "0", `of ${T.blank_s} s steady`);
+      if (Run.slow) { $("w-text").innerHTML = "Still not steady after a minute. Check the lid is closed and nothing moves, or press <b>Continue anyway</b> (the result may be less reliable)."; $("btn-anyway").classList.remove("hidden"); }
+      $("btn-anyway").onclick = () => Run.tabletIn();
+    }
+    if (p === "add") {
+      scene.innerHTML = `${ringHtml("ring", "var(--violet)")}<p class="serif big">Add the tablet now</p>
+        <p class="lead">Water looks good. <b>Lift the lid, drop the tablet in the middle, stir 5 slow circles with the stick, take the stick out and close the lid, all within about 10 seconds.</b> Then press <b>Continue</b> right away.</p>
+        <div class="row wrap" style="justify-content:center"><button type="button" class="btn" id="btn-continue" style="min-width:240px">Tablet is in · Continue</button><button type="button" class="btn ghost" id="btn-cancel">Cancel</button></div>`;
+      $("ring").classList.add("pulse");
+      const t0 = Date.now();
+      const step = () => { const left = Math.max(0, 10 - (Date.now() - t0) / 1000); setRing($("ring"), left / 10, String(Math.ceil(left)), left > 0 ? "seconds" : "press Continue"); };
+      step(); countdown = setInterval(step, 200);
+      $("btn-continue").onclick = (e) => { e.target.disabled = true; Run.tabletIn().catch((err) => { toast(err.message); e.target.disabled = false; }); };
+    }
+    if (p === "dissolving") {
+      scene.innerHTML = `${ringHtml("ring", "var(--sky-ink)")}<p class="serif big">Dissolving…</p><p class="lead" id="d-text">Keep the lid closed.</p>
+        <div class="row wrap" style="justify-content:center">${S.check.runMode === "full" ? `<button type="button" class="btn" id="btn-stop">Stop now &amp; analyze</button>` : ""}<button type="button" class="btn ghost" id="btn-cancel">Cancel</button></div>`;
+      setRing($("ring"), 0, "0:00", S.check.runMode === "quick" ? `of ${mmss(T.quick_s)}` : "elapsed");
+      if ($("btn-stop")) $("btn-stop").onclick = () => Run.finish();
+      if (!chart) chart = makeChart($("live-chart"), { checkpoints: S.check.runMode === "quick" ? Array.from({ length: Math.round(T.quick_s / 5) }, (_, k) => (k + 1) * 5) : null });
+    }
+    if (p === "analyzing") {
+      scene.innerHTML = `<div class="ring pulse" style="--rc:var(--ink)"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="track" cx="60" cy="60" r="52"/></svg><div class="ring-txt"><span class="tick run" style="width:34px;height:34px;justify-self:center"></span></div></div>
+        <p class="serif big">Building your result</p><p class="lead">The run is saved; the photos and the curve are being checked.</p>`;
+    }
+    const c = $("btn-cancel"); if (c) c.onclick = () => Run.cancel();
+  };
+  const onPhase = () => { drawRail(); drawScene(); };
+  Run.listeners.add(onPhase); S.leave.push(() => { Run.listeners.delete(onPhase); clearInterval(countdown); if (chart) chart.destroy(); });
+  onPhase();
+
+  S.onLive = (d) => {
+    const l = d.live, g = d.guide;
+    if (l && l.curve) { $("l-sec").textContent = Math.round(l.seconds); $("l-n").textContent = l.samples; }
+    $("l-in").textContent = Run.phase === "dissolving" && l && l.tablet_in_at_s ? `tablet in at ${Math.round(l.tablet_in_at_s)} s into the recording` : "";
+    if (!g) return;
+    if (Run.phase === "water" && g.phase === "water") {
+      $("w-checks").innerHTML = (g.checks || []).map((c) => `<li><span class="tick ${c.ok ? "ok" : "wait"}">${c.ok ? tickSvg : ""}</span><span>${esc(c.message)}</span></li>`).join("");
+      setRing($("ring"), (g.steady_s || 0) / (g.needed || T.blank_s), String(Math.floor(g.steady_s || 0)), `of ${g.needed || T.blank_s} s steady`);
+    }
+    if (Run.phase === "dissolving" && g.phase === "dissolving") {
+      const e = g.elapsed_s || 0;
+      if (g.mode === "quick") {
+        const q = g.quick_s || T.quick_s;
+        setRing($("ring"), e / q, mmss(e), `of ${mmss(q)}`);
+        $("d-text").innerHTML = `Keep the lid closed. <b>${mmss(e)} of ${mmss(q)}</b>: quick test, stops by itself.`;
+      } else {
+        const target = g.plateau ? Math.max(e, T.min_s) : Math.min(T.max_s, Math.max(T.min_s, e + 60));
+        setRing($("ring"), e / target, mmss(e), "elapsed");
+        $("d-text").innerHTML = `Keep the lid closed. It stops by itself when the curve flattens (at least ${mmss(T.min_s)}, at most ${mmss(T.max_s)}).` + (g.plateau ? " <b>Curve is flattening…</b>" : "");
+      }
+      $("r-time").textContent = `${mmss(e)} · ${g.mode === "quick" ? mmss(g.quick_s || T.quick_s) : "auto"}`;
+      if (chart && l && l.curve) setCurve(chart, l.curve);
+    }
+  };
+  $("btn-paste").onclick = async () => {
+    const fd = new FormData(); fd.append("label", "pasted"); fd.append("csv_text", $("paste").value); fd.append("profile_id", S.check.profileId || ""); fd.append("mode", S.check.runMode);
+    try { const r = await api("/api/run/upload", { method: "POST", body: fd }); await startScan(r.run_id); } catch (e) { toast("Could not read that text: " + e.message); }
+  };
+  $("btn-old").onclick = () => { if ($("old-run").value) startScan($("old-run").value).catch((e) => toast(e.message)); };
+});
+
 // ================================================================ boot
 async function boot() {
   try {
