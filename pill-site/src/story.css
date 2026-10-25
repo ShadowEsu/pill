@@ -35,6 +35,9 @@
 @media (max-width: 1100px) { .nav-links { display: none; } .nav-ch { display: flex; max-width: 40vw; } }
 .nav-app { padding: 8px 14px; font-size: 13px; min-height: 36px; margin-left: 14px; flex: none; }
 .nav .wrap { gap: 12px; }
+.nav .brand { margin-right: 20px; }
+/* without the links: brand left; chapter label and the app button together on the right */
+@media (max-width: 1100px) { .nav-ch { order: 1; margin-left: auto; } .nav-app { order: 2; } }
 @media (max-width: 520px) { .nav-ch { display: none; } }
 .reduced .nav-links a::after { transition: none; }
 
@@ -176,11 +179,11 @@
 @media (max-width: 560px) { .hm { grid-template-columns: 40px repeat(7, minmax(0, 1fr)); gap: 4px; } .hm-c { height: 30px; border-radius: 6px; } .hm-c em { display: none; } .hm-col { font-size: 9.5px; } .hm-row { font-size: 9.5px; } }
 
 /* ---------- stats band sparks ---------- */
-.spark { margin-top: 16px; max-width: 250px; }
+.spark { margin-top: 16px; max-width: 250px; min-height: 84px; }
 .spark svg { width: 100%; height: auto; overflow: visible; }
 .spark svg * { transform-box: fill-box; transform-origin: 50% 100%; }
 .sp-bar { fill: rgba(79,179,255,.38); }
-.sp-hot { fill: var(--lab); }
+.sp-hot { fill: var(--ink); }  /* red is kept for recall / held */
 .sp-bar--sky { fill: rgba(95,211,154,.5); }
 .sp-axis { stroke: rgba(22,24,27,.2); stroke-width: 1; }
 .sp-range { fill: rgba(79,179,255,.2); stroke: rgba(42,143,224,.6); stroke-width: 1; }
@@ -285,6 +288,8 @@
 
 /* ---------- Built Saturday: photo grid + blueprints ---------- */
 .build-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 2vw, 24px); margin-top: 40px; }
+/* the photos are 768 px wide: cap the grid so the lead (two columns) never shows them above 1× */
+.build-grid { max-width: 1120px; }
 .build-ph { margin: 0; min-width: 0; }
 .build-ph img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 18px; background: #1B2026; }
 .build-ph--lead { grid-column: span 2; grid-row: span 2; }

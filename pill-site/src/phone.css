@@ -682,6 +682,7 @@
   text-align: center;
   text-wrap: balance;
 }
+.section:not(.dark) .phone__caption { color: var(--ink-2); }
 
 @media (prefers-reduced-motion: reduce) {
   .pv__live i { animation: none; }

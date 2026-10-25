@@ -247,25 +247,30 @@ if (!reduced) {
       ['inline · red channel change', 0.035, 'var(--blue-ink)'],
       ['blank noise', 0.006, 'var(--muted)'],
     ];
-    const W = 1000, L = 300, R = 90, rowH = 64, T = 16;
-    const H = T + ROWS.length * rowH + 30;
-    const x = (v) => L + (v / 0.3) * (W - L - R);
-    const grid = [0, 0.1, 0.2, 0.3].map((v) => `<line x1="${x(v)}" x2="${x(v)}" y1="${T}" y2="${H - 30}" stroke="var(--line)"/><text x="${x(v)}" y="${H - 8}" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="var(--mono)">${v.toFixed(1)}</text>`).join('');
-    const bars = ROWS.map(([label, v, c], i) => {
-      const y = T + i * rowH + 14;
-      return `<text x="${L - 16}" y="${y + 21}" text-anchor="end" font-size="15" fill="var(--ink)" font-family="var(--sans)">${label}</text>
-        <rect x="${L}" y="${y}" width="${Math.max(3, x(v) - L).toFixed(1)}" height="32" rx="8" fill="${c}" data-bar/>
-        <text x="${(Math.max(3, x(v) - L) + L + 12).toFixed(1)}" y="${y + 21}" font-size="15" fill="var(--ink)" font-family="var(--mono)">${v}</text>`;
-    }).join('');
+    // two drawings of the same three numbers: labels beside the bars on wide screens, above them on phones
+    const chart = (narrow) => {
+      const W = narrow ? 360 : 1000, L = narrow ? 0 : 300, R = narrow ? 56 : 90, rowH = narrow ? 70 : 64, T = 16;
+      const H = T + ROWS.length * rowH + 30;
+      const x = (v) => L + (v / 0.3) * (W - L - R);
+      const grid = [0, 0.1, 0.2, 0.3].map((v) => `<line x1="${x(v)}" x2="${x(v)}" y1="${T}" y2="${H - 30}" stroke="var(--line)"/><text x="${x(v)}" y="${H - 8}" text-anchor="${narrow && v === 0 ? 'start' : 'middle'}" font-size="12" fill="var(--muted)" font-family="var(--mono)">${v.toFixed(1)}</text>`).join('');
+      const bars = ROWS.map(([label, v, c], i) => {
+        const y = T + i * rowH + (narrow ? 26 : 14), w = Math.max(3, x(v) - L).toFixed(1);
+        const lab = narrow
+          ? `<text x="0" y="${y - 9}" font-size="14" fill="var(--ink)" font-family="var(--sans)">${label}</text>`
+          : `<text x="${L - 16}" y="${y + 21}" text-anchor="end" font-size="15" fill="var(--ink)" font-family="var(--sans)">${label}</text>`;
+        return `${lab}
+        <rect x="${L}" y="${y}" width="${w}" height="${narrow ? 26 : 32}" rx="8" fill="${c}" data-bar/>
+        <text x="${(+w + L + 10).toFixed(1)}" y="${y + (narrow ? 18 : 21)}" font-size="15" fill="var(--ink)" font-family="var(--mono)">${v}</text>`;
+      }).join('');
+      return `<svg class="${narrow ? 'chart-narrow' : 'chart-wide'}" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Bar chart of the first real aspirin run: the side sensor's cloudiness signal rose by 0.29, the red channel changed by 0.035, and the blank noise was 0.006">${grid}${bars}</svg>`;
+    };
     mount.innerHTML = `
       <div class="box" style="padding:20px 20px 12px">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:8px">
           <p class="caption">first real aspirin run · signal change, as the station app reports it</p>
           <p class="caption">runs/REAL_aspirin_first_test.csv · measured, not modelled</p>
         </div>
-        <div class="table-scroll"><svg viewBox="0 0 ${W} ${H}" width="100%" style="min-width:560px" role="img" aria-label="Bar chart of the first real aspirin run: the side sensor's cloudiness signal rose by 0.29, the red channel changed by 0.035, and the blank noise was 0.006">
-          ${grid}${bars}
-        </svg></div>
+        ${chart(false)}${chart(true)}
       </div>`;
     if (!reduced) {
       const rects = mount.querySelectorAll('[data-bar]');

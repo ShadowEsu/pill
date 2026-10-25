@@ -6,7 +6,7 @@
   <title>Pill — The box measures. Pill explains.</title>
   <meta name="description" content="A dissolution check the size of a coffee mug, built from hobby parts: it dissolves one tablet and says Passed the screen, Needs lab testing or Unable to verify. Built at Cal Hacks 13.0.">
   <meta property="og:title" content="Pill — The box measures. Pill explains.">
-  <meta property="og:description" content="One tablet. A 60 s quick run, 2–10 min full. PASS / NEEDS LAB / UNABLE TO VERIFY. In clinic mode the answer holds the supplier's payment.">
+  <meta property="og:description" content="One tablet. A 60 s quick run, 2–10 min full. Passed the screen, Needs lab testing or Unable to verify. In clinic mode the answer holds the supplier's payment.">
   <meta property="og:type" content="website">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/fonts/instrument-serif-400.woff2" as="font" type="font/woff2" crossorigin>
@@ -23,7 +23,7 @@
       <a href="#film">Film</a>
       <a href="#station">Station</a>
       <a href="#problem">Problem</a>
-      <a href="#how">How it works</a>
+      <a href="#how">How</a>
       <a href="#story">Story</a>
       <a href="#table">At the table</a>
       <a href="#verdicts">Verdicts</a>
@@ -31,7 +31,6 @@
       <a href="#clinic">Clinic</a>
       <a href="#payments">Payments</a>
       <a href="#coinbase">Coinbase</a>
-      <a href="#limits">Limits</a>
       <a href="#team">Team</a>
     </nav>
     <a class="btn nav-app" href="https://pill-app-delta.vercel.app/welcome" target="_blank" rel="noopener">Open the app <span class="arrow" aria-hidden="true">→</span></a>
@@ -114,11 +113,11 @@
       <h2 class="h2" id="built-title">Built Saturday, at the table.</h2>
       <p class="lead reveal" style="margin-top:20px">The drawing above is this station. A purple 3D-printed chamber, a clear cup of water, three LEDs, two photoresistors, an Arduino UNO Q, a breadboard and a laptop. Stirred by hand with a stick.</p>
       <div class="build-grid">
-        <figure class="build-ph build-ph--lead reveal"><img src="/photos/station-171.webp" width="768" height="724" loading="lazy" decoding="async" alt="Top view of the station with the lid off and the blue LED on: a clear plastic cup of water inside the purple printed cylinder, blue light at the near wall where the LED box is attached, jumper wires running to the LED legs and to the Arduino UNO Q on the left"><figcaption><b>Blue LED on, lid off.</b> Light from the LED box (bottom) crosses the clear cup of water in the printed well.</figcaption></figure>
+        <figure class="build-ph build-ph--lead reveal"><img src="/photos/station-171.webp" width="768" height="700" loading="lazy" decoding="async" alt="Top view of the station with the lid off and the blue LED on: a clear plastic cup of water inside the purple printed cylinder, blue light at the near wall where the LED box is attached, jumper wires running to the LED legs and to the Arduino UNO Q on the left"><figcaption><b>Blue LED on, lid off.</b> Light from the LED box (bottom) crosses the clear cup of water in the printed well.</figcaption></figure>
         <figure class="build-ph reveal"><img src="/photos/station-191.webp" width="768" height="1024" loading="lazy" decoding="async" alt="Close-up of the purple LED box on the side of the chamber: a white, a blue and a red 5 mm LED in a row with jumper wires on their legs, two empty holes above and below the blue LED, and a thin slot on top"><figcaption><b>The LED box.</b> White, blue and red 5 mm LEDs, two spare holes, the diffuser slot on top.</figcaption></figure>
         <figure class="build-ph reveal"><img src="/photos/station-102.webp" width="768" height="834" loading="lazy" decoding="async" alt="The station with its flat purple lid on, a small hole in the lid, the LED box facing the camera, a photoresistor holder on the left wall with two wires, and a breadboard with resistors and jumper wires in front"><figcaption><b>Lid on.</b> A flat printed lid with one small hole; a photoresistor holder on the left wall.</figcaption></figure>
         <figure class="build-ph reveal"><img src="/photos/station-08.webp" width="768" height="654" loading="lazy" decoding="async" alt="Side view: the photoresistor holder at 90° to the beam facing the camera, its two leads coming out through the fin, the LED box on the right, and the Arduino UNO Q on a USB-C cable in front"><figcaption><b>The 90° holder.</b> The side sensor's leads come out through the fin; the UNO Q streams over USB-C.</figcaption></figure>
-        <figure class="build-ph reveal"><img src="/photos/station-17.webp" width="768" height="724" loading="lazy" decoding="async" alt="Top view with the lid off and the LEDs off: the clear plastic cup of water sitting inside the purple printed well, the LED box below it and the UNO Q at the left edge"><figcaption><b>LEDs off.</b> The clear plastic cup sits in the well; one whole tablet goes in per test.</figcaption></figure>
+        <figure class="build-ph reveal"><img src="/photos/station-17.webp" width="768" height="700" loading="lazy" decoding="async" alt="Top view with the lid off and the LEDs off: the clear plastic cup of water sitting inside the purple printed well, the LED box below it and the UNO Q at the left edge"><figcaption><b>LEDs off.</b> The clear plastic cup sits in the well; one whole tablet goes in per test.</figcaption></figure>
         <figure class="build-ph reveal"><img src="/photos/station-10.webp" width="768" height="629" loading="lazy" decoding="async" alt="The whole station on a table: the purple chamber with its lid, the LED box with its three LEDs, the Arduino UNO Q, a breadboard covered in jumper wires, and a spare purple cup shim ring at the back"><figcaption><b>Everything.</b> Chamber, LED box, UNO Q, breadboard with the dividers, a spare cup shim ring at the back.</figcaption></figure>
       </div>
       <h3 class="h3 build-bp-title reveal">Blueprints</h3>
@@ -389,7 +388,7 @@
         <div>
           <p class="eyebrow reveal">Clinic mode</p>
           <h2 class="h2">The verdict holds the payment.</h2>
-          <p class="lead reveal">A clinic samples one tablet from each delivery. PASS proposes release; NEEDS LAB holds the money and drafts a lab referral; UNABLE TO VERIFY escalates. Every decision is logged with the lot, the time, the rule that fired and the policy clause it quotes. No money moves without a pharmacist's tap. Today every money move is simulated: USDC on Base Sepolia once a CDP key is in, with a Capital One Nessie sandbox mirror if its key lands.</p>
+          <p class="lead reveal">A clinic samples one tablet from each delivery. Passed the screen proposes release; Needs lab testing holds the money and drafts a lab referral; Unable to verify escalates. Every decision is logged with the lot, the time, the rule that fired and the policy clause it quotes. No money moves without a pharmacist's tap. Today every money move is simulated: USDC on Base Sepolia once a CDP key is in, with a Capital One Nessie sandbox mirror if its key lands.</p>
           <p class="caption reveal" style="margin-top:28px">policy.md · the six clauses the agent may quote</p>
           <ul class="list reveal">
             <li><b>P1</b><span>Release needs PASS, no recall record for the lot, amount within the spend cap, and the pharmacist's tap.</span></li>
@@ -446,7 +445,7 @@
       <div class="facts reveal" style="margin-top:40px">
         <div><b>One rail, simulated today</b><span>USDC on Base Sepolia through a CDP agent wallet; nothing moves until the CDP key is in. A Capital One Nessie sandbox mirror is built for the fiat story and runs only if its key lands. One log line per decision.</span></div>
         <div><b>What the agent can do</b><span>Propose, draft a referral, buy a verdict under $1. It cannot release: release is a human tap, every time, and the model can only downgrade a decision.</span></div>
-        <div><b>What the agent cannot do</b><span>Hold more than one delivery's value, pay anyone not on the delivery, or move anything on a NEEDS LAB or UNABLE TO VERIFY. The caps live in policy.md, in plain text.</span></div>
+        <div><b>What the agent cannot do</b><span>Hold more than one delivery's value, pay anyone not on the delivery, or move anything on Needs lab testing or Unable to verify. The caps live in policy.md, in plain text.</span></div>
       </div>
 
       <p class="eyebrow reveal" style="margin-top:72px">Pricing · proposed</p>
@@ -476,7 +475,7 @@
             <svg class="cbx-ico" viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="14" width="16" height="20" rx="4"/><rect x="27" y="14" width="16" height="20" rx="4"/><path d="M15 24 H33"/><path d="M29 20 l4 4 l-4 4"/><circle cx="24" cy="9" r="3"/></svg>
             <p class="cbx-k">01 · Pay</p>
             <h3>Escrow → supplier, in USDC on Base.</h3>
-            <p>The delivery’s money waits in escrow. On PASS, a pharmacist taps release and the agent’s CDP wallet signs the transfer to the supplier. No tap, no transfer.</p>
+            <p>The delivery’s money waits in escrow. If the tablet passed the screen, a pharmacist taps release and the agent’s CDP wallet signs the transfer to the supplier. No tap, no transfer.</p>
           </article>
           <article class="cbx-card">
             <svg class="cbx-ico" viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="10" width="32" height="28" rx="6"/><path d="M16 22 h16 M16 29 h10"/><circle cx="36" cy="36" r="7"/><path d="M36 33 v6 M33.5 36 h5"/></svg>
@@ -546,13 +545,13 @@
   <section class="section" id="limits" style="padding-top:0">
     <div class="wrap">
       <div class="chapter reveal"><span class="ch-n">11</span><span class="ch-t">What it will not claim.</span></div>
-      <p class="eyebrow reveal">Fig 5 · What PASS does not mean</p>
+      <p class="eyebrow reveal">Fig 5 · What “Passed the screen” does not mean</p>
       <h2 class="h2">Pill screens tablets. A lab has the last word.</h2>
       <div class="split" style="margin-top:40px; align-items:start">
         <div class="box reveal">
-          <h4>PASS means</h4>
+          <h4>“Passed the screen” means</h4>
           <p class="body">This one tablet, on this station, dissolved like the good tablets in its reference profile. No red flags found.</p>
-          <h4 style="margin-top:20px">PASS does not mean</h4>
+          <h4 style="margin-top:20px">“Passed the screen” does not mean</h4>
           <p class="body">That the tablet is the right drug, the right dose, or free of contaminants. Pill checks how a tablet dissolves; it does not identify ingredients. Anything it cannot compare goes to a lab, by design.</p>
         </div>
         <div class="reveal">
@@ -581,7 +580,7 @@
       <h2 class="h2">Ask us the hard ones.</h2>
       <div class="qa">
         <div class="reveal"><h4>"Why aspirin?"</h4><p>It is white, so it has no colour to measure, which is why the side sensor matters: on our first run its cloudiness signal rose by 0.29 against a blank noise of 0.006, while the red channel moved by 0.035. Riboflavin was the first plan, but it absorbs blue so strongly that a whole tablet saturates the cup.</p></div>
-        <div class="reveal"><h4>"Would this catch a real antimalarial?"</h4><p>Not today, and it says so: UNABLE TO VERIFY for any drug without a reference profile on this station. An honest "no reference" beats a guess.</p></div>
+        <div class="reveal"><h4>"Would this catch a real antimalarial?"</h4><p>Not today, and it says so: Unable to verify, for any drug without a reference profile on this station. An honest "no reference" beats a guess.</p></div>
         <div class="reveal"><h4>"How do we know the demo isn't rigged?"</h4><p>Run ids and timestamps on every curve, the raw trace saved for every run, and a station you can open and look inside. Bring your own tablet.</p></div>
         <div class="reveal"><h4>"Who lets software hold money?"</h4><p>Nobody. The policy proposes; a pharmacist taps. The model can only downgrade a decision to "escalate", never release.</p></div>
         <div class="reveal"><h4>"Why not just scan the barcode?"</h4><p>Because lot numbers get copied. The FDA's December 2025 Ozempic case carried a real lot number. Only the tablet itself cannot lie about dissolving.</p></div>

@@ -44,11 +44,12 @@ export const PHONE_SEQUENCES = {
     ['released', 4800],
     ['recall', 8000],
   ],
+  // personal opens on its own screen (My medicines), so it never mirrors the clinic phone's first frame
   personal: [
+    ['medicines', 5600],
     ['bottle', 8000],
     ['scan', 5400, { lot: 'B2-07' }],
     ['pass', 3200],
-    ['medicines', 5600],
     ['calibration', 8000],
   ],
 };

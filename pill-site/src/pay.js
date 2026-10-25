@@ -44,13 +44,13 @@ function railSvg() {
   return `
   <svg class="rail-svg" viewBox="0 0 640 230" role="img" aria-label="Clinic wallet, Pill escrow and supplier wallet, with the amount moving between them by verdict">
     <g class="w1"><rect class="node" x="10" y="60" width="180" height="110" rx="16"/>
-      <text class="lbl" x="28" y="92">Clinic</text><text class="sub" x="28" y="110">pill-clinic · invoice units</text>
+      <text class="lbl" x="28" y="92">Clinic</text><text class="sub" x="28" y="110">pill-clinic wallet</text>
       <text class="amt" x="28" y="150" id="rail-clinic">8,760.00</text></g>
     <g class="w2"><rect class="node escrow" id="rail-escrow-node" x="230" y="60" width="180" height="110" rx="16"/>
       <text class="lbl" x="248" y="92">Pill escrow</text><text class="sub" x="248" y="110" id="rail-escrow-sub">holds until verdict + tap</text>
       <text class="amt" x="248" y="150" id="rail-escrow">1,240.00</text></g>
     <g class="w3"><rect class="node" x="450" y="60" width="180" height="110" rx="16"/>
-      <text class="lbl" x="468" y="92">Supplier</text><text class="sub" x="468" y="110">pill-supplier · invoice units</text>
+      <text class="lbl" x="468" y="92">Supplier</text><text class="sub" x="468" y="110">pill-supplier wallet</text>
       <text class="amt" x="468" y="150" id="rail-supplier">0.00</text></g>
     <path class="wire" id="wire-a" d="M190 115 H230"/>
     <path class="wire" id="wire-b" d="M410 115 H450"/>
@@ -141,16 +141,18 @@ export function mountX402(el) {
   el.innerHTML = `
     <h4>Pay-per-verdict, with x402</h4>
     <p>Another clinic, an NGO, or someone else's station can send a curve and buy a verdict for a few cents. No account, no key exchange: the server answers 402, the wallet pays, the server answers 200.</p>
-    <div class="term" id="x402-term" aria-live="polite">${X402_LINES.map(([c, t]) => `<span class="line ${c}">${esc(t)}</span>`).join('')}</div>
+    <div class="term" id="x402-term" aria-live="polite"><span class="idle">$ ready · press Call /verify to replay the 402 → sign → 200 exchange<i aria-hidden="true"></i></span>${X402_LINES.map(([c, t]) => `<span class="line ${c}">${esc(t)}</span>`).join('')}</div>
     <div class="row"><button type="button" class="pbtn-call" id="x402-run">Call /verify</button><button type="button" class="pbtn-call alt" id="x402-reset">Reset</button><span class="caption" style="margin:0">testnet · 0.05 USDC · simulated here · the paid 200 is pending</span></div>`;
   const lines = [...el.querySelectorAll('.line')];
   const run = el.querySelector('#x402-run');
   const reset = el.querySelector('#x402-reset');
   let timers = [];
   const stop = () => { timers.forEach(clearTimeout); timers = []; };
-  const doReset = () => { stop(); lines.forEach((l) => l.classList.remove('on')); };
+  const term = el.querySelector('#x402-term');
+  const doReset = () => { stop(); lines.forEach((l) => l.classList.remove('on')); term.classList.remove('running'); };
   const play = () => {
     doReset();
+    term.classList.add('running');
     const step = reduced ? 0 : 520;
     lines.forEach((l, i) => timers.push(setTimeout(() => { l.classList.add('on'); }, i * step)));
   };

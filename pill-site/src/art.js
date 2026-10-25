@@ -165,7 +165,7 @@ art.calibration = wrap(`
 export function artFor(key) { return art[key] || ''; }
 
 /* ---------- stats band: small charts under each number ---------- */
-// 0 and 1 draw the sourced figure to scale; 2 and 3 are decorative. All are labelled.
+// 0 and 1 draw the sourced figure to scale; 2 and 3 get an empty slot (no invented trend lines).
 export function statSpark(i) {
   const W = 240, H = 56;
   const svg = (inner, note) => `<div class="spark" aria-hidden="true"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${inner}</svg><p class="spark-note">${note}</p></div>`;
@@ -181,15 +181,8 @@ export function statSpark(i) {
       <line class="sp-mark" x1="${x(116000)}" x2="${x(116000)}" y1="22" y2="56"/>
       <circle class="sp-dot" cx="${x(116000)}" cy="40" r="5"/>`, 'illustration · modelled range 64k–158k, to scale');
   }
-  if (i === 2) {
-    const pts = [6, 8, 7, 11, 10, 14, 19, 17, 24, 31, 28, 36, 42, 39, 47];
-    const step = W / (pts.length - 1);
-    const line = pts.map((v, k) => `${(k * step).toFixed(1)} ${(H - 4 - v).toFixed(1)}`).join(' L');
-    return svg(`<path class="sp-area" d="M0 ${H} L${line} L${W} ${H} Z"/><path class="sp-line" d="M${line}"/>`, 'illustration · not data');
-  }
-  const vals = [18, 22, 20, 26, 24, 30, 28, 34, 33, 38, 41, 44];
-  const bw = 14, gap = (W - vals.length * bw) / (vals.length - 1);
-  return svg(vals.map((v, k) => `<rect class="sp-bar sp-bar--sky" x="${(k * (bw + gap)).toFixed(1)}" y="${H - v}" width="${bw}" height="${v}" rx="3"/>`).join(''), 'illustration · not data');
+  // 2 and 3 have no sourced series to draw; an empty slot keeps the text rows aligned
+  return '<div class="spark spark--none" aria-hidden="true"></div>';
 }
 
 /* ---------- clinic: a day on one timeline, from the app's demo deliveries ---------- */
