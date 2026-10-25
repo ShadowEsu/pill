@@ -1,5 +1,6 @@
 // Home. Medical: the deliveries desk (no longer at "/", kept for /home). Personal: Today — a big serif greeting, a dose ring
-// that fills, the next dose with a drawn clock, today's doses as capsule-shaped tiles, a mini timetable.
+// that fills, three big cards (My medicines, Schedule, Check a bottle at the station), the Easy mode toggle, the next dose
+// with a drawn clock, today's doses as capsule-shaped tiles, a mini timetable.
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Screen, SplitTitle } from '../components/Shell';
@@ -185,6 +186,23 @@ function Personal() {
           <SettingsLink />
         </div>
       </header>
+      <nav className="home-cards cascade" aria-label="My medicines, schedule and the station">
+        <Link to="/medicines" className="card home-card" style={{ '--i': 0 } as React.CSSProperties} data-home-card="medicines">
+          <Glyph name="bottle" size={48} />
+          <span><b>My medicines</b><span className="sub">{mine.length ? `${mine.length} ${mine.length === 1 ? 'bottle' : 'bottles'} · what the station tested` : 'What the station tested'}</span></span>
+          <span className="pointer" aria-hidden="true">→</span>
+        </Link>
+        <Link to="/schedule" className="card home-card" style={{ '--i': 1 } as React.CSSProperties} data-home-card="schedule">
+          <Glyph name="calendar" size={48} delay={120} />
+          <span><b>Schedule</b><span className="sub">{plannedN ? `${takenN} of ${plannedN} taken today · reminders` : 'Set times and reminders'}</span></span>
+          <span className="pointer" aria-hidden="true">→</span>
+        </Link>
+        <Link to="/station" className="card home-card dark" style={{ '--i': 2 } as React.CSSProperties} data-home-card="station">
+          <Glyph name="station" size={48} delay={240} />
+          <span><b>Check a bottle at the station</b><span className="sub">Lights off, clear water, one tablet, a verdict</span></span>
+          <span className="pointer" aria-hidden="true">→</span>
+        </Link>
+      </nav>
       <EasyToggle />
       <NextCard next={nextUp(planned, now)} now={now} />
 
