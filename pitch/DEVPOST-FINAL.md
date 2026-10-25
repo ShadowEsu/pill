@@ -6,7 +6,7 @@ Reconciled to what exists right now: the **Pill Gate station app** (`pillgate/`,
 
 | # | Min | Do | Where it goes |
 |---|---|---|---|
-| 1 | 3 | `cd ~/calhacks-13 && git add pillgate && git commit -m "pillgate ui: final"` (the UI rebuild is uncommitted right now), then `git push origin main` (origin is 4 commits behind: `3ac5fb8` vs local `517a721`) | repo |
+| 1 | 0 | Done 19:12: the UI rebuild is committed and pushed (`e558316`, origin = local) | repo |
 | 2 | 1 | GitHub → ShadowEsu/pill → Settings → make **Public** (it is PRIVATE at 19:05; Devpost needs the repo) | `[FILL 1]` |
 | 3 | 5 | Upload `pitch/film/pill-demo.mp4` (2:38) to YouTube, Unlisted; copy the link | `[FILL 2]` |
 | 4 | 1 | Team names (ask each teammate before naming them) | `[FILL 3]` |
