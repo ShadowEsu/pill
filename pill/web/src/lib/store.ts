@@ -59,8 +59,8 @@ export const actions = {
   updateBottle(id: string, patch: Partial<Bottle>) { set((s) => ({ bottles: s.bottles.map((b) => (b.id === id ? { ...b, ...patch } : b)) })); },
   markTaken(id: string) { set((s) => ({ bottles: s.bottles.map((b) => (b.id === id ? { ...b, takenAt: [Date.now(), ...b.takenAt] } : b)) })); const b = state.bottles.find((x) => x.id === id); if (b) activity(PEOPLE.you, `took ${b.drug} ${b.strength}`, 'ok', { kind: 'bottle', id }); },
 
-  startRun(r: { drug: string; lot: string; src: Source; bottleId?: string | null; deliveryId?: string | null }): Run {
-    const run: Run = { id: 'r-' + Date.now().toString(36).slice(-5), src: r.src, drug: r.drug, lot: r.lot, startedAt: Date.now(), samples: [], evaluation: null, mode: state.mode ?? 'personal' };
+  startRun(r: { drug: string; lot: string; src: Source; bottleId?: string | null; deliveryId?: string | null; demo?: boolean }): Run {
+    const run: Run = { id: 'r-' + Date.now().toString(36).slice(-5), src: r.src, drug: r.drug, lot: r.lot, startedAt: Date.now(), samples: [], evaluation: null, mode: state.mode ?? 'personal', ...(r.demo ? { demo: true } : {}) };
     set((s) => ({
       runs: [run, ...s.runs],
       bottles: r.bottleId ? s.bottles.map((b) => (b.id === r.bottleId ? { ...b, runId: run.id } : b)) : s.bottles,
@@ -68,6 +68,27 @@ export const actions = {
     }));
     activity(PEOPLE.station, `started run ${run.id} · ¼ tablet from lot ${run.lot}`, 'info', { kind: 'run', id: run.id });
     return run;
+  },
+  /**
+   * The guided demo's delivery, fresh for a new demo run: the previous demo's bottle, run and their activity lines go,
+   * and the delivery goes back to just "logged" (pending, no bottle, no run, one log line). Returns its id.
+   * Without this every demo run piled another TM-02 run, bottle and HOLD onto the same lot.
+   */
+  resetDemo(d: Pick<Delivery, 'id' | 'supplier' | 'drug' | 'lot' | 'amountUsd'>): string {
+    const at = Date.now();
+    const logged = `delivery logged · ${d.amountUsd.toFixed(2)} clinic → escrow (SANDBOX / TESTNET)`;
+    const fresh: Delivery = { ...d, bottleId: null, runId: null, outcome: 'pending', clause: null, log: [{ at, text: logged, kind: 'money' }], demo: true };
+    set((s) => {
+      const gone = new Set([d.id, ...s.runs.filter((r) => r.demo).map((r) => r.id), ...s.bottles.filter((b) => b.demo).map((b) => b.id)]);
+      return {
+        runs: s.runs.filter((r) => !r.demo),
+        bottles: s.bottles.filter((b) => !b.demo),
+        deliveries: [fresh, ...s.deliveries.filter((x) => x.id !== d.id && !x.demo)],
+        activities: s.activities.filter((a) => !(a.ref && gone.has(a.ref.id))),
+      };
+    });
+    activity(PEOPLE.tech, `logged delivery ${d.lot} from ${d.supplier} · $${d.amountUsd.toLocaleString('en-US')} into escrow`, 'money', { kind: 'delivery', id: d.id });
+    return d.id;
   },
   appendSamples(runId: string, samples: Sample[]) { set((s) => ({ runs: s.runs.map((r) => (r.id === runId ? { ...r, samples } : r)) })); },
   finishRun(runId: string, evaluation: Evaluation) {

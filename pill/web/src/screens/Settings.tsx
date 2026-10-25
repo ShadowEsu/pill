@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { Screen } from '../components/Shell';
 import Glyph, { type GlyphName } from '../components/Glyph';
 import BinaryPill from '../components/BinaryPill';
+import StationChip, { useStationStatus } from '../components/StationChip';
 import { actions, useStore } from '../lib/store';
 import { useSound } from '../lib/sound';
 import { followerSettings, useFollowerSettings } from '../lib/follower';
@@ -40,6 +41,7 @@ export default function Settings() {
   const mode = useStore((s) => s.mode);
   const bigText = useStore((s) => s.bigText);
   const station = useStore((s) => s.station);
+  const live = useStationStatus();   // the pay service's /station/status: serial · simulated · no station
   const sound = useSound();
   const follower = useFollowerSettings();
   const [cal, setCal] = useState<Cal>(PAY_URL ? { state: 'checking' } : { state: 'off', why: 'no pay service configured (VITE_PAY_URL)' });
@@ -115,11 +117,11 @@ export default function Settings() {
                 <span className="sub mono">{cal.state === 'checking' ? 'checking…' : cal.state === 'connected' ? `connected as ${cal.account}${cal.calendars != null ? ` · ${cal.calendars} calendars` : ''}` : `not connected · ${cal.why}`}</span></span>
               <span className={'chip ' + (cal.state === 'connected' ? 'ok' : cal.state === 'checking' ? 'live' : '')}><span className="dot" />{cal.state === 'connected' ? 'connected' : cal.state === 'checking' ? 'checking' : 'off'}</span>
             </div>
-            <div className="set-row">
+            <div className="set-row" aria-live="polite" data-station-row>
               <span><span className="lbl">Station</span>
-                <span className="sub mono">{station.id} · {station.online ? 'online' : 'offline'}{station.calibratedAt ? ` · calibrated ${dayLabel(station.calibratedAt).toLowerCase()} ${hm(station.calibratedAt)}` : ' · not calibrated'}</span>
-                <span className="sub mono">{ref ? `${ref.drug} band ${ref.bandLow}–${ref.bandHigh} · ${ref.runs} runs · CV ${ref.cv} %` : 'no reference band'}</span></span>
-              <span className={'chip ' + (station.online ? 'ok' : 'bad')}><span className="dot" />{station.online ? 'online' : 'offline'}</span>
+                <span className="sub mono">{live === undefined ? 'asking the pay service…' : live ? `${live.mode === 'sim' ? 'simulator (SERIAL_PORT=sim)' : `USB serial ${live.port ?? ''}`.trim()} · run ${live.state}${live.hello ? ` · firmware ${live.hello.fw}` : ''}` : 'no station on the pay service; runs play the recorded replays'}</span>
+                <span className="sub mono">{station.calibratedAt ? `calibrated ${dayLabel(station.calibratedAt).toLowerCase()} ${hm(station.calibratedAt)}` : 'not calibrated'} · {ref ? `${ref.drug} band ${ref.bandLow}–${ref.bandHigh} · ${ref.runs} runs · CV ${ref.cv} %` : 'no reference band'}</span></span>
+              <StationChip status={live} />
             </div>
           </section>
 

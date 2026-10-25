@@ -14,7 +14,10 @@ import { playSound } from '../lib/sound';
 import { absorbance } from '../lib/rules';
 import type { Mode, Run } from '../lib/types';
 
-const DELIVERY = 'd-1042';          // seeded: Bayview Medical Wholesale, calcium carbonate lot TM-02, $480 in escrow
+// The demo's own delivery (seeded as d-1042): each demo run resets it to just "logged" (actions.resetDemo) and drops the last
+// demo's bottle and run, so repeat runs replace the TM-02 hold instead of piling up another one.
+const DEMO_DELIVERY = { id: 'd-1042', supplier: 'Bayview Medical Wholesale', drug: 'calcium carbonate', lot: 'TM-02', amountUsd: 480 };
+const DELIVERY = DEMO_DELIVERY.id;
 const RUN_SPEED = 7.5;             // the Run screen's own default replay speed (samples per second)
 const MOMENT_T = 105;              // seconds into the TM-02 replay when the cloudy reading reaches the band edge
 const KEY = 'pill.demo.state';
@@ -68,7 +71,7 @@ const STEPS: Step[] = [
       const delivery = s.deliveries.some((d) => d.id === DELIVERY) ? DELIVERY : null;
       let bottleId = demo.bottleId && s.bottles.some((b) => b.id === demo.bottleId) ? demo.bottleId : null;
       if (!bottleId) {
-        bottleId = actions.addBottle({ drug: 'calcium carbonate', strength: '500 mg', lot: 'TM-02', maker: 'GSK', expiry: '2026-11', recall: 'no_record', recallCheckedAt: Date.now() }).id;
+        bottleId = actions.addBottle({ drug: 'calcium carbonate', strength: '500 mg', lot: 'TM-02', maker: 'GSK', expiry: '2026-11', recall: 'no_record', recallCheckedAt: Date.now(), demo: true }).id;
         if (delivery) actions.attachBottle(delivery, bottleId);
         setDemo({ bottleId });
       }
@@ -88,7 +91,7 @@ const STEPS: Step[] = [
       let id = demo.runId && s.runs.some((r) => r.id === demo.runId) ? demo.runId : null;
       if (!id) {
         playSound('rise');
-        id = actions.startRun({ drug: 'calcium carbonate', lot: 'TM-02', src: 'replay', bottleId: demo.bottleId, deliveryId: s.deliveries.some((d) => d.id === DELIVERY) ? DELIVERY : null }).id;
+        id = actions.startRun({ drug: 'calcium carbonate', lot: 'TM-02', src: 'replay', bottleId: demo.bottleId, deliveryId: s.deliveries.some((d) => d.id === DELIVERY) ? DELIVERY : null, demo: true }).id;
         setDemo({ runId: id });
       }
       go(`/run/${id}?replay=TM-02&speed=${RUN_SPEED * demo.speed}`);
@@ -203,6 +206,7 @@ export default function Demo() {
   const start = () => {
     const prev = getState().mode;
     if (prev !== 'medical') actions.setMode('medical');
+    actions.resetDemo(DEMO_DELIVERY);
     playSound('tap');
     setDemo({ ...OFF, on: true, speed, prevMode: prev });
   };

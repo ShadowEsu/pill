@@ -117,3 +117,36 @@
   .fol-dots i:nth-child(2) { opacity: .6; } .fol-dots i:nth-child(3) { opacity: 1; }
   .fol-dock, .fol-sheet, .fol-send, .fol-send > span, .fol-q { transition: none; }
 }
+
+/* ---- desktop: the open sheet docks as its own column ----
+   The screen column gives up the sheet's width (padding on .app), so the sheet never sits on a button or action.
+   ≥ 1180 px: a 380 px sheet; the screen's multi-column grids step down a size. 900–1179 px: a 340 px sheet, the sidebar
+   folds to its icons and every grid goes to one column, so the screen keeps a phone-or-wider column. */
+@media (min-width: 900px) {
+  .frame { --fol-sheet-w: 380px; --fol-col: 0px; }
+  .fol-sheet { width: var(--fol-sheet-w); }
+  .frame:has(> .fol[data-follower="open"]) { --fol-col: calc(var(--fol-sheet-w) + 24px + 16px); }
+  .frame > .app { padding-right: var(--fol-col); transition: padding-right .32s var(--ease); }
+  .frame:has(> .fol[data-follower="open"]) .wide-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .frame:has(> .fol[data-follower="open"]) .wide-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 900px) and (max-width: 1179px) {
+  .frame { --fol-sheet-w: 340px; }
+  .frame:has(> .fol[data-follower="open"]) > .nav { width: 76px; padding-inline: 10px; }
+  .frame:has(> .fol[data-follower="open"]) > .nav :is(.nav-label, .nav-brand .eyebrow, .nav-foot) { display: none; }
+  .frame:has(> .fol[data-follower="open"]) > .nav .nav-brand { justify-content: center; padding-inline: 0; }
+  .frame:has(> .fol[data-follower="open"]) > .nav .nav-item { justify-content: center; padding: 0; }
+  .frame:has(> .fol[data-follower="open"]) .app .screen { padding-inline: 24px; }
+  .frame:has(> .fol[data-follower="open"]) :is(.wide-2, .wide-3, .wide-4) { grid-template-columns: minmax(0, 1fr); }
+  .frame:has(> .fol[data-follower="open"]) .span-2 { grid-column: auto; }
+}
+@media (prefers-reduced-motion: reduce) { .frame > .app { transition: none; } }
+/* 900–1179 px with the sheet open: run rows take their phone layout so the narrower column never overflows */
+@media (min-width: 900px) and (max-width: 1179px) {
+  .frame:has(> .fol[data-follower="open"]) .rrow { grid-template-columns: 36px minmax(0, 1fr) auto; grid-template-areas: "pill main spark" "pill main time"; gap: 4px 12px; padding-right: 52px; }
+  .frame:has(> .fol[data-follower="open"]) .rrow-pill { grid-area: pill; width: 36px; }
+  .frame:has(> .fol[data-follower="open"]) .rrow-main { grid-area: main; }
+  .frame:has(> .fol[data-follower="open"]) .rrow-spark { grid-area: spark; justify-self: end; }
+  .frame:has(> .fol[data-follower="open"]) .rrow-time { grid-area: time; }
+  .frame:has(> .fol[data-follower="open"]) .rrow-pct { display: none; }
+}

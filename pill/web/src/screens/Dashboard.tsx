@@ -11,6 +11,7 @@ import ActorAvatar from '../components/ActorAvatar';
 import Curve from '../components/Curve';
 import BinaryPill from '../components/BinaryPill';
 import Glyph from '../components/Glyph';
+import StationChip, { useStationStatus } from '../components/StationChip';
 import { useStore } from '../lib/store';
 import { useReducedMotion } from '../lib/motion';
 import { curve } from '../lib/rules';
@@ -147,6 +148,7 @@ export default function Dashboard() {
   const runs = useStore((s) => s.runs);
   const acts = useStore((s) => s.activities);
   const station = useStore((s) => s.station);
+  const live = useStationStatus();   // the pay service's /station/status: serial · simulated · no station
   const now = useNow();
   const k = kpis(deliveries, runs, now);
   const agent = scorecard(deliveries);
@@ -207,9 +209,9 @@ export default function Dashboard() {
         <section className="card panel hover-line" aria-label="Station pulse">
           <div className="panel-head">
             <h2 className="row" style={{ gap: 10 }}><Glyph name="station" size={30} />Station pulse</h2>
-            <span className={'chip ' + (station.online ? 'live' : 'bad')}><span className="dot" />{station.online ? 'online' : 'offline'}</span>
+            <StationChip status={live} />
           </div>
-          <StationPulse run={lastRun} band={ref} online={station.online} />
+          <StationPulse run={lastRun} band={ref} online={!!live} />
           <span className="mono muted" style={{ fontSize: 11.5 }}>
             {ref ? `${ref.drug} band ${ref.bandLow}–${ref.bandHigh} · ${ref.runs} runs · CV ${ref.cv} %` : 'no reference band'}{station.calibratedAt ? ` · calibrated ${hm(station.calibratedAt)}` : ''}
           </span>
@@ -307,8 +309,11 @@ export default function Dashboard() {
       <section className="card decor-dots dash-station" aria-label="Station">
         <Glyph name="cup" size={40} />
         <span className="stack" style={{ gap: 2, flex: '1 1 220px', minWidth: 0 }}>
-          <span style={{ fontWeight: 600 }}>{station.id} · {station.online ? 'online' : 'offline'}</span>
-          <span className="mono" style={{ fontSize: 12, color: 'var(--ink-2)' }}>{ref ? `${ref.drug} band ${ref.bandLow}–${ref.bandHigh}` : 'no reference band'}{station.calibratedAt ? ` · calibrated ${hm(station.calibratedAt)}` : ''}</span>
+          <span className="row" style={{ gap: 8, flexWrap: 'wrap' }}><span style={{ fontWeight: 600 }}>{station.id}</span><StationChip status={live} /></span>
+          <span className="mono" style={{ fontSize: 12, color: 'var(--ink-2)' }}>
+            {live === undefined ? 'asking the pay service…' : live ? `${live.mode === 'sim' ? 'simulator' : `USB serial${live.port ? ' ' + live.port : ''}`} · run ${live.state}` : 'no station on the pay service · runs play the recorded replays'}
+            {' · '}{ref ? `${ref.drug} band ${ref.bandLow}–${ref.bandHigh}` : 'no reference band'}{station.calibratedAt ? ` · calibrated ${hm(station.calibratedAt)}` : ''}
+          </span>
         </span>
         <div className="row" style={{ gap: 10, flex: '1 1 300px', justifyContent: 'flex-end' }}>
           <Link to="/calibration" className="btn ghost" style={{ textDecoration: 'none', width: 'auto', flex: 1, maxWidth: 200 }}>Calibration</Link>

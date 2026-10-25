@@ -15,7 +15,7 @@ import PhaseRail from '../components/PhaseRail';
 import Cup from '../components/phases/Cup';
 import { Action, Screen } from '../components/Shell';
 import { actions, useStore } from '../lib/store';
-import { stationStatus, type StationStatus } from '../lib/station';
+import StationChip, { useStationStatus } from '../components/StationChip';
 import { playSound } from '../lib/sound';
 import ReadAloud from '../components/ReadAloud';
 import '../components/cinema.css';
@@ -45,14 +45,7 @@ export default function Place() {
   }, [live]);
 
   // the physical station (pay service /station/status); null = none, and Start plays the replay as before
-  const [station, setStation] = useState<StationStatus | null>(null);
-  useEffect(() => {
-    let alive = true;
-    const poll = () => void stationStatus().then((s) => { if (alive) setStation(s); });
-    poll();
-    const timer = window.setInterval(poll, 5000);
-    return () => { alive = false; clearInterval(timer); };
-  }, []);
+  const station = useStationStatus() ?? null;
 
   const drug = bottle?.drug ?? 'Riboflavin';
   const lot = bottle?.lot ?? 'B2-07';
@@ -79,11 +72,7 @@ export default function Place() {
         <p className="mono" style={{ fontSize: 13, color: 'var(--ink-2)' }}>
           {drug}{bottle?.strength ? ' ' + bottle.strength : ''} · lot {lot}{deliveryId ? ` · delivery ${deliveryId}` : ''}
         </p>
-        {station && (
-          <span className="chip ok pop-in" data-station={station.mode} title={station.port ?? undefined}>
-            <span className="dot" />Station online{station.mode === 'sim' ? ' · simulated' : ''}
-          </span>
-        )}
+        {station && <StationChip status={station} />}
       </div>
       <div className="ph-run">
         <PhaseRail at="prepare" progress={checked / CHECKS.length} clock={`${checked} / ${CHECKS.length} checks`} sound={false}

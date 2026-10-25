@@ -47,7 +47,9 @@ function useDemoRunning() {
 }
 
 interface Dock { btn: number; sheet: number; max: number }
-const BTN_RIGHT = 16, SHEET_W = 380, SHEET_RIGHT = 24, GAP = 12;
+const BTN_RIGHT = 16, SHEET_RIGHT = 24, GAP = 12;
+// the desktop sheet is 380 px wide, 340 px below 1180 px (follower.css --fol-sheet-w)
+const sheetW = (vw: number) => (vw < 1180 ? 340 : 380);
 
 /** Bottom offsets that keep the button and the sheet above the phone tab bar and above any .action-bar they overlap. */
 function useDock(deps: unknown[]): Dock {
@@ -67,7 +69,7 @@ function useDock(deps: unknown[]): Dock {
     };
     const base = Math.max(navH, phone ? 0 : 12);
     const btn = Math.max(base, over(vw - BTN_RIGHT - 72, vw - BTN_RIGHT)) + GAP;
-    const sheet = phone ? Math.max(navH, over(0, vw)) + 8 : Math.max(base, over(vw - SHEET_RIGHT - SHEET_W, vw - SHEET_RIGHT)) + GAP;
+    const sheet = phone ? Math.max(navH, over(0, vw)) + 8 : Math.max(base, over(vw - SHEET_RIGHT - sheetW(vw), vw - SHEET_RIGHT)) + GAP;
     const max = Math.max(240, Math.round(Math.min(phone ? vh * 0.7 : 640, vh - sheet - 12)));
     setDock((d) => (d.btn === btn && d.sheet === sheet && d.max === max ? d : { btn, sheet, max }));
   }, []);

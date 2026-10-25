@@ -100,7 +100,7 @@ export function seedHistory(): { deliveries: Delivery[]; runs: Run[]; bottles: B
   // two deliveries still pending for the live demo
   deliveries.unshift(
     { id: 'd-1041', supplier: 'Northside Pharma Supply', drug: 'riboflavin', lot: 'B2-07', amountUsd: 1240, bottleId: null, runId: null, outcome: 'pending', clause: null, log: [{ at: now - 50 * 60e3, text: 'delivery logged · 1,240.00 clinic → escrow (SANDBOX / TESTNET)', kind: 'money' }] },
-    { id: 'd-1042', supplier: 'Bayview Medical Wholesale', drug: 'calcium carbonate', lot: 'TM-02', amountUsd: 480, bottleId: null, runId: null, outcome: 'pending', clause: null, log: [{ at: now - 30 * 60e3, text: 'delivery logged · 480.00 clinic → escrow (SANDBOX / TESTNET)', kind: 'money' }] },
+    { id: 'd-1042', supplier: 'Bayview Medical Wholesale', drug: 'calcium carbonate', lot: 'TM-02', amountUsd: 480, bottleId: null, runId: null, outcome: 'pending', clause: null, log: [{ at: now - 30 * 60e3, text: 'delivery logged · 480.00 clinic → escrow (SANDBOX / TESTNET)', kind: 'money' }], demo: true },
   );
   act(now - 50 * 60e3, PEOPLE.tech, 'logged delivery B2-07 from Northside Pharma Supply · $1,240 into escrow', 'money', { kind: 'delivery', id: 'd-1041' });
   act(now - 30 * 60e3, PEOPLE.tech, 'logged delivery TM-02 from Bayview Medical Wholesale · $480 into escrow', 'money', { kind: 'delivery', id: 'd-1042' });

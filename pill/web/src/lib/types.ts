@@ -54,6 +54,7 @@ export interface Run {
   samples: Sample[];
   evaluation: Evaluation | null;
   mode: Mode;
+  /** made by the guided demo (/demo); the next demo run removes it */ demo?: boolean;
 }
 
 export type Mode = 'medical' | 'personal';
@@ -71,6 +72,7 @@ export interface Bottle {
   runId: string | null;       // the one tested tablet
   takenAt: number[];          // dose log (personal)
   reminder: string | null;    // 'HH:MM' (personal)
+  /** made by the guided demo (/demo); the next demo run removes it */ demo?: boolean;
 }
 
 export type RecallStatus = 'no_record' | 'recall' | 'unreachable' | 'unchecked';
@@ -86,6 +88,7 @@ export interface Delivery {
   outcome: 'pending' | 'release' | 'hold' | 'escalate' | 'released';
   clause: string | null;      // 'P1'…'P6'
   log: LogLine[];
+  /** the guided demo's own delivery (/demo): each demo run resets it to just "logged" instead of adding another */ demo?: boolean;
 }
 
 export interface LogLine {
