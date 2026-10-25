@@ -13,6 +13,8 @@ const api = async (path, opts = {}) => {
   return j;
 };
 const post = (path, body) => api(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+/** Only http(s) URLs become links (sources come from model output and lookups). */
+const safeUrl = (u) => (/^https?:\/\//i.test(String(u || "").trim()) ? String(u).trim() : "");
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const mmss = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -463,7 +465,14 @@ route(/^\/welcome$/, (v) => {
             <span class="arrow" aria-hidden="true">→</span></button>`).join("")}
         <p class="footnote">You can change this later in Settings. ${esc(DISCLAIMER)}</p>
       </section>
-    </div></div>`;
+    </div>
+    <section class="card how-strip rise" style="--i:4" aria-label="How a check works">
+      <p class="eyebrow">How a check works</p>
+      <ol>${[["bottle", "Photo", "the bottle and one tablet"], ["cup", `Water ${S.config.timing.blank_s} s`, "clean water, lid closed, steady"], ["tablet", "Tablet in", "drop, stir 5 circles, close, Continue"], ["sensor", `${S.config.timing.quick_s} s`, "light through the cup as it dissolves"]]
+        .map(([g, t, sub], i) => `<li style="--i:${i}">${glyph(g, 40)}<span><b>${t}</b><small>${sub}</small></span></li>`).join("")}
+        <li class="answers" style="--i:4"><span><b>Three answers</b><span class="row wrap" style="gap:6px;margin-top:4px"><span class="chip wash-pass">Passed the screen</span><span class="chip wash-lab">Needs lab testing</span><span class="chip wash-unable">Unable to verify</span></span></span></li>
+      </ol>
+    </section></div>`;
   S.leave.push(mountBinaryPill(v.querySelector(".hero canvas"), { dark: true, cell: 8, scale: 1.9 }));
   v.querySelectorAll("[data-mode]").forEach((b) => (b.onclick = () => {
     PREF.mode = b.dataset.mode; navMode = null;
@@ -906,7 +915,7 @@ route(/^\/result\/([^/]+)$/, async (v, id) => {
       $("report").innerHTML = `<p>${esc(r.plain_summary)}</p><p class="what">${esc(r.what_to_do)}</p>` +
         (r.evidence || []).map((e) => `<p class="ev">${esc(e.claim)}${(e.source_ids || []).map((i) => `<button type="button" class="sup" data-src="${esc(i)}" aria-label="Source ${esc(num[i] || i)}">${esc(num[i] || i)}</button>`).join("")}</p>`).join("");
       $("r-by").textContent = `${s.report_stage === "final" ? "final report" : "first report"} · ${r.generated_by === "template" ? "template" : "written by " + r.generated_by}`;
-      $("sources").innerHTML = (r.sources || []).map((x, i) => `<li id="src-${esc(x.id)}"><b>${i + 1}</b><span>${x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)} ↗</a>` : esc(x.title)}<small class="src-kind">${esc(x.kind)}</small></span></li>`).join("") || "<li class='muted'>No sources yet.</li>";
+      $("sources").innerHTML = (r.sources || []).map((x, i) => `<li id="src-${esc(x.id)}"><b>${i + 1}</b><span>${safeUrl(x.url) ? `<a href="${esc(safeUrl(x.url))}" target="_blank" rel="noopener noreferrer">${esc(x.title)} ↗</a>` : esc(x.title)}<small class="src-kind">${esc(x.kind)}</small></span></li>`).join("") || "<li class='muted'>No sources yet.</li>";
       $("guard").textContent = (r.guardrail_fixes || []).length ? "Guardrail corrections: " + r.guardrail_fixes.join(" ") : "";
       $("report").querySelectorAll("[data-src]").forEach((b) => (b.onclick = () => { const t = document.getElementById("src-" + b.dataset.src); if (t) t.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "center" }); }));
     }
@@ -1126,7 +1135,7 @@ route(/^\/atlas$/, async (v) => {
   if (gone) return;
   const box = $("atlas"); box.innerHTML = "";
   graph = ForceGraph3D()(box).width(box.clientWidth).height(box.clientHeight)
-    .graphData(data).nodeLabel((n) => n.label).nodeColor((n) => (n.kind === "recall" && n.lot_match ? "#ff2d2d" : KIND_COLORS[n.kind] || "#ccc"))
+    .graphData(data).nodeLabel((n) => esc(n.label)).nodeColor((n) => (n.kind === "recall" && n.lot_match ? "#ff2d2d" : KIND_COLORS[n.kind] || "#ccc"))
     .nodeVal((n) => (n.kind === "seller" ? 2 + (n.reports || 1) * 2 : n.kind === "medicine" ? 6 : 3))
     .linkOpacity(0.5).backgroundColor("#0d1014")
     .cooldownTicks(120).onEngineStop(() => graph && graph.zoomToFit(400, 60));

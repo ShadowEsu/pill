@@ -78,7 +78,7 @@ body.no-nav .brand { visibility: visible; }
 .caret { display: inline-block; width: 2px; height: 1.05em; margin-left: 2px; vertical-align: -.16em; background: currentColor; animation: caret 1s steps(1) infinite; }
 @keyframes caret { 50% { opacity: 0; } }
 @media (min-width: 900px) { .hero { min-height: 520px; padding: 34px; } .hero-word { font-size: 104px; } .hero-line { font-size: 32px; } }
-.modes { display: grid; gap: 12px; align-content: start; }
+.modes { display: grid; gap: 12px; align-content: start; grid-template-columns: minmax(0, 1fr); }
 .mode-card { display: grid; grid-template-columns: 64px 1fr auto; align-items: center; gap: 16px; padding: 16px; min-height: 104px; }
 .mode-card .gl-box { width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center; background: color-mix(in srgb, var(--tone-c) 16%, #fff); }
 .mode-card h3 { font-size: 17px; }
@@ -329,3 +329,18 @@ table.raw tbody th small { color: var(--muted); font-size: 10px; margin-left: 4p
 .st-stats > div { background: rgba(14,18,22,.6); padding: 9px 11px; min-width: 0; }
 .st-stats dt { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: rgba(242,245,247,.55); }
 .st-stats dd { margin: 2px 0 0; font-family: var(--mono); font-size: 15px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ---------- round 2: welcome "how a check works" ---------- */
+.how-strip { display: grid; gap: 12px; }
+.how-strip ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); }
+.how-strip li { position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; align-items: center; animation: rise .45s var(--ease) backwards; animation-delay: calc(var(--i) * 90ms + 300ms); }
+.how-strip li.answers { grid-template-columns: minmax(0, 1fr); padding-left: 52px; }
+.how-strip li b { display: block; font-weight: 600; font-size: 15px; }
+.how-strip li small { display: block; font-size: 13px; color: var(--ink-2); }
+.how-strip li:not(:last-child)::after { content: ""; position: absolute; left: 19px; top: 44px; height: 8px; width: 2px; border-radius: 2px; background: var(--line-2); }
+@media (min-width: 900px) {
+  .how-strip ol { grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(0, 1.4fr); gap: 14px; }
+  .how-strip li { grid-template-columns: minmax(0, 1fr); align-content: start; gap: 8px; }
+  .how-strip li.answers { padding-left: 0; }
+  .how-strip li:not(:last-child)::after { left: auto; right: -12px; top: 18px; width: 10px; height: 2px; }
+}
