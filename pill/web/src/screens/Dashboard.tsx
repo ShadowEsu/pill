@@ -306,6 +306,19 @@ export default function Dashboard() {
         <span className="chip"><span className="dot" style={{ background: 'var(--ink)' }} />{usd(agent.movedByAgentAlone)} moved by the agent alone</span>
       </Link>
 
+      <Link to="/verify#how" className="card panel hover-line dash-agent" aria-label="How the money moves: Coinbase x402 and CDP server wallets" data-money-card>
+        <span className="dash-agent-art" aria-hidden="true"><Glyph name="wallet" size={52} /></span>
+        <span className="stack" style={{ gap: 4, flex: '1 1 220px', minWidth: 0 }}>
+          <span className="eyebrow">Coinbase x402 · CDP SDK</span>
+          <span className="row" style={{ gap: 8, fontWeight: 600, fontSize: 18 }}>How the money moves <span className="pointer" aria-hidden="true">→</span></span>
+          <span className="muted" style={{ fontSize: 14 }}>Station → three answers → the policy agent → pill-clinic → pill-escrow → pill-supplier, USDC on Base Sepolia. Which model does what, and what none of them ever does.</span>
+        </span>
+        <span className="row" style={{ gap: 6, flexWrap: 'wrap' }}>
+          <span className="chip"><span className="dot" style={{ background: 'var(--cb)' }} />TESTNET</span>
+          <span className="chip"><span className="dot" />SANDBOX</span>
+        </span>
+      </Link>
+
       <section className="card decor-dots dash-station" aria-label="Station">
         <Glyph name="cup" size={40} />
         <span className="stack" style={{ gap: 2, flex: '1 1 220px', minWidth: 0 }}>

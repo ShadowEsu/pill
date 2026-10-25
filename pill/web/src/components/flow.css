@@ -1,0 +1,48 @@
+/* FlowDiagram: ink words, ink arrows; colour only in fills and the lit lines (Coinbase blue); red only the Hold box.
+   A dashed arrow has not run yet. Reduced motion: no pulse, no transitions. */
+.flow { margin: 0; display: grid; gap: 10px; min-width: 0; }
+.flow-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.flow-hint { display: none; margin: 0; font-size: 13px; color: var(--ink-2); }
+.flow-scroll { overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; border-radius: 14px; padding-bottom: 4px; }
+.flow-scroll:focus-visible { outline: 2px solid var(--cb); outline-offset: 2px; }
+.flow-scroll svg { display: block; width: 100%; height: auto; overflow: visible; }
+@media (max-width: 899px) { .flow-hint { display: block; } }
+.flow.compact .flow-hint { display: none; }
+@media (max-width: 760px) { .flow.compact .flow-hint { display: block; } }
+
+.flow-head { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; fill: var(--ink-2); }
+.flow-box rect { fill: var(--surface, #fff); stroke: var(--ink); stroke-width: 1.2; transition: fill .4s var(--ease), stroke .4s var(--ease), stroke-width .4s var(--ease); }
+.flow-box.t-pass rect { fill: var(--mint-tint); }
+.flow-box.t-lab rect { fill: var(--amber-tint); }
+.flow-box.t-unable rect { fill: var(--grey-tint); }
+.flow-box.t-hold rect { fill: var(--warm-tint); }
+.flow-box.t-chip rect { fill: var(--grey-tint); stroke: var(--line-2); }
+.flow-box.on rect { stroke: var(--cb); stroke-width: 2.4; }
+.flow-box.on.t-plain rect, .flow-box.on.t-chip rect { fill: var(--cb-tint); }
+.flow-box.on { animation: flow-on 1.6s var(--ease) 1; }
+@keyframes flow-on { 0% { opacity: .55; } 100% { opacity: 1; } }
+.flow-title { font-family: var(--sans); font-weight: 600; fill: var(--ink); }
+.flow-title.mono, .flow-sub.mono { font-family: var(--mono); }
+.flow-sub { font-family: var(--sans); fill: var(--ink-2); }
+.flow-note { font-family: var(--sans); font-size: 11px; fill: var(--ink-2); font-style: italic; }
+.flow-arrow path { fill: none; stroke: var(--ink); stroke-width: 1.4; transition: stroke .4s var(--ease), stroke-width .4s var(--ease); }
+.flow-arrow.on path { stroke: var(--cb); stroke-width: 2.4; }
+.flow-arrow.pending path { stroke-dasharray: 6 5; }
+.flow-arrow.link path { stroke-width: 1; stroke: var(--line-2); }
+.flow-alabel { font-family: var(--sans); font-size: 10.5px; fill: var(--ink); }
+
+.flow-caption { display: grid; gap: 10px; font-size: 14px; color: var(--ink-2); }
+.flow-caption p { margin: 0; }
+.flow-caption p.mono { font-size: 12px; }
+.flow-models { overflow-x: auto; }
+.flow-models table { width: 100%; min-width: 560px; border-collapse: collapse; font-size: 13.5px; color: var(--ink); }
+.flow-models th, .flow-models td { text-align: left; vertical-align: top; padding: 8px 10px; border-top: 1px solid var(--line); }
+.flow-models thead th { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); border-top: 0; }
+.flow-models tbody th { width: 22%; font-weight: 600; }
+.flow-models tbody th span { display: block; font-weight: 400; font-size: 11.5px; color: var(--ink-2); margin-top: 2px; }
+.flow-models td.never { width: 24%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-box.on { animation: none; }
+  .flow-box rect, .flow-arrow path { transition: none; }
+}

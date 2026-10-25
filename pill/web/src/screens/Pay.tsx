@@ -2,9 +2,13 @@
 // wallet pays it with a plain USDC transfer (QR / EIP-681 link). The status comes only from the service's chain watcher:
 // it turns paid when the transfer is in Base Sepolia's USDC Transfer log, with the real tx hash. Nothing is simulated.
 // Query: ?purpose=verify|escrow-release|donation&run=<id> prefills a new order; ?order=<id> reopens one.
+// On top: the policy agent and the money column (FlowDiagram, compact) with one delivery's path lit from its outcome:
+// ?delivery=<id>, else the delivery of ?run=, else the newest delivery the policy has decided, else the newest one.
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Screen } from '../components/Shell';
+import FlowDiagram, { deliveryPath } from '../components/FlowDiagram';
+import { useStore } from '../lib/store';
 import Qr from '../components/Qr';
 import { PAY_URL, type Unavailable } from '../lib/api';
 import { CHECKOUT_PURPOSES, createCheckout, getCheckout, payWithAgent, watchCheckout, type AgentPayAnswer, type CheckoutOrder, type CheckoutPurpose } from '../lib/checkout';
@@ -36,6 +40,10 @@ export default function Pay() {
   const [agent, setAgent] = useState<AgentPayAnswer | Unavailable | 'busy' | null>(null);
   const [copied, setCopied] = useState(false);
   const started = useRef(false);
+  const deliveries = useStore((s) => s.deliveries);
+  const asked = params.get('delivery');
+  const current = deliveries.find((d) => d.id === asked) ?? (runId ? deliveries.find((d) => d.runId === runId) : undefined)
+    ?? deliveries.find((d) => d.outcome !== 'pending') ?? deliveries[0];
 
   const open = useCallback(async (reopen: string | null) => {
     setError(null); setAgent(null); setOrder(null);
@@ -66,6 +74,16 @@ export default function Pay() {
 
   return (
     <Screen title="Pay with USDC · TESTNET" eyebrow="Checkout · Base Sepolia" tone="violet" back>
+      <section className="card stack" style={{ gap: 10 }} aria-label="Where the money goes">
+        <div className="row between" style={{ gap: 8, flexWrap: 'wrap' }}>
+          <h2 className="serif" style={{ fontWeight: 400, fontSize: '1.5rem' }}>Where the money goes</h2>
+          {current
+            ? <Link to={`/delivery/${current.id}`} className="mono" style={{ fontSize: 12, color: 'var(--ink)' }}>lit: lot {current.lot} · {current.outcome} →</Link>
+            : <span className="mono muted" style={{ fontSize: 12 }}>no delivery logged yet</span>}
+        </div>
+        <FlowDiagram compact active={current ? deliveryPath(current.outcome) : []} label="The policy agent and the money on Coinbase CDP server wallets" />
+        <Link to="/verify#how" className="footnote" style={{ color: 'var(--ink)' }}>The whole diagram, with the x402 lane and the models →</Link>
+      </section>
       {!PAY_URL ? (
         <section className="card stack">
           <span className="chip"><span className="dot" />SERVICE NOT CONNECTED</span>

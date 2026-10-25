@@ -3,8 +3,11 @@
 // (the browser holds no wallet) while this screen polls GET /health. Without it: the v1 simulation, labelled SIMULATED.
 // Motion: the terminal reveals one line at a time and types the newest; the response headers land as chips; a mini
 // TokenRail carries the 5¢ from the asking wallet to the verify service once it settles; the "real 402" badge pulses.
+// Above it all, "How the money moves" (#how): the FlowDiagram, whose x402 lane lights only with what this request did.
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import FlowDiagram from '../components/FlowDiagram';
+import type { CheckoutOrder } from '../lib/checkout';
 import { Action, Screen, SrcBadge } from '../components/Shell';
 import TokenRail from '../components/TokenRail';
 import TypeIn from '../components/TypeIn';
@@ -56,6 +59,14 @@ export default function Verify() {
   const [accept, setAccept] = useState<Accept | null>(null);
   const [real402, setReal402] = useState(false);
   const [health, setHealth] = useState<{ at: number; h: Health | null } | null>(null);
+  // The x402 lane on the diagram, lit only by what this page really saw: the request, the 402, and (live) a settled x402
+  // verify order on the service after this request, which means the buyer signed, the facilitator answered and a paid 200
+  // went back. The simulation lights the request, the 402 and the signing step, never the facilitator or the 200.
+  const [lane, setLane] = useState<string[]>([]);
+  const light = (...ids: string[]) => setLane((xs) => [...xs, ...ids.filter((x) => !xs.includes(x))]);
+  const { hash } = useLocation();
+  const howRef = useRef<HTMLElement>(null);
+  useEffect(() => { if (hash === '#how') howRef.current?.scrollIntoView({ block: 'start' }); }, [hash]);
   const timers = useRef<number[]>([]);
   const stopStream = useRef<(() => void) | null>(null);
   const abort = useRef<AbortController | null>(null);
@@ -77,6 +88,8 @@ export default function Verify() {
     abort.current = ctl;
     const push = (...ls: Line[]) => setLines((xs) => [...xs, ...ls]);
     const bytes = new TextEncoder().encode(body).length;
+    const sentAt = Date.now();
+    light('buyer', 'post');
     push({ text: `POST ${url}/verify  content-type: application/json  (${bytes} B)`, tone: 'out' });
     let res: Response;
     try {
@@ -97,6 +110,7 @@ export default function Verify() {
       const a = required.accepts[0];
       setAccept(a);
       setReal402(true);
+      light('p402');
       setHeaders(['HTTP 402', 'PAYMENT-REQUIRED', `x402Version ${required.x402Version}`, a.network, `USDC ${(Number(a.amount) / 1e6).toFixed(2)}`, ...(mode ? [`x-pill-mode ${mode}`] : [])]);
       push(
         { text: `402 Payment Required · mode ${mode ?? 'unknown'}`, tone: 'in' },
@@ -113,10 +127,16 @@ export default function Verify() {
           setHealth({ at: Date.now(), h });
           setSvcMode(h.mode);
         } catch { if (!ctl.signal.aborted) setHealth({ at: Date.now(), h: null }); }
+        // a real x402 settlement lands in the service's checkout list as a paid 'verify' order (pill/pay server.ts onSettled)
+        try {
+          const j = (await (await fetch(`${url}/checkout`, { signal: ctl.signal })).json()) as { orders?: CheckoutOrder[] };
+          if (j.orders?.some((o) => o.source === 'x402' && o.purpose === 'verify' && o.status === 'paid' && Date.parse(o.createdAt) >= sentAt)) light('sign', 'facilitator', 'ok200');
+        } catch { /* the checkout list is optional; the lane simply stays where it is */ }
       };
       void poll();
       timers.current.push(window.setInterval(poll, HEALTH_MS));
     } else if (res.ok && resBody) {
+      light('ok200');   // a 200 really arrived, but no facilitator step ran: the paid arrow stays dashed
       setHeaders([`HTTP ${res.status}`, ...(mode ? [`x-pill-mode ${mode}`] : [])]);
       push({ text: `${res.status} OK · mode ${mode ?? 'unknown'}`, tone: 'pay' }, ...jsonLines(resBody));
     } else {
@@ -132,12 +152,12 @@ export default function Verify() {
     try { JSON.parse(body); } catch { ok = false; }
     const bytes = new TextEncoder().encode(body).length;
     // each beat: its terminal lines, plus what it does to the header chips and the rail
-    const beats: { lines: Line[]; headers?: string[]; paid?: boolean }[] = ok
+    const beats: { lines: Line[]; headers?: string[]; paid?: boolean; lane?: string[] }[] = ok
       ? [
-          { lines: [{ text: `POST /verify  content-type: application/json  (${bytes} B)`, tone: 'out' }] },
-          { lines: [{ text: '402 Payment Required', tone: 'in' }, { text: `  accepts: base-sepolia · USDC · 0.05 · payTo ${SIM_PAY_TO}`, tone: 'in' }], headers: ['HTTP 402', 'PAYMENT-REQUIRED'] },
+          { lines: [{ text: `POST /verify  content-type: application/json  (${bytes} B)`, tone: 'out' }], lane: ['buyer', 'post'] },
+          { lines: [{ text: '402 Payment Required', tone: 'in' }, { text: `  accepts: base-sepolia · USDC · 0.05 · payTo ${SIM_PAY_TO}`, tone: 'in' }], headers: ['HTTP 402', 'PAYMENT-REQUIRED'], lane: ['p402'] },
           { lines: [{ text: '  PAYMENT-REQUIRED, decoded:', tone: 'in' }, ...jsonLines(SIM_REQUIRED)], headers: ['x402Version 1', 'base-sepolia', 'USDC 0.05'] },
-          { lines: [{ text: 'cap check: 0.05 USDC per verdict, 1 USDC daily cap · within the cap', tone: 'pay' }] },
+          { lines: [{ text: 'cap check: 0.05 USDC per verdict, 1 USDC daily cap · within the cap', tone: 'pay' }], lane: ['sign'] },
           { lines: [{ text: 'wallet signs 0.05 USDC (CDP agent wallet, TESTNET)', tone: 'pay' }] },
           { lines: [{ text: 'POST /verify  X-PAYMENT: <signed>', tone: 'out' }], headers: ['X-PAYMENT'] },
           { lines: [{ text: `200 OK · settled tx ${SIM_TX}`, tone: 'pay' }], headers: ['HTTP 200', 'X-PAYMENT-RESPONSE'], paid: true },
@@ -154,6 +174,7 @@ export default function Verify() {
         setLines((xs) => [...xs, ...b.lines]);
         if (b.headers) setHeaders((hs) => [...hs, ...b.headers!]);
         if (b.paid) setPaid(true);
+        if (b.lane) light(...b.lane);
       }, at));
     });
     const scriptMs = at + step;
@@ -190,6 +211,7 @@ export default function Verify() {
     setSrc(null);
     setAccept(null);
     setHealth(null);
+    setLane([]);
   }
 
   function send() {
@@ -216,6 +238,14 @@ export default function Verify() {
     <Screen title="Pay per verdict" eyebrow="Coinbase · x402" back="/" tone="violet" art={<Glyph name="wallet" size={48} />}
       right={<span className="chip"><span className="dot" style={{ background: 'var(--cb)' }} />x402 · TESTNET</span>}>
       <p style={{ color: 'var(--ink-2)', fontSize: 15 }}>Another clinic sends a curve; the service asks for 0.05 USDC before it answers. The verdict comes from the same seven rules the station uses.</p>
+
+      <section ref={howRef} id="how" className="card stack" style={{ gap: 10, scrollMarginTop: 16 }} aria-label="How the money moves">
+        <div className="row between" style={{ gap: 8, flexWrap: 'wrap' }}>
+          <h2 className="serif" style={{ fontWeight: 400, fontSize: '1.7rem' }}>How the money moves</h2>
+          <span className="mono muted" style={{ fontSize: 12 }}>{lane.length ? `lit: what this request did${PAY_URL ? '' : ' (SIMULATED)'}` : 'Send a curve to light the x402 lane'}</span>
+        </div>
+        <FlowDiagram active={lane} />
+      </section>
 
       <div className="wide-2" style={{ alignItems: 'start' }}>
         <div className="stack" style={{ gap: 14, minWidth: 0 }}>

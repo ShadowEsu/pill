@@ -140,6 +140,10 @@ export default function Settings() {
               <span className="mono" style={{ fontSize: 12, color: 'rgba(255,255,255,.7)' }}>pill-site.vercel.app ↗</span>
             </span>
           </a>
+          <p className="card" style={{ margin: 0, padding: '12px 16px', fontSize: 15 }} data-payments-line>
+            Payments: Coinbase x402 + CDP server wallets, USDC on Base Sepolia (TESTNET); Nessie SANDBOX mirror.{' '}
+            <Link to="/verify#how" style={{ color: 'var(--ink)', fontWeight: 600 }}>How the money moves →</Link>
+          </p>
           <section className="card set-group" aria-label="Credits and sources" style={{ '--i': 1 } as React.CSSProperties}>
             <GroupHead glyph="lab" title="Credits & sources" i={3} />
             <ul className="credits">
