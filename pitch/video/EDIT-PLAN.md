@@ -2,7 +2,7 @@
 
 Source: `pitch/video-raw/preston-pitch-raw.mp4`: 179.42 s, h264 1024×576 with a −90° rotation side-data tag (displays **portrait 576×1024**), 600/19 fps (31.58), AAC 44.1 kHz stereo. Output: **1080×1920**, 30 fps, h264 CRF 20, AAC 192k, faststart, loudnorm −16 LUFS.
 
-**Status: rendered** to `pitch/video/pill-pitch-90s.mp4` (2026-10-25). Everything below is in `pitch/video/edit/`, all generated from one cut list in `make_edit.py`.
+**Status: v2 rendered** to `pitch/video/pill-pitch-90s.mp4` (2026-10-25 01:03, commit 037d74d + this doc). v2 = owner's notes at 00:55: "it's not really payment, it's the process I explained; more animations; I can't hear music; more fun, more pop-ups". The 402 chip is gone; the pop-ups now tell his two processes; louder original score + SFX. Everything below is in `pitch/video/edit/`, all generated from one cut list in `make_edit.py`.
 
 ```
 bash pitch/video/edit/build.sh --preview   # seconds 0–10 (hook glow + first dip + captions) → pitch/video/pill-pitch-preview10.mp4
@@ -49,19 +49,19 @@ Hook first; then the problem in his words; the app and the box in the order he f
 
 ## Effects per cut
 - **C1 J-cut + glow (the "This is Pill" moment):** his audio runs 0:44.30–0:49.10 throughout. Video: 0.9 s of him (graded) on "So what we built", then at "it's Pill" a straight cut to the station shot 2:05.10–2:08.03 slowed to 0.75× (`setpts=(PTS-STARTPTS)/0.75`, `fps=30`, no interpolation) = 3.9 s. On that shot: upscale to 2160×3840 → `zoompan` 1.00→1.30 over 3.3 s, then holds (slow push in), then `split` into three: base, a `gblur σ=34` copy tinted violet (`colorchannelmixer`) blended `screen` at 0.62 (the glow), and an `edgedetect` ink-line copy blended `multiply` at 0.35 (the cartoon outline); then `eq` contrast 1.14 / sat 1.30 and `vignette PI/3.2` (focus). No ring on the hook (the glow, zoom and title carry it); the serif-italic **"Pill"** title (Instrument Serif, violet halo + paper outline, −4° tilt) pops 40→118→100 % on the cut at 0.90 s. Exits with a 0.25 s dip to white.
-- **grade** (all other cuts): `eq` contrast 1.05, saturation 1.10, gamma 1.04 (night footage lift).
-- **punch** (C4, C10): static 8 % punch-in, the "zoom cut" on the line that matters.
-- **Pop-ups** (`stickers/*.png`, spring-in: 70 px drop with a damped bounce + 0.12 s alpha fade, 0.18 s fade out): pill glyph @0:16.02 at "aspirin 81" (C3) · "The box measures." @0:27.21 then violet "Pill explains." @0:28.01 (C5, the website) · arrow at the water mark @0:41.03 (C6, 360 px) · ring round the timer dial on the laptop @0:47.28 (C8, 360 px = 33 % of the frame width) · "UNO Q · 1 line/s" @0:50.84 (C9) · the three answers stacked at "Unable to verify": "Passed the screen" @1:11.44 and "Needs lab testing" @1:11.59 dimmed to 45 %, "Unable to verify" @1:11.74 full and larger (C11, held into "So watch out") · end card pill @1:18.51 and "402 Payment Required · TESTNET" @1:19.11.
+- **grade** (under every cut's motion): `eq` contrast 1.05, saturation 1.10, gamma 1.04 (night footage lift).
+- **punch** (C4, C7, C10): static 8 % punch-in, the "zoom cut" on the line that matters.
+- **Pop-ups v2** (`stickers/pop-*.png` from `render_pops.mjs`, cropped to content; each springs in from 55 % scale with a damped overshoot and a 40-px drop, fades out, and plays a pop): **supply-chain process** stacked over the laptop below the captions, each staying to the end of C4: "✓ FDA process" @0:06.95 · "✓ Checked again… and again" @0:10.62 · "✓ Pharmacy shelf" @0:14.72 · amber "? The last step can fail" @0:19.48 · amber "! Wrong drug inside?" @0:23.08 (his words: "some of them could be malfunctioned… put different drugs in here") · **Pill process tracker** at the top: "Step 1 of 6 · Prescription" @0:27.21 → 2 What it looks like → 3 Water to the line → 4 Tablet in → 5 Countdown (held through the hardware) → 6 The answer @1:11.46 · extras: 🤔 at "why pills", "3D-printed ✨", 💧, 👀, ⏱️, "red · blue · white" light dots, "3 lights → 1 reading", the three answers (kept), 😬 at "oh no", pill at "swallow the right pills". Removed: "The box measures." / "Pill explains." chips over C5 (the line stays on the end card) and the "402 Payment Required" chip.
+- **Motion v2:** `push` = slow 1.00→1.06 push-in on every talking cut; `punch` on C4, C7, C10; C11 `shake` = 0.5-s decaying shake + 0.12-s white flash at "oh no".
 - **Captions** (`captions.ass`, libass, burned in last): 2–3-word groups, centred at y=1150 (inside the Meta/TikTok safe area), Inter Bold 86 px ink on a paper sticker outline (13 px) with a soft shadow; each group pops in 82→106→100 %; the spoken word flips to white ink on a violet fill and pops to 116 % for 180 ms, then returns to ink-on-paper. "PILL" and "UNABLE TO VERIFY" switch to Instrument Serif Italic. Colour only in fills; words are black or white.
 
-## Music
-The film's own generated score, `pitch/film/work/music.wav` (158 s, 96 BPM soft pad, sine bass on the bar, quiet pluck: rendered by `pitch/film/film.html` `renderAudio()`; original, so no licence or attribution needed). It's used from 0:00. Its scene ticks (22.5, 39.5, 51.5, 62.5 s) are muted with a volume envelope.
-- **Cue points:** 0:00 score in at full under the hook (0.4 s fade-in) · from ~0:00.8 ducked under his voice by `sidechaincompress` (threshold 0.025, ratio 9, attack 15 ms, release 380 ms) · lifts in his pauses (whips at 0:27.1, 0:47.1, 1:07.3) · 1:18.2 voice ends, score comes back up under the end card · 1:20.6 1.6 s fade-out.
-- Voice: high-pass 90 Hz + light `afftdn` (outdoor wind/noise); final `loudnorm I=-16 TP=-1.5 LRA=11`.
-- `pitch/film/work/` is untracked: the render needs this machine (or `MUSIC=/path/to.wav bash build.sh`).
+## Music + SFX (v2)
+`make_music.py` synthesises an original upbeat score, `work/music-fun.wav` (116 BPM, F–C–Dm–Bb: kick, clap, hats, bass, off-beat pluck chords, bell hook every other bar; no licence or attribution needed because nothing is sampled), plus `sfx/{pop,whoosh,ding,uhoh}.wav`. Run with the local venv: `uv venv -p 3.11 .venv && uv pip install -p .venv/bin/python numpy && .venv/bin/python make_music.py 90` (both outputs are gitignored, regenerate on another machine).
+- Mix: score at gain 0.34 (≈ −23 LUFS before the mix), light duck under his voice (`sidechaincompress` threshold 0.05, ratio 3, 20/300 ms), 0.3-s fade-in, 1.6-s fade-out; pop on every sticker, whoosh before each whip / fadewhite, uh-oh on "oh no", ding on the end card; `loudnorm I=-16`.
+- Measured on the v2 render: integrated −15.6 LUFS; end card (score + ding, no voice) −18.4 LUFS vs −16 LUFS in speech windows, so the score is plainly audible in every gap and sits roughly 7–10 dB under the voice.
 
 ## End card (1:18.21–1:22.21, 4 s)
-Paper background `#F4EFE6` · pill glyph · "The box measures. Pill explains." (Instrument Serif Italic 96) · "402 Payment Required · TESTNET" chip (x402 on Base Sepolia testnet) · **pill-site.vercel.app** · **github.com/ShadowEsu/pill** (Inter Bold 58).
+Paper background `#F4EFE6` · pill glyph · "The box measures. Pill explains." (Instrument Serif Italic 96) · chip "① tablet · one cup · three answers" with a ding · **pill-site.vercel.app** · **github.com/ShadowEsu/pill** (Inter Bold 58).
 
 ## Assets (`pitch/video/edit/`)
 - `make_edit.py`: the one source of truth (cut list, captions, pop-ups) → generates the four files below
@@ -72,7 +72,7 @@ Paper background `#F4EFE6` · pill glyph · "The box measures. Pill explains." (
 - `transcribe.sh`: the Gemini Files API transcription script
 - `bin/ffmpeg` (gitignored): static ffmpeg 9.0.2 with libass from ffmpeg.martin-riedl.de, because Homebrew's ffmpeg 8.1.2 has no `ass`/`subtitles` filter. `build.sh` fetches it again if it's missing.
 
-Checks run: `bash -n build.sh` OK; `build.sh --check` OK; full render 2026-10-25 00:49 → `pill-pitch-90s.mp4` (57.3 MB): video 82.20 s / 2466 frames, audio 82.30 s, integrated −16.2 LUFS, LRA 4.7 LU; frames checked at 2, 30, 48, 70 (result: "Checking…"), 78 ("Thank you.") and 81 s (full end card); `caption_check.py captions.srt`: 24 cues, 0 problems.
+Checks run (v2, 2026-10-25 01:03): `make_edit.py` + `build.sh --check` OK; 10-s preview frames viewed (hook glow, 🤔, FDA chip); full render 47 s → `pill-pitch-90s.mp4` (58.2 MB): video 82.20 s, audio 82.30 s, −15.6 LUFS; frames viewed at 23.3, 36.7, 43.3, 47.7, 56.7, 71.7, 72.2, 81.3 s (process stack, steps 3/5/6, 3D chip, timer, lights, answers + flash + 😬, end card without 402).
 
 ## Trend notes (sources opened 2026-10-24)
 - Word-by-word captions with an active-word highlight are the dominant short-form look; keep 2–4 words on screen, never a full sentence (zellahq.com, "Best Caption Styles for Short-Form Video", rev. 2026-10-23: https://zellahq.com/blog/best-caption-styles-for-short-form-video/). → 2–3-word groups with a highlighted spoken word.
