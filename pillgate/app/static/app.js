@@ -286,8 +286,10 @@ async function tick() {
   try { S.live = await api("/api/live"); } catch { S.live = null; }
   tickBusy = false;
   paintDevice();
+  if (S.live && !Run.recording && S.live.status && S.live.status.recording) await Run.adopt(S.live);
   if (S.live && Run.recording) Run.onLive(S.live);
   if (S.onLive && S.live) S.onLive(S.live);
+  paintRunBar();
 }
 
 // ================================================================ nav
@@ -347,6 +349,7 @@ async function render() {
   const path = (location.hash.slice(1) || "/").split("?")[0];
   if (!mode() && path !== "/welcome") { location.replace("#/welcome"); return; }
   if (path === "/" && mode() === "check") { location.replace("#/check/bottle"); return; }
+  if (/^\/check\/(bottle|tablet)$/.test(path) && (Run.recording || Run.phase === "analyzing")) { location.replace("#/check/measure"); return; }   // mid-run "Check" goes back to the run
   S.leave.splice(0).forEach((f) => { try { f(); } catch {} });
   S.onLive = null;
   document.body.dataset.mode = mode();
@@ -358,6 +361,7 @@ async function render() {
   view.innerHTML = "";
   renderNav(path);
   window.scrollTo(0, 0);
+  paintRunBar();
   try { await hit[0](view, ...hit[1].map(decodeURIComponent)); } catch (e) { view.insertAdjacentHTML("beforeend", `<div class="card banner note">Could not load this page: ${esc(e.message)}</div>`); }
   paintDevice();
 }
@@ -379,12 +383,33 @@ function beep(times = 1) {
 
 // ================================================================ the guided run (page-independent: keeps going if you look at another page)
 // idle → water (clean-water check) → add (beep, ~10 s to drop + stir + close) → dissolving (auto stop) → analyzing → result
+// One global poller (tick, 2×/s) drives it on every page, so you can open History or Profiles mid-run: the auto stop and the
+// scan still happen. A small marker in sessionStorage lets a reloaded tab re-attach to its own recording (never another tab's).
+const RUN_KEY = "pillgate.run";
 const Run = {
-  phase: "idle", started: 0, recording: false, slow: false, listeners: new Set(),
-  set(p) { this.phase = p; this.started = Date.now(); this.slow = false; this.listeners.forEach((f) => f()); },
+  phase: "idle", started: 0, recording: false, slow: false, stopping: false, listeners: new Set(),
+  dissolveS: 0, readyScan: null,            // elapsed seconds for the run bar; a scan made while you were on another page
+  set(p) { this.phase = p; this.started = Date.now(); this.slow = false; this.save(); this.listeners.forEach((f) => f()); paintRunBar(); },
+  save() {
+    try {
+      if (this.recording) sessionStorage.setItem(RUN_KEY, JSON.stringify({ phase: this.phase, runMode: S.check.runMode, profileId: S.check.profileId, continuedAt: this.continuedAt || null }));
+      else sessionStorage.removeItem(RUN_KEY);
+    } catch {}
+  },
   async start() {
     await post("/api/run/start", { mode: S.check.runMode });
-    this.recording = true; this.set("water");
+    this.recording = true; this.stopping = false; this.continuedAt = null; this.readyScan = null; this.set("water");
+  },
+  /** The server is recording but this page doesn't know it (reload): re-attach if this tab started it. */
+  async adopt(d) {
+    let m = null; try { m = JSON.parse(sessionStorage.getItem(RUN_KEY) || "null"); } catch {}
+    if (!m || this.adopting) return;
+    this.adopting = true;
+    Object.assign(S.check, { runMode: m.runMode || "quick", profileId: m.profileId || "" });
+    await Photos.restore();
+    this.recording = true; this.stopping = false; this.continuedAt = m.continuedAt;
+    this.set(d.guide && d.guide.phase === "dissolving" ? "dissolving" : m.phase === "add" ? "add" : "water");
+    this.adopting = false;
   },
   onLive(d) {
     const g = d.guide; if (!g) return;
@@ -392,23 +417,53 @@ const Run = {
       if (g.ok) { post("/api/run/mark", { name: "water_ok" }).catch(() => {}); this.set("add"); beep(2); }
       else if (!this.slow && (Date.now() - this.started) / 1000 > 60) { this.slow = true; this.listeners.forEach((f) => f()); }
     }
+    if (g.phase === "dissolving") this.dissolveS = g.elapsed_s || 0;
     if (this.phase === "dissolving" && g.phase === "dissolving" && g.stop) { beep(3); this.finish("auto: " + g.why); }
   },
   async tabletIn() { await post("/api/run/mark", { name: "tablet_in" }); this.continuedAt = Date.now(); this.set("dissolving"); },
   async finish() {
-    if (this.phase === "analyzing") return;
+    if (this.stopping || this.phase === "analyzing") return;      // one stop per run, whichever page asked
+    this.stopping = true;
     this.set("analyzing");
     try {
       const r = await post("/api/run/stop", { label: "check", profile_id: S.check.profileId || null });
-      this.recording = false;
+      this.recording = false; this.save();
       await startScan(r.run_id);
-    } catch (e) { this.recording = false; toast("Could not stop: " + e.message); this.set("idle"); }
+    } catch (e) { this.recording = false; this.save(); toast("Could not stop: " + e.message); this.set("idle"); }
+    this.stopping = false;
   },
   async cancel() {
+    this.stopping = true;
     try { await post("/api/run/stop", { label: "cancelled" }); } catch {}
-    this.recording = false; this.set("idle");
+    this.recording = false; this.stopping = false; this.set("idle");
   },
 };
+const onPath = (re) => re.test((location.hash.slice(1) || "/").split("?")[0]);
+/** Slim sticky bar on every page except Measure while a run is going, then "Result ready" once its scan exists. */
+function paintRunBar() {
+  const bar = $("runbar"); if (!bar) return;
+  const show = (cls, html) => {             // only touch the DOM when the words change (it runs 2×/s)
+    if (bar.className !== cls) bar.className = cls;
+    if (bar._html !== html) { bar._html = html; bar.innerHTML = html; }
+    if (bar.hidden) { document.documentElement.style.setProperty("--top-h", $("topbar").offsetHeight + "px"); bar.hidden = false; }
+  };
+  const onMeasure = onPath(/^\/check\/measure$/);
+  if (Run.recording || Run.phase === "analyzing") {
+    if (onMeasure) { bar.hidden = true; return; }
+    const T = S.config.timing, g = S.live && S.live.guide;
+    const what = Run.phase === "water" ? `Clean water ${g && g.phase === "water" ? `${Math.floor(g.steady_s || 0)}/${g.needed || T.blank_s} s` : ""}`
+      : Run.phase === "add" ? "Add the tablet now"
+      : Run.phase === "dissolving" ? `Dissolving ${mmss(Run.dissolveS)}${S.check.runMode === "quick" ? " of " + mmss(T.quick_s) : ""}`
+      : "Building the result…";
+    show("runbar" + (Run.phase === "add" ? " urgent" : ""), `<span class="rb-dot" aria-hidden="true"></span><span class="rb-text"><b>Run in progress</b> · ${esc(what)}</span><a class="rb-go" href="#/check/measure">↩ back to the run</a>`);
+    return;
+  }
+  if (Run.readyScan && !onPath(new RegExp("^/result/" + Run.readyScan.replace(/[^\w-]/g, "") + "$"))) {
+    show("runbar ready", `<span class="rb-dot" aria-hidden="true"></span><span class="rb-text" role="status"><b>Result ready</b> · your check finished</span><a class="rb-go" href="#/result/${encodeURIComponent(Run.readyScan)}">Open result →</a>`);
+    return;
+  }
+  bar.hidden = true;
+}
 async function startScan(runId) {
   const fd = new FormData();
   fd.append("run_id", runId); fd.append("profile_id", S.check.profileId || "");
@@ -416,10 +471,27 @@ async function startScan(runId) {
   if (S.check.imprint) fd.append("imprint", S.check.imprint);
   const r = await api("/api/scans", { method: "POST", body: fd });
   S.check.scanId = r.scan_id;
+  Photos.clear();
+  const stayed = onPath(/^\/check\//);          // still on the check flow: go straight to the result
+  Run.readyScan = stayed ? null : r.scan_id;      // elsewhere (History, Profiles…): don't yank the page, show "Result ready"
   Run.set("idle");
-  location.hash = "#/result/" + encodeURIComponent(r.scan_id);
+  if (stayed) location.hash = "#/result/" + encodeURIComponent(r.scan_id);
 }
+// Photos survive a reload during a run (IndexedDB holds the File blobs; sessionStorage can't). Best effort: failures are silent.
+const Photos = {
+  db() { return new Promise((ok, bad) => { const q = indexedDB.open("pillgate", 1); q.onupgradeneeded = () => q.result.createObjectStore("photos"); q.onsuccess = () => ok(q.result); q.onerror = () => bad(q.error); }); },
+  async put(key, file) { try { const d = await this.db(); d.transaction("photos", "readwrite").objectStore("photos").put(file || null, key); } catch {} },
+  async restore() {
+    try {
+      const d = await this.db();
+      const get = (k) => new Promise((ok) => { const q = d.transaction("photos").objectStore("photos").get(k); q.onsuccess = () => ok(q.result || null); q.onerror = () => ok(null); });
+      for (const k of ["bottle", "imprint"]) { const f = await get(k); if (f && !S.check[k]) { S.check[k] = f; S.check[k + "Url"] = URL.createObjectURL(f); } }
+    } catch {}
+  },
+  clear() { this.put("bottle", null); this.put("imprint", null); },
+};
 function resetCheck() {
+  Photos.clear();
   ["bottleUrl", "imprintUrl"].forEach((k) => S.check[k] && URL.revokeObjectURL(S.check[k]));
   Object.assign(S.check, { bottle: null, imprint: null, bottleUrl: "", imprintUrl: "", scanId: null });
 }
@@ -573,12 +645,12 @@ function viewfinderPage(v, { key, step, title, eyebrow, tone, tips, next, back, 
   v.querySelector(`#file-${key}`).addEventListener("change", (e) => {
     const f = e.target.files[0]; if (!f) return;
     if (S.check[key + "Url"]) URL.revokeObjectURL(S.check[key + "Url"]);
-    S.check[key] = f; S.check[key + "Url"] = URL.createObjectURL(f);
+    S.check[key] = f; S.check[key + "Url"] = URL.createObjectURL(f); Photos.put(key, f);
     viewfinderPage(v, { key, step, title, eyebrow, tone, tips, next, back, hint });
   });
   v.querySelector("#vf-skip").onclick = () => {
     if (S.check[key + "Url"]) URL.revokeObjectURL(S.check[key + "Url"]);
-    S.check[key] = null; S.check[key + "Url"] = ""; location.hash = "#" + next;
+    S.check[key] = null; S.check[key + "Url"] = ""; Photos.put(key, null); location.hash = "#" + next;
   };
 }
 
@@ -763,11 +835,12 @@ route(/^\/check\/measure$/, async (v) => {
         <p class="lead">Water looks good. <b>Lift the lid, drop the tablet in the middle, stir 5 slow circles with the stick, take the stick out and close the lid, all within about 10 seconds.</b> Then press <b>Continue</b> right away.</p>
         <div class="row wrap" style="justify-content:center"><button type="button" class="btn" id="btn-continue" style="min-width:240px">Tablet is in · Continue</button><button type="button" class="btn ghost" id="btn-cancel">Cancel</button></div>`;
       $("ring").classList.add("pulse");
-      const t0 = Date.now(); let rang = false;
+      const t0 = Run.started; let rang = Date.now() - t0 > 10000;   // re-attaching keeps the original countdown, no second beep
       const step = () => {
         const left = Math.max(0, 10 - (Date.now() - t0) / 1000);
         setRing($("ring"), left / 10, String(Math.ceil(left)), left > 0 ? "seconds" : "press Continue");
-        if (!left && !rang) { rang = true; beep(1); $("ring").classList.add("due"); }
+        if (!left && !rang) beep(1);
+        if (!left) { rang = true; $("ring").classList.add("due"); }
       };
       step(); countdown = setInterval(step, 200);
       $("btn-continue").onclick = (e) => { e.target.disabled = true; Run.tabletIn().catch((err) => { toast(err.message); e.target.disabled = false; }); };
