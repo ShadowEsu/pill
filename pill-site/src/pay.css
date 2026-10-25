@@ -53,7 +53,7 @@
 .x402 .term .line { display: block; opacity: 0; transform: translateY(4px); }
 .x402 .term .line.on { opacity: 1; transform: none; transition: opacity .3s, transform .3s; }
 .x402 .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
-.x402 .pbtn-call { font: 600 14px/1 var(--sans); border: 1px solid var(--ink); background: var(--ink); color: #fff; border-radius: 999px; padding: 12px 18px; cursor: pointer; }
+.x402 .pbtn-call { font: 600 14px/1 var(--sans); border: 1px solid var(--ink); background: var(--ink); color: #fff; border-radius: 999px; padding: 0 18px; min-height: 44px; cursor: pointer; }
 .x402 .pbtn-call.alt { background: transparent; color: var(--ink); }
 
 /* pricing */
@@ -77,7 +77,7 @@
 @media (max-width: 900px) { .calc { grid-template-columns: 1fr; } }
 .calc label { display: block; font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
 .calc label output { color: var(--ink); font-family: var(--sans); font-weight: 600; font-size: 14px; letter-spacing: 0; text-transform: none; margin-left: 8px; }
-.calc input[type="range"] { width: 100%; height: 32px; accent-color: var(--cb); margin: 0 0 12px; }
+.calc input[type="range"] { width: 100%; height: 44px; accent-color: var(--cb); margin: 0 0 12px; }
 .calc .out { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .calc .out > div { border-top: 2px solid rgba(79,179,255,.55); padding-top: 12px; }
 .calc .out > div:nth-child(2) { border-top-color: var(--cb); }

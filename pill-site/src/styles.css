@@ -331,3 +331,6 @@ html { scroll-padding-top: 76px; }
 
 /* on dark sections every muted label uses the dark muted grey (the light one is 3.2:1 there) */
 .dark { --muted: var(--dark-muted); }
+/* glass cards on dark: a faint lift, not a grey slab */
+.dark .accounts > div { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.1); backdrop-filter: none; -webkit-backdrop-filter: none; }
+.dark .accounts b { color: var(--dark-text); }
