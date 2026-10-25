@@ -433,7 +433,7 @@ function capsule(s, i = 0) {
   return `<a class="card capsule rise" style="--i:${i}" href="#/result/${encodeURIComponent(s.id)}">
     <span class="cap-icon cap-${cls}" aria-hidden="true"></span>
     <span class="meta"><b>${esc(s.drug || "Unknown medicine")}${s.lot ? " · lot " + esc(s.lot) : ""}</b><small>${esc(s.id)} · ${s.created ? esc(timeAgo(s.created)) : ""}</small></span>
-    <span>${resultChips(s.overall, s.done)}</span></a>`;
+    <span class="cap-chips">${resultChips(s.overall, s.done)}</span></a>`;
 }
 const dateEyebrow = () => new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 
@@ -763,6 +763,207 @@ route(/^\/check\/measure$/, async (v) => {
     try { const r = await api("/api/run/upload", { method: "POST", body: fd }); await startScan(r.run_id); } catch (e) { toast("Could not read that text: " + e.message); }
   };
   $("btn-old").onclick = () => { if ($("old-run").value) startScan($("old-run").value).catch((e) => toast(e.message)); };
+});
+
+// ================================================================ 6. Result (stamp, live stage log, curve vs reference, report)
+const STAGE_NAME = { load: "Read the run", vision: "Read the photos", normalize: "Match the name and profile", lookups: "RxNav and openFDA lookups", web: "Regulator web search", report: "Write the report", guardrail: "Check the report against the records" };
+const stageTick = (st) => {
+  if (st === "done" || st === "ok") return `<span class="tick ok">${tickSvg}</span>`;
+  if (st === "skipped") return `<span class="tick skip"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 6h6"/></svg></span>`;
+  if (st === "running") return `<span class="tick run"></span>`;
+  if (st === "pending") return `<span class="tick pend"></span>`;
+  return `<span class="tick err"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 3v3.6M6 8.8v.1"/></svg></span>`;
+};
+function modeLine(v) {
+  const m = mode();
+  if (m === "clinic") return v === "NEEDS_LAB" ? `<span class="chip wash-held"><span class="dot" style="background:var(--warm)"></span>held</span> Delivery held: send a sample for lab testing.`
+    : v === "PASSED_SCREEN" ? `The pharmacist can release this delivery. Release is a human tap, never automatic.` : `Delivery stays at the gate until the test is repeated.`;
+  if (m === "personal") return v === "PASSED_SCREEN" ? `Passed this screen. It checks how the tablet dissolves; it does not identify ingredients.` : `Show this to a pharmacist before taking more of it.`;
+  return v === "NEEDS_LAB" ? "Send a sample for lab testing." : "";
+}
+const kpiCell = (label, val) => `<div><dt>${esc(label)}</dt><dd>${esc(val)}</dd></div>`;
+const kvList = (o) => Object.entries(o || {}).filter(([, x]) => x !== null && x !== undefined && x !== "" && typeof x !== "object").map(([k, x]) => `<dt>${esc(k.replace(/_/g, " "))}</dt><dd>${esc(x)}</dd>`).join("");
+
+route(/^\/result\/([^/]+)$/, async (v, id) => {
+  let chart = null, timer = 0, lastTitle = "", drewCurve = false, left = false;
+  v.innerHTML = `<div id="r-head"></div>${stepsRail(3)}
+    <section class="card stamp-card" id="stamp"><span class="stamp pending">Checking…</span><p class="muted">The run is in. Reading the photos, looking up recalls and writing the report.</p></section>
+    <div class="wide-2">
+      <section class="card stack"><div class="row between"><h2 class="h">What the app is doing</h2><span class="chip" id="r-stage-chip"><span class="dot"></span>working</span></div><ul class="stagelog" id="stages"></ul></section>
+      <section class="card stack"><div class="row between"><h2 class="h">Report</h2><span class="footnote" id="r-by"></span></div><div class="report" id="report"><p class="skeleton">Writing the first report from the database lookups…</p></div>
+        <h3 class="h" style="font-size:14px;margin-top:6px">Sources</h3><ol class="sources" id="sources"><li class="muted">No sources yet.</li></ol><p class="footnote" id="guard"></p></section>
+    </div>
+    <div class="wide-2">
+      <section class="card stack"><div class="row between"><h2 class="h">Dissolution curve</h2><span class="footnote" id="r-ref"></span></div><div class="chartbox"><canvas id="r-chart"></canvas></div>
+        <details><summary class="small">Quality checks</summary><ul class="gates" id="gates"></ul></details></section>
+      <section class="card stack"><h2 class="h">Label and tablet</h2><div id="recall"></div><dl class="kv" id="fields"></dl><p class="banner note hidden" id="mock">Mock mode: the AI is off on this server, so the bottle and tablet photos were not read and no profile was matched automatically.</p></section>
+    </div>
+    <section class="card actions" style="align-items:center">
+      <a class="btn ghost" href="#/ask/${encodeURIComponent(id)}">Ask about this result</a>
+      <a class="btn ghost" href="#/issue/${encodeURIComponent(id)}">Report an issue</a>
+      <button type="button" class="btn" id="r-new">Check another</button>
+    </section>
+    <p class="disclaimer">${esc(DISCLAIMER)} Results that need lab testing should go to a qualified laboratory or pharmacist.</p>`;
+  $("r-new").onclick = () => { resetCheck(); location.hash = "#/check/bottle"; };
+  S.leave.push(() => { left = true; clearTimeout(timer); if (chart) chart.destroy(); });
+
+  const render1 = (s) => {
+    const a = s.analysis, verdict = s.overall || (a && a.result);
+    const title = verdict ? "Result" : "Checking…";
+    if (title !== lastTitle) { lastTitle = title; $("r-head").innerHTML = head({ eyebrow: `Step 4 of 4 · ${id}${s.label && s.label.drug_name ? " · " + s.label.drug_name : ""}`, title, tone: verdict ? RESULT_TONE[verdict] : "sky", back: "#/history" }); }
+    // stamp
+    const st = $("stamp");
+    if (verdict && !st.dataset.v) {
+      st.dataset.v = verdict;
+      st.className = `card stamp-card tone-${RESULT_TONE[verdict]}`;
+      const n = a ? a.numbers : null, q = a ? a.quantity : null, k = [];
+      if (a) {
+        if (q && q.percent_of_label !== null && q.percent_of_label !== undefined && a.result !== "UNABLE_TO_VERIFY") k.push(kpiCell("of labelled dose", q.percent_of_label + " %"));
+        k.push(kpiCell("time to 80 %", n.t80_s ? Math.round(n.t80_s) + " s" : "–"));
+        k.push(kpiCell("final level (A)", n.A_specific_end ?? "–"));
+        k.push(kpiCell("run after tablet in", Math.round(n.run_s_after_drop) + " s"));
+      }
+      st.innerHTML = `<p class="eyebrow">Screening result</p><span class="stamp" role="status">${esc(RESULT_TEXT[verdict])}</span>
+        <p class="headline" id="r-headline"></p>
+        <ul class="reasons">${(a ? a.reasons : []).map((r) => `<li>${esc(r)}</li>`).join("")}</ul>
+        ${modeLine(verdict) ? `<p class="mode-line">${modeLine(verdict)}</p>` : ""}
+        ${k.length ? `<dl class="kpis">${k.join("")}</dl>` : ""}
+        ${s.profile_name ? `<p class="footnote">Compared with profile: ${esc(s.profile_name)}</p>` : ""}`;
+    }
+    if (s.report && $("r-headline")) $("r-headline").textContent = s.report.headline || "";
+    if (s.error && $("r-headline")) $("r-headline").textContent = "Error: " + s.error;
+    // stage log
+    const stages = Object.entries(s.stages || {});
+    $("stages").innerHTML = stages.map(([k, x], i) => `<li style="--i:${i}">${stageTick(x.status)}<span>${esc(STAGE_NAME[k] || k)}${x.why ? `<span class="why">${esc(x.why)}</span>` : ""}</span><span class="ms">${x.status === "done" && x.ms != null ? x.ms + " ms" : esc(x.status)}</span></li>`).join("");
+    const doneN = stages.filter(([, x]) => !["pending", "running"].includes(x.status)).length;
+    $("r-stage-chip").className = "chip " + (s.done ? "ok" : "live beat");
+    $("r-stage-chip").innerHTML = `<span class="dot"></span>${s.done ? "done" : `${doneN} of ${stages.length}`}`;
+    // report
+    const r = s.report;
+    if (r) {
+      $("report").innerHTML = `<p>${esc(r.plain_summary)}</p><p class="what">${esc(r.what_to_do)}</p>` +
+        (r.evidence || []).map((e) => `<p class="ev">${esc(e.claim)}${(e.source_ids || []).map((i) => `<button type="button" class="sup" data-src="${esc(i)}">${esc(i)}</button>`).join("")}</p>`).join("");
+      $("r-by").textContent = `${s.report_stage === "final" ? "final report" : "first report, still researching…"} · ${r.generated_by}`;
+      $("sources").innerHTML = (r.sources || []).map((x) => `<li id="src-${esc(x.id)}"><b>${esc(x.id)}</b><span>${esc(x.kind)} · <a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}</a></span></li>`).join("") || "<li class='muted'>No sources yet.</li>";
+      $("guard").textContent = (r.guardrail_fixes || []).length ? "Guardrail corrections: " + r.guardrail_fixes.join(" ") : "";
+      $("report").querySelectorAll("[data-src]").forEach((b) => (b.onclick = () => { const t = document.getElementById("src-" + b.dataset.src); if (t) t.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "center" }); }));
+    }
+    // recall + fields
+    if (s.recall_status === "LOT_RECALLED") $("recall").innerHTML = `<p class="banner held">This lot matches an FDA recall record.${mode() === "clinic" ? " Delivery held." : ""}</p>`;
+    else if (s.recall_status) $("recall").innerHTML = `<span class="chip"><span class="dot"></span>recall: ${esc(String(s.recall_status).toLowerCase().replace(/_/g, " "))}</span>`;
+    $("fields").innerHTML = kvList(s.label) + kvList(s.imprint) || `<dt>photos</dt><dd>none read yet</dd>`;
+    $("mock").classList.toggle("hidden", !((s.label && s.label.mock) || (s.imprint && s.imprint.mock)));
+    // curve vs reference (once)
+    if (a && a.curve && !drewCurve) {
+      drewCurve = true;
+      const fp = a.fingerprint;
+      const extra = fp && fp.kind === "curve" && fp.checkpoints ? [{
+        label: "reference", borderColor: "rgba(22,24,27,.55)", backgroundColor: fp.checkpoints.map((c) => (c.ok ? "#5FD39A" : "#E09A3A")), borderDash: [3, 4], borderWidth: 1.5,
+        pointRadius: 4, pointBorderColor: "#fff", data: fp.checkpoints.map((c) => ({ x: c.t, y: c.ref })),
+      }] : [];
+      $("r-ref").textContent = extra.length ? `${fp.checkpoints.filter((c) => c.ok).length} of ${fp.checkpoints.length} checkpoints match` : (s.profile_name ? "" : "no reference profile");
+      chart = makeChart($("r-chart"), {});
+      setCurve(chart, a.curve, extra);
+      $("gates").innerHTML = (a.gates || []).map((g) => `<li><span class="tick ${g.ok ? "ok" : g.blocking ? "err" : "skip"}">${g.ok ? tickSvg : ""}</span><span>${esc(g.message)}</span></li>`).join("");
+    }
+  };
+  const poll = async () => {
+    let s;
+    try { s = await api("/api/scans/" + encodeURIComponent(id)); } catch (e) {
+      if (/not found|404/i.test(e.message)) { $("stamp").innerHTML = `<p class="banner note">No scan with id ${esc(id)}.</p>`; return; }
+      if (!left) timer = setTimeout(poll, 1500); return;
+    }
+    if (left) return;
+    render1(s);
+    if (!s.done) timer = setTimeout(poll, 1000);
+  };
+  await poll();
+});
+
+// ================================================================ 7. Ask (grounded in the report; voice where the browser allows)
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+route(/^\/ask\/([^/]+)$/, async (v, id) => {
+  const s = await api("/api/scans/" + encodeURIComponent(id)).catch(() => null);
+  const hist = (S.chats[id] = S.chats[id] || []);
+  const voiceOk = SR && window.isSecureContext;
+  v.innerHTML = `${head({ eyebrow: `Scan ${id}${s && s.label && s.label.drug_name ? " · " + s.label.drug_name : ""}`, title: "Ask about this result", tone: "violet", back: `#/result/${encodeURIComponent(id)}`, side: s ? resultChips(s.overall, s.done) : "" })}
+    <section class="card stack">
+      <div class="chat" id="chat" aria-live="polite"></div>
+      <div class="suggest" id="suggest">${["What does this result mean?", "What should I do next?", "Was this lot recalled?"].map((q) => `<button type="button" class="chip">${q}</button>`).join("")}</div>
+      <div class="ask-bar"><input id="ask-in" placeholder="e.g. What does this recall mean for me?" aria-label="Your question">
+        ${voiceOk ? `<button type="button" class="btn ghost icon mic" id="mic" aria-label="Speak your question"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>` : `<span></span>`}
+        <button type="button" class="btn" id="ask-go">Ask</button></div>
+      <div class="set-row" style="border-top:1px solid var(--line)"><span><b>Read answers aloud</b><small>${"speechSynthesis" in window ? "Uses this device's voice." : "Not available in this browser."}</small></span><button type="button" class="switch" role="switch" id="speak" aria-checked="${PREF.speak}" aria-label="Read answers aloud"></button></div>
+      <p class="footnote">Answers come only from this report and its sources. ${S.config.ai ? "" : "AI is in mock mode on this server, so answers are templates."} ${!SR ? "Voice input isn't supported in this browser: type your question." : !window.isSecureContext ? "Voice input needs https or localhost: type your question here." : ""}</p>
+    </section>
+    <p class="disclaimer">${esc(DISCLAIMER)}</p>`;
+  const chat = $("chat");
+  const add = (who, text) => { const d = document.createElement("div"); d.className = "msg " + who; d.textContent = text; chat.appendChild(d); chat.scrollTop = 1e9; return d; };
+  if (!hist.length) add("bot", s && s.report ? `Ask me anything about this result (${RESULT_TEXT[s.overall] || "still checking"}). I answer only from the report.` : "Ask me anything about this result. I answer only from the report.");
+  for (let i = 0; i < hist.length; i += 2) { add("me", hist[i].content); if (hist[i + 1]) add("bot", hist[i + 1].content); }
+  $("speak").onclick = (e) => { PREF.speak = !PREF.speak; e.currentTarget.setAttribute("aria-checked", String(PREF.speak)); };
+  const ask = async (q) => {
+    q = (q || $("ask-in").value).trim(); if (!q) return;
+    $("ask-in").value = ""; add("me", q);
+    const typing = add("bot", ""); typing.innerHTML = `<span class="typing" aria-label="Thinking"><i></i><i></i><i></i></span>`;
+    try {
+      const r = await post(`/api/scans/${encodeURIComponent(id)}/ask`, { question: q, history: hist });
+      hist.push({ role: "user", content: q }, { role: "assistant", content: r.answer });
+      typing.textContent = r.answer;
+      if (PREF.speak && "speechSynthesis" in window) speechSynthesis.speak(new SpeechSynthesisUtterance(r.answer));
+    } catch (e) { typing.textContent = "Sorry, " + e.message; }
+  };
+  $("ask-go").onclick = () => ask();
+  $("ask-in").addEventListener("keydown", (e) => { if (e.key === "Enter") ask(); });
+  $("suggest").querySelectorAll("button").forEach((b) => (b.onclick = () => ask(b.textContent)));
+  if (voiceOk) $("mic").onclick = (e) => {
+    const btn = e.currentTarget, rec = new SR(); rec.lang = "en-US"; rec.interimResults = false;
+    btn.classList.add("on"); rec.onend = () => btn.classList.remove("on");
+    rec.onresult = (ev) => { $("ask-in").value = ev.results[0][0].transcript; ask(); };
+    rec.start();
+  };
+  S.leave.push(() => { if ("speechSynthesis" in window) speechSynthesis.cancel(); });
+});
+
+// ================================================================ 8. Report an issue (draft → edit → Submit only on tap)
+route(/^\/issue\/([^/]+)$/, async (v, id) => {
+  const s = await api("/api/scans/" + encodeURIComponent(id)).catch(() => null);
+  v.innerHTML = `${head({ eyebrow: `Scan ${id}${s && s.label && s.label.drug_name ? " · " + s.label.drug_name : ""}`, title: "Report an issue", tone: "amber", back: `#/result/${encodeURIComponent(id)}`, side: s ? resultChips(s.overall, s.done) : "" })}
+    <div class="wide-2">
+      <section class="card stack">
+        <h2 class="h">Where did it come from?</h2>
+        <div class="grid2">
+          <label class="field">Where bought (shop / seller)<input id="i-seller"></label>
+          <label class="field">City<input id="i-city"></label>
+          <label class="field">When<input id="i-when" placeholder="e.g. Oct 2026"></label>
+          <label class="field">Anything else<input id="i-notes"></label>
+        </div>
+        <button type="button" class="btn ghost" id="i-draft">Draft the report</button>
+      </section>
+      <section class="card stack">
+        <h2 class="h">Your report</h2>
+        <textarea id="i-text" rows="9" placeholder="Tap “Draft the report” to start, then edit it here." aria-label="Report text"></textarea>
+        <button type="button" class="btn hidden" id="i-submit">Submit</button>
+        <p class="footnote" id="i-msg">Nothing is sent until you tap Submit. No reporter identity is stored.</p>
+      </section>
+    </div>
+    <p class="disclaimer">${esc(DISCLAIMER)}</p>`;
+  $("i-draft").onclick = async (e) => {
+    const btn = e.currentTarget; btn.disabled = true;
+    try {
+      const r = await post(`/api/scans/${encodeURIComponent(id)}/issue/draft`, { where: $("i-seller").value + ($("i-city").value ? ", " + $("i-city").value : ""), when: $("i-when").value, notes: $("i-notes").value });
+      $("i-text").value = r.draft; $("i-submit").classList.remove("hidden");
+      $("i-msg").textContent = "Check and edit the text. Nothing is sent until you tap Submit. No reporter identity is stored.";
+    } catch (err) { toast(err.message); }
+    btn.disabled = false;
+  };
+  $("i-submit").onclick = async (e) => {
+    const btn = e.currentTarget; btn.disabled = true;
+    try {
+      const r = await post("/api/issues", { scan_id: id, text: $("i-text").value, seller: $("i-seller").value, city: $("i-city").value, when: $("i-when").value });
+      $("i-msg").textContent = `Saved (${r.issue_id}). ${r.note}`; btn.classList.add("hidden");
+    } catch (err) { toast(err.message); btn.disabled = false; }
+  };
 });
 
 // ================================================================ boot
