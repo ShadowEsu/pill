@@ -517,7 +517,7 @@ function paintRunBar() {
       : Run.phase === "dissolving" ? `Dissolving ${mmss(Run.dissolveS)}${S.check.runMode === "quick" ? " of " + mmss(T.quick_s) : ""}`
       : "Building the result…";
     const showTag = PREF.show ? `<span class="chip show-chip">SHOW</span>` : "";
-    show("runbar" + (Run.phase === "add" ? " urgent" : ""), `<span class="rb-dot" aria-hidden="true"></span>${showTag}<span class="rb-text"><b>Run in progress</b> · ${esc(what)}</span><button type="button" class="rb-reset">Reset</button><a class="rb-go" href="#/check/measure">↩ back to the run</a>`);
+    show("runbar" + (Run.phase === "add" ? " urgent" : ""), `<span class="rb-dot" aria-hidden="true"></span>${showTag}<span class="rb-text"><b class="rb-lbl">Run in progress · </b>${esc(what)}</span><button type="button" class="rb-reset">Reset</button><a class="rb-go" href="#/check/measure" aria-label="Back to the run">↩ <span class="rb-long">back to the </span>run</a>`);
     return;
   }
   if (Run.readyScan && onPath(new RegExp("^/result/" + Run.readyScan.replace(/[^\w-]/g, "") + "$"))) Run.readyScan = null;   // seen it
@@ -1436,8 +1436,9 @@ function stationMini(on, why, tablet = false) {
 function paintStationCounts(id, raw, mini = true) {
   if (!raw) return;
   const a0 = $(id + "-a0"), a1 = $(id + "-a1");   // mini: the HTML list beside the drawing (#st-m-a0/a1); big: SVG call-outs
-  if (a0 && raw.B_a != null) a0.textContent = mini ? `A0 ${raw.B_a}` : `A0 · ${raw.B_a} (blue on)`;
-  if (a1 && raw.B_b != null) a1.textContent = mini ? `A1 ${raw.B_b}` : `A1 · ${raw.B_b} (blue on)`;
+  const n = (x) => Math.round(+x);         // the replay's last line can be an average: show whole counts
+  if (a0 && raw.B_a != null) a0.textContent = mini ? `A0 ${n(raw.B_a)}` : `A0 · ${n(raw.B_a)} (blue on)`;
+  if (a1 && raw.B_b != null) a1.textContent = mini ? `A1 ${n(raw.B_b)}` : `A1 · ${n(raw.B_b)} (blue on)`;
 }
 const BLUEPRINTS = [["01_wiring_overview", "Wiring overview", "Board, LEDs and both photoresistors"], ["02_breadboard_layout", "Breadboard layout", "Where every jumper goes"], ["03_chamber_cross_sections", "Chamber cross-sections", "Top and side, cut through the beam (design drawing; the build uses a plain lid)"]];
 const STATION_PHOTOS = [["station-19", "The blue LED lit, shining in through the LED box"], ["station-17", "From above: cup of water inside the chamber, LED box at the bottom right"], ["station-191", "LED box: white, blue and red LEDs, diffuser slot on top"], ["station-171", "From above with the blue LED on"]];
@@ -1463,7 +1464,7 @@ route(/^\/station$/, (v) => {
     ["station", "Lid", "Flat, with one small hole. Closed, it keeps the inside dark; lift it only to drop the tablet in and stir."],
   ];
   v.innerHTML = `${head({ eyebrow: "Hardware", title: "The station", tone: "violet", back: "#/", side: `<div class="row wrap" style="gap:8px">${deviceChip()}<span class="chip"><span class="dot"></span>lines read&nbsp;<span class="mono" data-lines>–</span></span></div>` })}
-    <figure class="card st-hero rise"><img src="/static/photos/station-19.webp" alt="The real station: a purple printed chamber with a cup of water inside, the LED box on its side with the blue LED lit, wired to the board" width="900" height="1200">
+    <figure class="card st-hero rise"><img src="/static/photos/station-19.webp" alt="The real station: a purple printed chamber with a cup of water inside, the LED box on its side with the blue LED lit, wired to the board" width="1067" height="1172">
       <figcaption><b>The real build.</b> Purple printed chamber, cup of clean water inside, LED box on the wall with the blue LED on.</figcaption></figure>
     <div class="wide-2">
       <section class="card stack rise" style="--i:1"><div class="row between"><h2 class="h">From above</h2><span class="footnote">lid off</span></div>${stationTop({ id: "st-big" })}
