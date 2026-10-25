@@ -75,6 +75,8 @@ Then show personal mode: bigger text, recall status per bottle, read-aloud.
 
 **The answer is Unable to verify.** "That's the correct answer. There's no reference profile for this tablet on this box yet, and it refuses to guess." Don't apologise for it.
 
+**The bottle swap (your reveal from the video).** You can put a different tablet in the Aspirin 81 bottle and run it. Say it the way the box sees it: "The bottle says aspirin. The tablet isn't. There's no match, so it won't pass." If a judge asks "did it detect the swap?": "Not by itself yet. Tonight it said Unable to verify because this box has no reference for that product. With an aspirin reference recorded, a tablet that dissolves differently comes out Needs lab testing. Either way it doesn't pass." Never say it identified the drug.
+
 **The water check won't go green.** Close the lid fully, press the tape down, turn away from bright lights. After 1 minute "Continue anyway" appears. Don't use it in front of a judge. Say "light leak, give me ten seconds" and restart.
 
 **Lid open too long.** "It caught that. Over 25 seconds open and it won't trust the run." Then redo it.
