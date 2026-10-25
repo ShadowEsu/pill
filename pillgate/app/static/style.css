@@ -547,3 +547,33 @@ body.easy .chip { border-color: var(--line-2); }
 .show-bar { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
 .show-bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--mint), var(--sky)); transform-origin: left; animation: tile-bar 1.1s var(--ease) backwards; }
 .show-note { color: var(--ink-2); } .show-note a { color: var(--ink); }
+
+/* ---------- round 7: How Pill fits together (flow.js) ---------- */
+.flow-scroll { overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); padding: 12px; }
+.flow-scroll:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.flow-svg { display: block; width: 100%; min-width: 980px; height: auto; }
+.flow-hint { margin: 0; font-size: 13px; color: var(--ink-2); }
+@media (min-width: 1100px) { .flow-hint { display: none; } }
+.flow-svg .fl-node rect { stroke: rgba(22,24,27,.28); stroke-width: 1.2; fill: #fff; }
+.flow-svg .fl-node.dashed rect { stroke-dasharray: 5 4; stroke: rgba(22,24,27,.6); }
+.flow-svg .f-mint rect { fill: rgba(95,211,154,.30); } .flow-svg .f-amber rect { fill: rgba(224,154,58,.28); }
+.flow-svg .f-grey rect { fill: rgba(154,160,166,.26); } .flow-svg .f-red rect { fill: rgba(224,83,46,.22); }
+.flow-svg .f-violet rect { fill: rgba(122,92,255,.16); } .flow-svg .f-sky rect { fill: rgba(79,179,255,.16); }
+.flow-svg text { fill: var(--ink); font-family: var(--sans); }
+.flow-svg .fl-t { font-weight: 600; } .flow-svg .fl-l { fill: #2B2E33; }
+.flow-svg .fl-h { font: 600 13px var(--mono); letter-spacing: .02em; }
+.flow-svg .fl-c { font-size: 12px; fill: #2B2E33; }
+.flow-svg .fl-al { font: 500 11px var(--mono); }
+.flow-svg .fl-arrow { fill: none; stroke: var(--ink); stroke-width: 1.4; }
+.flow-svg .fl-arrow.dashed { stroke-dasharray: 6 5; }
+.flow-svg .fl-headp { fill: var(--ink); }
+.flow-svg .fl-rule { stroke: var(--line-2); stroke-dasharray: 2 4; }
+.flow-svg .fl-node { animation: rise .5s var(--ease) backwards; animation-delay: calc(var(--i) * 30ms); }
+.fl-table-wrap { overflow-x: auto; }
+.fl-table { width: 100%; min-width: 560px; border-collapse: collapse; font-size: 14px; }
+.fl-table caption { text-align: left; font-weight: 600; padding-bottom: 8px; }
+.fl-table th, .fl-table td { text-align: left; vertical-align: top; padding: 10px 12px; border-top: 1px solid var(--line); }
+.fl-table thead th { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); border-top: 0; }
+.fl-table tbody th { width: 22%; font-weight: 600; } .fl-table tbody th small { display: block; font: 400 11.5px var(--mono); color: var(--ink-2); margin-top: 3px; }
+.fl-table td:last-child { width: 22%; }
+.more-line { grid-column: 1 / -1; margin: 4px 2px; font-size: 14px; color: var(--ink-2); } .more-line a { color: var(--ink); font-weight: 600; }

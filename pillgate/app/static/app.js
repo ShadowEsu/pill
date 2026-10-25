@@ -1475,10 +1475,13 @@ route(/^\/station$/, (v) => {
       <ol class="parts">${PARTS.map(([g, t, p], i) => `<li style="--i:${i}"><span class="part-ic">${glyph(g, 40)}</span><span><b>${esc(t)}</b><small>${esc(p)}</small></span></li>`).join("")}</ol></section>
     <section class="stack"><div class="row between"><h2 class="h">Blueprints</h2><span class="footnote">tap to open full size</span></div>
       <div class="bp-grid">${BLUEPRINTS.map(([f, t, p], i) => `<button type="button" class="card bp rise" style="--i:${i + 4}" data-src="/static/blueprints/${f}.webp" data-alt="${esc(t)}"><img src="/static/blueprints/${f}.webp" alt="" loading="lazy"><span><b>${esc(t)}</b><small>${esc(p)}</small></span></button>`).join("")}</div></section>
+    <section class="card stack rise" id="flow" style="--i:7"><div class="row between wrap"><h2 class="h">How Pill fits together</h2><span class="footnote">station → three answers → clinic policy → Coinbase · x402</span></div>
+      ${window.PillFlow ? window.PillFlow.html() : `<p class="muted">The diagram didn't load; reload the page.</p>`}</section>
     <section class="stack"><h2 class="h">Photos</h2>
       <div class="ph-grid">${STATION_PHOTOS.map(([f, t], i) => `<button type="button" class="ph rise" style="--i:${i + 7}" data-src="/static/photos/${f}.webp" data-alt="${esc(t)}"><img src="/static/photos/${f}.webp" alt="${esc(t)}" loading="lazy"></button>`).join("")}</div></section>
     <p class="disclaimer">${esc(DISCLAIMER)}</p>`;
   v.querySelectorAll("[data-src]").forEach((b) => (b.onclick = () => lightbox(b.dataset.src, b.dataset.alt)));
+  if (new URLSearchParams(location.hash.split("?")[1] || "").get("at") === "flow") requestAnimationFrame(() => $("flow").scrollIntoView({ block: "start", behavior: reduceMotion() ? "auto" : "smooth" }));
   const paint = (d) => paintStationCounts("st-big", (d.live && d.live.raw_last) || d.raw_last, false);
   if (S.live) paint(S.live);
   S.onLive = paint;
@@ -1656,7 +1659,8 @@ route(/^\/more$/, (v) => {
   v.innerHTML = `${head({ eyebrow: MODES[mode()] ? MODES[mode()].name + " mode" : "", title: "More", tone: "grey" })}
     <section class="more-grid">${items.map(([to, ic, t, p], i) => `<a class="card more-tile rise" style="--i:${i}" href="#${to}"><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path d="${ICONS[ic]}"/></svg><b>${t}</b><small>${p}</small></a>`).join("")}
       <button type="button" class="card more-tile rise" style="--i:5" id="more-ask"><span class="dock-ic" aria-hidden="true"><i></i><i></i></span><b>Ask Pill</b><small>Questions about a result or the app</small></button>
-      <a class="card more-tile rise" style="--i:6" href="#/welcome"><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg><b>Change mode</b><small>Clinic, Personal or Check</small></a></section>`;
+      <a class="card more-tile rise" style="--i:6" href="#/welcome"><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg><b>Change mode</b><small>Clinic, Personal or Check</small></a></section>
+    <p class="more-line">Where the station sits: it measures, the clinic app's policy decides Release, Hold or Escalate, and Coinbase test wallets move the money. <a href="#/station?at=flow">How Pill fits together →</a></p>`;
   $("more-ask").onclick = () => Dock.show();
 });
 
