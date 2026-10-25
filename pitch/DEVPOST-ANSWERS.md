@@ -139,10 +139,12 @@ arduino-uno-q, arduino, c++, python, fastapi, sqlite, javascript, typescript, re
 
 ## Links
 
-- Website: https://pill-site.vercel.app (custom domain, once its DNS is live: https://pillmeifyoucan.health)
-- Clinic / personal app: https://pill-app-delta.vercel.app
+- Website: https://pillmeifyoucan.health (alias: https://pill-site.vercel.app)
+- Clinic / personal app: https://app.pillmeifyoucan.health (alias: https://pill-app-delta.vercel.app)
 - Repo (station app in `pillgate/`, clinic app in `pill/web`, pay service in `pill/pay`): https://github.com/ShadowEsu/pill-calhacks `[FILL 1: make this repo public first; it is PRIVATE until you flip it. Not the old ShadowEsu/pill: that one stays private]`
 - Pitch video (1:27, portrait, Public, "Not made for kids", channel "Pill"): https://www.youtube.com/watch?v=clBqG3o4MbA (same video: https://youtube.com/shorts/clBqG3o4MbA; YouTube files it as a Short because it is portrait and under 3 minutes)
+- Animated explainer (2:38, Unlisted; describes the first design with a quarter tablet): https://youtu.be/cTQpc1VoN00
+- Clinic app walkthrough (62 s, Unlisted, no sound, early build): https://youtu.be/h8rAvjgKoxo
 - Figma deck: `[FILL 4: Figma link]`
 
 ## Gallery images
@@ -160,7 +162,7 @@ Ready to upload, in order, from `pitch/gallery/` (real JPG/PNG, names cropped of
 | 7 | `pitch/gallery/07-station-measure.png` | The clean-water check, then the run, with raw counts from both sensors (replay of our aspirin run). |
 | 8 | `pitch/gallery/08-station-result.png` | Replay of our aspirin run: Unable to verify (no reference yet). |
 | 9 | `pitch/gallery/09-clinic-verify-x402.png` | Clinic app, Verify page: the x402 lane lit by a real 402 (the paid 200 stays dashed). |
-| 10 | `pitch/gallery/10-clinic-dashboard.png` | Clinic dashboard: deliveries, the station card and "How the money moves". |
+| 10 | `pitch/gallery/10-clinic-dashboard.png` | Clinic dashboard: this week at a glance, the station card, station pulse and the timetable (demo data). |
 | 11 | `pitch/gallery/11-station-app-home.png` | Station app home: "Is this tablet dissolving the way it should?", with the last check and next dose. |
 | 12 | `pitch/gallery/12-station-app-dissolving.png` | Station app on a phone, mid-run: the tablet dissolving, both sensors read once a second (replay). |
 | 13 | `pitch/gallery/13-station-app-history.png` | Station app history: every check and run is kept; our aspirin runs say Unable to verify (no reference yet). |
