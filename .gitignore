@@ -8,3 +8,8 @@ pillgate/app/.venv/
 pillgate/app/data/app.db
 pillgate/app/.env
 pillgate/app/__pycache__/
+pillgate/app/data/uploads/
+pillgate/app/data/water_ref.json
+pillgate/runs/check_run_*.csv
+pillgate/.ngrok-test.log
+pillgate/figma/
