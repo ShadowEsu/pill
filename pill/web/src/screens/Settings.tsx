@@ -1,7 +1,8 @@
 // Settings (/settings): who I am, big text, sound, the follower assistant and its voice replies, the Google Calendar bridge status (live from pill-pay), the station,
 // reset the demo data, the build, and credits & sources (the website first, so the site and the app read as one product).
 // Groups carry a hand-drawn glyph each; switches spring their thumb.
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useCalendarStatus } from '../components/CalendarButton';
 import { Link } from 'react-router-dom';
 import { Screen } from '../components/Shell';
 import Glyph, { type GlyphName } from '../components/Glyph';
@@ -14,7 +15,6 @@ import { dayLabel, hm } from '../lib/when';
 import { REFERENCES } from '../data/reference';
 import '../story.css';
 
-const PAY_URL = import.meta.env.VITE_PAY_URL as string | undefined;
 const SHA: string = import.meta.env.VITE_SHA || 'dev';
 
 const SITE = 'https://pill-site.vercel.app';
@@ -26,8 +26,6 @@ const CREDITS = [
   { t: 'x402 payments on the Coinbase Developer Platform', d: 'Coinbase CDP · TESTNET', href: 'https://docs.cdp.coinbase.com/x402/welcome' },
   { t: 'Built at Cal Hacks 13.0', d: 'October 2026', href: 'https://www.calhacks.io/' },
 ];
-
-type Cal = { state: 'checking' } | { state: 'connected'; account: string; calendars: number | null } | { state: 'off'; why: string };
 
 function Switch({ on, label, onToggle }: { on: boolean; label: string; onToggle: () => void }) {
   return <button type="button" role="switch" aria-checked={on} aria-label={label} className="switch" onClick={onToggle} />;
@@ -44,26 +42,9 @@ export default function Settings() {
   const live = useStationStatus();   // the pay service's /station/status: serial · simulated · no station
   const sound = useSound();
   const follower = useFollowerSettings();
-  const [cal, setCal] = useState<Cal>(PAY_URL ? { state: 'checking' } : { state: 'off', why: 'no pay service configured (VITE_PAY_URL)' });
+  const cal = useCalendarStatus();
   const [confirm, setConfirm] = useState(false);
   const [resetAt, setResetAt] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (!PAY_URL) return;
-    // A flag, not an AbortController: the status call is cheap, and an aborted fetch shows up as a failed request.
-    let alive = true;
-    fetch(`${PAY_URL}/calendar/status`)
-      .then((r) => r.json() as Promise<unknown>)
-      .then((d) => {
-        if (!alive) return;
-        if (!d || typeof d !== 'object' || !('mode' in d)) { setCal({ state: 'off', why: 'unexpected reply from the pay service' }); return; }
-        const account = 'account' in d && typeof d.account === 'string' ? d.account : 'unknown';
-        if (d.mode === 'composio') setCal({ state: 'connected', account, calendars: 'calendars' in d && typeof d.calendars === 'number' ? d.calendars : null });
-        else setCal({ state: 'off', why: 'error' in d && typeof d.error === 'string' ? d.error.split('\n')[0].slice(0, 120) : `no Google account linked as ${account}` });
-      })
-      .catch((e: unknown) => { if (alive) setCal({ state: 'off', why: `pay service unreachable (${e instanceof Error ? e.message : 'network error'})` }); });
-    return () => { alive = false; };
-  }, []);
 
   const ref = station.reference ? REFERENCES[station.reference] : null;
   const reset = () => {

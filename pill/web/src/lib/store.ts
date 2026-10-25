@@ -8,6 +8,7 @@ import { seedHistory, PEOPLE } from '../data/history';
 export interface State {
   mode: Mode | null;            // null until onboarding
   bigText: boolean;             // personal mode default true
+  easy: boolean;                // Easy mode: 125 % text, higher contrast, bigger hit areas, read-aloud on (easy.css)
   bottles: Bottle[];
   runs: Run[];
   deliveries: Delivery[];
@@ -18,12 +19,13 @@ export interface State {
 const KEY = 'pill.state.v2';
 const seed = (): State => {
   const h = seedHistory();
-  return { mode: null, bigText: false, bottles: h.bottles, runs: h.runs, deliveries: h.deliveries, activities: h.activities, station: { id: 'STATION 01', online: true, calibratedAt: Date.now() - 3 * 3600e3, reference: 'riboflavin' } };
+  return { mode: null, bigText: false, easy: false, bottles: h.bottles, runs: h.runs, deliveries: h.deliveries, activities: h.activities, station: { id: 'STATION 01', online: true, calibratedAt: Date.now() - 3 * 3600e3, reference: 'riboflavin' } };
 };
 
 let state: State = (() => { try { const raw = localStorage.getItem(KEY); return raw ? { ...seed(), ...JSON.parse(raw) } : seed(); } catch { return seed(); } })();
 const listeners = new Set<() => void>();
 document.documentElement.classList.toggle('big', state.bigText);
+document.documentElement.classList.toggle('easy', state.easy);
 function set(patch: Partial<State> | ((s: State) => Partial<State>)) {
   state = { ...state, ...(typeof patch === 'function' ? patch(state) : patch) };
   localStorage.setItem(KEY, JSON.stringify(state));
@@ -46,7 +48,8 @@ export const actions = {
   activity,
   setMode(mode: Mode) { set({ mode, bigText: mode === 'personal' }); document.documentElement.classList.toggle('big', mode === 'personal'); },
   setBigText(bigText: boolean) { set({ bigText }); document.documentElement.classList.toggle('big', bigText); },
-  reset() { localStorage.removeItem(KEY); state = seed(); listeners.forEach((l) => l()); },
+  setEasy(easy: boolean) { set({ easy }); document.documentElement.classList.toggle('easy', easy); },
+  reset() { localStorage.removeItem(KEY); state = seed(); document.documentElement.classList.remove('easy'); listeners.forEach((l) => l()); },
   calibrate(reference: string) { set((s) => ({ station: { ...s.station, calibratedAt: Date.now(), reference } })); },
 
   addBottle(b: Omit<Bottle, 'id' | 'takenAt' | 'reminder' | 'runId' | 'usedFor'> & { usedFor?: string }): Bottle {

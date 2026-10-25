@@ -1,0 +1,64 @@
+/* Easy mode (store.easy → <html class="easy">, Settings and the Personal home): 125 % text, higher contrast, bigger hit
+   areas. Words stay black on white; only the greys get darker and the lines stronger. */
+html.easy {
+  font-size: 125%;
+  --ink-2: #24272B;
+  --muted: #3F4349;
+  --line: rgba(22, 24, 27, 0.22);
+  --line-2: rgba(22, 24, 27, 0.4);
+  --tap: 68px;
+}
+html.easy body { font-size: 21px; line-height: 1.5; }
+html.easy .title { font-size: 42px; }
+@media (min-width: 900px) { html.easy .title { font-size: 54px; } }
+html.easy .btn { min-height: 68px; font-size: 21px; border-width: 2px; }
+html.easy .btn.ghost { border-color: var(--ink); }
+html.easy .chip { font-size: 14px; padding: 8px 12px; color: var(--ink); border-color: var(--line-2); }
+html.easy .chip .dot { width: 10px; height: 10px; }
+html.easy .eyebrow { font-size: 13px; color: var(--ink-2); }
+html.easy .footnote { font-size: 16px; color: var(--ink-2); }
+html.easy .muted { color: var(--ink-2); }
+html.easy .card { border-color: var(--line-2); }
+html.easy input[type="text"], html.easy input[type="number"], html.easy input[type="time"], html.easy textarea { min-height: 60px; font-size: 21px; border-width: 2px; border-color: var(--ink-2); }
+html.easy .nav-item { min-height: 60px; font-size: 13px; color: var(--ink-2); }
+html.easy .switch { transform: scale(1.25); transform-origin: right center; }
+html.easy .set-row .btn { min-height: 56px; font-size: 18px; }
+html.easy a:not(.btn):not(.card):not(.nav-item) { text-underline-offset: 3px; }
+html.easy :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+/* the Schedule's big dose rows (Schedule.tsx) */
+.dose-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.dose-row { display: grid; gap: 12px; padding: 16px; }
+.dose-row-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; }
+.dose-row-name { font-size: 22px; font-weight: 600; line-height: 1.2; text-transform: capitalize; overflow-wrap: anywhere; }
+.dose-row-sub { font-size: 18px; color: var(--ink-2); margin-top: 2px; }
+.dose-row-time { font-family: var(--mono); font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }
+.dose-row.taken { background: color-mix(in srgb, var(--surface) 88%, var(--mint)); }
+.dose-row.late { box-shadow: inset 4px 0 0 var(--amber), var(--shadow, none); }
+.dose-row-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+.dose-row-actions .btn { min-height: 64px; font-size: 20px; padding: 0 14px; }
+.dose-row-status { font-size: 20px; }
+html.easy .dose-row-name { font-size: 27px; }
+html.easy .dose-row-sub, html.easy .dose-row-status { font-size: 22px; }
+html.easy .dose-row-time { font-size: 36px; }
+@media (max-width: 420px) { .dose-row-actions { grid-template-columns: 1fr; } .dose-row-head { grid-template-columns: auto minmax(0, 1fr); } .dose-row-time { grid-column: 1 / -1; } }
+
+/* the Personal home's three cards and the Easy mode toggle (Home.tsx, EasyToggle.tsx) */
+.home-cards { display: grid; gap: 12px; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .home-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.home-card { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 16px; min-height: 88px; text-decoration: none; color: var(--ink); }
+.home-card b { display: block; font-size: 21px; line-height: 1.2; }
+.home-card .sub { display: block; font-size: 15px; color: var(--ink-2); margin-top: 2px; }
+.home-card.dark { background: var(--navy); color: #fff; border-color: transparent; }
+.home-card.dark .sub { color: rgba(255, 255, 255, .78); }
+.home-card.dark .glyph .g-ink { stroke: #fff; }
+html.easy .home-card b { font-size: 25px; }
+html.easy .home-card .sub { font-size: 18px; }
+.easy-toggle { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 16px 18px; width: 100%; text-align: left; cursor: pointer; font: inherit; color: var(--ink); min-height: 88px; }
+.easy-toggle b { display: block; font-size: 22px; }
+.easy-toggle .sub { display: block; font-size: 15px; color: var(--ink-2); margin-top: 2px; }
+.easy-toggle .knob { width: 64px; height: 38px; border-radius: 999px; background: var(--grey-tint); border: 2px solid var(--line-2); position: relative; transition: background .25s var(--ease); flex: none; }
+.easy-toggle .knob::after { content: ""; position: absolute; top: 3px; left: 3px; width: 28px; height: 28px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0, 0, 0, .25); transition: transform .3s var(--ease); }
+.easy-toggle[aria-checked="true"] .knob { background: var(--mint); border-color: var(--mint); }
+.easy-toggle[aria-checked="true"] .knob::after { transform: translateX(26px); }
+html.easy .easy-toggle .sub { font-size: 18px; }

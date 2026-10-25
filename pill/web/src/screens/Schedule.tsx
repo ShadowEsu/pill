@@ -1,14 +1,20 @@
-// Personal schedule: the day as a strip with a sliding now-line, the next three doses counting down to the second,
-// what is due now, today's timetable (taken / planned / missed), a week of doses by hour as a heat map, and 14-day streaks.
-import { useSyncExternalStore } from 'react';
+// Personal schedule, built to be read from arm's length: one big row per medicine with its time, one "I took it" tap
+// per dose (logged to the dose log), "Remind me" (a browser notification at that time every day while Pill is open in a
+// tab) and the Google Calendar event (pill-pay → the connected Google account; its status chip at the top). Then the day
+// as a strip with a sliding now-line, the next three doses counting down to the second, today's timetable
+// (taken / planned / missed), a week of doses by hour as a heat map, and 14-day streaks.
+import { useState, useSyncExternalStore } from 'react';
 import { Link } from 'react-router-dom';
 import { Screen } from '../components/Shell';
 import Timetable from '../components/Timetable';
 import Heatmap, { type Heat } from '../components/Heatmap';
 import MedIcon, { medColor } from '../components/MedIcon';
 import Glyph from '../components/Glyph';
+import CalendarButton, { CalendarChip, useCalendarStatus } from '../components/CalendarButton';
+import ReadAloud from '../components/ReadAloud';
 import { actions, useStore } from '../lib/store';
-import { doseItems, dueSoon, myBottles, takenToday } from '../lib/doses';
+import { doseItems, myBottles, takenToday } from '../lib/doses';
+import { setReminder, useReminders } from '../lib/reminders';
 import { DAY, H, atClock, dayStart, hm, hourOf, useNow } from '../lib/when';
 import type { Bottle } from '../lib/types';
 import '../components/viz.css';
@@ -73,6 +79,75 @@ function Countdown({ ms }: { ms: number }) {
   );
 }
 
+/** One big row per medicine, earliest time first; as-needed medicines last. */
+function DoseRows({ bottles, now }: { bottles: Bottle[]; now: number }) {
+  const cal = useCalendarStatus();
+  const rem = useReminders();
+  const easy = useStore((s) => s.easy);
+  const [asked, setAsked] = useState<string | null>(null);
+  const rows = [...bottles].sort((a, b) => (a.reminder ?? '99:99').localeCompare(b.reminder ?? '99:99'));
+  const d = new Date(now);
+  const today = `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;   // local date for the calendar event
+  const blocked = rem.permission === 'denied' || rem.permission === 'unsupported';
+  return (
+    <section className="stack" style={{ gap: 12 }} aria-label="My doses today" data-dose-rows>
+      <div className="panel-head" style={{ flexWrap: 'wrap', gap: 8 }}>
+        <h2 className="serif" style={{ fontWeight: 400, fontSize: '1.9rem' }}>My doses today</h2>
+        <CalendarChip cal={cal} />
+      </div>
+      {rows.length === 0 && <p className="card" style={{ padding: 20, fontSize: 20 }}>No medicines yet. Add one from <Link to="/medicines">My medicines</Link>.</p>}
+      <ul className="dose-rows">
+        {rows.map((b) => {
+          const taken = takenToday(b, now);
+          const at = b.reminder ? atClock(b.reminder, now) : null;
+          const doneToday = !!b.reminder && taken.length > 0;
+          const late = at != null && !doneToday && now > at;
+          const ringing = rem.on.includes(b.id);
+          const status = doneToday ? `Taken today at ${hm(taken[0])}`
+            : at == null ? (taken.length ? `As needed · last taken ${hm(taken[0])}` : 'As needed')
+            : late ? `Not taken yet · due at ${b.reminder}`
+            : `Due at ${b.reminder}`;
+          return (
+            <li key={b.id} className={'card dose-row' + (doneToday ? ' taken' : '') + (late ? ' late' : '')} data-dose-row={b.id}>
+              <div className="dose-row-head">
+                <MedIcon drug={b.drug} size={52} still />
+                <div style={{ minWidth: 0 }}>
+                  <p className="dose-row-name">{b.drug} <span style={{ fontWeight: 400, color: 'var(--ink-2)' }}>{b.strength}</span></p>
+                  <p className="dose-row-sub">{b.usedFor}</p>
+                </div>
+                <span className="dose-row-time" aria-label={b.reminder ? `at ${b.reminder}` : 'as needed'}>{b.reminder ?? '—'}</span>
+              </div>
+              <p className="dose-row-status row" role="status" style={{ gap: 10 }}>
+                <span aria-hidden="true" style={{ width: 12, height: 12, borderRadius: '50%', flex: 'none', background: doneToday ? 'var(--mint)' : late ? 'var(--amber)' : 'var(--grey)' }} />
+                {status}
+              </p>
+              <div className="dose-row-actions">
+                {doneToday
+                  ? <span className="chip ok" style={{ justifyContent: 'center', minHeight: 64, fontSize: 18 }}><span className="dot" />Taken at {hm(taken[0])}</span>
+                  : <button type="button" className="btn mint" onClick={() => actions.markTaken(b.id)} data-action="took-it">I took it</button>}
+                <button type="button" className={'btn ' + (ringing ? 'sky' : 'ghost')} aria-pressed={ringing} disabled={!b.reminder || (blocked && !ringing)} data-action="remind"
+                  onClick={async () => { const p = await setReminder(b.id, !ringing); setAsked(p); }}>
+                  {ringing ? 'Reminder on' : 'Remind me'}
+                </button>
+              </div>
+              {b.reminder
+                ? <CalendarButton compact summary={`Take ${b.drug} ${b.strength}`} description={`Lot ${b.lot}. ${b.usedFor}`} start={`${today}T${b.reminder}:00`} minutes={10} recurrenceDaily label="Add to Google Calendar, every day" />
+                : <p className="footnote">Set a time in <Link to="/medicines">My medicines</Link> to get reminders.</p>}
+              {easy && <ReadAloud text={`${b.drug} ${b.strength}. ${status}.`} size={56} />}
+            </li>
+          );
+        })}
+      </ul>
+      <p className="footnote" role="note" style={{ fontSize: 16 }}>
+        Remind me pops up a notification on this device at the dose time, every day, while Pill is open in a browser tab. Close the tab and it stays quiet; the Google Calendar event reminds you either way.
+        {rem.permission === 'denied' && ' Notifications are blocked for Pill in this browser; allow them in the site settings to use Remind me.'}
+        {rem.permission === 'unsupported' && ' This browser has no notifications; use Google Calendar instead.'}
+        {asked === 'default' && ' The browser did not answer the notification question; tap Remind me again.'}
+      </p>
+    </section>
+  );
+}
+
 export default function Schedule() {
   const bottles = useStore((s) => s.bottles);
   const deliveries = useStore((s) => s.deliveries);
@@ -83,7 +158,7 @@ export default function Schedule() {
   const items = doseItems(mine, now);
   const hrs = [...items.map((i) => hourOf(i.at)), hourOf(now)];
   const start = Math.max(0, Math.min(6, Math.floor(Math.min(...hrs)))), end = Math.min(24, Math.max(22, Math.ceil(Math.max(...hrs) + 0.5)));
-  const due = dueSoon(mine, now);
+  const all = myBottles(bottles, deliveries);
   const next = upcoming(mine, tick, 3);
 
   const days = Array.from({ length: 14 }, (_, i) => dayStart(now) - (13 - i) * DAY);
@@ -105,6 +180,8 @@ export default function Schedule() {
 
   return (
     <Screen title="Schedule" tone="sky" eyebrow={new Date(now).toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })} art={<Glyph name="calendar" size={56} />}>
+      <DoseRows bottles={all} now={now} />
+
       <section className="card panel dstrip-card" aria-label="Today at a glance">
         <div className="panel-head"><h2>Today</h2><span className="eyebrow">{pad2(S0)}:00–{pad2(S1)}:00</span></div>
         <DayStrip bottles={mine} now={tick} />
@@ -124,23 +201,6 @@ export default function Schedule() {
               <Countdown ms={n.at - tick} />
             </div>
           ))}
-        </section>
-      )}
-
-      {due.length > 0 && (
-        <section className="stack" aria-label="Due now">
-          {due.map((b) => {
-            const late = atClock(b.reminder!, now) < now;
-            return (
-              <div key={b.id} className={'card due-card' + (late ? ' late' : '')}>
-                <span className="row" style={{ gap: 12, minWidth: 0 }}>
-                  <MedIcon drug={b.drug} size={40} />
-                  <span style={{ fontSize: '1.1rem' }}><b style={{ textTransform: 'capitalize' }}>{b.drug}</b> <span className="mono" style={{ fontSize: 13 }}>{b.reminder}</span>{late && <span className="chip warn beat" style={{ marginLeft: 8 }}><span className="dot" />late</span>}</span>
-                </span>
-                <button type="button" className="btn mint" style={{ width: 'auto', flex: 'none' }} onClick={() => actions.markTaken(b.id)}>Taken now</button>
-              </div>
-            );
-          })}
         </section>
       )}
 

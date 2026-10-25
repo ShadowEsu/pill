@@ -2,7 +2,12 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import './motion.css'
+import './easy.css'
 import App from './App.tsx'
+import { startReminderClock } from './lib/reminders'
+
+// "Remind me" notifications ring while any Pill tab is open (lib/reminders.ts)
+startReminderClock()
 
 // Button ripple: the press point becomes --rx/--ry on the pressed .btn (index.css .btn::after). One passive listener.
 document.addEventListener('pointerdown', (e) => {
