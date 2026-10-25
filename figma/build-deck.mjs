@@ -538,27 +538,93 @@ S('Three answers', [
   }),
 ], 'It says three things only: PASS, NEEDS LAB, UNABLE TO VERIFY. Never a fourth. In the clinic app PASS means this tablet\'s curve matched the reference band; it does not mean right drug, right dose or contaminant-free.');
 
-// 8 · clinic mode: the money rail
-const rail = [['Clinic', 'wallet · USDC on Base', 'pays into escrow when the delivery is logged', X, 320, C.surface, C.line], ['Escrow', 'Pill escrow', 'holds it until a PASS and a pharmacist\u2019s tap', X + 450, 340, C.skyTint, 'rgba(79,179,255,0.40)'], ['Supplier', 'wallet · USDC on Base', 'paid only on release', X + 920, 320, C.surface, C.line]];
-const outcomes = [['PASS', '+ the pharmacist\u2019s tap \u2192 escrow pays the supplier (P1)'], ['NEEDS LAB', 'held; the lab referral is drafted with the curve (P2)'], ['UNABLE TO VERIFY', 'escalated to a person; no money moves (P3)']];
-S('Clinic mode', [
-  ...chrome('Clinic mode · the payment gate'),
-  head(X, 150, 1250, 'The verdict holds the payment.', 92),
-  ...chipRow(X, 270, [['ESCROW SIMULATED', C.greyTint, { dot: C.grey }], ['TESTNET · BASE SEPOLIA', C.violetTint, { dot: C.violet }]]),
-  body(X, 340, 1180, 'A clinic samples one tablet from each delivery. The policy agent reads the verdict, the recall check and the spend cap, and proposes. Only a pharmacist\u2019s tap releases money.', { size: 26 }),
-  ...rail.flatMap(([k, sub, d, x, w, fill, stroke]) => [card(x, 490, w, 190, { fill, stroke, radius: 24 }),
-    text(x + 28, 514, w - 56, k, { size: 30, weight: 600, lh: 120 }), mono(x + 28, 558, w - 56, sub),
-    text(x + 28, 596, w - 56, d, { size: 21, color: C.ink2, lh: 140 })]),
-  line([[X + 332, 585], [X + 438, 585]], C.sky, { w: 3, dash: [8, 7] }),
-  line([[X + 802, 585], [X + 908, 585]], C.sky, { w: 3 }),
-  ...outcomes.flatMap(([v, d], i) => {
-    const y = 730 + i * 74;
-    return [...chip(X, y, v, VERDICT[v][0], { dot: VERDICT[v][1], w: 300 }), line([[X + 316, y + 20], [X + 390, y + 20]], C.line2, { w: 2, headLen: 10 }),
-      text(X + 408, y + 4, 840, d, { size: 24, lh: 130 })];
+// 8 · how the money moves, and who decides (pitch/FLOW-SPEC.md: the tree, the Coinbase money column, the x402 lane, the models row)
+// Arrows are ink; a dashed line means "not yet run"; red only on Hold.
+const RED_TINT = 'rgba(224,72,72,0.16)';
+const arrow = (pts, o = {}) => line(pts, C.ink, { w: 2, headLen: 10, ...o });
+/** Outline-only box drawn as a dashed path (rect has no dash): "not yet run". */
+const dashedBox = (x, y, w, h, stroke = C.ink2) => [rect(x, y, w, h, { fill: C.surface, radius: 0 }), curve(x, y, w, h, `M 0 0 L ${w} 0 L ${w} ${h} L 0 ${h} L 0 0`, stroke, { w: 2, dash: [8, 7] })];
+const ANSWERS = [['Passed the screen', C.mintTint], ['Needs lab testing', C.amberTint], ['Unable to verify', C.greyTint]];
+const OUTPUTS = [['Release · passed + no recall + within cap + tap', C.mintTint], ['Hold · needs lab; lab referral drafted', RED_TINT], ['Escalate · unable to verify \u2192 a person; nothing moves', C.greyTint]];
+const WALLETS = ['pill-clinic', 'pill-escrow', 'pill-supplier'];
+const LANE = [
+  ['Buyer agent · another clinic, or an agent with no local reference', C.surface],
+  ['POST /verify with a curve', C.surface],
+  ['402 Payment Required · 0.05 USDC (TESTNET); the price travels in the 402', C.violetTint],
+  ['Buyer reads the price, checks its 1 USDC / 24 h cap, signs', C.surface],
+  ['Facilitator verifies the signature', C.surface],
+  ['200 + verdict JSON · pending a CDP key / 0.05 test USDC', null],
+];
+const MODELS = [
+  ['Claude', 'Station: reads the bottle label + imprint, writes the report, answers Ask, behind the guardrail. Clinic: the two-sentence \u201cwhy\u201d; the escrow clerk (returns the ceiling computed in code, or escalate).', 'Sets a verdict; moves money'],
+  ['Gemini', 'Clinic: reads the bottle label into editable fields (unreadable \u2192 null); runs the agentic checker (label, up to three cup frames, code tools for the recall lookup).', 'Sets a verdict; invents a field'],
+  ['Deterministic code', 'analysis.py and rules.ts (U1 U2 U3 N1 N2 N3 P1) set every verdict; the policy computes the ceiling; the clause filter drops any model sentence with a banned claim word (over half dropped \u2192 rule text).', 'Calls a model to decide'],
+];
+S('Money flow', [
+  ...chrome('How the money moves', { footer: false }),
+  head(X, 112, 1500, 'How the money moves, and who decides.', 56),
+  ...[['Measure', X], ['Three answers', 480], ['The policy agent · pill/pay', 830], ['The money · Coinbase', 1360]].map(([t, x]) => eyebrow(x, 196, t, 470, { size: 15, ls: 10 })),
+  // column 1: measure
+  card(X, 228, 300, 64, { radius: 18 }), text(X + 24, 246, 252, 'One tablet', { size: 20, weight: 600, lh: 130 }),
+  arrow([[270, 294], [270, 318]]),
+  card(X, 322, 300, 150, { radius: 18 }), text(X + 24, 338, 252, 'Station · Arduino UNO Q', { size: 20, weight: 600, lh: 130 }),
+  text(X + 24, 370, 252, 'Blue · white · red LEDs, 2 photoresistors, 1 CSV line/s. The firmware decides nothing.', { size: 16, color: C.ink2, lh: 140 }),
+  arrow([[270, 474], [270, 498]]),
+  card(X, 502, 300, 104, { radius: 18 }), text(X + 24, 518, 252, 'analysis.py', { font: 'mono', size: 20, weight: 600, lh: 130 }),
+  text(X + 24, 550, 252, 'Deterministic: curve maths, quality gates.', { size: 16, color: C.ink2, lh: 140 }),
+  // column 2: the fork
+  ...ANSWERS.flatMap(([label, fill], i) => {
+    const y = 240 + i * 96;
+    return [rect(480, y, 290, 76, { fill, radius: 16 }), text(504, y + 24, 250, label, { size: 20, weight: 600, lh: 130 }),
+      arrow([[422, 554], [450, 554], [450, y + 38], [476, y + 38]])];
   }),
-  ...phone(1440, 150, 360, APP.heldTop, 800),
-  mono(1440, 962, 360, 'app · delivery held under P2', { align: 'center', size: 16 }),
-], 'And it decides the money. A policy agent holds the payment in escrow and proposes release only on a PASS; a pharmacist taps to approve. Claude explains the result and keeps the log, but never sets a verdict and never moves money. Escrow is simulated until a CDP key; testnet only.');
+  text(480, 528, 290, 'Three answers, never four. No model sets a verdict.', { size: 16, color: C.ink2, lh: 140 }),
+  // column 3: the policy agent
+  card(830, 228, 470, 196, { radius: 18 }),
+  text(854, 246, 422, 'Six clauses P1\u2013P6, in code \u2192 a ceiling.', { size: 20, weight: 600, lh: 130 }),
+  text(854, 280, 422, 'Claude may only return the ceiling or escalate.', { size: 17, color: C.ink2, lh: 140 }),
+  mono(854, 330, 422, 'in: the verdict · recall lookup (openFDA) · bottle label (Gemini \u2192 editable fields; unreadable = null) · invoice amount vs cap · pharmacist\u2019s tap', { size: 14, color: C.ink2 }),
+  arrow([[770, 278], [826, 278]]), arrow([[770, 374], [826, 374]]), arrow([[770, 470], [800, 470], [800, 400], [826, 400]]),
+  arrow([[1065, 426], [1065, 448]]),
+  ...OUTPUTS.flatMap(([label, fill], i) => {
+    const y = 452 + i * 60;
+    return [rect(830, y, 470, 50, { fill, radius: 25 }), text(852, y + 14, 430, label, { size: 16, weight: 500, lh: 130 })];
+  }),
+  // column 4: the money (CDP server wallets)
+  ...WALLETS.flatMap((name, i) => {
+    const y = 228 + i * 108;
+    return [card(1360, y, 250, 64, { radius: 16 }), text(1380, y + 10, 210, name, { font: 'mono', size: 20, weight: 600, lh: 130 }),
+      mono(1380, y + 38, 210, 'CDP server wallet', { size: 14 })];
+  }),
+  arrow([[1450, 294], [1450, 332]]), text(1462, 300, 170, 'hold · delivery logged', { size: 15, color: C.ink2, lh: 130 }),
+  arrow([[1450, 402], [1450, 440]]), text(1462, 408, 170, 'release', { size: 15, color: C.ink2, lh: 130 }),
+  arrow([[1612, 368], [1650, 368], [1650, 260], [1614, 260]]), text(1662, 300, 140, 'refund', { size: 15, color: C.ink2, lh: 130 }),
+  arrow([[1302, 477], [1356, 477]]),
+  ...dashedBox(1640, 404, 160, 104),
+  text(1652, 414, 136, 'Capital One Nessie mirror, sandbox dollars (SANDBOX; not yet run)', { size: 14, color: C.ink, lh: 135 }),
+  text(1360, 524, 440, 'USDC on Base Sepolia (TESTNET) · Coinbase CDP SDK server wallets', { size: 16, color: C.ink2, lh: 140 }),
+  ...chip(1360, 578, 'ESCROW · MODE: SIMULATED UNTIL A CDP KEY', C.greyTint, { size: 14 }),
+  // the second lane: selling a verdict over x402
+  eyebrow(X, 640, 'Selling a verdict · Coinbase x402', 1200, { size: 15, ls: 10 }),
+  ...LANE.flatMap(([label, fill], i) => {
+    const x = X + i * 285;
+    return [
+      ...(fill ? [card(x, 666, 256, 96, { fill, radius: 16 })] : dashedBox(x, 666, 256, 96)),
+      text(x + 12, 678, 232, label, { size: 16, weight: i === 2 ? 600 : 400, lh: 135 }),
+      ...(i < LANE.length - 1 ? [arrow([[x + 258, 714], [x + 283, 714]], i === LANE.length - 2 ? { dash: [6, 5] } : {})] : []),
+    ];
+  }),
+  text(X, 774, W - 2 * X, 'Real 402 today; the facilitator\u2019s verify step answered (insufficient_balance on our unfunded test wallet). @x402/express · @x402/evm · CDP SDK. Service modes cdp · public-facilitator · simulated, each named in every response.', { size: 15, color: C.ink2, lh: 140 }),
+  // the models row
+  mono(X, 830, 260, 'MODEL', { size: 14, ls: 10 }), mono(400, 830, 900, 'DOES', { size: 14, ls: 10 }), mono(1440, 830, 360, 'NEVER', { size: 14, ls: 10 }),
+  ...MODELS.flatMap(([who, does, never], i) => {
+    const y = 860 + i * 52;
+    return [rect(X, y - 8, W - 2 * X, 1, { fill: C.line }),
+      text(X, y, 260, who, { size: 17, weight: 600, lh: 130 }),
+      text(400, y, 1010, does, { size: 15, color: C.ink2, lh: 140 }),
+      text(1440, y, 360, never, { size: 15, color: C.ink, lh: 140 })];
+  }),
+], 'How the money moves, and who decides. One tablet goes into the station; deterministic code turns the curve into one of three answers. The policy agent runs six clauses in code to get a ceiling; Claude may only return that ceiling or escalate. Passed, no recall, within the cap and a pharmacist\u2019s tap releases the escrow to the supplier; Needs lab holds it and drafts a lab referral; Unable to verify escalates to a person. The money column is three Coinbase CDP server wallets, USDC on Base Sepolia, testnet, and escrow moves are simulated until we have a CDP key. Underneath, another clinic can buy a verdict over x402: the 402 is real today, the paid 200 is still pending. Claude and Gemini explain and read; code sets every verdict.');
 
 // 9 · coinbase
 const x402 = [['402', 'The server answers \u201cPayment Required\u201d: 0.05 USDC on Base Sepolia.'], ['sign', 'The buyer\u2019s wallet signs that exact payment; over its spend cap, it refuses.'], ['settle', 'PENDING · the facilitator settles it on Base Sepolia (needs 0.05 test USDC or a CDP key).'], ['200', 'PENDING · the server answers with the verdict and the rule id that fired.']];
