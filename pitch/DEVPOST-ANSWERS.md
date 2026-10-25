@@ -161,4 +161,14 @@ Ready to upload, in order, from `pitch/gallery/` (real JPG/PNG, names cropped of
 | 8 | `pitch/gallery/08-station-result.png` | Replay of our aspirin run: Unable to verify (no reference yet). |
 | 9 | `pitch/gallery/09-clinic-verify-x402.png` | Clinic app, Verify page: the x402 lane lit by a real 402 (the paid 200 stays dashed). |
 | 10 | `pitch/gallery/10-clinic-dashboard.png` | Clinic dashboard: deliveries, the station card and "How the money moves". |
+| 11 | `pitch/gallery/11-station-app-home.png` | Station app home: "Is this tablet dissolving the way it should?", with the last check and next dose. |
+| 12 | `pitch/gallery/12-station-app-dissolving.png` | Station app on a phone, mid-run: the tablet dissolving, both sensors read once a second (replay). |
+| 13 | `pitch/gallery/13-station-app-history.png` | Station app history: every check and run is kept; our aspirin runs say Unable to verify (no reference yet). |
+| 14 | `pitch/gallery/14-clinic-deliveries.png` | Clinic app, Deliveries: each lot is logged into SANDBOX escrow, tested one tablet each, then held or released. |
+| 15 | `pitch/gallery/15-clinic-kiosk-running.png` | Clinic kiosk mid-run: the reading settles at 97% of reference, with the curve and the light path (replay). |
+| 16 | `pitch/gallery/16-clinic-pay-escalation.png` | Clinic app, Pay: an Unable to verify lot escalates to a person and no money moves (USDC TESTNET). |
+| 17 | `pitch/gallery/17-site-hero.png` | Our website's first screen: "The box measures. Pill explains." next to the station at our table. |
+| 18 | `pitch/gallery/18-station-parts-drawing.png` | The station's parts, drawn on our website: printed chamber, LED box and two photoresistor holders. |
+| 19 | `pitch/gallery/19-film-tablet-dissolving.png` | Demo film: a tablet in the cup, and the blue line rising as the water clouds (synthetic replay curve). |
+| 20 | `pitch/gallery/20-ask-pill-answer.png` | Ask Pill on a phone: Claude explains in plain English why our aspirin scan said Unable to verify. |
 
