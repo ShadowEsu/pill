@@ -225,6 +225,9 @@ table.bom td:last-child { text-align: right; font-family: var(--mono); font-size
 .h2[data-type] { position: relative; }
 .h2[data-type] .caret { display: inline-block; width: 0.06em; height: 0.85em; background: currentColor; opacity: .6; margin-left: 0.04em; vertical-align: -0.08em; animation: blink 1s steps(2, start) infinite; }
 .h2[data-type].done .caret { display: none; }
+.h2[data-type] { position: relative; }
+.h2[data-type] .tg { visibility: hidden; }
+.h2[data-type] .tl { position: absolute; inset: 0; }
 .reduced .h2[data-type] .caret { display: none; }
 .fig .spec { font-family: var(--mono); font-size: 12px; letter-spacing: .02em; color: var(--dark-muted); margin-top: 12px; border-top: 1px solid var(--dark-line); padding-top: 10px; }
 .fig-wide { grid-column: 1 / -1; min-height: 320px; }
@@ -304,3 +307,6 @@ table.rules td:last-child { font-family: var(--mono); font-size: 13px; }
 .footer { border-top-color: rgba(79,179,255,.25); }
 .nav { background: rgba(245,246,244,.72); }
 .dark + .section .nav, .nav.on-dark { background: rgba(14,18,22,.72); }
+
+/* hash jumps and nav clicks land below the fixed nav */
+html { scroll-padding-top: 76px; }

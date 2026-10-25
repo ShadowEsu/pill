@@ -148,11 +148,11 @@ export function mountX402(el) {
   const reset = el.querySelector('#x402-reset');
   let timers = [];
   const stop = () => { timers.forEach(clearTimeout); timers = []; };
-  const doReset = () => { stop(); lines.forEach((l) => l.classList.remove('on')); run.disabled = false; };
+  const doReset = () => { stop(); lines.forEach((l) => l.classList.remove('on')); };
   const play = () => {
-    doReset(); run.disabled = true;
+    doReset();
     const step = reduced ? 0 : 520;
-    lines.forEach((l, i) => timers.push(setTimeout(() => { l.classList.add('on'); if (i === lines.length - 1) run.disabled = false; }, i * step)));
+    lines.forEach((l, i) => timers.push(setTimeout(() => { l.classList.add('on'); }, i * step)));
   };
   run.addEventListener('click', play);
   reset.addEventListener('click', doReset);

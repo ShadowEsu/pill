@@ -242,7 +242,7 @@
 /* ---------- Screens: a scroll-snap slideshow of both apps ---------- */
 .ss { margin-top: 44px; }
 .ss-tabs { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid var(--dark-line); border-radius: 999px; background: rgba(255,255,255,.04); }
-.ss-tab { font: 500 14px/1 var(--sans); color: var(--dark-text); background: none; border: 0; border-radius: 999px; padding: 10px 16px; cursor: pointer; }
+.ss-tab { font: 500 14px/1 var(--sans); color: var(--dark-text); background: none; border: 0; border-radius: 999px; padding: 0 18px; min-height: 44px; cursor: pointer; }
 .ss-tab[aria-selected="true"] { background: var(--dark-text); color: var(--dark); }
 .ss-tab:focus-visible, .ss-arrow:focus-visible, .ss-track:focus-visible, .ss-dot:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
 .ss-deck { margin-top: 24px; }
@@ -254,7 +254,7 @@
 .ss-slide p b { font-weight: 600; }
 .ss-ctl { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
 .ss-arrow { width: 44px; height: 44px; flex: none; border-radius: 50%; border: 1px solid var(--dark-line); background: rgba(255,255,255,.06); color: var(--dark-text); font: 500 18px/1 var(--sans); cursor: pointer; }
-.ss-arrow:disabled { opacity: .35; cursor: default; }
+.ss-arrow[aria-disabled="true"] { opacity: .35; cursor: default; }
 .ss-dots { display: flex; gap: 8px; flex-wrap: wrap; }
 .ss-dot { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; background: rgba(233,238,242,.28); cursor: pointer; transition: width .25s, background .25s; }
 .ss-dot.on { width: 22px; background: var(--dark-text); }

@@ -1,4 +1,5 @@
-import { animate, stagger, onScroll, createTimeline, utils } from 'animejs';
+import { animate, stagger, createTimeline, utils } from 'animejs';
+import { onScroll } from './scroll.js';
 import { artFor, statSpark, timetable, heatmap } from './art.js';
 import * as stationMod from './station.js';
 const { mountStation, autoDemo, partFigures } = stationMod;
@@ -76,7 +77,9 @@ if (!reduced) {
     const full = lines.join('\n');
     h.setAttribute('data-type', '');
     h.setAttribute('aria-label', full.replace('\n', ' '));
-    h.innerHTML = '<span class="typed"></span><span class="caret" aria-hidden="true"></span>';
+    // an invisible copy of the full heading holds its final height, so typing never pushes the page down
+    const esc = full.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\n/g, '<br>');
+    h.innerHTML = `<span class="tg" aria-hidden="true">${esc}</span><span class="tl" aria-hidden="true"><span class="typed"></span><span class="caret"></span></span>`;
     const typed = h.querySelector('.typed');
     let started = false;
     const io = new IntersectionObserver(([e]) => {

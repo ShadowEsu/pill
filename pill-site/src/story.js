@@ -2,7 +2,8 @@
 // plus the Coinbase flow diagram and the FIG-grid data-flow arrows.
 // Every scene is a pure function of one number p in [0, 6): scene i owns [i, i + 1). The desktop pin drives
 // one stage from the scroll position (anime.js onScroll + sync); phones and reduced motion get the same scenes stacked.
-import { animate, createTimer, onScroll, stagger, utils } from 'animejs';
+import { animate, createTimer, stagger, utils } from 'animejs';
+import { onScroll } from './scroll.js';
 import './story.css';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -373,7 +374,7 @@ export function mountStory(section) {
     const render = (p) => {
       p = clamp(p, 0, 5.999);
       stage.render(p);
-      fill.style.transform = `scaleY(${(p / 5.8).toFixed(4)})`;
+      fill.style.transform = `scaleY(${Math.min(1, p / 5.8).toFixed(4)})`;
       const a = Math.min(5, Math.floor(p));
       copies.forEach((c, i) => {
         // in during the last 14 % of the previous scene's window, out during the last 14 % of its own
@@ -520,41 +521,64 @@ export function mountScreens(root) {
     slides().forEach((s, i) => { const dd = Math.abs(s.offsetLeft - t.offsetLeft - x); if (dd < d) { d = dd; best = i; } });
     return best;
   };
+  // idx is the screen the reader asked for; on wide screens the last few share one scroll position, so at the end of
+  // the track the scroll alone cannot tell them apart
+  let idx = 0;
+  let aim = null; // scrollLeft a button or key asked for; scroll events on the way there do not move idx
+  const atEnd = (t) => t.scrollLeft + t.clientWidth >= t.scrollWidth - 2;
   const go = (i) => {
     const s = slides(), t = track();
-    i = Math.max(0, Math.min(s.length - 1, i));
-    t.scrollTo({ left: s[i].offsetLeft - t.offsetLeft, behavior: reduced ? 'auto' : 'smooth' });
+    idx = Math.max(0, Math.min(s.length - 1, i));
+    aim = Math.min(s[idx].offsetLeft - t.offsetLeft, t.scrollWidth - t.clientWidth);
+    t.scrollTo({ left: aim, behavior: reduced ? 'auto' : 'smooth' });
+    paint(false);
   };
-  const paint = () => {
-    const s = slides(), i = current(), t = track();
-    dotsEl.querySelectorAll('.ss-dot').forEach((d, k) => { d.classList.toggle('on', k === i); d.setAttribute('aria-current', k === i ? 'true' : 'false'); });
-    count.textContent = `${i + 1} / ${s.length}`;
-    prev.disabled = t.scrollLeft <= 2;
-    next.disabled = t.scrollLeft + t.clientWidth >= t.scrollWidth - 2;
+  const paint = (fromScroll = true) => {
+    const s = slides(), t = track(), c = current();
+    if (fromScroll && aim != null && Math.abs(t.scrollLeft - aim) < 2) aim = null;
+    else if (fromScroll && aim == null) idx = atEnd(t) ? (idx >= c ? idx : s.length - 1) : c;
+    dotsEl.querySelectorAll('.ss-dot').forEach((d, k) => { d.classList.toggle('on', k === idx); d.setAttribute('aria-current', k === idx ? 'true' : 'false'); });
+    count.textContent = `${idx + 1} / ${s.length}`;
+    // aria-disabled, not disabled: a focused button that gets disabled drops keyboard focus to <body>
+    prev.setAttribute('aria-disabled', String(idx === 0));
+    next.setAttribute('aria-disabled', String(idx === s.length - 1));
   };
   const buildDots = () => {
     dotsEl.innerHTML = slides().map((_, i) => `<button type="button" class="ss-dot" tabindex="-1" aria-label="Screen ${i + 1}"></button>`).join('');
     dotsEl.querySelectorAll('.ss-dot').forEach((d, i) => d.addEventListener('click', () => go(i)));
-    paint();
+    aim = null;
+    idx = current();
+    paint(false);
   };
-  const show = (name) => {
-    tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.deck === name)));
+  const show = (name, focus = false) => {
+    tabs.forEach((t) => { const on = t.dataset.deck === name; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; if (on && focus) t.focus(); });
     decks.forEach((d) => { d.hidden = d.dataset.deck !== name; });
     deck = decks.find((d) => d.dataset.deck === name);
     buildDots();
   };
-  tabs.forEach((t) => t.addEventListener('click', () => show(t.dataset.deck)));
-  prev.addEventListener('click', () => go(current() - 1));
-  next.addEventListener('click', () => go(current() + 1));
+  tabs.forEach((t, k) => {
+    t.addEventListener('click', () => show(t.dataset.deck));
+    t.addEventListener('keydown', (e) => {
+      const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      const to = e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : step ? (k + step + tabs.length) % tabs.length : -1;
+      if (to < 0) return;
+      e.preventDefault();
+      show(tabs[to].dataset.deck, true);
+    });
+  });
+  prev.addEventListener('click', () => { if (prev.getAttribute('aria-disabled') !== 'true') go(idx - 1); });
+  next.addEventListener('click', () => { if (next.getAttribute('aria-disabled') !== 'true') go(idx + 1); });
   decks.forEach((d) => {
     const t = d.querySelector('.ss-track');
     let raf = 0;
     t.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; paint(); }); }, { passive: true });
+    // a swipe or wheel takes over from a button's scroll
+    for (const ev of ['wheel', 'touchstart', 'pointerdown']) t.addEventListener(ev, () => { aim = null; }, { passive: true });
     t.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight') { e.preventDefault(); go(current() + 1); }
-      else if (e.key === 'ArrowLeft') { e.preventDefault(); go(current() - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); go(idx + 1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); go(idx - 1); }
     });
   });
-  addEventListener('resize', paint, { passive: true });
+  addEventListener('resize', () => paint(), { passive: true });
   show(deck.dataset.deck);
 }

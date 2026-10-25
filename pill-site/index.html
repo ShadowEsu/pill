@@ -343,10 +343,10 @@
       <p class="lead reveal" style="margin-top:20px">Pill Gate runs the station on a laptop; the clinic app runs the delivery, the escrow and the log on a laptop or a phone. Swipe, use the arrows, or the arrow keys.</p>
       <div class="ss" data-ss>
         <div class="ss-tabs" role="tablist" aria-label="Which app">
-          <button type="button" role="tab" class="ss-tab" data-deck="gate" aria-selected="true">Pill Gate · station</button>
-          <button type="button" role="tab" class="ss-tab" data-deck="clinic" aria-selected="false">Clinic app</button>
+          <button type="button" role="tab" class="ss-tab" id="ss-tab-gate" aria-controls="ss-deck-gate" data-deck="gate" aria-selected="true">Pill Gate · station</button>
+          <button type="button" role="tab" class="ss-tab" id="ss-tab-clinic" aria-controls="ss-deck-clinic" data-deck="clinic" aria-selected="false" tabindex="-1">Clinic app</button>
         </div>
-        <div class="ss-deck" data-deck="gate" role="region" aria-roledescription="carousel" aria-label="Pill Gate screens">
+        <div class="ss-deck" id="ss-deck-gate" data-deck="gate" role="tabpanel" aria-labelledby="ss-tab-gate" aria-roledescription="carousel">
           <ol class="ss-track" tabindex="0">
             <li class="ss-slide"><img src="/screens/gate-welcome.webp" width="474" height="1024" loading="lazy" decoding="async" alt="Pill Gate welcome screen with Clinic, Personal and Check modes"><p><b>Welcome.</b> Pick clinic, personal or a quick check.</p></li>
             <li class="ss-slide"><img src="/screens/gate-home.webp" width="474" height="1024" loading="lazy" decoding="async" alt="Pill Gate home screen"><p><b>Home.</b> The station’s state and the next step.</p></li>
@@ -358,7 +358,7 @@
             <li class="ss-slide"><img src="/screens/gate-profiles.webp" width="474" height="1024" loading="lazy" decoding="async" alt="Pill Gate reference profiles screen"><p><b>Profiles.</b> Reference profiles, built from three or more good runs.</p></li>
           </ol>
         </div>
-        <div class="ss-deck" data-deck="clinic" role="region" aria-roledescription="carousel" aria-label="Clinic app screens" hidden>
+        <div class="ss-deck" id="ss-deck-clinic" data-deck="clinic" role="tabpanel" aria-labelledby="ss-tab-clinic" aria-roledescription="carousel" hidden>
           <ol class="ss-track" tabindex="0">
             <li class="ss-slide"><img src="/screens/clinic-station.webp" width="474" height="1024" loading="lazy" decoding="async" alt="Clinic app station screen, status offline"><p><b>Station.</b> Says offline when nothing is plugged in; runs then play as labelled replays.</p></li>
             <li class="ss-slide"><img src="/screens/clinic-01-prepare.webp" width="474" height="1024" loading="lazy" decoding="async" alt="Clinic app run, prepare phase"><p><b>Prepare.</b> The checks before a run starts.</p></li>

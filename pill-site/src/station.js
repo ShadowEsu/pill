@@ -6,7 +6,8 @@
 // autoDemo(handle) runs the idle loop (assemble → hold → explode → hold → assemble) while on screen.
 // attachScroll(handle, { stage }) drives progress from scroll and falls back to the idle loop when scrolling stops.
 // partFigures holds seven standalone 300×300 SVG strings for a FIG grid; every path carries data-draw="i".
-import { createTimeline, animate, onScroll } from 'animejs';
+import { createTimeline, animate } from 'animejs';
+import { onScroll } from './scroll.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 const RAD = Math.PI / 180;
