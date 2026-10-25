@@ -40,7 +40,6 @@ esac
   -f lavfi -t 4.0 -i "anullsrc=r=48000:cl=stereo" \
   -i "$MUSIC" \
   -ss 125.100 -t 2.925 -i "$SRC" \
-  -loop 1 -framerate 30 -t 3.80 -i stickers/ring.png \
   -loop 1 -framerate 30 -t 3.20 -i stickers/pill.png \
   -loop 1 -framerate 30 -t 7.20 -i stickers/chip-box.png \
   -loop 1 -framerate 30 -t 6.40 -i stickers/chip-explains.png \

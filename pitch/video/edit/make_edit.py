@@ -65,12 +65,11 @@ STK = {'answer-passed': (900, 204, 62, 410), 'answer-lab': (900, 204, 62, 410), 
        'arrow': (500, 500, 262, 262)}
 # pop-ups: (cut id or "END", src time (or seconds into end card), sticker, on-screen width, x, y, dur, alpha)
 POPS = [
-    ("C1", 45.25, "ring", 980, 50, 560, 3.8, 1.0),
     ("C3", 19.90, "pill", 300, 720, 330, 3.2, 1.0),
     ("C5", 56.00, "chip-box", 640, 60, 300, 7.2, 1.0),
     ("C5", 56.80, "chip-explains", 520, 480, 480, 6.4, 1.0),
     ("C6", 74.80, "arrow", 360, 640, 760, 2.6, 1.0),
-    ("C8", 104.30, "ring", 900, 90, 620, 3.2, 1.0),
+    ("C8", 104.30, "ring", 360, 410, 735, 3.2, 1.0),  # ≤35 % of frame width, round the dial on the laptop (≈590,870 at 1:45)
     ("C9", 112.60, "chip-unoq", 600, 240, 300, 6.0, 1.0),
     ("C11", 168.10, "answer-passed", 760, 160, 300, 4.6, 0.45),
     ("C11", 168.25, "answer-lab", 760, 160, 480, 4.45, 0.45),
