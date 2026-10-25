@@ -18,9 +18,9 @@ import '../story.css';
 
 const SHA: string = import.meta.env.VITE_SHA || 'dev';
 
-const SITE = 'https://pill-site.vercel.app';
+const SITE = 'https://pillmeifyoucan.health';
 const CREDITS = [
-  { t: 'Pill · the website', d: 'pill-site.vercel.app · how the station works, the story, the demo', href: SITE },
+  { t: 'Pill · the website', d: 'pillmeifyoucan.health · how the station works, the story, the demo', href: SITE },
   { t: 'WHO fact sheet: substandard and falsified medical products', d: 'World Health Organization', href: 'https://www.who.int/news-room/fact-sheets/detail/substandard-and-falsified-medical-products' },
   { t: 'openFDA drug enforcement (recalls)', d: 'U.S. Food and Drug Administration', href: 'https://open.fda.gov/apis/drug/enforcement/' },
   { t: 'Nessie sandbox API', d: 'Capital One · SANDBOX', href: 'http://api.nessieisreal.com/' },
@@ -137,7 +137,7 @@ export default function Settings() {
             <span className="set-site-copy">
               <span className="eyebrow" style={{ color: 'rgba(255,255,255,.6)' }}>About Pill</span>
               <span className="serif" style={{ fontSize: 28, lineHeight: 1.05 }}>The box measures. Pill explains.</span>
-              <span className="mono" style={{ fontSize: 12, color: 'rgba(255,255,255,.7)' }}>pill-site.vercel.app ↗</span>
+              <span className="mono" style={{ fontSize: 12, color: 'rgba(255,255,255,.7)' }}>pillmeifyoucan.health ↗</span>
             </span>
           </a>
           <p className="card" style={{ margin: 0, padding: '12px 16px', fontSize: 15 }} data-payments-line>

@@ -18,7 +18,7 @@ const CHOICES: { mode: Mode; eyebrow: string; title: string; sub: string; glyphs
 ];
 const WORD = 'Pill';
 const TAGLINE = 'The box measures. Pill explains.';
-const SITE = 'https://pill-site.vercel.app';
+const SITE = 'https://pillmeifyoucan.health';
 const CHAR_MS = 40, TYPE_DELAY = 620;
 
 /** The tagline, typed once at 40 ms a character after a short beat; static under reduced motion. */

@@ -102,7 +102,7 @@ async function drawShareCard(cv: HTMLCanvasElement, run: Run) {
   c.strokeStyle = LINE; c.lineWidth = 1.5; c.beginPath(); c.moveTo(72, 556); c.lineTo(W - 72, 556); c.stroke();
   c.fillStyle = INK; c.font = `600 22px ${SANS}`; c.fillText('Screening result, not a pharmacopeial test.', 72, 594);
   c.fillStyle = MUTED; c.font = `400 16px ${MONO}`; c.textAlign = 'right';
-  c.fillText(ev ? `rule ${ev.rule} · pill-site.vercel.app` : 'pill-site.vercel.app', W - 72, 592); c.textAlign = 'left';
+  c.fillText(ev ? `rule ${ev.rule} · pillmeifyoucan.health` : 'pillmeifyoucan.health', W - 72, 592); c.textAlign = 'left';
 }
 
 const canShareFiles = () => {
