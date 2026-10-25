@@ -65,7 +65,7 @@ const STEPS: Step[] = [
   },
   {
     key: 'place', label: 'place the tablet', ms: 12_000,
-    say: () => 'One quarter tablet goes into the water. Before it starts, the station checks its light, its dark reading, the paddle and the lid.',
+    say: () => 'Clean water in the purple chamber, lid closed. Before the run, the station checks its light, its dark reading and the lid; then the whole tablet goes in and the stick stirs 5 circles.',
     enter: (go) => {
       const s = getState();
       const delivery = s.deliveries.some((d) => d.id === DELIVERY) ? DELIVERY : null;

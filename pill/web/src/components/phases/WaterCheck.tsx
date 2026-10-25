@@ -1,4 +1,4 @@
-// Phase 2, clear water: plain water in the cup with the paddle turning, a 10-s ring, the inline reading's stability as a
+// Phase 2, clean water: clean water in the closed chamber with nothing moving, a 10-s ring, the inline reading's stability as a
 // CV % of the readings so far (mint under the station's 2 % limit), and the blank value latching when the reading holds.
 // The station retries an unstable blank up to three times ('unstable, retry'); after that the run stops.
 import Cup from './Cup';
@@ -17,9 +17,9 @@ export default function WaterCheck({ readings, progress, secs, latched, unstable
   const last = readings.at(-1);
   return (
     <div className="ph-in">
-      <span className="eyebrow ph-eb">phase 2 · clear water</span>
+      <span className="eyebrow ph-eb">phase 2 · clean water</span>
       <div className="ph-water">
-        <Cup size={150} paddle={!fault} label="A cup of clear water with the paddle turning" />
+        <Cup size={150} label="The closed chamber of clean water, nothing moving" />
         <div className="ph-ring-wrap sm">
           <svg viewBox="0 0 120 120" className="ph-ring" aria-hidden="true">
             <circle cx="60" cy="60" r={R} className="track" />
@@ -31,14 +31,14 @@ export default function WaterCheck({ readings, progress, secs, latched, unstable
       {fault ? (
         <>
           <p className="serif ph-big">The water would not hold still.</p>
-          <p className="ph-sub">Three clear-water readings in a row moved more than 2 %. Check the lid and that the cup is plain water, then retry.</p>
+          <p className="ph-sub">Three clean-water readings in a row moved more than 2 %. Check the lid is closed, the water is clean and nothing touches the chamber, then retry.</p>
           <p className="mono ph-msg">{fault}</p>
-          {onRetry && <button type="button" className="btn ph-retry" onClick={onRetry} data-action="retry">Retry the clear water</button>}
+          {onRetry && <button type="button" className="btn ph-retry" onClick={onRetry} data-action="retry">Retry the clean water</button>}
         </>
       ) : (
         <>
-          <p className="serif ph-big">{latched != null ? 'Clear water, latched.' : 'Clear water first.'}</p>
-          <p className="ph-sub">Plain water with the paddle on. This is the 100 % every later reading is measured against.</p>
+          <p className="serif ph-big">{latched != null ? 'Clean water, latched.' : 'Clean water first.'}</p>
+          <p className="ph-sub">10 seconds, lid closed, nothing moving. This is the 100 % every later reading is measured against.</p>
         </>
       )}
       <div className="ph-meter" role="meter" aria-label="Blank stability, coefficient of variation" aria-valuemin={0} aria-valuemax={4} aria-valuenow={+cv.toFixed(2)}>

@@ -90,7 +90,7 @@ export default function Onboarding() {
             <span style={{ display: 'grid', gap: 2, minWidth: 0 }}>
               <span className="eyebrow">Story · 7 chapters</span>
               <span className="t">How Pill works</span>
-              <span className="s">One quarter tablet, two sensors, three words.</span>
+              <span className="s">One whole tablet, two sensors, three words.</span>
             </span>
             <span aria-hidden="true" className="onb-arrow">▶</span>
           </Link>

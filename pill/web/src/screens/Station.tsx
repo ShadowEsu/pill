@@ -16,10 +16,10 @@ import type { Sample } from '../lib/types';
 import '../phases.css';
 
 const STORY: Record<PhaseKey, string> = {
-  dark: 'Both LEDs go off. The box has to read dark: a light leak over 100 counts means the lid is open.',
-  blank: 'Plain water, paddle on. Ten readings that hold within 2 % become the 100 % everything is measured against.',
-  drop: 'One quarter tablet goes in. The station waits for the inline light to fall 6 %, and asks again after 30 s.',
-  dissolve: 'The tablet dissolves. Straight through, blue light dims; at 90°, riboflavin glows. Chalk only dims.',
+  dark: 'Both LEDs go off inside the purple chamber. It has to read dark: a light leak over 100 counts means the lid is open.',
+  blank: 'Clean water, lid closed, nothing moving, 10 seconds. Readings that hold within 2 % become the 100 % everything is measured against.',
+  drop: 'The whole tablet goes in through the hole in the lid; stir 5 circles with the stick. The station waits for the inline light to fall 6 %, and asks again after 30 s.',
+  dissolve: 'The tablet dissolves: Quick about 60–90 s, Full 2–10 min. Straight through, blue light dims; at 90°, riboflavin glows. Chalk only dims.',
   settle: 'The curve flattens. Twenty seconds with |dA/dt| under 0.001 per second is a plateau.',
   verdict: 'Seven fixed rules read the curve: PASS, NEEDS LAB or UNABLE TO VERIFY, with the rule that fired.',
 };
@@ -95,7 +95,7 @@ export default function Station() {
           <PhaseRail at={at} progress={progress} layout="row" prepare={false} sound={false}
             clock={at === 'dark' || at === 'blank' ? run?.state ?? '' : `${clock(t)}`} note={run?.message ?? null} />
         ) : (
-          <p style={{ color: 'var(--ink-2)' }}>{word === 'offline' ? 'Nothing: no station is connected.' : 'Idle. The lights are on and the paddle is still.'}</p>
+          <p style={{ color: 'var(--ink-2)' }}>{word === 'offline' ? 'Nothing: no station is connected.' : 'Idle. The lights are on and the chamber is waiting for clean water.'}</p>
         )}
         <Link to="/bottle" className="btn" style={{ textDecoration: 'none' }} data-action="start-run">Start a run</Link>
       </section>
@@ -119,7 +119,7 @@ export default function Station() {
       </div>
 
       <section className="stack" style={{ gap: 10 }} aria-label="How a run works">
-        <div className="row between"><span className="eyebrow">how a run works</span><span className="mono muted" style={{ fontSize: 12 }}>about 2 minutes</span></div>
+        <div className="row between"><span className="eyebrow">how a run works</span><span className="mono muted" style={{ fontSize: 12 }}>Quick about 60–90 s · Full 2–10 min</span></div>
         <ol className="st-how">
           {PHASES.map((p, i) => (
             <li key={p.key} className={p.key === 'dark' ? 'dark' : undefined} style={{ '--c': p.key === 'dark' ? 'rgba(255,255,255,.2)' : p.color } as React.CSSProperties}>

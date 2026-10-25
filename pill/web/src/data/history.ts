@@ -74,7 +74,7 @@ export function seedHistory(): { deliveries: Delivery[]; runs: Run[]; bottles: B
       const ev = evaluate(samples, s.kind === 'noref' ? null : ref);
       runs.push({ id: rid, src: 'replay', drug, lot: s.lot, startedAt: t0 + 6 * 60e3, samples, evaluation: ev, mode: 'medical' });
       bottle.runId = rid; d.runId = rid;
-      act(t0 + 6 * 60e3, PEOPLE.station, `started run ${rid} · ¼ tablet from ${s.lot}`, 'info', { kind: 'run', id: rid });
+      act(t0 + 6 * 60e3, PEOPLE.station, `started run ${rid} · whole tablet from ${s.lot}`, 'info', { kind: 'run', id: rid });
       act(t0 + 9 * 60e3, PEOPLE.station, `finished run ${rid} · ${ev.verdict} · rule ${ev.rule} · ${ev.pct ? ev.pct + ' % of reference' : 'no reference'}`, ev.verdict === 'PASS' ? 'ok' : 'hold', { kind: 'run', id: rid });
       act(t0 + 9 * 60e3 + 20e3, PEOPLE.claude, `wrote the two-sentence why for ${rid} (filtered)`, 'info', { kind: 'run', id: rid });
       // policy

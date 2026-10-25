@@ -108,9 +108,9 @@
 .ph-water { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
 .ph-cup { position: relative; flex: none; }
 .ph-cup svg { width: 100%; height: 100%; overflow: visible; }
-.ph-cup .ph-blade { transform-box: fill-box; transform-origin: center; }
-.ph-cup.spinning .ph-blade { animation: ph-spin .7s linear infinite; }
-@keyframes ph-spin { 0% { transform: scaleX(1); } 25% { transform: scaleX(.08); } 50% { transform: scaleX(-1); } 75% { transform: scaleX(.08); } 100% { transform: scaleX(1); } }
+.ph-cup .ph-stick { transform-box: view-box; transform-origin: 70px 14px; }
+.ph-cup.stirring .ph-stick { animation: ph-stir .8s ease-in-out 5; }
+@keyframes ph-stir { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-7deg); } 75% { transform: rotate(7deg); } }
 .ph-cup .ph-ripples ellipse { transform-box: fill-box; transform-origin: center; opacity: 0; animation: ph-ripple 1.6s var(--ease) both; }
 .ph-cup .ph-ripples .r2 { animation-delay: .16s; } .ph-cup .ph-ripples .r3 { animation-delay: .32s; }
 .ph-cup.tab-falling .ph-ripples ellipse { animation-delay: .5s; } .ph-cup.tab-falling .ph-ripples .r2 { animation-delay: .66s; } .ph-cup.tab-falling .ph-ripples .r3 { animation-delay: .82s; }
@@ -181,7 +181,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .ph-name, .ph-in, .ph-tickval, .ph-dot svg, .ph-cup .ph-rest { animation: none !important; }
-  .ph-seg.is-now .ph-fill, .ph-auto .is-now .ph-dot, .ph-cup .ph-blade, .ph-cup .ph-tab, .ph-cup .ph-ripples ellipse, .ph-cup .ph-fizz circle,
+  .ph-seg.is-now .ph-fill, .ph-auto .is-now .ph-dot, .ph-cup .ph-stick, .ph-cup .ph-tab, .ph-cup .ph-ripples ellipse, .ph-cup .ph-fizz circle,
   .ph-prompt, .ph-fault .ph-lid, .ph-zoom .ph-head-dot, .ph-holding .dot, .st-pulse, .ph-s-dark .ph-ring-wrap::before { animation: none !important; }
   .ph-cup.tab-falling .ph-tab { transform: translateY(150px); opacity: 0; }
 }

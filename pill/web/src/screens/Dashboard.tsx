@@ -201,7 +201,7 @@ export default function Dashboard() {
         <BinaryPill width={220} height={130} cell={5} scale={1.7} className="st-bpill" label="The station, printed in ones and zeros" />
         <span className="eyebrow">station · {station.id}</span>
         <span className="serif st-card-title">Station</span>
-        <span className="st-sub">Lights off 3 s · clear water 10 s · drop · dissolving · settling · verdict. Its status, the run on it now, the last five runs.</span>
+        <span className="st-sub">Lights off 3 s · clean water 10 s · drop the whole tablet, 5 stirs · dissolving · settling · verdict. Its status, the run on it now, the last five runs.</span>
         <span className="st-open">Open the station <span aria-hidden="true">→</span></span>
       </Link>
 

@@ -69,7 +69,7 @@ export const actions = {
       bottles: r.bottleId ? s.bottles.map((b) => (b.id === r.bottleId ? { ...b, runId: run.id } : b)) : s.bottles,
       deliveries: r.deliveryId ? s.deliveries.map((d) => (d.id === r.deliveryId ? { ...d, runId: run.id } : d)) : s.deliveries,
     }));
-    activity(PEOPLE.station, `started run ${run.id} · ¼ tablet from lot ${run.lot}`, 'info', { kind: 'run', id: run.id });
+    activity(PEOPLE.station, `started run ${run.id} · whole tablet from lot ${run.lot}`, 'info', { kind: 'run', id: run.id });
     return run;
   },
   /**

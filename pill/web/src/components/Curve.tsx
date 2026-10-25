@@ -160,7 +160,7 @@ export function RunReadout({ samples, strip = true, checks = true }: { samples: 
   const chips: [string, boolean | null, string, string][] = [
     ['LED', last ? last.led : null, 'LED ok', 'LED fault'],
     ['dark', last ? last.dark < last.blank * 0.05 : null, 'dark ok', 'dark high'],
-    ['paddle', last ? last.paddle : null, 'paddle turning', 'paddle stopped'],
+    ['run', last ? last.paddle : null, 'run clock on', 'run clock off'],
     ['lid', last ? last.lid : null, 'lid closed', 'lid open'],
   ];
   return (

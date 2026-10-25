@@ -55,7 +55,7 @@ export default function SensorPath({ led, glow, inline, running = false }: {
       {/* beam into the cup */}
       <Arrow x1={78} y1={72} x2={142} y2={72} color={beam} opacity={led ? 1 : 0} flow={running && led} delay={150} />
       {/* cup with water; mint tint = glow */}
-      <text x="180" y="30" textAnchor="middle" style={mono}>cup · quarter tablet</text>
+      <text x="180" y="30" textAnchor="middle" style={mono}>chamber · whole tablet</text>
       <path d="M150 58 L153 108 a4 4 0 0 0 4 4 h46 a4 4 0 0 0 4 -4 L210 58 Z" fill="var(--sky-tint)" />
       <path d="M150 58 L153 108 a4 4 0 0 0 4 4 h46 a4 4 0 0 0 4 -4 L210 58 Z" fill="var(--mint)" style={{ opacity: g * 0.45, transition: 'opacity .4s var(--ease)' }} />
       <path d="M150 58 q7.5 -3 15 0 t15 0 t15 0 t15 0" fill="none" stroke="var(--sky)" strokeWidth="1.2" />

@@ -163,8 +163,8 @@ function AddSheet({ onClose }: { onClose: () => void }) {
           <span className="pointer" aria-hidden="true">→</span>
         </Link>
         <Link to="/bottle" className="sheet-opt">
-          <Glyph name="quarter" size={44} delay={120} />
-          <span><b>Then test one tablet</b><span className="sub">A quarter tablet in the station, three minutes, one of three words.</span></span>
+          <Glyph name="tablet" size={44} delay={120} />
+          <span><b>Then test one tablet</b><span className="sub">The whole tablet in the station: Quick about 60–90 s, one of three words.</span></span>
           <span className="pointer" aria-hidden="true">→</span>
         </Link>
         <button type="button" className="btn ghost" onClick={onClose}>Not now</button>

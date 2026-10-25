@@ -74,7 +74,7 @@ function Dissolve({ play, wide }: ArtProps) {
   return (
     <div className="stack" style={{ alignItems: 'center', gap: 12 }}>
       <PillFill pct={pct} size={wide ? 340 : 220} />
-      <p className="mono muted" style={{ fontSize: 12.5 }}>¼ tablet · water · 3:00 stirring</p>
+      <p className="mono muted" style={{ fontSize: 12.5 }}>whole tablet · clean water · 5 circles · 60–90 s</p>
     </div>
   );
 }
@@ -217,7 +217,7 @@ function Limits({ wide }: ArtProps) {
         <div className="stack" style={{ gap: 8 }}>
           <span className="eyebrow">Pill is</span>
           <ul>
-            <li><span>+</span><span>a first look at a lot, in three minutes</span></li>
+            <li><span>+</span><span>a first look at a lot, in about a minute and a half</span></li>
             <li><span>+</span><span>a record of every run and every decision</span></li>
             <li><span>+</span><span>a reason to send a lot to a lab</span></li>
           </ul>
@@ -241,7 +241,7 @@ const CHAPTERS: Chapter[] = [
     body: 'Most of them look like the right tablet. The pharmacist who signs for a box has a label, a lot number and a delivery note, and no way to see inside.',
     src: <>Source: <a href={WHO_2017} target="_blank" rel="noopener noreferrer">WHO, 2017</a></>, Art: OneInTen, dots: true },
   { name: 'Dissolve', line: 'A tablet cannot lie about dissolving.',
-    body: 'Drop a quarter tablet into water and stir for three minutes. The right dose of the right medicine colours the water by a known amount, at a known pace. Too little, too slow or nothing at all, and the curve shows it.', Art: Dissolve },
+    body: 'Drop the whole tablet into clean water, close the lid and stir 5 circles with the stick. The right dose of the right medicine colours the water by a known amount, at a known pace: Quick about 60–90 s, Full 2–10 min. Too little, too slow or nothing at all, and the curve shows it.', Art: Dissolve },
   { name: 'Two sensors', line: 'Two sensors, one answer.',
     body: 'A blue light shines straight through the cup, and the inline sensor reads how much it dims: the absorbance. A second sensor at 90° watches for riboflavin’s green glow. Chalk can cloud the water enough to dim the beam. It cannot glow.', Art: Sensors, dots: true },
   { name: 'Three words', line: 'Three words, never a guess.',

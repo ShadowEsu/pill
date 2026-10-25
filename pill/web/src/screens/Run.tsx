@@ -1,5 +1,5 @@
 // The run, as the station does it (SOFTWARE-PLAN §2, pill/pay/src/station.ts): lights off (3 s, the box must read dark) →
-// clear water (10 s, the blank has to hold under 2 % CV) → drop the tablet (the inline light falls 6 %) → dissolving (the
+// clean water (10 s, lid closed, the blank has to hold under 2 % CV) → drop the whole tablet, 5 stirs (the inline light falls 6 %) → dissolving (the
 // capsule fills, the curve draws, the 90° glow meter) → settling (20 s with |dA/dt| under ε) → verdict. The PhaseRail on
 // top (phone) or at the left (desktop) walks those phases; one scene card morphs between them. Ends on the evaluation.
 // Replays play the same choreography (lib/stream replayStream phases); a live station (?station=1 → ?srun=) maps the
@@ -34,13 +34,13 @@ import { DRUGS, REFERENCES, REPLAYS } from '../data/reference';
 import type { Sample, Source } from '../lib/types';
 import '../components/cinema.css';
 
-const FAULT_WORDS: Record<string, string> = { lid_open: 'lid opened', led_fail: 'LED failed', temp_out: 'water temperature out of range', no_blank: 'no clear-water reading' };
+const FAULT_WORDS: Record<string, string> = { lid_open: 'lid opened', led_fail: 'LED failed', temp_out: 'water temperature out of range', no_blank: 'no clean-water reading' };
 const WIDE = '(min-width: 900px)';
 const MOMENT = 'Something is dissolving. Nothing is glowing.';
 const ORDER = PHASES.map((p) => p.key);
 /** Each phase stays on screen at least this long: a fast replay can move faster than the eye. */
 const DWELL = 1300;
-const TITLE: Record<PhaseKey, string> = { dark: 'Lights off', blank: 'Clear water', drop: 'Drop the tablet', dissolve: 'Dissolving…', settle: 'Settling…', verdict: 'Done' };
+const TITLE: Record<PhaseKey, string> = { dark: 'Lights off', blank: 'Clean water', drop: 'Drop the tablet', dissolve: 'Dissolving…', settle: 'Settling…', verdict: 'Done' };
 const TONE: Record<PhaseKey, Tone> = { dark: 'violet', blank: 'sky', drop: 'sky', dissolve: 'sky', settle: 'violet', verdict: 'none' };
 function onWideChange(l: () => void) {
   const m = window.matchMedia(WIDE);
@@ -161,7 +161,7 @@ export default function Run() {
   const fault = faultIdx >= 0 ? samples[faultIdx] : null;
   const evaluation = run?.evaluation ?? null;
 
-  // where the run is: the station's own state before the paddle starts, then the curve (6 % drop, settling, plateau)
+  // where the run is: the station's own state before the run clock starts, then the curve (6 % drop, settling, plateau)
   const curvePhase: PhaseKey = marks.drop == null ? 'drop' : marks.settle == null ? 'dissolve' : 'settle';
   const target: PhaseKey = preFault ? preFault.phase
     : fault ? curvePhase

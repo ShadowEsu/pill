@@ -45,8 +45,8 @@ function HoldRing({ left, colour }: { left: number; colour: string }) {
 
 const WORDS: Verdict[] = ['PASS', 'NEEDS LAB', 'UNABLE TO VERIFY'];
 const BEATS = [
-  'A quarter tablet goes into the water.',
-  'It dissolves for three minutes while the paddle stirs.',
+  'The whole tablet goes into clean water, lid closed.',
+  'Five circles with the stick, then it dissolves: Quick about 60–90 s, Full 2–10 min.',
   'Two sensors read the light through it and the glow from it.',
   'Seven fixed rules choose one of three words.',
 ];
@@ -97,7 +97,7 @@ function Attract({ onWake }: { onWake: () => void }) {
         <div className="cn-dots" aria-hidden="true" style={{ '--beat': `${BEAT_MS}ms` } as React.CSSProperties}>
           {BEATS.map((_, i) => <i key={i + (i === beat ? '-on' : '')} className={i === beat ? 'on' : i < beat ? 'past' : undefined} style={i < beat ? { background: 'rgba(255,255,255,.8)' } : undefined} />)}
         </div>
-        <p className="cn-attract-cta">Drop one quarter tablet to begin</p>
+        <p className="cn-attract-cta">Drop the whole tablet in to begin</p>
       </div>
       <div className="cn-attract-foot">
         <span>Tap anywhere to begin · screening result, not a pharmacopeial test</span>
@@ -166,7 +166,7 @@ export default function Kiosk() {
   const phase = phaseAt(t);
   const running = !!run && !ev;
   const status = !run ? 'ready' : phase.status;
-  const doing = !run ? 'Place a quarter tablet, close the lid, press Start.' : `${phase.doing[0].toUpperCase()}${phase.doing.slice(1)}.`;
+  const doing = !run ? 'Clean water in, lid closed, press Start. The tablet goes in after the 10-second water check.' : `${phase.doing[0].toUpperCase()}${phase.doing.slice(1)}.`;
   const startBtn = (
     <button type="button" className={'btn' + (!running ? ' cn-ready' : '')} style={{ flex: short ? 'none' : '1 0 280px', width: short ? '100%' : 'auto', minHeight: short ? 64 : 72, fontSize: 22 }} disabled={running} onClick={() => { setLeft(null); playSound('rise'); setRunId(actions.startRun({ drug: 'riboflavin', lot: 'B2-07', src: 'replay' }).id); }}>
       {running ? `Running · ${clock(t)} / 3:00` : ev ? 'Start again (replay B2-07)' : 'Start (replay B2-07)'}

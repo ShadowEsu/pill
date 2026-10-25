@@ -199,7 +199,7 @@ function Personal() {
         </Link>
         <Link to="/station" className="card home-card dark" style={{ '--i': 2 } as React.CSSProperties} data-home-card="station">
           <Glyph name="station" size={48} delay={240} />
-          <span><b>Check a bottle at the station</b><span className="sub">Lights off, clear water, one tablet, a verdict</span></span>
+          <span><b>Check a bottle at the station</b><span className="sub">Lights off, clean water, the whole tablet, a verdict</span></span>
           <span className="pointer" aria-hidden="true">→</span>
         </Link>
       </nav>

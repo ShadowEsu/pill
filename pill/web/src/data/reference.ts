@@ -2,7 +2,7 @@
 import type { Reference, Sample } from '../lib/types';
 
 export const REFERENCES: Record<string, Reference> = {
-  riboflavin: { drug: 'riboflavin', label: 'Riboflavin 100 mg (quarter tablet)', bandLow: 0.36, bandHigh: 0.47, bandMean: 0.415, glowMin: 0.12, scatterMax: 0.03, runs: 10, cv: 7 },
+  riboflavin: { drug: 'riboflavin', label: 'Riboflavin 100 mg (whole tablet)', bandLow: 0.36, bandHigh: 0.47, bandMean: 0.415, glowMin: 0.12, scatterMax: 0.03, runs: 10, cv: 7 },
 };
 
 /** What the drug is used for, in plain words (grandparent-readable). Only drugs we might see this weekend. */
@@ -35,8 +35,8 @@ export function makeCurve(opts: { plateau: number; tau: number; glow: number; se
 }
 
 export const REPLAYS: Record<string, { label: string; drug: string; lot: string; samples: Sample[] }> = {
-  'B2-07': { label: 'Riboflavin ¼ tablet, lot B2-07', drug: 'riboflavin', lot: 'B2-07', samples: makeCurve({ plateau: 0.42, tau: 38, glow: 0.33, seed: 7 }) },
-  'TM-02': { label: 'Chalk antacid ¼ tablet, lot TM-02 (cloudy water reaches the band, no glow)', drug: 'riboflavin', lot: 'TM-02', samples: makeCurve({ plateau: 0.40, tau: 50, glow: 0.015, seed: 2 }) },
+  'B2-07': { label: 'Riboflavin, whole tablet, lot B2-07', drug: 'riboflavin', lot: 'B2-07', samples: makeCurve({ plateau: 0.42, tau: 38, glow: 0.33, seed: 7 }) },
+  'TM-02': { label: 'Chalk antacid, whole tablet, lot TM-02 (cloudy water reaches the band, no glow)', drug: 'riboflavin', lot: 'TM-02', samples: makeCurve({ plateau: 0.40, tau: 50, glow: 0.015, seed: 2 }) },
   'B2-LID': { label: 'Riboflavin, lid opened at 0:41', drug: 'riboflavin', lot: 'B2-09', samples: makeCurve({ plateau: 0.42, tau: 38, glow: 0.33, seed: 9, fault: { at: 41, code: 'lid_open' } }) },
   'AMX-01': { label: 'Amoxicillin, no reference', drug: 'amoxicillin', lot: 'AMX-01', samples: makeCurve({ plateau: 0.3, tau: 45, glow: 0.05, seed: 11 }) },
 };

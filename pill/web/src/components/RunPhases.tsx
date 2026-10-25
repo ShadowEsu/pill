@@ -1,13 +1,14 @@
 // The run as a timetable of the station's six phases (SOFTWARE-PLAN §2, pill/pay/src/station.ts): lights off (3 s) →
-// clear water (10 s) → drop → dissolving → settling → verdict, proportional to time, with a pointer at t. t = 0 is the
-// moment the paddle starts; the two pre-run phases sit at negative t. Where drop and settling end depends on the curve,
+// clean water (10 s, lid closed, nothing moving) → drop (the whole tablet goes in, stirred by hand: 5 circles with the stick
+// through the one hole in the lid) → dissolving → settling → verdict, proportional to time, with a pointer at t. t = 0 is the
+// moment the run starts; the two pre-run phases sit at negative t. Where drop and settling end depends on the curve,
 // so `marks` moves those boundaries; without marks the nominal ones below are used.
 // A fault freezes the pointer where it happened and greys everything after it.
 export const PHASES = [
   { key: 'dark', name: 'Lights off', short: 'dark', dur: '3 s', from: -13, to: -10, color: 'var(--navy)', status: 'lights off', doing: 'the lights are off for 3 seconds; the box has to read dark' },
-  { key: 'blank', name: 'Clear water', short: 'water', dur: '10 s', from: -10, to: 0, color: 'var(--c6)', status: 'clear water', doing: 'reading plain water with the paddle on; the reading has to hold steady' },
-  { key: 'drop', name: 'Drop', short: 'drop', dur: '≤ 30 s', from: 0, to: 5, color: 'var(--violet)', status: 'drop the tablet', doing: 'the quarter tablet goes in; the inline reading has to fall 6 %' },
-  { key: 'dissolve', name: 'Dissolving', short: 'dissolve', dur: '1–2 min', from: 5, to: 110, color: 'var(--c1)', status: 'dissolving', doing: 'the tablet is dissolving; both channels are being watched' },
+  { key: 'blank', name: 'Clean water', short: 'water', dur: '10 s', from: -10, to: 0, color: 'var(--c6)', status: 'clean water', doing: 'reading clean water with the lid closed and nothing moving; the reading has to hold steady' },
+  { key: 'drop', name: 'Drop', short: 'drop', dur: '≤ 30 s', from: 0, to: 5, color: 'var(--violet)', status: 'drop the tablet', doing: 'the whole tablet goes in; stir 5 circles with the stick, lid closed; the inline reading has to fall 6 %' },
+  { key: 'dissolve', name: 'Dissolving', short: 'dissolve', dur: '1–10 min', from: 5, to: 110, color: 'var(--c1)', status: 'dissolving', doing: 'the tablet is dissolving; both channels are being watched' },
   { key: 'settle', name: 'Settling', short: 'settle', dur: '20 s', from: 110, to: 180, color: 'var(--c4)', status: 'settling', doing: 'the reading is settling; it has to hold flat for 20 seconds' },
   { key: 'verdict', name: 'Verdict', short: 'verdict', dur: 'rules', from: 180, to: 186, color: 'var(--ink)', status: 'verdict', doing: 'the rules read the curve' },
 ] as const;
@@ -40,7 +41,7 @@ const CSS = `
 @media (prefers-reduced-motion: reduce) { .rp-live { animation: none; } }
 `;
 
-/** `t` in seconds from the paddle start (negative while the station reads the dark and the clear water). */
+/** `t` in seconds from the run start (negative while the station reads the dark and the clean water). */
 export default function RunPhases({ t, marks, fault = null, big = false, legend = true, done = false }: {
   t: number; marks?: PhaseMarks; fault?: number | null; big?: boolean; legend?: boolean;
   /** the verdict is in */ done?: boolean;
@@ -51,7 +52,7 @@ export default function RunPhases({ t, marks, fault = null, big = false, legend 
   const share = (at - lo) / (hi - lo);
   const now = phaseAt(at, marks);
   const stopped = fault != null;
-  const pointer = stopped ? `stopped at ${clock(at)}` : done ? 'verdict in' : at < 0 ? `t − ${Math.ceil(-at)} s · ${now.name.toLowerCase()}` : `${clock(at)} since the paddle started`;
+  const pointer = stopped ? `stopped at ${clock(at)}` : done ? 'verdict in' : at < 0 ? `t − ${Math.ceil(-at)} s · ${now.name.toLowerCase()}` : `${clock(at)} since the run started`;
   return (
     <div className="stack" style={{ gap: 8 }} role="group" aria-label={`Run timetable: ${now.name}${at >= 0 ? `, ${clock(at)}` : ''}${stopped ? ', stopped' : ''}`}>
       <style href="pm-runphases" precedence="pm">{CSS}</style>

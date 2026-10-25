@@ -1,11 +1,11 @@
 // Prepare: phase 0 of the run. The PhaseRail starts here (Prepare filling as the station pre-checks go green, the six
 // station phases waiting after it), so Prepare → Run reads as one sequence. Then the light path the checks prove out, the
-// pre-checks, the one instruction (plain water in, lid closed, the tablet waits for its phase), then Start.
-// The checks are simulated until the live stream reports led/dark/paddle/lid; ?live=1 skips the simulation.
+// pre-checks, the one instruction (clean water in the purple chamber, lid closed, the whole tablet waits for its phase),
+// then Start. The checks are simulated until the live stream reports led/dark/lid; ?live=1 skips the simulation.
 // When the pay service reports a station (/station/status), a 'Station online' chip shows and Start runs it for real
 // (Run.tsx ?station=1); otherwise Start plays the replay.
 // Motion: each check draws its checkmark with a rising tick; the light path's arrows draw in once the LED is green; the
-// quarter tablet hovers over the clear water; Start pulses softly once every check is green.
+// whole tablet hovers over the chamber's clean water; Start pulses softly once every check is green.
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Checklist from '../components/Checklist';
@@ -22,12 +22,12 @@ import '../components/cinema.css';
 
 const CHECK_MS = 600;
 const CHECKS = [
-  { label: 'LED baseline', hint: 'Blue light through clear water' },
+  { label: 'LED baseline', hint: 'Blue light through clean water' },
   { label: 'Dark reading', hint: 'Sensors with the light off' },
-  { label: 'Paddle turning', hint: 'Stirring the water' },
+  { label: 'Stick ready', hint: 'For 5 circles by hand, through the lid’s hole' },
   { label: 'Lid closed', hint: 'No outside light' },
 ];
-const SAY = 'Fill the cup with plain water and close the lid. Keep one quarter tablet ready: the station asks for it after the clear-water check.';
+const SAY = 'Fill the cup in the purple chamber with clean water and close the lid. Keep the whole tablet and the stick ready: the station asks for the tablet after the 10-second clean-water check. Then stir 5 circles through the hole in the lid.';
 
 export default function Place() {
   const nav = useNavigate();
@@ -76,7 +76,7 @@ export default function Place() {
       </div>
       <div className="ph-run">
         <PhaseRail at="prepare" progress={checked / CHECKS.length} clock={`${checked} / ${CHECKS.length} checks`} sound={false}
-          note={allDone ? 'Ready. Start runs the six phases below, about two minutes.' : 'The station checks itself before the run.'} />
+          note={allDone ? 'Ready. Start runs the six phases below: Quick about 60–90 s, Full 2–10 min.' : 'The station checks itself before the run.'} />
         <div className="wide-2">
           <div className="stack" style={{ gap: 14, minWidth: 0 }}>
             <div className="stack cn-field" style={{ gap: 8 }}>
@@ -94,16 +94,16 @@ export default function Place() {
           </div>
           <section className="card decor-dots cn-field" style={{ display: 'grid', gap: 12, justifyItems: 'center', animationDelay: '160ms' }}>
             <span className="eyebrow" style={{ justifySelf: 'start' }}>phase 0 · prepare</span>
-            <div style={{ paddingTop: 30 }}><Cup size={140} tablet="held" label="A cup of plain water with a quarter tablet waiting above it" /></div>
+            <div style={{ paddingTop: 30 }}><Cup size={140} tablet="held" label="The purple chamber of clean water with a whole tablet waiting above it" /></div>
             <p style={{ fontSize: '1.4rem', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.2, justifySelf: 'stretch' }}>
-              Fill the cup with plain water. Close the lid.
+              Fill the cup with clean water. Close the lid.
             </p>
-            <p style={{ color: 'var(--ink-2)', justifySelf: 'stretch' }}>Keep one quarter tablet ready: the station asks for it after the clear-water check.</p>
+            <p style={{ color: 'var(--ink-2)', justifySelf: 'stretch' }}>Keep the whole tablet and the stick ready. After the 10-second clean-water check (lid closed, nothing moving) the station asks for the tablet: drop it through the hole in the lid and stir 5 circles.</p>
             <ReadAloud text={SAY} size={56} />
           </section>
         </div>
       </div>
-      <Action note="About two minutes: lights off, clear water, then the tablet. Keep the lid closed.">
+      <Action note="Quick about 60–90 s, Full 2–10 min: lights off, clean water, then the tablet. Keep the lid closed.">
         <button type="button" className={'btn' + (allDone ? ' cn-ready' : '')} disabled={!allDone} onClick={start}>
           {allDone ? 'Start' : live ? 'Waiting for the station…' : `Checking the station… ${checked}/${CHECKS.length}`}
         </button>
