@@ -90,7 +90,7 @@
 .reduced .rail-svg .wire.live { animation: none; }
 .pay-grid > *, .calc > *, .plans > * { min-width: 0; }
 .rail-log, .x402 .term { overflow-wrap: anywhere; word-break: break-word; }
-.rail-verdicts button { white-space: nowrap; }
+.rail-verdicts button { white-space: nowrap; min-height: 44px; }
 @media (max-width: 480px) { .rail-verdicts button { font-size: 12px; padding: 9px 11px; } .plan .price { font-size: 48px; } }
 
 /* ---------- What Coinbase is for here: violet band, amber builder note ---------- */

@@ -205,8 +205,8 @@ table.rules td:first-child { font-family: var(--mono); font-size: 13px; color: v
 /* footer */
 .footer { padding-block: 56px; border-top: 1px solid var(--line); }
 .footer .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.footer .links { display: flex; gap: 18px; flex-wrap: wrap; font-size: 14px; color: var(--ink-2); }
-.footer .links a { text-decoration: underline; text-underline-offset: 3px; }
+.footer .links { display: flex; gap: 0 18px; flex-wrap: wrap; font-size: 14px; color: var(--ink-2); }
+.footer .links a { text-decoration: underline; text-underline-offset: 3px; display: inline-flex; align-items: center; min-height: 44px; }
 @media (max-width: 720px) { .footer .wrap { grid-template-columns: 1fr; } }
 
 /* bom table */

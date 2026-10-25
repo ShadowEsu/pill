@@ -112,7 +112,7 @@ function makeStage() {
       <line x1="186" y1="400" x2="446" y2="400" stroke="#E6F4FF" stroke-width="2" stroke-dasharray="2 16" stroke-linecap="round" data-k="photons" opacity="0"/>
       <rect x="100" y="340" width="84" height="152" rx="4" fill="rgba(110,98,210,.28)" stroke="rgba(233,238,242,.5)" stroke-width="1.2"/>
       <circle cx="128" cy="400" r="4.5" fill="#F2F1EC"/><circle cx="142" cy="400" r="4.5" fill="#4FB3FF"/><circle cx="156" cy="400" r="4.5" fill="#C8574B"/>
-      <text x="100" y="330" class="st-t">LED box · W B R</text>
+      <text x="100" y="316" class="st-t">LED box</text><text x="100" y="330" class="st-t">W · B · R</text>
       <path d="M456 492 V385 a9.5 9.5 0 0 1 19 0 V492 Z" fill="rgba(110,98,210,.28)" stroke="rgba(233,238,242,.5)" stroke-width="1.2"/>
       <rect x="446" y="394" width="9" height="12" rx="2" fill="rgba(79,179,255,.55)"/><text x="482" y="440" class="st-t">in line · A0</text>
       <circle cx="320" cy="400" r="40" fill="url(#${u}-glow)" data-k="halo" opacity="0"/>
@@ -350,7 +350,7 @@ function makeStage() {
 }
 
 /* ---------- the story section ---------- */
-const copyHTML = (s, i) => `<p class="sc-n"><b>${s.n}</b> / 06 · ${s.time}</p><p class="sc-line">${s.line}</p><p class="sc-cap">${s.cap}</p>`;
+const copyHTML = (s, i) => `<p class="sc-n"><b>${s.n}</b> / 06 · ${s.name} · ${s.time}</p><p class="sc-line">${s.line}</p><p class="sc-cap">${s.cap}</p>`;
 
 export function mountStory(section) {
   const track = section.querySelector('.story-track');
@@ -375,7 +375,8 @@ export function mountStory(section) {
       p = clamp(p, 0, 5.999);
       stage.render(p);
       fill.style.transform = `scaleY(${Math.min(1, p / 5.8).toFixed(4)})`;
-      const a = Math.min(5, Math.floor(p));
+      // the rail steps at the copy's crossfade midpoint (copy i is fully in at p = i, half in at i - 0.07)
+      const a = Math.min(5, Math.floor(p + 0.07));
       copies.forEach((c, i) => {
         // in during the last 14 % of the previous scene's window, out during the last 14 % of its own
         const inn = i === 0 ? 1 : seg(p, i - 0.14, i);

@@ -457,10 +457,10 @@ function template(uid) {
   <div class="phone__frame">
     <div class="phone__screen">${STATUS}
       <div class="phone__views">${scanView()}
-${verdictView('pass', 'pass', 'Riboflavin 100 mg (1 tablet) · lot B2-07',
+${verdictView('pass', 'pass', 'Riboflavin 100 mg · lot B2-07',
     'consistent with the reference: this lot, one tablet',
     ['plateau 0.41 · band 0.36-0.47', '90° 0.78 · min 0.40'], 'P1')}
-${verdictView('needslab', 'lab', 'Riboflavin 100 mg (1 tablet) · lot TM-02',
+${verdictView('needslab', 'lab', 'Riboflavin 100 mg · lot TM-02',
     'light dropped but the 90° signal did not rise: not consistent with the reference',
     ['plateau 0.52 · band 0.36-0.47', '90° 0.03 · min 0.40'], 'N2',
     `<button type="button" class="pbtn pbtn--fill" tabindex="-1">Hold payment</button>

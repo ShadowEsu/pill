@@ -142,7 +142,7 @@ const partFallback = (label) => `<svg viewBox="0 0 300 300" width="100%" role="i
     ${node(695, 70, 190, 96, 'Policy', ['policy.md P1–P6', 'release · hold · escalate', 'spend cap · log line'])}
     ${arrow(885, 118, 925)}
     ${node(925, 70, 165, 96, 'Money', ['simulated today', 'clinic → escrow →', 'supplier'], 'rgba(47,107,255,0.9)')}
-    ${node(255, 196, 240, 56, 'Claude', ['"why" text · log line · bottle fields'])}
+    ${node(255, 196, 240, 56, 'Claude', ['bottle fields · "why" · log line'])}
     <path d="M375 196 V166" ${D}/>
     ${node(695, 196, 170, 56, 'openFDA', ['recall by lot · cached'])}
     <path d="M780 196 V166" ${D}/>
