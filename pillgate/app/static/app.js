@@ -451,11 +451,11 @@ route(/^\/welcome$/, (v) => {
           <p class="eyebrow">Dissolution screening · ${esc(S.config.app_name)}</p>
           <p class="hero-word">${esc(S.config.app_name)}</p>
           <p class="hero-line">One tablet, one curve, one answer.</p>
-          <p class="hero-sub"><span class="typed"></span><span class="caret" aria-hidden="true"></span></p>
+          <p class="hero-sub"><span class="ghost" aria-hidden="true">the box measures how it dissolves · the app explains</span><span class="typed-line"><span class="typed"></span><span class="caret" aria-hidden="true"></span></span></p>
         </div>
       </section>
       <section class="modes">
-        <div class="row between wrap"><h2 class="title" style="font-size:34px">Who is this for?</h2>${deviceChip()}</div>
+        <div class="stack" style="gap:8px"><h2 class="title" style="font-size:34px">Who is this for?</h2><div class="chip-line">${deviceChip()}</div></div>
         ${[["clinic", "clinic", "Clinic", "I run the gate at a clinic or pharmacy", MODES.clinic.who],
            ["personal", "bottle", "Personal", "I'm checking my own medicine", MODES.personal.who],
            ["check", "sensor", "Check", "Just run a check", MODES.check.who]].map(([k, g, name, line, sub], i) =>

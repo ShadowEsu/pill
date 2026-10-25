@@ -1,0 +1,68 @@
+{
+  "server": "http://127.0.0.1:8001/",
+  "viewport": "390x844",
+  "waterS": 10,
+  "seen": [
+    " | false | 1 of 7",
+    " | false | 2 of 7",
+    " | false | 3 of 7",
+    "first report · template | true | 4 of 7",
+    "first report · template | true | 5 of 7",
+    "final report · written by claude-sonnet-5 | false | done"
+  ],
+  "sawPulse": true,
+  "done": true,
+  "out": {
+    "routes": [
+      [
+        "2026-10-25T02:54:42.049Z",
+        "#/welcome"
+      ],
+      [
+        "2026-10-25T02:54:46.160Z",
+        "#/"
+      ],
+      [
+        "2026-10-25T02:54:47.807Z",
+        "#/check/bottle"
+      ],
+      [
+        "2026-10-25T02:54:51.403Z",
+        "#/check/tablet"
+      ],
+      [
+        "2026-10-25T02:54:55.631Z",
+        "#/check/measure"
+      ],
+      [
+        "2026-10-25T02:56:20.423Z",
+        "#/result/scan_1024_195620_81ce"
+      ]
+    ],
+    "hash": "#/result/scan_1024_195620_81ce",
+    "stamp": "Unable to verify",
+    "by": "final report · written by claude-sonnet-5",
+    "recall": "Other lots of this product have recalls",
+    "sources": [
+      "1 RxNorm: aspirin 325 MG ↗ RxNav",
+      "2 NDC 49483-331: Enteric Coated Aspirin Regular Strength (Time-Cap Labs, Inc) ↗ openFDA NDC",
+      "3 Recall D-844-2013 (Class II, Terminated) ↗ openFDA recall",
+      "4 Recall D-1026-2014 (Class II, Terminated) ↗ openFDA recall",
+      "5 Recall D-875-2014 (Class II, Terminated) ↗ openFDA recall",
+      "6 Recall D-0319-2015 (Class II, Terminated) ↗ openFDA recall",
+      "7 Recall D-1044-2017 (Class II, Terminated) ↗ openFDA recall",
+      "8 Recall D-1050-2017 (Class II, Terminated) ↗ openFDA recall"
+    ],
+    "stages": [
+      "Read the run 3 ms",
+      "Read the photos 10278 ms",
+      "Match the name and profile 1707 ms",
+      "RxNav and openFDA lookups 2077 ms",
+      "Regulator web search 7421 ms",
+      "Write the report 9197 ms",
+      "Check the report against the records 4 ms"
+    ],
+    "sw": 390
+  },
+  "errs": []
+}

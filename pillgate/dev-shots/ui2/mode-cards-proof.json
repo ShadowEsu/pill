@@ -1,0 +1,32 @@
+[
+  [
+    "clinic",
+    [
+      "clinic",
+      "#/",
+      "Gate"
+    ],
+    0,
+    "390/390"
+  ],
+  [
+    "personal",
+    [
+      "personal",
+      "#/",
+      "Home"
+    ],
+    0,
+    "390/390"
+  ],
+  [
+    "check",
+    [
+      "check",
+      "#/check/bottle",
+      "Check"
+    ],
+    0,
+    "390/390"
+  ]
+]
