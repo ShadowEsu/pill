@@ -140,7 +140,7 @@ const X402_LINES = [
 export function mountX402(el) {
   el.innerHTML = `
     <h4>Pay-per-verdict, with x402</h4>
-    <p>Another clinic, an NGO, or someone else's box can send a curve and buy a verdict for a few cents. No account, no key exchange: the server answers 402, the wallet pays, the server answers 200.</p>
+    <p>Another clinic, an NGO, or someone else's station can send a curve and buy a verdict for a few cents. No account, no key exchange: the server answers 402, the wallet pays, the server answers 200.</p>
     <div class="term" id="x402-term" aria-live="polite">${X402_LINES.map(([c, t]) => `<span class="line ${c}">${esc(t)}</span>`).join('')}</div>
     <div class="row"><button type="button" class="pbtn-call" id="x402-run">Call /verify</button><button type="button" class="pbtn-call alt" id="x402-reset">Reset</button><span class="caption" style="margin:0">testnet · 0.05 USDC · simulated here · the paid 200 is pending</span></div>`;
   const lines = [...el.querySelectorAll('.line')];

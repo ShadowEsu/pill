@@ -465,7 +465,7 @@ ${verdictView('needslab', 'lab', 'Riboflavin 100 mg (1 tablet) · lot TM-02',
     `<button type="button" class="pbtn pbtn--fill" tabindex="-1">Hold payment</button>
             <button type="button" class="pbtn pbtn--ghost" tabindex="-1">Draft lab referral</button>`)}
 ${verdictView('unable', 'unable', 'no reference loaded',
-    'no reference for this drug on this box', null, 'U1',
+    'no reference for this drug on this station', null, 'U1',
     '<button type="button" class="pbtn pbtn--ghost" tabindex="-1">Escalate to pharmacist</button>')}
 ${deliveryView()}${releasedView()}${bottleView('bottle', uid)}${bottleView('recall', uid)}${medicinesView()}${calibrationView()}
       </div>

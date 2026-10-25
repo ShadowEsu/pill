@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Pill — The box measures. Pill explains.</title>
-  <meta name="description" content="A lab-in-a-box from hobby parts that dissolves one tablet and says Passed the screen, Needs lab testing or Unable to verify. Built at Cal Hacks 13.0.">
+  <meta name="description" content="A dissolution check the size of a coffee mug, built from hobby parts: it dissolves one tablet and says Passed the screen, Needs lab testing or Unable to verify. Built at Cal Hacks 13.0.">
   <meta property="og:title" content="Pill — The box measures. Pill explains.">
   <meta property="og:description" content="One tablet. A 60 s quick run, 2–10 min full. PASS / NEEDS LAB / UNABLE TO VERIFY. In clinic mode the answer holds the supplier's payment.">
   <meta property="og:type" content="website">
@@ -48,7 +48,7 @@
         <p class="eyebrow reveal">Cal Hacks 13.0 · October 2026</p>
         <h1 class="display" data-split>The box measures.<br><em>Pill</em> explains.</h1>
         <p class="hero-sub"><span class="sr">A tablet cannot lie about dissolving.</span><span class="hs-ghost" aria-hidden="true">A tablet cannot lie about dissolving.</span><span class="hs-typed" aria-hidden="true"></span></p>
-        <p class="lead reveal">A lab-in-a-box from hobby parts: a 3D-printed chamber, three LEDs, two light sensors and an Arduino UNO Q. Drop one tablet in a clear cup of water, close the lid, and 60 s later (quick run; 2–10 min for a full one) it says <b>Passed the screen</b>, <b>Needs lab testing</b> or <b>Unable to verify</b>. In a clinic, that answer decides whether the supplier gets paid.</p>
+        <p class="lead reveal">A dissolution check the size of a coffee mug, from hobby parts: a 3D-printed chamber, three LEDs, two light sensors and an Arduino UNO Q. Drop one tablet in a clear cup of water, close the lid, and 60 s later (quick run; 2–10 min for a full one) it says <b>Passed the screen</b>, <b>Needs lab testing</b> or <b>Unable to verify</b>. In a clinic, that answer decides whether the supplier gets paid.</p>
         <div class="cta reveal">
           <a class="btn" href="https://pill-app-delta.vercel.app/welcome" target="_blank" rel="noopener">Open the app <span class="arrow" aria-hidden="true">→</span></a>
           <a class="btn ghost" href="#screens">See the screens</a>
@@ -71,7 +71,7 @@
   <!-- 2. Station: the exploded blueprint on dark -->
   <section class="section dark stage" id="station">
     <div class="wrap">
-      <div class="chapter"><span class="ch-n">01</span><span class="ch-t">Meet the box.</span></div>
+      <div class="chapter"><span class="ch-n">01</span><span class="ch-t">Meet the station.</span></div>
       <div class="stage-head">
         <div>
           <p class="eyebrow">Fig 1 · The station</p>
@@ -82,8 +82,8 @@
       <div class="station" id="station-mount" aria-label="Line drawing of the Pill station as built: a 3D-printed cylinder chamber with a flat lid, a clear cup of water inside, an LED box on one side with white, blue and red LEDs, one photoresistor holder straight across from the LEDs and one at 90°, an Arduino UNO Q and a breadboard, and the laptop app that shows the curve"></div>
       <div class="stage-labels">
         <div><p class="caption">01 · Lid</p><p>A flat printed lid with a skirt and a plug that keep room light out, and one small hole. Opening it marks the moment the tablet went in.</p></div>
-        <div><p class="caption">02 · Chamber</p><p>A purple 3D-printed cylinder, 70 mm across, with a well the cup drops into. Hand-stirred today; a stirrer motor is next.</p></div>
-        <div><p class="caption">03 · Cup</p><p>A clear plastic cup of water and one whole tablet. A printed shim ring keeps it centred on the beam.</p></div>
+        <div><p class="caption">02 · Chamber</p><p>A purple 3D-printed cylinder, 84 mm across and 84 mm tall, with a 78 mm well the cup drops into. Hand-stirred today; a stirrer motor is next.</p></div>
+        <div><p class="caption">03 · Cup</p><p>A clear plastic cup of water and one whole tablet. One of three printed shim rings keeps it centred on the beam.</p></div>
         <div><p class="caption">04 · LED box</p><p>A printed box on the side of the chamber holds white, blue and red 5 mm LEDs. They shine through a diffuser plate into the cup, one at a time.</p></div>
         <div><p class="caption">05 · Two photoresistors</p><p>One in a holder straight across from the LED box (how much light gets through), one at 90° (how much scatters: the cloudiness a white tablet makes).</p></div>
         <div><p class="caption">06 · Brains</p><p>An Arduino UNO Q and a breadboard with the divider resistors. A dark reading every second, then one per colour, one CSV line to the laptop. The firmware decides nothing.</p></div>
@@ -96,7 +96,7 @@
     <div class="wrap">
       <p class="eyebrow reveal">Fig 1.1 · The real thing</p>
       <h2 class="h2" id="built-title">Built Saturday, at the table.</h2>
-      <p class="lead reveal" style="margin-top:20px">The drawing above is this box. A purple 3D-printed chamber, a clear cup of water, three LEDs, two photoresistors, an Arduino UNO Q, a breadboard and a laptop. Stirred by hand with a stick.</p>
+      <p class="lead reveal" style="margin-top:20px">The drawing above is this station. A purple 3D-printed chamber, a clear cup of water, three LEDs, two photoresistors, an Arduino UNO Q, a breadboard and a laptop. Stirred by hand with a stick.</p>
       <div class="build-grid">
         <figure class="build-ph build-ph--lead reveal"><img src="/photos/station-171.webp" width="768" height="724" loading="lazy" decoding="async" alt="Top view of the station with the lid off and the blue LED on: a clear plastic cup of water inside the purple printed cylinder, blue light at the near wall where the LED box is attached, jumper wires running to the LED legs and to the Arduino UNO Q on the left"><figcaption><b>Blue LED on, lid off.</b> Light from the LED box (bottom) crosses the clear cup of water in the printed well.</figcaption></figure>
         <figure class="build-ph reveal"><img src="/photos/station-191.webp" width="768" height="1024" loading="lazy" decoding="async" alt="Close-up of the purple LED box on the side of the chamber: a white, a blue and a red 5 mm LED in a row with jumper wires on their legs, two empty holes above and below the blue LED, and a thin slot on top"><figcaption><b>The LED box.</b> White, blue and red 5 mm LEDs, two spare holes, the diffuser slot on top.</figcaption></figure>
@@ -131,8 +131,8 @@
       <div class="facts reveal">
         <div><b class="num">7,152</b><span>pharmaceutical crime incidents logged in 2025 (falsified medicines, diversion and theft), the most on record</span><a class="src" href="https://www.psi-inc.org/incident-trends" target="_blank" rel="noopener">PSI</a></div>
         <div><b class="num">3.7 million</b><span>trademark-infringing pharmaceutical items seized at the US border in fiscal 2024</span><a class="src" href="https://www.cbp.gov/sites/default/files/2025-01/IntellectualPropertyRightsSeizureStatisticsFiscalYear2024%20FINAL.pdf" target="_blank" rel="noopener">US CBP</a></div>
-        <div><b class="num">up to $4.4B</b><span>of cross-border trade in trademark-infringing pharmaceuticals in 2016</span><a class="src" href="https://euipo.europa.eu/tunnel-web/secure/webdav/guest/document_library/observatory/documents/reports/Trade_in_Counterfeit_Pharmaceutical_Products/Trade_in_Counterfeit_Pharmaceutical_Products_en.pdf" target="_blank" rel="noopener">OECD/EUIPO, 2020</a></div>
-        <div><b class="num">20%, 17%</b><span>antimalarials and antibiotics: the two most-reported categories to WHO</span><a class="src" href="https://www.who.int/news/item/28-11-2017-1-in-10-medical-products-in-developing-countries-is-substandard-or-falsified" target="_blank" rel="noopener">WHO, 2017</a></div>
+        <div><b class="num">1.3 million</b><span>Medication errors injure approximately 1.3 million people a year in the United States, according to the World Health Organization (2017). Errors, not falsified medicines: a second way the tablet in hand can go wrong.</span><a class="src" href="https://www.who.int/news/item/29-03-2017-who-launches-global-effort-to-halve-medication-related-errors-in-5-years" target="_blank" rel="noopener">WHO, 2017</a></div>
+        <div><b class="num">44,000–98,000</b><span>A 1999 Institute of Medicine report estimated that medical errors in U.S. hospitals cause between 44,000 and 98,000 deaths a year. All medical errors, not drugs alone.</span><a class="src" href="https://www.nationalacademies.org/read/9728/chapter/2" target="_blank" rel="noopener">IOM, To Err Is Human, 1999</a></div>
         <div><b class="num">20 days</b><span>from report to public alert for Uzbekistan's contaminated syrups; about 8 months for falsified Ozempic. Then the alert still has to reach the clinic.</span><a class="src" href="https://www.who.int/news/item/11-01-2023-medical-product-alert-n-1-2023-substandard-%28contaminated%29-liquid-dosage-medicines" target="_blank" rel="noopener">WHO alerts</a></div>
         <div><b class="num">€25.85</b><span>per sample for the cheapest field screening kit in one 13-country network; a lab result takes 7–10 business days</span><a class="src" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9338985" target="_blank" rel="noopener">GPHF Minilab study, 2022</a></div>
       </div>
@@ -157,7 +157,7 @@
   <section class="section dark" id="parts" data-nav="station" style="padding-top:0">
     <div class="wrap">
       <div class="figs">
-        <div class="fig reveal"><p class="caption">Fig 0.1</p><div class="art" data-part="container"></div><h4>Chamber</h4><p>A 3D-printed cylinder with the clear cup of water in its well. The beam crosses the cup from the LED box to the far wall; the side sensor sits at 90°.</p><p class="spec">Ø 70 mm × 78 mm · well Ø 64 mm · beam 28 mm above the floor · flat lid, one small hole</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.1</p><div class="art" data-part="container"></div><h4>Chamber</h4><p>A 3D-printed cylinder with the clear cup of water in its well. The beam crosses the cup from the LED box to the far wall; the side sensor sits at 90°.</p><p class="spec">Ø 84 × 84 mm · well Ø 78 mm · beam 28 mm above the well floor · lid Ø 90 mm, one 3.6 mm hole · three shim rings, bores 58 / 64 / 70 mm</p></div>
         <div class="fig reveal"><p class="caption">Fig 0.2</p><div class="art" data-part="led"></div><h4>The LED box</h4><p>White, blue and red 5 mm LEDs push into holes in the box's outer wall and shine through a diffuser plate that slides into a slot on top. Lit in turn once a second; red is the colour reference.</p><p class="spec">D5–D8 · active-low through one 330 Ω resistor to 5 V · LOW means on</p></div>
         <div class="fig reveal"><p class="caption">Fig 0.3</p><div class="art" data-part="ldr"></div><h4>Two photoresistor holders</h4><p>Each photoresistor pushes into a pocket from inside the well; its leads leave through the holder. One holder faces the LED box, one sits at 90° to the beam.</p><p class="spec">CdS photoresistor · 10 kΩ divider from 3V3 · A0 across the cup · A1 at 90°</p></div>
         <div class="fig reveal"><p class="caption">Fig 0.4 · Next</p><div class="art" data-part="thermistor"></div><h4>Next: a thermistor</h4><p>Not on the station yet. The lid's small hole is there for it: a bead on two leads, dipped in the water. Today the water temperature is typed in for each run.</p><p class="spec">what’s next · temperature on every reading instead of once per run</p></div>
@@ -179,7 +179,7 @@
         <div class="t">before → 60 s (quick) · 2–10 min (full)</div>
         <div>
           <div class="step reveal">
-            <div><p class="caption">Before</p><h3 class="h3">Good tablets make the reference.</h3><p class="body">Three or more runs of a known-good tablet on this same box make a reference profile: how fast it dissolves and how far the signal moves, colour (blue minus red) for yellow tablets, cloudiness on the side sensor for white ones. Without a profile the answer is Unable to verify, by design. The station’s first profile is not recorded yet.</p></div>
+            <div><p class="caption">Before</p><h3 class="h3">Good tablets make the reference.</h3><p class="body">Three or more runs of a known-good tablet on this same station make a reference profile: how fast it dissolves and how far the signal moves, colour (blue minus red) for yellow tablets, cloudiness on the side sensor for white ones. Without a profile the answer is Unable to verify, by design. The station’s first profile is not recorded yet.</p></div>
             <div class="art-slot" data-art="calibration"></div>
           </div>
           <div class="step reveal">
@@ -235,7 +235,7 @@
       <div class="chapter reveal"><span class="ch-n">06</span><span class="ch-t">What the judges see.</span></div>
       <p class="eyebrow reveal">Fig 2c · Pill Gate, the station app</p>
       <h2 class="h2">At the table.</h2>
-      <p class="lead reveal" style="margin-top:22px">The box on the table runs Pill Gate: a guided check that walks one tablet from clean water to an answer in five phases, with the time each one takes on the rail.</p>
+      <p class="lead reveal" style="margin-top:22px">The station on the table runs Pill Gate: a guided check that walks one tablet from clean water to an answer in five phases, with the time each one takes on the rail.</p>
       <ol class="pg-rail reveal" aria-label="The five phases of a check">
         <li class="pg-ph" style="--w:1.1"><span class="pg-bar" aria-hidden="true"><i></i></span><b>Prepare</b><span class="pg-t">checks</span><span class="pg-d">Clean water in the cup, lid closed, LED reaching the sensor.</span></li>
         <li class="pg-ph" style="--w:1"><span class="pg-bar" aria-hidden="true"><i></i></span><b>Clean water</b><span class="pg-t">10 s</span><span class="pg-d">The reading has to stay steady for 10 s before a tablet goes in.</span></li>
@@ -252,7 +252,7 @@
       <div class="split pg-split">
         <div class="reveal">
           <p class="eyebrow">The station</p>
-          <p class="pg-body">An Arduino UNO Q runs at 3.3 V with a 12-bit ADC. Once a second it turns every LED off and reads both photoresistors (the dark reading, which cancels room light), then lights blue, white and red in turn and reads again: one photoresistor in line with the beam, one at 90° to it. It prints one CSV line and decides nothing. Pill Gate, on the laptop, builds the curves and matches the run against a reference profile recorded from known-good tablets on the same box.</p>
+          <p class="pg-body">An Arduino UNO Q runs at 3.3 V with a 12-bit ADC. Once a second it turns every LED off and reads both photoresistors (the dark reading, which cancels room light), then lights blue, white and red in turn and reads again: one photoresistor in line with the beam, one at 90° to it. It prints one CSV line and decides nothing. Pill Gate, on the laptop, builds the curves and matches the run against a reference profile recorded from known-good tablets on the same station.</p>
         </div>
         <div class="reveal">
           <p class="eyebrow">Three answers, one product</p>
@@ -277,7 +277,7 @@
           <h2 class="h2">Three answers.<br>Never a guess.</h2>
           <p class="lead">The clinic app runs on a laptop and on your phone. Green means the run matched the reference. Warm red means it did not, and the money stays put. Grey means Pill has nothing to compare against, so it asks a person. The phone below replays a simulated curve.</p>
           <ul class="list">
-            <li><b>P1</b><span><b>PASS</b> (Passed the screen): the run sits inside the spread of good tablets on this box.</span></li>
+            <li><b>P1</b><span><b>PASS</b> (Passed the screen): the run sits inside the spread of good tablets on this station.</span></li>
             <li><b>N1</b><span><b>NEEDS LAB</b> (Needs lab testing): outside it, slower, weaker, cloudier or clearer than the good ones.</span></li>
             <li><b>U1</b><span><b>UNABLE TO VERIFY</b>: no reference for this product, a fault, the lid open too long, or a noisy blank.</span></li>
           </ul>
@@ -346,7 +346,7 @@
           <ol class="ss-track" tabindex="0">
             <li class="ss-slide"><img src="/screens/clinic-station.webp" width="474" height="1026" loading="lazy" decoding="async" alt="Clinic app station screen, status simulated"><p><b>Station.</b> Says simulated when the pay service plays the firmware.</p></li>
             <li class="ss-slide"><img src="/screens/clinic-01-prepare.webp" width="474" height="1026" loading="lazy" decoding="async" alt="Clinic app run, prepare phase"><p><b>Prepare.</b> The checks before a run starts.</p></li>
-            <li class="ss-slide"><img src="/screens/clinic-02-dark.webp" width="474" height="1026" loading="lazy" decoding="async" alt="Clinic app run, lights off phase"><p><b>Lights off.</b> A dark reading, so the box knows what nothing looks like.</p></li>
+            <li class="ss-slide"><img src="/screens/clinic-02-dark.webp" width="474" height="1026" loading="lazy" decoding="async" alt="Clinic app run, lights off phase"><p><b>Lights off.</b> A dark reading, so the station knows what nothing looks like.</p></li>
             <li class="ss-slide"><img src="/screens/clinic-03-water.webp" width="474" height="1026" loading="lazy" decoding="async" alt="Clinic app run, clean water phase"><p><b>Water.</b> Clean water for 10 s: the blank.</p></li>
             <li class="ss-slide"><img src="/screens/clinic-04-drop.webp" width="474" height="1026" loading="lazy" decoding="async" alt="Clinic app run, tablet drop phase"><p><b>Drop.</b> The tablet goes in.</p></li>
             <li class="ss-slide"><img src="/screens/clinic-05-dissolving.webp" width="474" height="1026" loading="lazy" decoding="async" alt="Clinic app run, dissolving phase"><p><b>Dissolving.</b> The capsule fills as the curve rises.</p></li>
@@ -416,7 +416,7 @@
       <div class="cb-badge reveal"><span class="sq" aria-hidden="true"></span>Coinbase · x402 · payment agents</div>
       <p class="eyebrow reveal" style="margin-top:22px">Payments</p>
       <h2 class="h2">The verdict is the invoice.</h2>
-      <p class="lead reveal" style="margin-top:20px">Money in Pill is boring on purpose. The clinic pays a delivery into escrow when it is logged. The box tests one tablet. The policy agent reads the verdict, the recall check and the spend cap, and proposes <b>release</b>, <b>hold</b> or <b>escalate</b>. A pharmacist taps. Only then does USDC move from escrow to the supplier, on Base, signed by the agent's own CDP wallet. The same agent can buy a verdict from someone else's box with x402, a few cents at a time.</p>
+      <p class="lead reveal" style="margin-top:20px">Money in Pill is boring on purpose. The clinic pays a delivery into escrow when it is logged. The station tests one tablet. The policy agent reads the verdict, the recall check and the spend cap, and proposes <b>release</b>, <b>hold</b> or <b>escalate</b>. A pharmacist taps. Only then does USDC move from escrow to the supplier, on Base, signed by the agent's own CDP wallet. The same agent can buy a verdict from someone else's station with x402, a few cents at a time.</p>
       <div class="pay-grid">
         <div class="rail reveal" id="rail-mount"></div>
         <div class="x402 reveal" id="x402-mount"></div>
@@ -460,13 +460,13 @@
             <svg class="cbx-ico" viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="10" width="32" height="28" rx="6"/><path d="M16 22 h16 M16 29 h10"/><circle cx="36" cy="36" r="7"/><path d="M36 33 v6 M33.5 36 h5"/></svg>
             <p class="cbx-k">02 · Buy</p>
             <h3>A verdict from another station, for a few cents.</h3>
-            <p>With x402 the agent pays per request for a verdict from someone else’s box: no account, no invoice, capped under $1.</p>
+            <p>With x402 the agent pays per request for a verdict from someone else’s station: no account, no invoice, capped under $1.</p>
           </article>
           <article class="cbx-card">
             <svg class="cbx-ico" viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="8" width="30" height="32" rx="6"/><path d="M17 30 C 21 30, 22 18, 31 18"/><path d="M17 36 h14"/><circle cx="31" cy="18" r="2.5"/></svg>
             <p class="cbx-k">03 · Earn</p>
             <h3>Every station sells <code>/verify</code>.</h3>
-            <p>Each box answers <code>/verify</code> over x402 at 5¢ a verdict (proposed). Send a curve, get PASS / NEEDS LAB / UNABLE TO VERIFY and the rule id.</p>
+            <p>Each station answers <code>/verify</code> over x402 at 5¢ a verdict (proposed). Send a curve, get PASS / NEEDS LAB / UNABLE TO VERIFY and the rule id.</p>
           </article>
         </div>
         <p class="cbx-sub reveal">One x402 call, four steps</p>
@@ -529,7 +529,7 @@
       <div class="split" style="margin-top:40px; align-items:start">
         <div class="box reveal">
           <h4>PASS means</h4>
-          <p class="body">This one tablet, on this box, dissolved like the good tablets in its reference profile. No red flags found.</p>
+          <p class="body">This one tablet, on this station, dissolved like the good tablets in its reference profile. No red flags found.</p>
           <h4 style="margin-top:20px">PASS does not mean</h4>
           <p class="body">That the tablet is the right drug, the right dose, or free of contaminants. Pill checks how a tablet dissolves; it does not identify ingredients. Anything it cannot compare goes to a lab, by design.</p>
         </div>
@@ -538,7 +538,7 @@
           <table class="rules">
             <thead><tr><th>Rule</th><th>Fires when</th><th>Verdict</th></tr></thead>
             <tbody>
-              <tr><td>U1</td><td>No reference for this drug on this box</td><td>UNABLE TO VERIFY</td></tr>
+              <tr><td>U1</td><td>No reference for this drug on this station</td><td>UNABLE TO VERIFY</td></tr>
               <tr><td>U2</td><td>Any fault: lid open, sensor saturated, LED dead</td><td>UNABLE TO VERIFY</td></tr>
               <tr><td>U3</td><td>Under 30 s of data, or the reading never settled</td><td>UNABLE TO VERIFY</td></tr>
               <tr><td>N1</td><td>Plateau below the reference band</td><td>NEEDS LAB</td></tr>
@@ -559,8 +559,8 @@
       <h2 class="h2">Ask us the hard ones.</h2>
       <div class="qa">
         <div class="reveal"><h4>"Why aspirin?"</h4><p>It is white, so it has no colour to measure, which is why the side sensor matters: on our first run its cloudiness signal rose by 0.29 against a blank noise of 0.006, while the red channel moved by 0.035. Riboflavin was the first plan, but it absorbs blue so strongly that a whole tablet saturates the cup.</p></div>
-        <div class="reveal"><h4>"Would this catch a real antimalarial?"</h4><p>Not today, and it says so: UNABLE TO VERIFY for any drug without a reference profile on this box. An honest "no reference" beats a guess.</p></div>
-        <div class="reveal"><h4>"How do we know the demo isn't rigged?"</h4><p>Run ids and timestamps on every curve, the raw trace saved for every run, and an ugly box you can open. Bring your own tablet.</p></div>
+        <div class="reveal"><h4>"Would this catch a real antimalarial?"</h4><p>Not today, and it says so: UNABLE TO VERIFY for any drug without a reference profile on this station. An honest "no reference" beats a guess.</p></div>
+        <div class="reveal"><h4>"How do we know the demo isn't rigged?"</h4><p>Run ids and timestamps on every curve, the raw trace saved for every run, and a station you can open and look inside. Bring your own tablet.</p></div>
         <div class="reveal"><h4>"Who lets software hold money?"</h4><p>Nobody. The policy proposes; a pharmacist taps. The model can only downgrade a decision to "escalate", never release.</p></div>
         <div class="reveal"><h4>"Why not just scan the barcode?"</h4><p>Because lot numbers get copied. The FDA's December 2025 Ozempic case carried a real lot number. Only the tablet itself cannot lie about dissolving.</p></div>
         <div class="reveal"><h4>"What does it cost, really?"</h4><p>Hobby parts: an Arduino UNO Q, two photoresistors, three LEDs, a clear cup and a 3D-printed chamber. One tablet per test and 60 s for a quick run. A new lab dissolution tester typically costs $20,000–$100,000, and a lab result typically takes 7–10 business days.</p></div>
@@ -575,7 +575,7 @@
         <div>
           <p class="eyebrow">The team</p>
           <h2 class="h2">Built in one weekend, by hand.</h2>
-          <p class="lead" style="margin-top:20px">Every line of firmware, backend and app, the station, the first runs and this page were made during the Cal Hacks 13.0 hacking period. The method is textbook optics: a tablet changes how light crosses a cup of water; two sensors watch it happen. What is new is what the box does with the answer.</p>
+          <p class="lead" style="margin-top:20px">Every line of firmware, backend and app, the station, the first runs and this page were made during the Cal Hacks 13.0 hacking period. The method is textbook optics: a tablet changes how light crosses a cup of water; two sensors watch it happen. What is new is what the station does with the answer.</p>
           <p class="caption" style="margin-top:28px">where AI is used, and where it is not</p>
           <ul class="list">
             <li><b>AI</b><span>Claude reads the bottle label into five fields, writes the two-sentence "why" under a verdict, and drafts the decision-log line, all passed through a word filter.</span></li>

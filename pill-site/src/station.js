@@ -1,5 +1,5 @@
 // Pill station — isometric line-art blueprint of the real build, with an exploded, turning assembly.
-// Geometry follows pillgate/cad/peel_chamber.scad: a 3D-printed cylinder chamber with a flat lid (one small hole),
+// Geometry follows the printed plate (pillgate/cad/peel_plate_complete.stl, measured) and peel_chamber.scad: a 3D-printed cylinder chamber with a flat lid (one small hole),
 // an LED box on one side (white, blue, red), photoresistor holders in line and at 90°, a clear cup on a shim ring,
 // then the Arduino UNO Q, the breadboard with the dividers and the laptop running Pill Gate.
 // mountStation(el) renders the scene and returns { setProgress(p), destroy() }.
@@ -147,17 +147,17 @@ function kit(cam, off = [0, 0, 0], pre = null) {
 
 
 /* ───────────────────────── scene parts (world units = cm) ───────────────────────── */
-// The real build, from pillgate/cad/peel_chamber.scad (mm → cm). The chamber is centred at the origin on the
-// table. +x / +y face the viewer. The beam runs along y: the LED box sits on +y, the in-line photoresistor
-// straight across on −y, the 90° photoresistor on +x.
+// The real print, measured from pillgate/cad/peel_plate_complete.stl (5 shells: body, lid, 3 shim rings; see
+// pillgate/cad/README.md). The chamber is centred at the origin on the table. +x / +y face the viewer. The beam
+// runs along y: the LED box sits on +y, the in-line photoresistor straight across on −y, the 90° one on +x.
 
-const CH = { Ro: 3.5, Rw: 3.2, H: 7.8, floor: 0.4, az: 3.2 }; // body Ø70 × 78 mm, well Ø64, beam 28 mm above the well floor
-const POD = { w: 1.5, y0: Math.sqrt(3.5 * 3.5 - 1.5 * 1.5), y1: 6.1, z1: 4.7 }; // 30 × 30 mm LED box, 26 mm out of the wall
-const BOSS = { r: 0.7, out: CH.Ro + 0.6 }; // Ø14 mm photoresistor holders, 6 mm out of the wall
-const LID = { r: 3.79, z0: 7.0, z1: 8.1, plugR: 3.14, hole: [0, -2.0], holeR: 0.18 }; // flat lid, skirt + plug, one Ø3.6 mm hole
-const CUP = { r0: 2.7, r1: 3.1, z0: 0.4, z1: 6.6, water: 4.6 }; // clear cup, water well over the beam
-const SHIM = { ro: 3.16, ri: 2.9, z0: 0.4, z1: 1.6 }; // cup shim ring (the Ø58 mm one)
-const DIFF = { w: 1.3, y0: 3.53, y1: 3.67, z0: 2.1, z1: 4.8 }; // diffuser plate in its slot
+const CH = { Ro: 4.2, Rw: 3.9, H: 8.4, floor: 0.4, az: 3.2 }; // STL: body Ø84 × 84 mm, well Ø78, floor 4, beam 28 mm above the floor
+const POD = { w: 1.5, y0: Math.sqrt(4.2 * 4.2 - 1.5 * 1.5), y1: 6.8, z1: 4.7 }; // STL: LED box 30 wide, 26 out of the wall, top at 47 mm
+const BOSS = { r: 0.7, out: CH.Ro + 0.6 }; // STL: holders 14 wide, 6 out of the wall, top at 39 mm
+const LID = { r: 4.49, z0: 7.6, z1: 8.7, plugR: 3.84, hole: [0, -2.7], holeR: 0.18 }; // STL: lid Ø89.8 × 11 (8 skirt + 3 plate), plug Ø76.8, one Ø3.6 hole 27 mm off centre
+const CUP = { r0: 3.3, r1: 3.85, z0: 0.4, z1: 7.2, water: 4.8 }; // clear cup (not printed): drawn to fit the Ø78 well, ≤ 68 mm tall
+const SHIM = { ro: 3.86, ri: 3.2, z0: 0.4, z1: 1.6 }; // STL: shim rings Ø77.2 × 12, bores Ø58 / 64 / 70 (the Ø64 one drawn)
+const DIFF = { w: 1.3, y0: 4.23, y1: 4.37, z0: 2.1, z1: 4.8 }; // diffuser plate in its slot (separate print, SCAD)
 const LEDS = [['lw', -0.8], ['lb', 0], ['lr', 0.8]]; // white · blue · red, 8 mm apart on the box's outer wall
 const LED_AT = [0, POD.y1, CH.az];
 const LDR_AT = [0, -CH.Rw, CH.az]; // in line: straight across the cup from the LED box
@@ -421,12 +421,12 @@ const EXPLODE = {
   uno: [-3.5, -1, 3.5],
   laptop: [2, -2, 0],
 };
-const SHIM_HOP = { to: [11.5, 1, 0], up: 9 };
+const SHIM_HOP = { to: [12, 1.5, 0], up: 9 };
 const CUP_TILT = -7 * RAD;
 
 const LABELS = [
   { id: 'lid', no: '01', title: 'FLAT LID', sub: 'one small hole · skirt keeps light out', at: [[0, LID.r, LID.z1], 'lid'], x: 40, y: 92, side: 'L' },
-  { id: 'body', no: '02', title: '3D-PRINTED CHAMBER', sub: 'Ø 70 mm · purple print · dark inside', at: [[-CH.Ro * 0.71, CH.Ro * 0.71, 5.6], 'body'], x: 40, y: 160, side: 'L' },
+  { id: 'body', no: '02', title: '3D-PRINTED CHAMBER', sub: 'Ø 84 × 84 mm · purple print · dark inside', at: [[-CH.Ro * 0.71, CH.Ro * 0.71, 5.6], 'body'], x: 40, y: 160, side: 'L' },
   { id: 'cup', no: '03', title: 'CLEAR CUP', sub: 'water + one tablet · shim ring centres it', at: [[[CUP.r1 * 0.71, -CUP.r1 * 0.71, CUP.z1], 'cup'], [[SHIM.ro * 0.71, SHIM.ro * 0.71, SHIM.z1], 'shim']], x: 860, y: 92, side: 'R' },
   { id: 'app', no: '04', title: 'PILL GATE APP', sub: 'laptop: curves · reference · answer', at: [[LAP.x, (LAP.y0 + LAP.y1) / 2, LAP.zb + 6], 'laptop'], x: 860, y: 160, side: 'R' },
   { id: 'led', no: '05', title: 'LED BOX', sub: 'white · blue · red, 5 mm · diffuser slot', at: [[[LED_AT[0], LED_AT[1] + 0.4, LED_AT[2]], 'led'], [[DIFF.w, DIFF.y1, DIFF.z1], 'diffuser']], x: 40, y: 700, side: 'L' },
@@ -436,7 +436,7 @@ const LABELS = [
 
 /* ───────────────────────── mount ───────────────────────── */
 
-const SCENE_CAM = { S: 22, ox: 600, oy: 470, pivot: [0, -4.7, 4] };
+const SCENE_CAM = { S: 19, ox: 600, oy: 470, pivot: [0, -4.7, 4] };
 const CHAR_W = 7.04; // 11px JetBrains Mono advance + letter-spacing
 const GLYPHS = 10; // '1'/'0' glyphs streaming UNO Q → laptop
 const AMBIENT_FROM = 0.05; // beam pulse, light and stream run above this progress
@@ -888,7 +888,7 @@ const FIG_ST = { led: 0, spin: 0, diffuser: 0, piCurve: 1, fx: {} };
 
 // Fig 0.1: the chamber with its lid off: the cup of water in the well, the beam across, the 90° path
 function figChamber() {
-  const k = figKit(19, [0, 1.34, 3.4], 150);
+  const k = figKit(16, [0, 1.0, 4.2], 150);
   const a = k.cam.a;
   const items = [k.line([0, 0, -1], [0, 0, 10], 'g')];
   items.push(...partBody(k));
@@ -904,7 +904,7 @@ function figChamber() {
 
 // Fig 0.2: the LED box: three LEDs pulled out of their holes, the diffuser plate lifted out of its slot
 function figLedBox() {
-  const k = figKit(24, [0, 6, 3.5], 158);
+  const k = figKit(24, [0, 6.7, 3.5], 158);
   const items = [
     k.arc([0, 0, 0], CH.Ro, Math.PI / 2 - 0.7, Math.PI / 2 + 0.7, 'g', X, Y, 16),
     k.arc([0, 0, POD.z1 + 1.2], CH.Ro, Math.PI / 2 - 0.7, Math.PI / 2 + 0.7, 'g', X, Y, 16),
@@ -924,7 +924,7 @@ function figLedBox() {
 // Fig 0.3: a photoresistor holder seen from inside the well: the pocket in the wall, the photoresistor pulled
 // out toward the cup, its leads lined up with the pocket (they leave through the holder's two leg holes)
 function figLdrHolder() {
-  const k = figKit(28, [2.6, 0, 3], 160, 180);
+  const k = figKit(28, [3.3, 0, 3], 160, 180);
   const t0 = -0.62, t1 = 0.62, zt = 6;
   const inner = (z) => circ([0, 0, z], CH.Rw, X, Y, 16, t0, t1);
   const outer = (z) => circ([0, 0, z], CH.Ro, X, Y, 16, t0, t1);
@@ -937,14 +937,14 @@ function figLdrHolder() {
     k.line([1.0, 0, CH.az], [CH.Rw, 0, CH.az], 'g'),
   ];
   const S = 2.4;
-  const { M, a } = sensorFrame([1.25, 0, CH.az], Math.PI, S);
+  const { M, a } = sensorFrame([1.9, 0, CH.az], Math.PI, S);
   items.push(...ldrBody(k, M, a, S));
   return figSvg(items);
 }
 
 // Fig 0.4 (next): a thermistor bead dangling through the lid's one small hole into the water
 function figThermistor() {
-  const k = figKit(28, [0, 0, -0.67], 150);
+  const k = figKit(24, [0, 0, -0.67], 150);
   const [hx, hy] = LID.hole;
   const items = [
     k.ring([0, 0, -3], CUP.r1, X, Y, 'w', 48),
@@ -963,7 +963,7 @@ function figThermistor() {
 // Fig 0.5 (next): the DC-motor lid from the CAD: a tower on the lid, the motor in its pocket, a rod down to a
 // four-blade paddle that turns below the beam
 function figStirrer() {
-  const k = figKit(17, [0, 0, -1.6], 150);
+  const k = figKit(15, [0, 0, -1.6], 150);
   const lz = LID.z1 - LID.z0; // plate top (lid local, skirt bottom at 0)
   const tw = 0.99, tl = 1.24; // tower half-sizes: (motor 15.8 × 20.8 mm) + 4 mm walls
   const items = [

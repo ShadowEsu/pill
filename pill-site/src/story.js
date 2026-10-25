@@ -22,9 +22,12 @@ export const SCENES = [
 ];
 
 /* ---------- geometry ---------- */
-const xl = (y) => 200 + (14 * (y - 150)) / 330; // cup left wall
-const xr = (y) => 440 - (14 * (y - 150)) / 330; // cup right wall
-const WL = 200; // water line
+// to the printed chamber's proportions at 3.24 px/mm (pillgate/cad/peel_plate_complete.stl): body Ø84 × 84 mm
+// (x 184–456, y 220–492), LED box 26 mm out, in-line holder 6 mm out and 39 mm tall; the clear cup sits in the
+// well with its rim at about 72 mm and the water at about 48 mm
+const xl = (y) => 200 + (14 * (y - 260)) / 220; // cup left wall
+const xr = (y) => 440 - (14 * (y - 260)) / 220; // cup right wall
+const WL = 336; // water line
 const WATER = `M${xl(WL).toFixed(1)} ${WL} L${xr(WL).toFixed(1)} ${WL} L426 480 L214 480 Z`;
 // the app's capsule (PillFill), 140 x 300 box
 const CAP = 'M12 152 V62 A58 58 0 0 1 128 62 V152 Z';
@@ -87,30 +90,30 @@ function makeStage() {
     <!-- scenes 2-4: the cup, shared -->
     <g data-cup>
       <text x="352" y="101" class="st-t">wooden stir stick, by hand</text>
-      <path d="M186 150 h268" stroke="rgba(233,238,242,.5)" stroke-width="3" stroke-linecap="round"/>
-      <path d="M200 150 L214 480 L426 480 L440 150" ${L}/>
-      <path d="M184 140 H196 V480 H444 V140 H456 V492 H184 Z" fill="rgba(110,98,210,.28)" stroke="rgba(233,238,242,.5)" stroke-width="1.2" stroke-linejoin="round"/>
+      <path d="M198 260 h244" stroke="rgba(233,238,242,.5)" stroke-width="3" stroke-linecap="round"/>
+      <path d="M200 260 L214 480 L426 480 L440 260" ${L}/>
+      <path d="M184 220 H196 V480 H444 V220 H456 V492 H184 Z" fill="rgba(110,98,210,.28)" stroke="rgba(233,238,242,.5)" stroke-width="1.2" stroke-linejoin="round"/>
       <path d="${WATER}" fill="rgba(79,179,255,.09)"/>
       <path d="${WATER}" fill="#E9EEF2" data-k="tint" opacity="0"/>
       <g clip-path="url(#${u}-water)"><circle cx="320" cy="400" r="40" fill="url(#${u}-glow)" data-k="bloom" opacity="0"/></g>
       <path d="M${xl(WL).toFixed(1)} ${WL} H${xr(WL).toFixed(1)}" stroke="rgba(79,179,255,.7)" stroke-width="1.5"/>
-      <path d="M${(xl(WL) - 12).toFixed(1)} ${WL} h10" stroke="rgba(233,238,242,.4)"/><text x="${(xl(WL) - 16).toFixed(1)}" y="${WL + 4}" class="st-t" text-anchor="end">small cup</text>
-      <g data-k="stick"><line x1="320" y1="96" x2="320" y2="352" stroke="#C9A877" stroke-width="5" stroke-linecap="round"/></g>
+      <path d="M${(xr(WL) + 18).toFixed(1)} ${WL} h10" stroke="rgba(233,238,242,.4)"/><text x="${(xr(WL) + 32).toFixed(1)}" y="${WL + 4}" class="st-t">clear cup · water</text>
+      <g data-k="stick"><line x1="320" y1="96" x2="320" y2="440" stroke="#C9A877" stroke-width="5" stroke-linecap="round"/></g>
       <!-- tablet + bubbles -->
       <g data-k="bubbles" fill="none" stroke="rgba(190,225,255,.55)" stroke-width="1">${[0, 1, 2, 3, 4].map(() => '<circle r="2.5" cx="-20" cy="-20"/>').join('')}</g>
       <g data-k="tab" transform="translate(380 40)"><ellipse cx="0" cy="0" rx="12" ry="7" fill="#F4F6F8" stroke="#B9C2CC" stroke-width="1.2"/><path d="M-6 0 h12" stroke="#B9C2CC" stroke-width="1"/></g>
       <g data-k="tabcloud" fill="#F4F6F8">${[0, 1, 2, 3, 4, 5].map((k) => `<circle cx="${370 + k * 6}" cy="${462 - (k % 3) * 5}" r="${1.5 + (k % 2)}"/>`).join('')}</g>
       <!-- light path -->
-      <circle cx="165" cy="400" r="34" fill="url(#${u}-led)" data-k="ledglow" opacity="0"/>
+      <circle cx="142" cy="400" r="34" fill="url(#${u}-led)" data-k="ledglow" opacity="0"/>
       <line x1="184" y1="400" x2="${xl(400).toFixed(1)}" y2="400" stroke="#4FB3FF" stroke-width="4" stroke-linecap="round" data-k="beamA" opacity="0"/>
       <line x1="${xl(400).toFixed(1)}" y1="400" x2="${xr(400).toFixed(1)}" y2="400" stroke="url(#${u}-beam)" stroke-width="4" data-k="beamB" opacity="0"/>
       <line x1="${xr(400).toFixed(1)}" y1="400" x2="446" y2="400" stroke="#4FB3FF" stroke-width="4" stroke-linecap="round" data-k="beamC" opacity="0"/>
       <line x1="186" y1="400" x2="446" y2="400" stroke="#E6F4FF" stroke-width="2" stroke-dasharray="2 16" stroke-linecap="round" data-k="photons" opacity="0"/>
-      <rect x="140" y="376" width="44" height="48" rx="4" fill="rgba(110,98,210,.28)" stroke="rgba(233,238,242,.5)" stroke-width="1.2"/>
-      <circle cx="151" cy="400" r="4" fill="#F2F1EC"/><circle cx="162" cy="400" r="4" fill="#4FB3FF"/><circle cx="173" cy="400" r="4" fill="#C8574B"/>
-      <text x="140" y="366" class="st-t">LED box · W B R</text>
-      <path d="M456 420 V392 a7 7 0 0 1 14 0 V420 Z" fill="rgba(110,98,210,.28)" stroke="rgba(233,238,242,.5)" stroke-width="1.2"/>
-      <rect x="446" y="394" width="9" height="12" rx="2" fill="rgba(79,179,255,.55)"/><text x="452" y="440" class="st-t">in line · A0</text>
+      <rect x="100" y="340" width="84" height="152" rx="4" fill="rgba(110,98,210,.28)" stroke="rgba(233,238,242,.5)" stroke-width="1.2"/>
+      <circle cx="128" cy="400" r="4.5" fill="#F2F1EC"/><circle cx="142" cy="400" r="4.5" fill="#4FB3FF"/><circle cx="156" cy="400" r="4.5" fill="#C8574B"/>
+      <text x="100" y="330" class="st-t">LED box · W B R</text>
+      <path d="M456 492 V385 a9.5 9.5 0 0 1 19 0 V492 Z" fill="rgba(110,98,210,.28)" stroke="rgba(233,238,242,.5)" stroke-width="1.2"/>
+      <rect x="446" y="394" width="9" height="12" rx="2" fill="rgba(79,179,255,.55)"/><text x="482" y="440" class="st-t">in line · A0</text>
       <circle cx="320" cy="400" r="40" fill="url(#${u}-glow)" data-k="halo" opacity="0"/>
       <circle cx="320" cy="400" r="14" fill="none" stroke="rgba(233,238,242,.55)" stroke-width="1.2" stroke-dasharray="3 3"/>
       <circle cx="320" cy="400" r="5" fill="rgba(233,238,242,.35)" data-k="gfilter"/>
@@ -261,7 +264,7 @@ function makeStage() {
         const run = p < 2 ? seg(t2, 0.5, 1) : 1;
         const f = ((p * 1.7 + i * 0.21) % 1);
         b.setAttribute('cx', (372 + i * 5 + Math.sin(f * 6 + i) * 4).toFixed(1));
-        b.setAttribute('cy', (452 - f * 240).toFixed(1));
+        b.setAttribute('cy', (452 - f * (446 - WL)).toFixed(1));
         op(b, run * (1 - f) * 0.9);
       });
       // light: on from scene 3
