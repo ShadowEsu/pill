@@ -12,7 +12,7 @@ Reconciled to what exists right now: the **Pill Gate station app** (`pillgate/`,
 | 4 | 1 | Team names (ask each teammate before naming them) | `[FILL 3]` |
 | 5 | 5 | Figma Plan B: figma.com → Import → `figma/pill-deck.pptx` → Share → Anyone with the link → copy (`figma/SUBMIT.md` §Plan B); if the plugin runs instead, add the Design-file and Present links | `[FILL 4]` |
 | 6 | 2 | Capital One Nessie key: http://api.nessieisreal.com → sign in with GitHub → key into `pill/pay/.env` as `NESSIE_KEY=` → `npm run serve` → `curl localhost:8402/nessie/accounts` shows three SANDBOX accounts. No key by submit time → **untick Nessie** and delete its paragraph | `[FILL 5]` |
-| 7 | 10 | Pill Gate: reset the UNO Q (board streams 0 lines at 19:05), record **3 reference runs** of your reference tablet in Quick mode, Profiles → Build reference, then one real scan with Claude on (`:8000`). Until that happens the station rows in "Real vs simulated" stay as written | `[FILL 6]`, `[FILL 7]` |
+| 7 | 10 | Pill Gate: reset the UNO Q (board streams 0 lines at 19:05), record **3 reference runs** of your reference tablet in Quick mode, Profiles → Build reference, then one real scan with Claude on (`:8000`). Until that happens the station rows in "Real vs simulated" stay as written | `[FILL 6]`,  |
 | 8 | 1 | Chamber: printed from `pillgate/cad/` or a taped box? | `[FILL 8]` |
 | 9 | 1 | Did anyone talk to a pharmacist this weekend? One sentence, with permission, or delete the sentence | `[FILL 9]` |
 | 10 | 5 | Paste the block below into Devpost; tick exactly the boxes in the next table; MLH Commit Fellowship supplemental form | Devpost |
@@ -129,7 +129,7 @@ Inspiration / prior art: Peel (HackMIT 2026), method only, no code. LED-as-senso
 | Piece | Status right now |
 |---|---|
 | Station hardware | **Real:** Arduino UNO Q, 2 photoresistors, blue/white/red LEDs; firmware streams 1 CSV line/s. One real aspirin run recorded Saturday (`runs/REAL_aspirin_first_test.csv`). `[FILL 6: reference profile built from ≥3 live runs · or · "reference profile not yet recorded; the table demo replays the real aspirin run"]` |
-| Station app | **Real:** analysis, guided run, lid detection, guardrail; 14 tests pass. Live Claude label/report: `[FILL 7: ran on scan <id> Sunday · or · "run in mock mode so far; Claude on at the table"]` |
+| Station app | **Real:** analysis, guided run, lid detection, guardrail; 14 tests pass. Live Claude label/report: **ran** Sat 19:19 on scan `scan_1024_191752_f0c2` (replay of the real aspirin run, `claude-sonnet-5`): label read as Aspirin 325 mg, NDC 49483-331-10, Time-Cap Labs; imprint "ASPIRIN / A1"; openFDA found recalls for other lots; report with 10 numbered sources; guardrail rewrote the headline to the measured result (Unable to verify: no reference profile yet) |
 | Label reading (clinic app) | **Real:** Gemini, live; photo held in memory only |
 | The "why" sentences, escrow clerk | **Real:** Claude, live, clause-filtered; deterministic template if the API fails |
 | Verdict rules | **Real:** seven deterministic rules in the clinic app and pay service; reference matching in the station app |

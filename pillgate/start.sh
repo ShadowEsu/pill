@@ -13,7 +13,8 @@ if [ ! -x .venv/bin/python ]; then
 fi
 
 KEYFILE="$HOME/.config/preston-secrets/anthropic-pill.env"
-if [ -f "$KEYFILE" ]; then set -a; . "$KEYFILE"; set +a; echo "Claude: on (${CLAUDE_MODEL:-claude-sonnet-5-5})"; else echo "Claude: OFF (no $KEYFILE) - mock mode"; fi
+if [ -f "$KEYFILE" ]; then set -a; . "$KEYFILE"; set +a; export CLAUDE_MODEL="${CLAUDE_MODEL:-claude-sonnet-5}"; echo "Claude: on ($CLAUDE_MODEL)"; else echo "Claude: OFF (no $KEYFILE) - mock mode"; fi
+# claude-sonnet-5-5 / opus-5-5 / fable reject the forced tool_choice the backend uses (400 at 19:15 Sat); sonnet-5 accepts it.
 
 # only one program may hold the USB port: stop anything else on it
 if [ "$MODE" != "replay" ]; then
