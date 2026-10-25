@@ -351,14 +351,20 @@ const GEMINI_SHOT = {
   report: shot(TALL_PHONE, 'gemini/checker-report-390.webp'),
   follower: shot(TALL_PHONE, 'gemini/follower-open-390.webp'),
 };
-// Pill Gate, the station app (pillgate/: FastAPI + Arduino UNO Q), and the UNO Q wiring diagram (title row cropped off)
+// Pill Gate, the station app (pillgate/: FastAPI + Arduino UNO Q)
 const GATE = 'pillgate/dev-shots/ui';
 const GATE_SHOT = {
   measure: img(`${GATE}/measure-390.png`, { w: 360, cap: 2.2, q: 12 }),
   flowResult: img(`${GATE}/flow-06-result-390.png`, { w: 360, cap: 2.2, q: 12 }),
   result: img(`${GATE}/result-390.png`, { w: 360, cap: 2.2, q: 12 }),
 };
-const WIRING = img('pillgate/diagrams/01_wiring_overview.png', { ...BIG(1200), box: [0, 0.1, 1, 0.86] });
+// Real station photos (photos/station, Sat) and the chamber blueprint's top view, prepared by figma/station-photos.sh (sips + cwebp)
+const PHOTO = 'figma/art/station';
+const STATION_PHOTO = {
+  ledBox: img(`${PHOTO}/slide-led-box.webp`, BIG(768)),
+  blueCup: img(`${PHOTO}/slide-blue-cup.webp`, BIG(768)),
+  topView: img(`${PHOTO}/chamber-top-view.webp`, BIG(1060)),
+};
 // Art captured from the live site by capture-art.mjs (figma/art/*.png)
 const ART = {
   pill: img('figma/art/binary-pill.png', BIG(1000)),
@@ -447,10 +453,15 @@ S('The station', [
     return [{ t: 'ellipse', x: X, y: y + 9, w: 18, h: 18, fill: dot },
       text(X + 36, y, 700, k, { size: 25, weight: 600, lh: 130 }), text(X + 36, y + 38, 700, d, { size: 18, color: C.ink2, lh: 140 })];
   }),
-  card(920, 150, 880, 760, { fill: C.surface }),
-  image(950, 200, 820, 620, WIRING, { fit: 'contain' }),
-  mono(950, 836, 820, 'Fig 1 · UNO Q wiring (pillgate/diagrams): photoresistors on A0/A1 from 3V3; LEDs on D5\u2013D8, active-low via one 330 \u03a9 from 5V.'),
-], 'The station is an Arduino UNO Q, a 3.3-volt board with a 12-bit ADC. Once a second it turns every LED off and reads both photoresistors, the dark reading that cancels room light, then lights blue, white and red in turn and reads again: one sensor in line with the beam, one at ninety degrees. It sends one CSV line a second. The firmware decides nothing; the laptop does the maths.');
+  ...[[STATION_PHOTO.ledBox, 'Photo · the purple 3D-printed chamber with a clear cup of water; the side box holds white, blue and red LEDs; a sensor holder on the chamber wall; the UNO Q at left.'],
+    [STATION_PHOTO.blueCup, 'Photo · from above: blue light inside the cup, the LED box below it, the UNO Q at lower left.']].flatMap(([id, cap], i) => {
+    const x = 920 + i * 450;
+    return [image(x, 150, 430, 352, id, { radius: 20, fit: 'cover' }), mono(x, 516, 430, cap, { size: 16 })];
+  }),
+  card(920, 612, 474, 388, { fill: C.surface, radius: 20 }),
+  image(924, 616, 466, 380, STATION_PHOTO.topView, { radius: 16, fit: 'contain' }),
+  mono(1420, 624, 380, 'Drawing · the chamber design, top view (pillgate/diagrams): the LED pod on one side, one photoresistor straight across the cup, one at 90\u00b0 to the beam.', { size: 16 }),
+], 'The station is an Arduino UNO Q, a 3.3-volt board with a 12-bit ADC. These are photos of it from Saturday: a purple 3D-printed chamber holding a clear cup of water, a side box with white, blue and red LEDs, and the UNO Q next to it. The drawing shows where the two photoresistors sit, one in line with the beam and one at ninety degrees. Once a second it turns every LED off and reads both, the dark reading that cancels room light, then lights blue, white and red in turn and reads again. It sends one CSV line a second. The firmware decides nothing; the laptop does the maths.');
 
 // 5 · the station app: Pill Gate's guided check and its three answers (station-app wording)
 const gatePhases = [
@@ -811,8 +822,17 @@ S('Ask and next', [
 if (slides.length !== TOTAL) throw new Error(`TOTAL is ${TOTAL} but ${slides.length} slides were built`);
 
 // ───────────────────────────── design pages + board ─────────────────────────────
+// The real station (photos/station; frames with people in the background left out) leads the App screens page.
+const stationGroup = {
+  title: 'The station · real photos (Sat)',
+  sub: '4 photos (photos/station) + the chamber design drawing (pillgate/diagrams/03_chamber_cross_sections.png, top view)',
+  items: [
+    ...['17', '171', '19', '191'].map((n) => ({ name: `Station · photo ${n}`, label: `station-${n}`, img: img(`${PHOTO}/station-${n}.webp`, PHONE), kind: 'phone', route: null, source: `photos/station/station-${n}.jpg`, cropped: null })),
+    { name: 'Station · chamber drawing (top view)', label: 'chamber top view', img: img(`${PHOTO}/chamber-top-view.webp`, { w: 640, cap: 0, q: 12 }), kind: 'desktop', route: null, source: 'pillgate/diagrams/03_chamber_cross_sections.png', cropped: null },
+  ],
+};
 const design = {
-  appScreens: { title: 'App screens', note: `Every app screenshot from pill/web/dev-shots (${appShotCount}), grouped by build pass in the order they were taken. Phone frames are 390 wide; each frame name is "App · <file>" and maps to a route.`, groups: appGroups },
+  appScreens: { title: 'App screens', note: `The real station first (4 photos + the chamber drawing), then every app screenshot from pill/web/dev-shots (${appShotCount}), grouped by build pass in the order they were taken. Phone frames are 390 wide; each screenshot frame is named "App · <file>" and maps to a route.`, groups: [stationGroup, ...appGroups] },
   website: { title: 'Website', note: `Every site screenshot from pill-site/dev-shots (${siteShotCount}; shots of the first design excluded). Live: https://pill-site.vercel.app`, groups: siteGroups },
   tokens: { title: 'Tokens', note: `From pill/web/src/index.css :root (${appVars.length} declarations, ${tokens.length} unique tokens: ${tokenColors.length} colours → paint styles + COLOR variables, ${tokenNumbers.length} sizes → FLOAT variables). The app copied them by hand from pill-site/src/styles.css: ${drift.identical} of ${siteVars.length} arrived identical, ${drift.changed.length} changed value, ${drift.missing.length} were renamed or dropped.`, items: tokens, drift },
   stageLog: { title: 'Stage log', columns: stages.map((s) => s.name), rows: [['Tools', 'tools'], ['Minutes', 'minutes'], ['Rating (1–5)', 'rating'], ['What we did', 'did'], ['What broke', 'broke'], ['Into the project', 'forward']].map(([label, k]) => ({ label, cells: stages.map((s) => s[k]) })) },

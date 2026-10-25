@@ -44,7 +44,7 @@ Result (email, handle and id masked here; nothing else removed):
    ```sh
    node -e '
    const m=require("./figma/file-meta.json"), d=require("./figma/deck.json");
-   const items=new Map(d.design.appScreens.groups.flatMap(g=>g.items).map(i=>[i.name,i]));
+   const items=new Map(d.design.appScreens.groups.flatMap(g=>g.items).filter(i=>i.route).map(i=>[i.name,i]));
    const out=[]; (function w(n){ if(!n||typeof n!=="object")return; if(n.name&&items.has(n.name)&&n.id){const i=items.get(n.name); out.push({file_key:process.env.KEY,node_id:n.id,name:"Route "+i.route+" · "+i.source,url:"https://github.com/<owner>/<repo>/blob/main/"+i.source});} Object.values(n).forEach(w); })(m);
    require("fs").writeFileSync("figma/dev-resources.json",JSON.stringify({dev_resources:out}));
    console.log(out.length,"dev resources");'

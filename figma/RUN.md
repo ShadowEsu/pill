@@ -45,6 +45,7 @@ Figma Design imports PNG and SVG by drag and drop. `figma/import-kit/`:
 ## Rebuild (after any repo change)
 
 ```sh
+sh figma/station-photos.sh                     # only when photos/station changes: real station photos → figma/art/station (sips + cwebp)
 node figma/build-deck.mjs                      # deck.json + deck.html + metrics.json (prints slide count, size; runs the plugin against a stub API)
 python3 -m http.server 5391 --bind 127.0.0.1   # from the repo root, in another terminal, for the next step
 # omp eval (JS): see the header of figma/shoot-deck.mjs: default export → deck-preview/*.png, `pdf` export → pill-deck.pdf
