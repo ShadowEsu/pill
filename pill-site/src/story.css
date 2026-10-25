@@ -303,3 +303,8 @@
 }
 .reduced .build-bp-card { transition: none; }
 .reduced .build-bp-card:hover { transform: none; }
+
+/* ---------- the binary pill: the product's mark, between the story and the table ---------- */
+.pill-divider { padding: clamp(48px, 7vw, 88px) var(--gutter) 0; text-align: center; }
+.pill-divider canvas { display: block; width: min(420px, 80%); height: auto; margin-inline: auto; }
+.pill-divider .caption { margin-top: 6px; }
