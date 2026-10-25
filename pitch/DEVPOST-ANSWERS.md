@@ -148,19 +148,18 @@ arduino-uno-q, arduino, c++, python, fastapi, sqlite, javascript, typescript, re
 
 ## Gallery images
 
-Upload in this order. Devpost takes JPG / PNG / GIF (5 MB max; 3:2 works best for the thumbnail). The station photos are JPEG at 768×1024 (portrait), so crop the thumbnail to 768×512. **All app screenshots below are WebP inside, even the `.png` ones** (`file` says "Web/P"), so convert them to real PNG before uploading.
+Ready to upload, in order, from `pitch/gallery/` (real JPG/PNG, names cropped off, thumbnail already 3:2):
 
 | # | File | Caption |
 |---|---|---|
-| 1 (**thumbnail**) | `photos/station/station-19.jpg` | The station at our table: printed chamber, LED box, Arduino UNO Q. |
-| 2 | `photos/station/station-171.jpg` | Blue LED on: light crossing the cup of water inside the chamber. |
-| 3 | `photos/station/station-191.jpg` | White, blue and red LEDs shine into the chamber through holes. |
-| 4 | `photos/station/station-17.jpg` | From above: a small clear cup of water inside the chamber. |
-| 5 | `pitch/diagrams/money-flow.png` | How the money moves: one tablet → three answers → policy agent → Coinbase wallets (TESTNET), plus the x402 lane. |
-| 6 | `pillgate/dev-shots/ui2/bottle-1280.png` | Step 1: photograph the bottle; personal details are removed. |
-| 7 | `pillgate/dev-shots/ui2/measure-1280.png` | Quick 60 s or full run, with raw counts from both sensors (replay of our aspirin run). |
-| 8 | `pillgate/dev-shots/ui2/result-1280.png` | Replay of our aspirin run: Unable to verify (no reference yet). |
-| 9 | `pill/web/dev-shots/phases/live-verdict-390.webp` | Clinic app, SIMULATED run (labelled): PASS by rule P1. |
-| 10 | `pill/web/dev-shots/phases/dashboard-station-card-1280.webp` | Clinic dashboard: the station card and its run phases. |
+| 1 (**thumbnail**) | `pitch/gallery/01-thumbnail-station.jpg` | The station at our table: printed chamber, LED box, Arduino UNO Q. |
+| 2 | `pitch/gallery/02-station-blue.jpg` | Blue LED on: light crossing the cup of water inside the chamber. |
+| 3 | `pitch/gallery/03-station-leds.jpg` | White, blue and red LEDs shine into the chamber through holes. |
+| 4 | `pitch/gallery/04-station-cup.jpg` | From above: a small clear cup of water inside the chamber. |
+| 5 | `pitch/gallery/05-money-flow.png` | How the money moves: one tablet → three answers → policy agent → Coinbase wallets (TESTNET), plus the x402 lane. |
+| 6 | `pitch/gallery/06-station-bottle.png` | Step 1: photograph the bottle; personal details are removed. |
+| 7 | `pitch/gallery/07-station-measure.png` | The clean-water check, then the run, with raw counts from both sensors (replay of our aspirin run). |
+| 8 | `pitch/gallery/08-station-result.png` | Replay of our aspirin run: Unable to verify (no reference yet). |
+| 9 | `pitch/gallery/09-clinic-verify-x402.png` | Clinic app, Verify page: the x402 lane lit by a real 402 (the paid 200 stays dashed). |
+| 10 | `pitch/gallery/10-clinic-dashboard.png` | Clinic dashboard: deliveries, the station card and "How the money moves". |
 
-Thumbnail and crop note: `station-19.jpg` is the thumbnail (crop it to 3:2). `station-171.jpg` and `station-17.jpg` show a handwritten name on a paper in the top-right corner: crop off the top-right corner before uploading, or leave them out. `station-191.jpg` is clean. Don't use `pill/web/dev-shots/phases/07-verdict-1280.webp`: it still shows the old design ("quarter tablet", "paddle turning", "90° glow", "3:00").
