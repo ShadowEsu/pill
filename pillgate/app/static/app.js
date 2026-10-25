@@ -966,6 +966,142 @@ route(/^\/issue\/([^/]+)$/, async (v, id) => {
   };
 });
 
+// ================================================================ 9. History
+route(/^\/history$/, async (v) => {
+  const [sc, rs] = await Promise.all([api("/api/scans").catch(() => []), api("/api/runs").catch(() => [])]);
+  sc.sort((a, b) => (b.created || 0) - (a.created || 0));
+  rs.reverse();
+  v.innerHTML = `${head({ eyebrow: `${sc.length} checks · ${rs.length} runs`, title: "History", tone: "sky", side: `<a class="btn ghost" href="#/check/bottle">New check</a>` })}
+    <div class="wide-2">
+      <section class="card stack"><h2 class="h">Checks</h2><div class="capsules">${sc.map(capsule).join("") || `<p class="muted">No checks yet.</p>`}</div></section>
+      <section class="card stack"><h2 class="h">Runs</h2><ul class="list">${rs.map((r, i) => `<li class="rise" style="--i:${Math.min(i, 12)}"><span>${esc(r.label)}<br><small>${esc(r.id)} · ${r.samples} samples · ${esc(r.source)} · ${esc(r.mode)}</small></span><span class="cap-chips">${r.result ? `<span class="chip wash-${RESULT_CLASS[r.result]}">${esc(RESULT_TEXT[r.result])}</span>` : ""}</span></li>`).join("") || `<li class="muted">No runs yet.</li>`}</ul></section>
+    </div>`;
+});
+
+// ================================================================ 10. Profiles (reference / calibration builders)
+route(/^\/profiles$/, async (v) => {
+  const [ps, rs] = await Promise.all([api("/api/profiles").catch(() => []), api("/api/runs").catch(() => [])]);
+  const runOpts = rs.map((r) => `<option value="${esc(r.id)}">${esc(r.label)} · ${esc(r.id)}</option>`).join("");
+  v.innerHTML = `${head({ eyebrow: `${ps.length} profiles`, title: "Profiles", tone: "violet" })}
+    <section class="card stack"><h2 class="h">What a good tablet looks like</h2>
+      <p class="muted">A profile tells the app what a good tablet looks like. <b>Reference</b> = 3 or more runs of a known-good tablet. <b>Calibration</b> = solutions of known strength, so the app can estimate the dose released.</p>
+      <ul class="list">${ps.map((p) => `<li><span><b>${esc(p.name)}</b> ${p.demo ? `<span class="sim">DEMO, simulated</span>` : ""}<br><small>${esc(p.id)} · ${p.reference ? "reference ✓ (" + esc(p.mode) + " mode, " + esc(p.signal) + ")" : "no reference"}${p.match_names && p.match_names.length ? " · matches: " + esc(p.match_names.join(", ")) : ""} · ${p.calibration ? "calibration ✓" : "no calibration"}</small></span></li>`).join("")}</ul>
+    </section>
+    <div class="wide-2">
+      <section class="card stack"><h2 class="h">Build a reference profile</h2>
+        <div class="grid2">
+          <label class="field">Profile id<input id="ref-id" placeholder="aspirin_ref"></label>
+          <label class="field">Name<input id="ref-name" placeholder="Aspirin 325 mg uncoated, brand X"></label>
+          <label class="field">Label words that match it<input id="ref-match" placeholder="aspirin"></label>
+        </div>
+        <fieldset class="stack" style="border:0;padding:0;margin:0"><legend class="field" style="margin-bottom:8px">What changes when it dissolves?</legend>
+          ${[["scatter", "Cloudiness, side sensor", "White tablet, e.g. plain aspirin. Recommended."], ["colour", "Colour", "Yellow water, e.g. riboflavin / B-complex."], ["cloud", "Cloudiness, straight-through red light", "Weaker signal."]]
+            .map(([val, t, sub], i) => `<label class="mode-opt check"><input type="radio" name="ref-signal" value="${val}"${i === 0 ? " checked" : ""}><span><b>${t}</b><br><small>${sub}</small></span></label>`).join("")}
+        </fieldset>
+        <p class="footnote">Tick 3 or more runs of the same known-good tablet, recorded in the same mode:</p>
+        <ul class="list" id="ref-runs">${rs.map((r) => `<li><label class="check"><input type="checkbox" value="${esc(r.id)}"> <span>${esc(r.label)}<br><small>${esc(r.mode)} · ${esc(r.id)} · ${r.samples} samples</small></span></label></li>`).join("") || `<li class="muted">Record some runs first.</li>`}</ul>
+        <button type="button" class="btn" id="btn-ref">Build reference</button><pre class="pre" id="ref-out"></pre>
+      </section>
+      <section class="card stack"><h2 class="h">Build a calibration</h2>
+        <p class="footnote">One run per standard (include plain water = 0). Each run: cup with the standard, lid on, record about 60 s.</p>
+        <div class="grid2">
+          <label class="field">Profile id<input id="cal-id" placeholder="riboflavin_ref"></label>
+          <label class="field">Name<input id="cal-name"></label>
+          <label class="field">Label words<input id="cal-match" placeholder="riboflavin"></label>
+          <label class="field">Label dose (mg per tablet)<input id="cal-mg" type="number" step="any"></label>
+          <label class="field">Water volume (mL)<input id="cal-vol" type="number" value="145"></label>
+        </div>
+        <div class="stack" id="cal-rows"></div>
+        <div class="actions"><button type="button" class="btn ghost" id="btn-row">Add standard</button><button type="button" class="btn" id="btn-cal">Build calibration</button></div>
+        <pre class="pre" id="cal-out"></pre>
+      </section>
+    </div>`;
+  const addRow = (conc) => {
+    const d = document.createElement("div"); d.className = "row";
+    d.innerHTML = `<select class="cal-run" aria-label="Run">${runOpts}</select><input class="cal-conc" type="number" step="any" placeholder="mg/L" style="max-width:110px" aria-label="Concentration mg/L" value="${conc ?? ""}">`;
+    $("cal-rows").appendChild(d);
+  };
+  addRow(0); addRow(); addRow();
+  $("btn-row").onclick = () => addRow();
+  const words = (id) => $(id).value.split(",").map((x) => x.trim()).filter(Boolean);
+  $("btn-ref").onclick = async () => {
+    const ids = [...$("ref-runs").querySelectorAll("input:checked")].map((i) => i.value);
+    try {
+      const r = await post("/api/profiles/reference", { profile_id: $("ref-id").value || "my_reference", name: $("ref-name").value || "My reference",
+        match_names: words("ref-match"), run_ids: ids, signal: v.querySelector('input[name="ref-signal"]:checked').value });
+      $("ref-out").textContent = JSON.stringify(r.reference, null, 2); toast("Reference saved");
+    } catch (e) { $("ref-out").textContent = "Error: " + e.message; }
+  };
+  $("btn-cal").onclick = async () => {
+    const standards = [...$("cal-rows").children].map((d) => ({ run_id: d.querySelector(".cal-run").value, conc_mg_per_l: parseFloat(d.querySelector(".cal-conc").value) })).filter((x) => x.run_id && !isNaN(x.conc_mg_per_l));
+    try {
+      const r = await post("/api/profiles/calibration", { profile_id: $("cal-id").value || "my_calibration", name: $("cal-name").value || "My calibration",
+        match_names: words("cal-match"), label_mg: parseFloat($("cal-mg").value), volume_ml: parseFloat($("cal-vol").value) || 145, standards });
+      $("cal-out").textContent = JSON.stringify(r.calibration, null, 2); toast("Calibration saved");
+    } catch (e) { $("cal-out").textContent = "Error: " + e.message; }
+  };
+});
+
+// ================================================================ Atlas (3D graph: library loaded on first open, graph destroyed on leave)
+const KIND_COLORS = { medicine: "#3fb79c", lot: "#f3b25b", manufacturer: "#7aa2ff", recall: "#ff6b6b", seller: "#c792ea" };
+function loadScript(src) { return new Promise((ok, bad) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = bad; document.head.appendChild(s); }); }
+route(/^\/atlas$/, async (v) => {
+  v.innerHTML = `${head({ eyebrow: "medicines · lots · makers · recalls · sellers", title: "Atlas", tone: "sky" })}
+    <section class="card stack"><p class="muted">Medicines, lots, manufacturers, recalls and the sellers named in reports. Sellers show a report count, never who reported.</p>
+      <div class="legend">${Object.entries(KIND_COLORS).map(([k, c]) => `<span style="--c:${c}">${k}</span>`).join("")}</div>
+      <div id="atlas" class="atlas"><p>Loading the graph…</p></div></section>`;
+  let graph = null, gone = false;
+  const onResize = () => { if (graph) graph.width($("atlas").clientWidth); };
+  S.leave.push(() => {
+    gone = true; window.removeEventListener("resize", onResize);
+    if (graph) { try { graph.pauseAnimation(); graph._destructor && graph._destructor(); } catch {} graph = null; }
+  });
+  const data = await api("/api/atlas");
+  if (gone) return;
+  if (!data.nodes.length) { $("atlas").innerHTML = "<p>No checks yet.</p>"; return; }
+  if (!window.ForceGraph3D) { try { await loadScript("/static/vendor/3d-force-graph-1.80.0.min.js"); } catch { $("atlas").innerHTML = "<p>Could not load the 3D library.</p>"; return; } }
+  if (gone) return;
+  const box = $("atlas"); box.innerHTML = "";
+  graph = ForceGraph3D()(box).width(box.clientWidth).height(box.clientHeight)
+    .graphData(data).nodeLabel((n) => n.label).nodeColor((n) => (n.kind === "recall" && n.lot_match ? "#ff2d2d" : KIND_COLORS[n.kind] || "#ccc"))
+    .nodeVal((n) => (n.kind === "seller" ? 2 + (n.reports || 1) * 2 : n.kind === "medicine" ? 6 : 3))
+    .linkOpacity(0.5).backgroundColor("#0d1014")
+    .cooldownTicks(120).onEngineStop(() => graph && graph.zoomToFit(400, 60));
+  window.addEventListener("resize", onResize);
+});
+
+// ================================================================ Settings
+route(/^\/settings$/, (v) => {
+  const sw = (id, on, label) => `<button type="button" class="switch" role="switch" id="${id}" aria-checked="${on}" aria-label="${label}"></button>`;
+  const c = S.config;
+  v.innerHTML = `${head({ eyebrow: MODES[mode()] ? MODES[mode()].name + " mode" : "", title: "Settings", tone: "grey" })}
+    <div class="wide-2">
+      <section class="card stack"><h2 class="h">Who is this for?</h2>
+        <div class="stack">${Object.entries(MODES).map(([k, m]) => `<button type="button" class="mode-opt" data-mode="${k}" aria-pressed="${mode() === k}"><b>${m.name}</b><small>${esc(m.who)}</small></button>`).join("")}</div>
+        <p class="footnote">The mode changes the words, the home page and the menu. The checks themselves are the same.</p>
+      </section>
+      <section class="card stack"><h2 class="h">This device</h2>
+        <div class="set-row"><span><b>Sounds</b><small>Beeps when it's time to add the tablet and when the run stops.</small></span>${sw("s-sound", PREF.sound, "Sounds")}</div>
+        <div class="set-row"><span><b>Read answers aloud</b><small>On the Ask page.</small></span>${sw("s-speak", PREF.speak, "Read answers aloud")}</div>
+        <div class="set-row"><span><b>Reset local preferences</b><small>Forgets the mode and these switches on this browser only.</small></span><button type="button" class="btn ghost sm" id="s-reset">Reset</button></div>
+      </section>
+      <section class="card stack span-2"><h2 class="h">Server</h2>
+        <dl class="kv"><dt>app</dt><dd>${esc(c.app_name)}</dd><dt>AI</dt><dd>${c.ai ? "on · " + esc(c.model) : "mock mode (no API key)"}</dd>
+          <dt>quick test</dt><dd>${c.timing.quick_s} s</dd><dt>full test</dt><dd>${mmss(c.timing.min_s)}–${mmss(c.timing.max_s)}</dd><dt>clean water</dt><dd>${c.timing.blank_s} s steady</dd>
+          <dt>device</dt><dd>${deviceChip()}</dd><dt>lines read</dt><dd data-lines>–</dd></dl>
+        <p class="footnote">${esc(DISCLAIMER)}</p>
+      </section>
+    </div>`;
+  v.querySelectorAll("[data-mode]").forEach((b) => (b.onclick = () => { PREF.mode = b.dataset.mode; navMode = null; render(); toast(MODES[b.dataset.mode].name + " mode"); }));
+  $("s-sound").onclick = (e) => { PREF.sound = !PREF.sound; e.currentTarget.setAttribute("aria-checked", String(PREF.sound)); if (PREF.sound) beep(1); };
+  $("s-speak").onclick = (e) => { PREF.speak = !PREF.speak; e.currentTarget.setAttribute("aria-checked", String(PREF.speak)); };
+  $("s-reset").onclick = (e) => {
+    const b = e.currentTarget;
+    if (b.dataset.armed) { PREF.reset(); navMode = null; location.hash = "#/welcome"; return; }
+    b.dataset.armed = "1"; b.textContent = "Tap again to reset";
+  };
+});
+
 // ================================================================ boot
 async function boot() {
   try {
