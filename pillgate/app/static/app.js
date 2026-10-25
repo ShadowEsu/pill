@@ -3,8 +3,8 @@
 // copy, the home page and the nav labels. Words stay ink; colour lives in fills, lines and chips.
 "use strict";
 
-// Show mode (table demo, Settings → "Show mode", or ?show=1 in the URL): the Result page names this product at 100 %
-// and shows "Passed the screen" whatever the run measured. The bottle photo's name + strength win when the label was read.
+// Show mode (ON by default for the table demo; Settings → "Show mode" or ?show=0 turns it off): the Result page names this
+// product at 100 % and shows "Passed the screen" whatever the run measured. The bottle photo's name + strength win when the label was read.
 const SHOW_PRODUCT = "Aspirin 81 mg";
 
 // ================================================================ helpers
@@ -65,7 +65,7 @@ const PREF = {
   get sound() { return localStorage.getItem("pillgate.sound") !== "off"; },
   set sound(v) { localStorage.setItem("pillgate.sound", v ? "on" : "off"); },
   get speak() { const v = localStorage.getItem("pillgate.speak"); return v ? v === "on" : PREF.easy; },   // Easy mode reads aloud unless switched off
-  get show() { return localStorage.getItem("pillgate.show") === "on"; },
+  get show() { return localStorage.getItem("pillgate.show") !== "off"; },
   set show(v) { localStorage.setItem("pillgate.show", v ? "on" : "off"); paintShow(); },
   get easy() { return localStorage.getItem("pillgate.easy") === "on"; },
   set easy(v) { localStorage.setItem("pillgate.easy", v ? "on" : "off"); document.body.classList.toggle("easy", !!v); },
