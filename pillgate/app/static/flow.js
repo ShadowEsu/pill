@@ -60,7 +60,7 @@
     [6, 766, "Libraries: @x402/express · @x402/evm · CDP SDK. Service modes: cdp · public-facilitator · simulated, each named in every response.", "c"],
   ];
   const MODELS = [
-    ["Claude", "claude-sonnet-5 in this station app tonight; claude-sonnet-5-5 named in the Devpost text",
+    ["Claude", "claude-sonnet-5",
       "Station: reads the bottle label and the imprint, writes the report, answers Ask, all behind the guardrail. Clinic: the two-sentence \"why\"; the escrow clerk (returns the ceiling computed in code, or escalate).", "Sets a verdict; moves money"],
     ["Gemini", "clinic app",
       "Clinic: reads the bottle label into editable fields (unreadable → null); runs the agentic checker (label, up to three cup frames, code tools for the recall lookup).", "Sets a verdict; invents a field"],

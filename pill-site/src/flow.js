@@ -122,7 +122,7 @@ export const GROUPS = [
 ];
 
 export const MODELS = [
-  { model: 'Claude', ids: ['claude-sonnet-5 (station app)', 'claude-sonnet-5-5 (Devpost text)'], does: 'Station: reads the bottle label and imprint, writes the report, answers Ask, behind the guardrail. Clinic: the two-sentence “why”; the escrow clerk (returns the ceiling computed in code, or escalate).', never: 'Sets a verdict; moves money' },
+  { model: 'Claude', ids: ['claude-sonnet-5'], does: 'Station: reads the bottle label and imprint, writes the report, answers Ask, behind the guardrail. Clinic: the two-sentence “why”; the escrow clerk (returns the ceiling computed in code, or escalate).', never: 'Sets a verdict; moves money' },
   { model: 'Gemini', ids: [], does: 'Clinic: reads the bottle label into editable fields (unreadable → null); runs the agentic checker (label, up to three cup frames, code tools for the recall lookup).', never: 'Sets a verdict; invents a field' },
   { model: 'Deterministic code', ids: [], does: 'analysis.py and rules.ts (U1 U2 U3 N1 N2 N3 P1) set every verdict; the policy computes the ceiling; the clause filter drops any model sentence with a banned claim word (more than half dropped → rule text instead).', never: 'Calls a model to decide' },
 ];
