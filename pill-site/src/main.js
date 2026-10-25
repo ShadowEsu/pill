@@ -3,7 +3,6 @@ import { artFor, statSpark, timetable, heatmap } from './art.js';
 import * as stationMod from './station.js';
 const { mountStation, autoDemo, partFigures } = stationMod;
 import { mountPhone, PHONE_SEQUENCES } from './phone.js';
-import { mountBinaryPill } from './pill.js';
 import './station.css';
 import './pay.css';
 import { mountRail, mountX402, mountCalc } from './pay.js';
@@ -27,10 +26,10 @@ if (!reduced) {
   utils.set('.reveal', { opacity: 1, translateY: 0 });
 }
 
-/* ---------- hero: binary pill + word-by-word headline ---------- */
+/* ---------- hero: the CAD drawing of the chamber beside the photo + word-by-word headline ---------- */
 {
-  const cv = document.getElementById('binary-pill');
-  if (cv) mountBinaryPill(cv, { paper: false, scale: 1.45 });
+  const draw = document.querySelector('[data-hero-draw]');
+  if (draw) draw.innerHTML = partFigures.container;
   const h1 = document.querySelector('[data-split]');
   if (h1) {
     const wrapWords = (node) => {

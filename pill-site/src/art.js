@@ -3,6 +3,24 @@
 const S = 'fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"';
 const G = 'fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="3 4" opacity=".45"';
 const wrap = (inner, label) => `<svg viewBox="0 0 400 300" width="100%" role="img" aria-label="${label}" style="color:var(--ink-2)">${inner}</svg>`;
+const V = 'fill="rgba(124,110,230,0.2)" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"';
+
+// The real chamber in side section, beam left → right (from pillgate/cad/peel_chamber.scad): printed walls and
+// floor, the clear cup, the LED box on the left (white, blue, red), the in-line photoresistor holder on the right,
+// and the flat lid with its one small hole, its top at y = lid (56 = closed).
+function chamberSection({ lid = 56 } = {}) {
+  const L = lid;
+  return `
+    <g data-draw>
+      <path d="M118 66 H128 V240 H272 V66 H282 V250 H118 Z" ${V}/>
+      <rect x="70" y="130" width="48" height="48" rx="3" ${V}/>
+      <path d="M282 176 V146 a7 7 0 0 1 14 0 V176 Z" ${V}/>
+      <path d="M112 ${L} H198 V${L + 18} H129 V${L + 10} H117 V${L + 18} H112 Z" ${V}/>
+      <path d="M202 ${L} H288 V${L + 18} H283 V${L + 10} H271 V${L + 18} H202 Z" ${V}/>
+    </g>
+    <g ${S} data-draw><path d="M136 84 H264"/><path d="M138 84 L145 238 H255 L262 84"/><rect x="270" y="149" width="9" height="10" rx="2"/></g>
+    <g data-draw stroke="currentColor" stroke-width="1.2"><circle cx="82" cy="154" r="4.5" fill="#F2F1EC"/><circle cx="94" cy="154" r="4.5" fill="var(--blue)"/><circle cx="106" cy="154" r="4.5" fill="#C8574B"/></g>`;
+}
 
 const art = {
   bottle: wrap(`
@@ -20,35 +38,25 @@ const art = {
   `, 'A pill bottle photographed by a phone; the label fields are read and the lot is checked'),
 
   blank: wrap(`
-    <g ${G}><line x1="40" y1="260" x2="360" y2="260"/></g>
-    <g ${S} data-draw>
-      <path d="M120 70 h160 l-10 180 h-140 z"/>
-      <path d="M128 150 h144" stroke-dasharray="6 5"/>
-      <path d="M134 120 q66 -14 132 0" opacity=".6"/>
-    </g>
-    <g ${S} data-draw><rect x="60" y="150" width="22" height="22" rx="4"/><path d="M82 161 h38" stroke-dasharray="2 3"/></g>
-    <g ${S} data-draw><rect x="318" y="150" width="22" height="22" rx="4"/><path d="M280 161 h38" stroke-dasharray="2 3"/></g>
-    <text x="58" y="142" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">LED off → dark</text>
-    <text x="238" y="142" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">water → blank</text>
-    <text x="150" y="235" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">lid closed · steady for 10 s</text>
-  `, 'The chamber with plain water: a dark reading, then a blank reading'),
+    <g ${G}><line x1="40" y1="262" x2="360" y2="262"/></g>
+    ${chamberSection()}
+    <g ${S} data-draw><path d="M146 128 H254" stroke-dasharray="6 5"/><path d="M152 112 q48 -10 96 0" opacity=".6"/></g>
+    <text x="24" y="118" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">LEDs off → dark</text>
+    <text x="300" y="118" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">water → blank</text>
+    <text x="200" y="284" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">lid closed · steady for 10 s</text>
+  `, 'The printed chamber in section with only water in the clear cup and the lid closed: a dark reading with the LEDs off, then a blank reading'),
 
   drop: wrap(`
-    <g ${G}><line x1="40" y1="260" x2="360" y2="260"/></g>
-    <g ${S} data-draw>
-      <path d="M120 70 h160 l-10 180 h-140 z"/>
-      <path d="M128 150 h144" stroke-dasharray="6 5"/>
-      <rect x="190" y="168" width="20" height="10" rx="5"/>
-      <path d="M200 40 v40" stroke-dasharray="3 4"/><path d="M194 74 l6 8 l6 -8"/>
-      <path d="M170 90 h60 M200 90 v30" /><path d="M186 120 h28" />
-    </g>
-    <g data-draw><path d="M72 161 h110" stroke="var(--blue)" stroke-width="2.4" stroke-linecap="round"/><path d="M214 161 h104" stroke="var(--blue)" stroke-width="2.4" stroke-linecap="round" opacity=".35"/></g>
-    <g data-draw><path d="M200 182 v52" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="2 4" opacity=".7"/></g>
-    <rect x="52" y="150" width="20" height="22" rx="4" ${S}/><rect x="318" y="150" width="20" height="22" rx="4" ${S}/><rect x="190" y="234" width="20" height="22" rx="4" ${S}/>
-    <text x="50" y="142" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">LEDs · B W R</text>
-    <text x="300" y="142" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">inline · A0</text>
-    <text x="216" y="250" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">90° · scatter · A1</text>
-  `, 'A tablet dropping into a small cup; light crosses one corner to the inline sensor, and the side sensor at ninety degrees reads the light that scatters as the water clouds'),
+    <g ${G}><line x1="40" y1="262" x2="360" y2="262"/></g>
+    ${chamberSection({ lid: 22 })}
+    <g ${S} data-draw><path d="M146 128 H254" stroke-dasharray="6 5"/><path d="M200 70 v44" stroke-dasharray="3 4"/><path d="M194 108 l6 8 l6 -8"/></g>
+    <g data-draw><ellipse cx="214" cy="232" rx="13" ry="4" fill="var(--paper)" stroke="currentColor" stroke-width="1.4"/></g>
+    <g data-draw><path d="M128 154 H272" stroke="var(--blue)" stroke-width="2.4" stroke-linecap="round"/></g>
+    <g data-draw><path d="M200 154 v-2" stroke="currentColor"/><circle cx="200" cy="154" r="10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 3"/></g>
+    <text x="40" y="118" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">LEDs · W B R</text>
+    <text x="300" y="118" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">in line · A0</text>
+    <text x="200" y="284" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="currentColor" opacity=".7">90° · A1 · on the back wall (dashed ring)</text>
+  `, 'The printed chamber in section with the lid lifted: one tablet drops into the clear cup of water; light crosses from the LED box to the in-line photoresistor, and the photoresistor on the back wall at ninety degrees reads the light the clouding water scatters'),
 
   curve: wrap(`
     <g ${G}><line x1="60" y1="240" x2="360" y2="240"/><line x1="60" y1="40" x2="60" y2="240"/><rect x="60" y="96" width="300" height="44" fill="currentColor" stroke="none" opacity=".07"/></g>
@@ -109,8 +117,19 @@ const partFallback = (label) => `<svg viewBox="0 0 300 300" width="100%" role="i
       ${sub.map((s, i) => `<text x="${x + 14}" y="${y + 46 + i * 15}" font-family="var(--mono)" font-size="10.5" fill="${M}">${s}</text>`).join('')}
     </g>`;
   const arrow = (x1, y, x2) => `<path d="M${x1} ${y} H${x2 - 8}" ${W} class="flow" data-draw/><path d="M${x2 - 8} ${y - 4} l8 4 l-8 4" ${W}/>`;
-  art.pipeline = `<svg viewBox="0 0 1100 270" width="100%" role="img" aria-label="Data path: station to backend to verdict to policy to sandbox bank and pharmacist">
-    ${node(10, 70, 185, 96, 'Station', ['UNO Q · 1 CSV line/s', 'dark · blue · white · red', 'two photoresistors'])}
+  const WS = 'stroke="rgba(255,255,255,0.55)" stroke-width="1.25"';
+  // the station node carries a small drawing of the real chamber: printed cylinder, LED box with W·B·R, holder
+  const glyph = `<g aria-hidden="true">
+      <path d="M128 20 V52 A26 8 0 0 0 180 52 V20" fill="#2E2A55" ${WS}/>
+      <ellipse cx="154" cy="20" rx="26" ry="8" fill="#2E2A55" ${WS}/>
+      <ellipse cx="154" cy="20" rx="22" ry="6" fill="none" ${WS}/>
+      <rect x="112" y="36" width="20" height="20" rx="2" fill="#2E2A55" ${WS}/>
+      <circle cx="117" cy="46" r="2.2" fill="#F2F1EC"/><circle cx="122" cy="46" r="2.2" fill="#2F6BFF"/><circle cx="127" cy="46" r="2.2" fill="#C8574B"/>
+      <path d="M180 58 V42 a3.5 3.5 0 0 1 7 0 V56" fill="#2E2A55" ${WS}/>
+    </g>`;
+  art.pipeline = `<svg viewBox="0 0 1100 270" width="100%" role="img" aria-label="Data path: the printed station chamber to the backend to the verdict to the policy to the simulated escrow and the pharmacist">
+    ${glyph}
+    ${node(10, 70, 185, 96, 'Station', ['UNO Q · 1 CSV line/s', 'dark · white · blue · red', 'in-line + 90° sensors'])}
     ${arrow(195, 118, 235)}
     ${node(235, 70, 215, 96, 'Backend', ['absorbance = log(blank/now)', 'plateau · t80 · scatter', '7 rules, in order'])}
     ${arrow(450, 118, 490)}

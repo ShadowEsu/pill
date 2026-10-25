@@ -48,7 +48,7 @@
         <p class="eyebrow reveal">Cal Hacks 13.0 · October 2026</p>
         <h1 class="display" data-split>The box measures.<br><em>Pill</em> explains.</h1>
         <p class="hero-sub"><span class="sr">A tablet cannot lie about dissolving.</span><span class="hs-ghost" aria-hidden="true">A tablet cannot lie about dissolving.</span><span class="hs-typed" aria-hidden="true"></span></p>
-        <p class="lead reveal">A lab-in-a-box from hobby parts. Drop one tablet in a small cup of water, close the lid, and 60 s later (quick run; 2–10 min for a full one) it says <b>Passed the screen</b>, <b>Needs lab testing</b> or <b>Unable to verify</b>. In a clinic, that answer decides whether the supplier gets paid.</p>
+        <p class="lead reveal">A lab-in-a-box from hobby parts: a 3D-printed chamber, three LEDs, two light sensors and an Arduino UNO Q. Drop one tablet in a clear cup of water, close the lid, and 60 s later (quick run; 2–10 min for a full one) it says <b>Passed the screen</b>, <b>Needs lab testing</b> or <b>Unable to verify</b>. In a clinic, that answer decides whether the supplier gets paid.</p>
         <div class="cta reveal">
           <a class="btn" href="https://pill-app-delta.vercel.app/welcome" target="_blank" rel="noopener">Open the app <span class="arrow" aria-hidden="true">→</span></a>
           <a class="btn ghost" href="#screens">See the screens</a>
@@ -60,10 +60,11 @@
           <div><b>Two modes</b>clinic and personal</div>
         </div>
       </div>
-      <div class="hero-pill reveal">
-        <canvas id="binary-pill" width="900" height="640" aria-label="A capsule drawn out of ones and zeros, slowly turning"></canvas>
-        <p class="caption">one tablet · one curve · one answer</p>
-      </div>
+      <figure class="hero-photo reveal">
+        <img src="/photos/station-19.webp" width="768" height="884" fetchpriority="high" decoding="async" alt="The Pill station on a table: a purple 3D-printed cylinder with a clear cup of water inside, the purple LED box on its side with white, blue and red LEDs wired in, a photoresistor holder on the left wall, and an Arduino UNO Q with jumper wires in front">
+        <div class="hero-draw" data-hero-draw aria-hidden="true"></div>
+        <figcaption class="caption">the station as built · lid off · the drawing is the same chamber, from the CAD</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -78,14 +79,38 @@
         </div>
         <p class="stage-hint">scroll to explode</p>
       </div>
-      <div class="station" id="station-mount" aria-label="Line drawing of the Pill station: a dark box with a small clear cup, blue, white and red LEDs and two light sensors across one corner, an Arduino UNO Q board and the laptop app that shows the curve; the stirrer and thermistor on the drawing are next, not built yet"></div>
+      <div class="station" id="station-mount" aria-label="Line drawing of the Pill station as built: a 3D-printed cylinder chamber with a flat lid, a clear cup of water inside, an LED box on one side with white, blue and red LEDs, one photoresistor holder straight across from the LEDs and one at 90°, an Arduino UNO Q and a breadboard, and the laptop app that shows the curve"></div>
       <div class="stage-labels">
-        <div><p class="caption">01 · Chamber</p><p>A small clear cup of water inside a dark box. One whole tablet per test; the lid stays closed while it reads.</p></div>
-        <div><p class="caption">02 · Stirring</p><p>Today the cup is stirred by hand with a wooden stick. A stirrer motor is next, so stirring stops depending on the hand.</p></div>
-        <div><p class="caption">03 · Light path</p><p>Blue, white and red LEDs and one photoresistor in line with the beam: how much light gets through the cup.</p></div>
-        <div><p class="caption">04 · Side sensor</p><p>A second photoresistor at 90° to the beam: how much light scatters sideways, the cloudiness a white tablet makes.</p></div>
-        <div><p class="caption">05 · Temperature</p><p>Typed in for each run today. A thermistor in the water is next.</p></div>
-        <div><p class="caption">06 · Brains</p><p>An Arduino UNO Q takes a dark reading every second, then one per colour, and streams one CSV line. The firmware decides nothing; the laptop app does the maths.</p></div>
+        <div><p class="caption">01 · Lid</p><p>A flat printed lid with a skirt and a plug that keep room light out, and one small hole. Opening it marks the moment the tablet went in.</p></div>
+        <div><p class="caption">02 · Chamber</p><p>A purple 3D-printed cylinder, 70 mm across, with a well the cup drops into. Hand-stirred today; a stirrer motor is next.</p></div>
+        <div><p class="caption">03 · Cup</p><p>A clear plastic cup of water and one whole tablet. A printed shim ring keeps it centred on the beam.</p></div>
+        <div><p class="caption">04 · LED box</p><p>A printed box on the side of the chamber holds white, blue and red 5 mm LEDs. They shine through a diffuser plate into the cup, one at a time.</p></div>
+        <div><p class="caption">05 · Two photoresistors</p><p>One in a holder straight across from the LED box (how much light gets through), one at 90° (how much scatters: the cloudiness a white tablet makes).</p></div>
+        <div><p class="caption">06 · Brains</p><p>An Arduino UNO Q and a breadboard with the divider resistors. A dark reading every second, then one per colour, one CSV line to the laptop. The firmware decides nothing.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2b. The real station: photos from the table + the blueprints -->
+  <section class="section dark" id="built" data-nav="station" aria-labelledby="built-title" style="padding-top:0">
+    <div class="wrap">
+      <p class="eyebrow reveal">Fig 1.1 · The real thing</p>
+      <h2 class="h2" id="built-title">Built Saturday, at the table.</h2>
+      <p class="lead reveal" style="margin-top:20px">The drawing above is this box. A purple 3D-printed chamber, a clear cup of water, three LEDs, two photoresistors, an Arduino UNO Q, a breadboard and a laptop. Stirred by hand with a stick.</p>
+      <div class="build-grid">
+        <figure class="build-ph build-ph--lead reveal"><img src="/photos/station-171.webp" width="768" height="724" loading="lazy" decoding="async" alt="Top view of the station with the lid off and the blue LED on: a clear plastic cup of water inside the purple printed cylinder, blue light at the near wall where the LED box is attached, jumper wires running to the LED legs and to the Arduino UNO Q on the left"><figcaption><b>Blue LED on, lid off.</b> Light from the LED box (bottom) crosses the clear cup of water in the printed well.</figcaption></figure>
+        <figure class="build-ph reveal"><img src="/photos/station-191.webp" width="768" height="1024" loading="lazy" decoding="async" alt="Close-up of the purple LED box on the side of the chamber: a white, a blue and a red 5 mm LED in a row with jumper wires on their legs, two empty holes above and below the blue LED, and a thin slot on top"><figcaption><b>The LED box.</b> White, blue and red 5 mm LEDs, two spare holes, the diffuser slot on top.</figcaption></figure>
+        <figure class="build-ph reveal"><img src="/photos/station-102.webp" width="768" height="834" loading="lazy" decoding="async" alt="The station with its flat purple lid on, a small hole in the lid, the LED box facing the camera, a photoresistor holder on the left wall with two wires, and a breadboard with resistors and jumper wires in front"><figcaption><b>Lid on.</b> A flat printed lid with one small hole; a photoresistor holder on the left wall.</figcaption></figure>
+        <figure class="build-ph reveal"><img src="/photos/station-08.webp" width="768" height="654" loading="lazy" decoding="async" alt="Side view: the photoresistor holder at 90° to the beam facing the camera, its two leads coming out through the fin, the LED box on the right, and the Arduino UNO Q on a USB-C cable in front"><figcaption><b>The 90° holder.</b> The side sensor's leads come out through the fin; the UNO Q streams over USB-C.</figcaption></figure>
+        <figure class="build-ph reveal"><img src="/photos/station-17.webp" width="768" height="724" loading="lazy" decoding="async" alt="Top view with the lid off and the LEDs off: the clear plastic cup of water sitting inside the purple printed well, the LED box below it and the UNO Q at the left edge"><figcaption><b>LEDs off.</b> The clear plastic cup sits in the well; one whole tablet goes in per test.</figcaption></figure>
+        <figure class="build-ph reveal"><img src="/photos/station-10.webp" width="768" height="629" loading="lazy" decoding="async" alt="The whole station on a table: the purple chamber with its lid, the LED box with its three LEDs, the Arduino UNO Q, a breadboard covered in jumper wires, and a spare purple cup shim ring at the back"><figcaption><b>Everything.</b> Chamber, LED box, UNO Q, breadboard with the dividers, a spare cup shim ring at the back.</figcaption></figure>
+      </div>
+      <h3 class="h3 build-bp-title reveal">Blueprints</h3>
+      <p class="body build-bp-note reveal">Drawn before the build. The build uses three of the five LED holes (white, blue, red) and the plain lid; the green LED and the stirrer motor are not fitted. Open any one full size.</p>
+      <div class="build-bp">
+        <a class="build-bp-card reveal" href="/photos/blueprint-01_wiring_overview.webp" target="_blank" rel="noopener"><img src="/photos/blueprint-01_wiring_overview-640.webp" width="640" height="426" loading="lazy" decoding="async" alt="Wiring diagram: two photoresistors in 10 kΩ dividers from 3V3 to A0 and A1 on the Arduino UNO Q, LEDs on D5 to D8 through one shared 330 Ω resistor from 5 V"><span><b>01 · Wiring</b> UNO Q, dividers, LEDs</span></a>
+        <a class="build-bp-card reveal" href="/photos/blueprint-02_breadboard_layout.webp" target="_blank" rel="noopener"><img src="/photos/blueprint-02_breadboard_layout-640.webp" width="640" height="406" loading="lazy" decoding="async" alt="Breadboard layout: a half-size breadboard with two 10 kΩ resistors, one 330 Ω resistor, and the jumpers to 3V3, GND, A0, A1 and 5 V"><span><b>02 · Breadboard</b> where each resistor goes</span></a>
+        <a class="build-bp-card reveal" href="/photos/blueprint-03_chamber_cross_sections.webp" target="_blank" rel="noopener"><img src="/photos/blueprint-03_chamber_cross_sections-640.webp" width="640" height="259" loading="lazy" decoding="async" alt="Chamber cross-sections: a top view with the LED box, the clear cup, the in-line photoresistor across the cup and the second one at 90°; a side view showing the beam 28 mm above the well floor"><span><b>03 · Chamber</b> top and side sections</span></a>
       </div>
     </div>
   </section>
@@ -132,12 +157,12 @@
   <section class="section dark" id="parts" data-nav="station" style="padding-top:0">
     <div class="wrap">
       <div class="figs">
-        <div class="fig reveal"><p class="caption">Fig 0.1</p><div class="art" data-part="container"></div><h4>Chamber</h4><p>A small clear cup of water in a dark box, with the light path across one corner.</p><p class="spec">about 6.8 cm across the beam · light-tight lid · opening it marks tablet-in</p></div>
-        <div class="fig reveal"><p class="caption">Fig 0.2</p><div class="art" data-part="led"></div><h4>Blue, white and red LEDs</h4><p>5 mm, lit in turn once a second. Red is the colour reference: it separates cloudiness from colour.</p><p class="spec">D5–D8 · active-low through one 330 Ω resistor to 5 V · LOW means on</p></div>
-        <div class="fig reveal"><p class="caption">Fig 0.3</p><div class="art" data-part="ldr"></div><h4>Two light sensors</h4><p>One in line with the beam, one at 90° to it. The same cup, watched from two angles.</p><p class="spec">CdS photoresistor · 10 kΩ divider from 3V3 · A0 across the cup · A1 at 90°</p></div>
-        <div class="fig reveal"><p class="caption">Fig 0.4 · Next</p><div class="art" data-part="thermistor"></div><h4>Next: a thermistor</h4><p>Not on the station yet. Today the water temperature is typed in for each run.</p><p class="spec">what’s next · temperature on every reading instead of once per run</p></div>
-        <div class="fig reveal"><p class="caption">Fig 0.5 · Next</p><div class="art" data-part="stepper"></div><h4>Next: a stirrer</h4><p>Not on the station yet. Today the cup is stirred by hand with a wooden stick.</p><p class="spec">what’s next · the same stir every run, without the hand</p></div>
-        <div class="fig reveal"><p class="caption">Fig 0.6</p><div class="art" data-part="esp32"></div><h4>Arduino UNO Q</h4><p>Reads the sensors and streams one CSV line a second. The firmware decides nothing.</p><p class="spec">3.3 V · 12-bit ADC · dark reading before every sweep · 115200 baud</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.1</p><div class="art" data-part="container"></div><h4>Chamber</h4><p>A 3D-printed cylinder with the clear cup of water in its well. The beam crosses the cup from the LED box to the far wall; the side sensor sits at 90°.</p><p class="spec">Ø 70 mm × 78 mm · well Ø 64 mm · beam 28 mm above the floor · flat lid, one small hole</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.2</p><div class="art" data-part="led"></div><h4>The LED box</h4><p>White, blue and red 5 mm LEDs push into holes in the box's outer wall and shine through a diffuser plate that slides into a slot on top. Lit in turn once a second; red is the colour reference.</p><p class="spec">D5–D8 · active-low through one 330 Ω resistor to 5 V · LOW means on</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.3</p><div class="art" data-part="ldr"></div><h4>Two photoresistor holders</h4><p>Each photoresistor pushes into a pocket from inside the well; its leads leave through the holder. One holder faces the LED box, one sits at 90° to the beam.</p><p class="spec">CdS photoresistor · 10 kΩ divider from 3V3 · A0 across the cup · A1 at 90°</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.4 · Next</p><div class="art" data-part="thermistor"></div><h4>Next: a thermistor</h4><p>Not on the station yet. The lid's small hole is there for it: a bead on two leads, dipped in the water. Today the water temperature is typed in for each run.</p><p class="spec">what’s next · temperature on every reading instead of once per run</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.5 · Next</p><div class="art" data-part="stepper"></div><h4>Next: a stirrer</h4><p>Not on the station yet. The CAD has a lid with a motor tower, a rod and a four-blade paddle that turns below the beam. Today the cup is stirred by hand with a wooden stick.</p><p class="spec">what’s next · the same stir every run, without the hand</p></div>
+        <div class="fig reveal"><p class="caption">Fig 0.6</p><div class="art" data-part="esp32"></div><h4>Arduino UNO Q and breadboard</h4><p>The board reads both photoresistors through 10 kΩ dividers on the breadboard and streams one CSV line a second. The firmware decides nothing.</p><p class="spec">3.3 V · 12-bit ADC · dark reading before every sweep · 115200 baud</p></div>
         <div class="fig reveal fig-row"><div class="art" data-part="pi"></div><div><p class="caption">Fig 0.7</p><h4>Pill Gate, the station app</h4><p>The station face, on the laptop the UNO Q plugs into. It builds the curves, spots the moment the tablet went in from the lid opening, matches the run against a reference profile and gives one of three answers.</p><p class="spec">Python · FastAPI · SQLite · 14 tests · says REPLAY (not live) when it replays a CSV</p></div></div>
         <div class="fig reveal fig-wide"><p class="caption">Fig 0.8 · Data path</p><div class="art" data-part="pipeline"></div><h4>Sensor → curve → verdict → decision</h4><p>The UNO Q measures. The software owns the maths, the rules and the payment policy. Claude writes the plain-English "why" and the log line; it never sets a verdict or moves money.</p><p class="spec">CSV line/s · absorbance = log(blank/now) · reference match · 7 rules · policy.md · escrow simulated until a CDP key</p></div>
       </div>
@@ -532,7 +557,7 @@
         <div class="reveal"><h4>"How do we know the demo isn't rigged?"</h4><p>Run ids and timestamps on every curve, the raw trace saved for every run, and an ugly box you can open. Bring your own tablet.</p></div>
         <div class="reveal"><h4>"Who lets software hold money?"</h4><p>Nobody. The policy proposes; a pharmacist taps. The model can only downgrade a decision to "escalate", never release.</p></div>
         <div class="reveal"><h4>"Why not just scan the barcode?"</h4><p>Because lot numbers get copied. The FDA's December 2025 Ozempic case carried a real lot number. Only the tablet itself cannot lie about dissolving.</p></div>
-        <div class="reveal"><h4>"What does it cost, really?"</h4><p>Hobby parts: an Arduino UNO Q, two photoresistors, three LEDs, a cup and a dark box. One tablet per test and 60 s for a quick run. A new lab dissolution tester typically costs $20,000–$100,000, and a lab result typically takes 7–10 business days.</p></div>
+        <div class="reveal"><h4>"What does it cost, really?"</h4><p>Hobby parts: an Arduino UNO Q, two photoresistors, three LEDs, a clear cup and a 3D-printed chamber. One tablet per test and 60 s for a quick run. A new lab dissolution tester typically costs $20,000–$100,000, and a lab result typically takes 7–10 business days.</p></div>
       </div>
     </div>
   </section>
@@ -565,7 +590,7 @@
             <li><b>01</b><span>An Arduino UNO Q: 3.3 V, 12-bit ADC, one CSV line a second</span></li>
             <li><b>02</b><span>Two CdS photoresistors in 10 kΩ dividers: one in line with the beam, one at 90°</span></li>
             <li><b>03</b><span>Blue, white and red 5 mm LEDs, lit in turn</span></li>
-            <li><b>04</b><span>A small clear cup and a dark box with a lid</span></li>
+            <li><b>04</b><span>A clear plastic cup in a purple 3D-printed chamber with a flat lid (one small hole), an LED box and two photoresistor holders</span></li>
             <li><b>05</b><span>A wooden stick to stir, and a laptop running Pill Gate</span></li>
           </ul>
           <p class="src" style="margin-top:12px">Hobby parts, no lab equipment. Next: a stirrer and a thermistor, so stirring and temperature stop depending on the hand.</p>

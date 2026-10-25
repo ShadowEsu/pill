@@ -89,6 +89,7 @@ function makeStage() {
       <text x="352" y="101" class="st-t">wooden stir stick, by hand</text>
       <path d="M186 150 h268" stroke="rgba(233,238,242,.5)" stroke-width="3" stroke-linecap="round"/>
       <path d="M200 150 L214 480 L426 480 L440 150" ${L}/>
+      <path d="M184 140 H196 V480 H444 V140 H456 V492 H184 Z" fill="rgba(110,98,210,.28)" stroke="rgba(233,238,242,.5)" stroke-width="1.2" stroke-linejoin="round"/>
       <path d="${WATER}" fill="rgba(79,179,255,.09)"/>
       <path d="${WATER}" fill="#E9EEF2" data-k="tint" opacity="0"/>
       <g clip-path="url(#${u}-water)"><circle cx="320" cy="400" r="40" fill="url(#${u}-glow)" data-k="bloom" opacity="0"/></g>
@@ -101,15 +102,19 @@ function makeStage() {
       <g data-k="tabcloud" fill="#F4F6F8">${[0, 1, 2, 3, 4, 5].map((k) => `<circle cx="${370 + k * 6}" cy="${462 - (k % 3) * 5}" r="${1.5 + (k % 2)}"/>`).join('')}</g>
       <!-- light path -->
       <circle cx="165" cy="400" r="34" fill="url(#${u}-led)" data-k="ledglow" opacity="0"/>
-      <line x1="180" y1="400" x2="${xl(400).toFixed(1)}" y2="400" stroke="#4FB3FF" stroke-width="4" stroke-linecap="round" data-k="beamA" opacity="0"/>
+      <line x1="184" y1="400" x2="${xl(400).toFixed(1)}" y2="400" stroke="#4FB3FF" stroke-width="4" stroke-linecap="round" data-k="beamA" opacity="0"/>
       <line x1="${xl(400).toFixed(1)}" y1="400" x2="${xr(400).toFixed(1)}" y2="400" stroke="url(#${u}-beam)" stroke-width="4" data-k="beamB" opacity="0"/>
-      <line x1="${xr(400).toFixed(1)}" y1="400" x2="452" y2="400" stroke="#4FB3FF" stroke-width="4" stroke-linecap="round" data-k="beamC" opacity="0"/>
-      <line x1="182" y1="400" x2="452" y2="400" stroke="#E6F4FF" stroke-width="2" stroke-dasharray="2 16" stroke-linecap="round" data-k="photons" opacity="0"/>
-      <rect x="150" y="388" width="30" height="24" rx="4" ${L}/><text x="146" y="380" class="st-t">LEDs · B W R</text>
-      <rect x="452" y="386" width="6" height="28" fill="rgba(79,179,255,.55)"/><rect x="460" y="388" width="30" height="24" rx="4" ${L}/><text x="452" y="430" class="st-t">inline · A0</text>
-      <circle cx="320" cy="500" r="40" fill="url(#${u}-glow)" data-k="halo" opacity="0"/>
-      <rect x="302" y="486" width="36" height="6" fill="rgba(233,238,242,.35)" data-k="gfilter"/>
-      <rect x="305" y="494" width="30" height="24" rx="4" ${L}/><text x="346" y="512" class="st-t">side · 90° · A1</text>
+      <line x1="${xr(400).toFixed(1)}" y1="400" x2="446" y2="400" stroke="#4FB3FF" stroke-width="4" stroke-linecap="round" data-k="beamC" opacity="0"/>
+      <line x1="186" y1="400" x2="446" y2="400" stroke="#E6F4FF" stroke-width="2" stroke-dasharray="2 16" stroke-linecap="round" data-k="photons" opacity="0"/>
+      <rect x="140" y="376" width="44" height="48" rx="4" fill="rgba(110,98,210,.28)" stroke="rgba(233,238,242,.5)" stroke-width="1.2"/>
+      <circle cx="151" cy="400" r="4" fill="#F2F1EC"/><circle cx="162" cy="400" r="4" fill="#4FB3FF"/><circle cx="173" cy="400" r="4" fill="#C8574B"/>
+      <text x="140" y="366" class="st-t">LED box · W B R</text>
+      <path d="M456 420 V392 a7 7 0 0 1 14 0 V420 Z" fill="rgba(110,98,210,.28)" stroke="rgba(233,238,242,.5)" stroke-width="1.2"/>
+      <rect x="446" y="394" width="9" height="12" rx="2" fill="rgba(79,179,255,.55)"/><text x="452" y="440" class="st-t">in line · A0</text>
+      <circle cx="320" cy="400" r="40" fill="url(#${u}-glow)" data-k="halo" opacity="0"/>
+      <circle cx="320" cy="400" r="14" fill="none" stroke="rgba(233,238,242,.55)" stroke-width="1.2" stroke-dasharray="3 3"/>
+      <circle cx="320" cy="400" r="5" fill="rgba(233,238,242,.35)" data-k="gfilter"/>
+      <text x="320" y="516" class="st-t" text-anchor="middle">side · 90° · A1 · on the back wall</text>
       <!-- readout panel (scenes 3 and 4) -->
       <g data-k="readA" opacity="0">
         <rect x="474" y="150" width="154" height="176" rx="14" class="st-panel"/>

@@ -29,13 +29,24 @@
   stroke-width: 1;
   stroke-dasharray: 3 4;
 }
-/* the only colour: the blue LED, its beam, and the PASS dot */
+/* colour lives only in fills: the purple print, the clear cup, the tablet, the three LEDs, the resistors;
+   the blue beam and the PASS dot are the only coloured strokes */
 .station .b,
 .station .bf { stroke: var(--blue, #2F6BFF); stroke-width: 1.25; }
 .station .bf { fill: var(--dark, #0B0C0E); }
 .station .bb { stroke: var(--blue, #2F6BFF); stroke-width: 1.25; stroke-dasharray: 4 3; }
 .station .ok { fill: var(--pass, #1B8A5A); stroke: none; }
-/* fx layer: pulsing beam, travelling light, 90° scatter, ESP32 → Pi data stream */
+.station .vf, .station .cf, .station .tf, .station .df, .station .rf { stroke: rgba(255, 255, 255, 0.55); stroke-width: 1.25; }
+.station .vf { fill: #2E2A55; }
+.station .cf { fill: rgba(190, 225, 255, 0.05); }
+.station .tf { fill: #E9EEF2; stroke-width: 1; }
+.station .df { fill: rgba(255, 255, 255, 0.16); stroke-width: 1; }
+.station .rf { fill: #C9B48A; stroke-width: 1; }
+.station .lw, .station .lb, .station .lr { stroke: rgba(255, 255, 255, 0.7); stroke-width: 1.25; }
+.station .lw { fill: #F2F1EC; }
+.station .lb { fill: var(--blue, #2F6BFF); }
+.station .lr { fill: #C8574B; }
+/* fx layer: pulsing beam, travelling light, 90° scatter, UNO Q → laptop data stream */
 .station .st-scatter {
   stroke: var(--blue, #2F6BFF);
   stroke-width: 1;

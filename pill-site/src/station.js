@@ -1,4 +1,7 @@
-// Pill station — isometric line-art blueprint with an exploded, turning assembly.
+// Pill station — isometric line-art blueprint of the real build, with an exploded, turning assembly.
+// Geometry follows pillgate/cad/peel_chamber.scad: a 3D-printed cylinder chamber with a flat lid (one small hole),
+// an LED box on one side (white, blue, red), photoresistor holders in line and at 90°, a clear cup on a shim ring,
+// then the Arduino UNO Q, the breadboard with the dividers and the laptop running Pill Gate.
 // mountStation(el) renders the scene and returns { setProgress(p), destroy() }.
 // autoDemo(handle) runs the idle loop (assemble → hold → explode → hold → assemble) while on screen.
 // attachScroll(handle, { stage }) drives progress from scroll and falls back to the idle loop when scrolling stops.
@@ -66,11 +69,7 @@ const add3 = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
 const mul3 = (a, k) => [a[0] * k, a[1] * k, a[2] * k];
 const X = [1, 0, 0], Y = [0, 1, 0], Z = [0, 0, 1];
 
-// Rigid tilts about an axis parallel to X (through h, in the y–z plane) or Y (x–z plane).
-function tiltX(theta, h) {
-  const c = Math.cos(theta), s = Math.sin(theta);
-  return ([x, y, z]) => { const dy = y - h[1], dz = z - h[2]; return [x, h[1] + dy * c - dz * s, h[2] + dy * s + dz * c]; };
-}
+// Rigid tilt about an axis parallel to Y (x–z plane) through h.
 function tiltY(phi, h) {
   const c = Math.cos(phi), s = Math.sin(phi);
   return ([x, y, z]) => { const dx = x - h[0], dz = z - h[2]; return [h[0] + dx * c - dz * s, y, h[2] + dx * s + dz * c]; };
@@ -146,124 +145,121 @@ function kit(cam, off = [0, 0, 0], pre = null) {
   return k;
 }
 
-/* ───────────────────────── scene parts (world units ≈ cm) ───────────────────────── */
-// Container centred at the origin on the box floor. +x / +y face the viewer.
 
-const CONT = { r0: 4.9, r1: 5.7, z0: 0.3, z1: 11.3, water: 7.0, fill: 7.6 };
-const contR = (z) => CONT.r0 + ((CONT.r1 - CONT.r0) * (z - CONT.z0)) / (CONT.z1 - CONT.z0);
-const OPT_Z = 4.6;
-const OPT_R = contR(OPT_Z);
-const LED_AT = [OPT_R * Math.cos(10 * RAD), OPT_R * Math.sin(10 * RAD), OPT_Z]; // +10°, shines toward -y
-const LDR_AT = [OPT_R * Math.cos(-10 * RAD), OPT_R * Math.sin(-10 * RAD), OPT_Z]; // -10°, faces +y
-const LDR90_AT = [OPT_R + 0.45, 0, OPT_Z]; // at 90° to the beam, facing -x
-const SENSOR_SCALE = 1.9; // sensors drawn larger than life so they read at this scale
-const STEP = { cx: 3.0, cy: 2.2, shaft: [2.2, 2.2] };
-const PI_BASE = { x: 8, y0: -21, y1: -40.4, zb: 1.4, lean: 13 * RAD };
+/* ───────────────────────── scene parts (world units = cm) ───────────────────────── */
+// The real build, from pillgate/cad/peel_chamber.scad (mm → cm). The chamber is centred at the origin on the
+// table. +x / +y face the viewer. The beam runs along y: the LED box sits on +y, the in-line photoresistor
+// straight across on −y, the 90° photoresistor on +x.
 
-function partBox(k) {
-  const cs = corners(-11, -11, 0, 11, 11, 19);
-  const items = k.wire(cs);
-  const t = 0.45; // cardboard thickness: inner rim
-  items.push(k.poly([[-11 + t, -11 + t, 19], [11 - t, -11 + t, 19], [11 - t, 11 - t, 19], [-11 + t, 11 - t, 19]], true));
-  // cable port on the +y wall and a crease line on the +x wall
-  items.push(k.poly([[2.5, 11, 1.2], [5.5, 11, 1.2], [5.5, 11, 3.0], [2.5, 11, 3.0]], true));
-  items.push(k.line([11, -11, 16.5], [11, 11, 16.5], 'g'));
-  return items;
+const CH = { Ro: 3.5, Rw: 3.2, H: 7.8, floor: 0.4, az: 3.2 }; // body Ø70 × 78 mm, well Ø64, beam 28 mm above the well floor
+const POD = { w: 1.5, y0: Math.sqrt(3.5 * 3.5 - 1.5 * 1.5), y1: 6.1, z1: 4.7 }; // 30 × 30 mm LED box, 26 mm out of the wall
+const BOSS = { r: 0.7, out: CH.Ro + 0.6 }; // Ø14 mm photoresistor holders, 6 mm out of the wall
+const LID = { r: 3.79, z0: 7.0, z1: 8.1, plugR: 3.14, hole: [0, -2.0], holeR: 0.18 }; // flat lid, skirt + plug, one Ø3.6 mm hole
+const CUP = { r0: 2.7, r1: 3.1, z0: 0.4, z1: 6.6, water: 4.6 }; // clear cup, water well over the beam
+const SHIM = { ro: 3.16, ri: 2.9, z0: 0.4, z1: 1.6 }; // cup shim ring (the Ø58 mm one)
+const DIFF = { w: 1.3, y0: 3.53, y1: 3.67, z0: 2.1, z1: 4.8 }; // diffuser plate in its slot
+const LEDS = [['lw', -0.8], ['lb', 0], ['lr', 0.8]]; // white · blue · red, 8 mm apart on the box's outer wall
+const LED_AT = [0, POD.y1, CH.az];
+const LDR_AT = [0, -CH.Rw, CH.az]; // in line: straight across the cup from the LED box
+const LDR90_AT = [CH.Rw, 0, CH.az]; // side: 90° to the beam
+const SENSOR_SCALE = 1.9; // photoresistors drawn larger than life so they read at this scale
+const UNO = { x0: -14.6, x1: -7.74, y0: -2.6, y1: 2.73, z0: 0, z1: 0.16 }; // Arduino UNO Q, 68.6 × 53.3 mm
+const BB = { x0: -15, x1: -6.75, y0: 3.4, y1: 8.9, z0: 0, z1: 0.85 }; // half-size breadboard with the dividers
+const LAP = { x: 6.5, y0: -8, y1: -19, zb: 0.5, lean: 14 * RAD, depth: 7.5, h: 8 }; // laptop, drawn smaller than life
+
+// photoresistor holder: a fin with a rounded top, hulled down to the table (as printed); normal at angle phi
+function holderFace(phi, s) {
+  const n = [Math.cos(phi), Math.sin(phi)], a = [-Math.sin(phi), Math.cos(phi)];
+  const P = (aa, z) => [n[0] * s + a[0] * aa, n[1] * s + a[1] * aa, z];
+  const out = [P(-BOSS.r, 0)];
+  for (let i = 0; i <= 12; i++) {
+    const t = Math.PI - (Math.PI * i) / 12;
+    out.push(P(BOSS.r * Math.cos(t), CH.az + BOSS.r * Math.sin(t)));
+  }
+  out.push(P(BOSS.r, 0));
+  return { pts: out, P, a: [a[0], a[1], 0] };
 }
-
-function partBoxLid(k, st) {
-  // shallow cardboard lid: lifted and tipped at rest; first swings further open, then settles shut as the box recedes
-  const tilt = (-8 * (1 - st.boxlid) - 14 * st.boxUp) * RAD;
-  const M = ([x, y, z]) => {
-    const dx = x + 11.4;
-    return [-11.4 + dx * Math.cos(tilt) - z * Math.sin(tilt), y, 23 + dx * -Math.sin(tilt) + z * Math.cos(tilt)];
-  };
-  const cs = corners(-11.4, -11.4, 0, 11.4, 11.4, 1.8, M);
-  const items = k.solid(cs, 'p');
-  items.push(k.poly([[-11.4, -11.4, 0.7], [11.4, -11.4, 0.7], [11.4, 11.4, 0.7]].map(M), false, 'g'));
-  return items;
-}
-
-function partContainer(k) {
-  const { r0, r1, z0, z1 } = CONT;
-  const a = k.cam.a;
-  const bottom = circ([0, 0, z0], r0, X, Y, 48);
-  const top = circ([0, 0, z1], r1, X, Y, 48);
-  const items = [
-    k.hull(bottom.concat(top), 'p'),
-    k.poly(top, true),
-    k.ring([0, 0, z1 - 0.35], 6.05, X, Y),
-    k.ring([0, 0, z1], 6.05, X, Y),
-    k.arc([0, 0, z0], r0, Math.PI - a, TAU - a, 'g', X, Y, 32),
-    // stacking ridge near the base
-    k.arc([0, 0, z0 + 0.9], contR(z0 + 0.9), -a, Math.PI - a, 'p', X, Y, 32),
+function holder(k, phi) {
+  const sIn = Math.sqrt(CH.Ro * CH.Ro - BOSS.r * BOSS.r) - 0.05;
+  const outer = holderFace(phi, BOSS.out), inner = holderFace(phi, sIn);
+  return [
+    k.hull(outer.pts.concat(inner.pts), 'vf'),
+    k.poly(outer.pts, true),
+    // the two leg holes the photoresistor's leads come out of
+    k.ring(outer.P(-0.18, CH.az), 0.08, outer.a, Z, 'p', 8),
+    k.ring(outer.P(0.18, CH.az), 0.08, outer.a, Z, 'p', 8),
   ];
-  // water surface
-  const wr = contR(CONT.water);
-  items.push(k.ring([0, 0, CONT.water], wr, X, Y, 'w', 48));
-  items.push(k.arc([0, 0, CONT.water], wr * 0.62, 0.3, 1.9, 'g'));
-  items.push(k.arc([0, 0, CONT.water], wr * 0.36, 3.6, 5.2, 'g'));
-  // printed fill line on the front with end ticks
-  const fr = contR(CONT.fill);
-  const fc = Math.PI / 2 - a + 0.75;
-  items.push(k.arc([0, 0, CONT.fill], fr, fc - 0.45, fc + 0.45, 'p', X, Y, 16));
-  const tick = (t) => [[fr * Math.cos(t), fr * Math.sin(t), CONT.fill - 0.35], [fr * Math.cos(t), fr * Math.sin(t), CONT.fill + 0.35]];
-  items.push(k.multi([tick(fc - 0.45), tick(fc + 0.45)]));
+}
+
+function partBody(k) {
+  // far holder first (in line, −y), then the cylinder, then the near holder (90°, +x) and the LED box (+y)
+  const items = [...holder(k, -90 * RAD)];
+  items.push(...k.cyl([0, 0, 0], [0, 0, CH.H], CH.Ro, CH.Ro, X, Y, 'vf', 56));
+  items.push(k.ring([0, 0, CH.H], CH.Rw, X, Y, 'p', 56)); // the well
+  items.push(...holder(k, 0));
+  items.push(...k.solid(corners(-POD.w, POD.y0, 0, POD.w, POD.y1, POD.z1), 'vf'));
+  // five Ø5.2 mm holes on the box's outer wall: three LEDs in a row, two spare above and below the blue
+  for (const [dx, dz] of [[0, 0.8], [0, -0.8], [-0.8, 0], [0, 0], [0.8, 0]]) items.push(k.ring([dx, POD.y1, CH.az + dz], 0.26, X, Z, 'p', 14));
+  // diffuser slot on top of the box
+  items.push(k.poly([[-DIFF.w, DIFF.y0, POD.z1], [DIFF.w, DIFF.y0, POD.z1], [DIFF.w, DIFF.y1, POD.z1], [-DIFF.w, DIFF.y1, POD.z1]], true));
   return items;
+}
+
+function partDiffuser(k, st) {
+  // only the part of the plate that has left the slot is drawn; the rest is inside the LED box
+  const z0 = Math.max(DIFF.z0, POD.z1 - 6 * st.diffuser);
+  if (z0 >= DIFF.z1 - 0.01) return [];
+  return k.solid(corners(-DIFF.w, DIFF.y0, z0, DIFF.w, DIFF.y1, DIFF.z1), 'df');
 }
 
 function partLid(k) {
-  const items = k.cyl([0, 0, 11.3], [0, 0, 11.8], 6.2, 6.2, X, Y);
-  items.push(k.ring([0, 0, 11.8], 5.3, X, Y));
-  // rectangular phone window
-  items.push(k.poly([[-4.2, -4.0, 11.8], [-1.6, -4.0, 11.8], [-1.6, -1.2, 11.8], [-4.2, -1.2, 11.8]], true));
-  items.push(k.poly([[-3.95, -3.75, 11.8], [-1.85, -3.75, 11.8], [-1.85, -1.45, 11.8], [-3.95, -1.45, 11.8]], true, 'g'));
-  // shaft hole for the paddle
-  items.push(k.ring([STEP.shaft[0], STEP.shaft[1], 11.8], 0.35, X, Y, 'p', 16));
+  const items = k.cyl([0, 0, LID.z0], [0, 0, LID.z1], LID.r, LID.r, X, Y, 'vf', 56);
+  items.push(k.ring([0, 0, LID.z0], LID.plugR, X, Y, 'g', 48)); // the plug under the plate (hidden)
+  items.push(k.ring([LID.hole[0], LID.hole[1], LID.z1], LID.holeR, X, Y, 'p', 14)); // the one small hole
   return items;
 }
 
-function partPhone(k) {
-  const items = k.solid(corners(-5.9, -4.1, 11.85, 1.1, 10.6, 12.6));
-  items.push(k.poly([[-5.45, -3.5, 12.6], [0.65, -3.5, 12.6], [0.65, 10.0, 12.6], [-5.45, 10.0, 12.6]], true));
-  items.push(k.line([-3.4, -3.8, 12.6], [-1.4, -3.8, 12.6]));
-  // camera lens on the underside, over the lid window (hidden → dashed)
-  items.push(k.ring([-2.9, -2.6, 11.85], 0.6, X, Y, 'g', 20));
-  items.push(k.line([-2.9, -2.6, 11.85], [-2.9, -2.6, 4.2], 'g'));
+function partCup(k) {
+  const { r0, r1, z0, z1, water } = CUP;
+  const a = k.cam.a;
+  const rAt = (z) => r0 + ((r1 - r0) * (z - z0)) / (z1 - z0);
+  const items = [
+    k.hull(circ([0, 0, z0], r0, X, Y, 48).concat(circ([0, 0, z1], r1, X, Y, 48)), 'cf'),
+    k.ring([0, 0, z1], r1, X, Y, 'p', 48),
+    k.ring([0, 0, z1 - 0.25], r1 - 0.04, X, Y, 'p', 48), // rolled rim
+    k.arc([0, 0, z0], r0, Math.PI - a, TAU - a, 'g', X, Y, 32),
+    k.ring([0, 0, water], rAt(water), X, Y, 'w', 48),
+    k.arc([0, 0, water], rAt(water) * 0.6, 0.3, 1.9, 'g'),
+  ];
+  // one whole tablet on the cup floor
+  items.push(...k.cyl([0.6, 0.4, z0 + 0.05], [0.6, 0.4, z0 + 0.3], 0.5, 0.5, X, Y, 'tf', 20));
   return items;
 }
 
-function partStepper(k, st) {
-  const [sx, sy] = STEP.shaft;
-  const items = [k.line([sx, sy, 11.8], [sx, sy, 2.6])];
-  // fan-blade paddle: three pitched blades, turned by st.paddle (radians, driven by the ambient loop)
-  const blades = [];
-  for (let i = 0; i < 3; i++) {
-    const t = (i * TAU) / 3 + 0.4 + st.paddle;
-    const P = (r, dt, dz) => [sx + r * Math.cos(t + dt), sy + r * Math.sin(t + dt), 3.0 + dz];
-    blades.push([P(0.35, -0.35, 0.35), P(2.1, -0.3, 0.5), P(2.2, 0.28, -0.4), P(0.35, 0.35, -0.35), P(0.35, -0.35, 0.35)]);
-  }
-  items.push(k.multi(blades));
-  items.push(...k.cyl([sx, sy, 2.6], [sx, sy, 3.4], 0.38, 0.38, X, Y, 'pf', 16));
-  // mounting ears, can, wire cap
-  const { cx, cy } = STEP;
-  items.push(...k.solid(corners(cx - 1.8, cy - 0.55, 11.8, cx + 1.8, cy + 0.55, 11.95)));
-  items.push(k.ring([cx - 1.45, cy, 11.95], 0.18, X, Y, 'p', 12));
-  items.push(k.ring([cx + 1.45, cy, 11.95], 0.18, X, Y, 'p', 12));
-  items.push(...k.cyl([cx, cy, 11.95], [cx, cy, 13.85], 1.4, 1.4, X, Y));
-  items.push(...k.solid(corners(cx + 1.15, cy - 0.65, 12.05, cx + 1.85, cy + 0.65, 13.5)));
-  items.push(k.poly([[cx + 1.85, cy, 12.9], [cx + 2.6, cy - 1.3, 12.7], [cx + 2.2, cy - 2.6, 12.3], [cx + 1.4, cy - 3.3, 12.0]]));
-  // ULN2003 driver board with DIP chip, four LEDs and header pins
-  const bx0 = 1.8, by0 = -4.1, bx1 = 5.0, by1 = -1.1;
-  items.push(...k.solid(corners(bx0, by0, 11.8, bx1, by1, 11.95)));
-  items.push(...k.solid(corners(2.5, -3.45, 11.95, 4.3, -2.8, 12.25)));
-  const leds = [];
-  for (let i = 0; i < 4; i++) leds.push(circ([2.3 + i * 0.55, -1.55, 11.95], 0.1, X, Y, 8, 0, TAU).concat([[2.3 + i * 0.55 + 0.1, -1.55, 11.95]]));
-  items.push(k.multi(leds));
-  const pins = [];
-  for (let i = 0; i < 7; i++) pins.push([[4.7, -3.8 + i * 0.4, 11.95], [4.7, -3.8 + i * 0.4, 12.45]]);
-  for (let i = 0; i < 4; i++) pins.push([[2.2 + i * 0.4, -3.85, 11.95], [2.2 + i * 0.4, -3.85, 12.45]]);
-  items.push(k.multi(pins));
+function partShim(k) {
+  const items = k.cyl([0, 0, SHIM.z0], [0, 0, SHIM.z1], SHIM.ro, SHIM.ro, X, Y, 'vf', 48);
+  items.push(k.ring([0, 0, SHIM.z1], SHIM.ri, X, Y, 'pf', 48)); // the hole the cup's base sits in
+  return items;
+}
+
+function partLed(k, st) {
+  // each LED goes in from outside: flange on the box's outer wall, dome pointing into the box, legs out the back
+  const S = 1 + 0.8 * st.spin;
+  const items = [];
+  LEDS.forEach(([c, dx], i) => {
+    const base = [dx + (i - 1) * 1.2 * st.led, POD.y1, CH.az];
+    const at = (s) => add3(base, [0, -s * S, 0]);
+    items.push(k.multi([
+      [add3(base, [-0.1 * S, 0, 0]), add3(base, [-0.1 * S, 1.7 * S, 0]), add3(base, [-0.1 * S, 1.9 * S, -0.2 * S])],
+      [add3(base, [0.1 * S, 0, 0]), add3(base, [0.1 * S, 1.4 * S, 0])],
+    ]));
+    const dome = [];
+    for (const [s, r] of [[0.55, 0.25], [0.65, 0.235], [0.73, 0.19], [0.78, 0.11], [0.8, 0.02]]) dome.push(...circ(at(s), r * S, X, Z, 16));
+    items.push(k.hull(dome, c));
+    items.push(...k.cyl(at(0.55), at(0.1), 0.25 * S, 0.25 * S, X, Z, c, 20));
+    items.push(...k.cyl(at(0.1), at(0), 0.29 * S, 0.29 * S, X, Z, c, 20));
+    if (i === 1) st.fx.ledTip = k.pr(at(0.8)); // the beam leaves the blue LED's dome
+  });
   return items;
 }
 
@@ -274,34 +270,12 @@ function sensorFrame(anchor, phi, S) {
   const M = (sa, ss, sb) => add3(anchor, add3(mul3(a, sa * S), add3(mul3(n, ss * S), [0, 0, sb * S])));
   return { n, a, M };
 }
-// sensors grow as they drift out so their faces read in the exploded view
+// photoresistors grow as they drift out so their faces read in the exploded view
 const sensorScale = (st) => SENSOR_SCALE + 1.4 * st.spin;
 
-function partLed(k, st) {
-  // shines toward -y across the corner; turns to show its profile when exploded
-  const phi = (-90 + 90 * st.spin) * RAD;
-  const S = sensorScale(st);
-  const { M, n, a } = sensorFrame(LED_AT, phi, S);
-  const items = [
-    k.multi([[M(-0.1, -0.85, 0), M(-0.1, -2.3, 0)], [M(0.1, -0.85, 0), M(0.1, -1.9, 0), M(0.1, -2.05, -0.15)]]),
-  ];
-  items.push(...k.cyl(M(0, -0.88, 0), M(0, -0.78, 0), 0.29 * S, 0.29 * S, a, Z, 'bf', 24));
-  items.push(...k.cyl(M(0, -0.78, 0), M(0, -0.25, 0), 0.25 * S, 0.25 * S, a, Z, 'bf', 24));
-  // dome
-  const dome = [];
-  for (const [s, r] of [[-0.25, 0.25], [-0.15, 0.235], [-0.07, 0.19], [-0.02, 0.11], [0, 0.02]]) dome.push(...circ(M(0, s, 0), r * S, a, Z, 20));
-  items.push(k.hull(dome, 'bf'));
-  // the beam itself lives in the fx layer so it can pulse; record where it leaves the dome
-  st.fx.ledTip = k.pr(M(0, 0.02, 0));
-  return items;
-}
-
-function ldrBody(k, M, n, a, S) {
-  // LDR face points along +n; the filter chip (transparent, outline only) sits in front of it
-  const items = [];
-  items.push(k.multi([[M(-0.09, -0.32, 0), M(-0.09, -1.6, 0)], [M(0.09, -0.32, 0), M(0.09, -1.6, 0)]]));
-  const chip = [[-0.45, -0.45], [0.45, -0.45], [0.45, 0.45], [-0.45, 0.45]];
-  items.push(k.poly(chip.map(([x, z]) => M(x, 0.02, z)), true, 'g'));
+function ldrBody(k, M, a, S) {
+  // CdS photoresistor: face along +n, two leads out the back (through the holder)
+  const items = [k.multi([[M(-0.09, -0.32, 0), M(-0.09, -1.6, 0)], [M(0.09, -0.32, 0), M(0.09, -1.6, 0)]])];
   items.push(...k.cyl(M(0, -0.32, 0), M(0, -0.12, 0), 0.27 * S, 0.27 * S, a, Z, 'pf', 24));
   const zz = [];
   for (let i = 0; i <= 6; i++) {
@@ -310,170 +284,162 @@ function ldrBody(k, M, n, a, S) {
     zz.push(M(i % 2 ? w : -w, -0.12, zb));
   }
   items.push(k.poly(zz));
-  items.push(k.poly(chip.map(([x, z]) => M(x, 0.1, z)), true));
   return items;
 }
 
 function partLdr(k, st) {
-  const phi = (90 - 45 * st.spin) * RAD; // faces +y toward the LED → turns to the viewer
+  const phi = (90 - 45 * st.spin) * RAD; // faces +y, across the cup at the LED box → turns to the viewer
   const S = sensorScale(st);
-  const { M, n, a } = sensorFrame(LDR_AT, phi, S);
-  st.fx.ldrFace = k.pr(M(0, 0.1, 0));
-  return ldrBody(k, M, n, a, S);
+  const { M, a } = sensorFrame(LDR_AT, phi, S);
+  st.fx.ldrFace = k.pr(M(0, -0.12, 0));
+  return ldrBody(k, M, a, S);
 }
 
 function partLdr90(k, st) {
-  const phi = (180 - 135 * st.spin) * RAD; // faces -x into the beam → turns to the viewer
+  const phi = (180 - 135 * st.spin) * RAD; // faces −x, into the cup at 90° to the beam → turns to the viewer
   const S = sensorScale(st);
-  const { M, n, a } = sensorFrame(LDR90_AT, phi, S);
-  st.fx.ldr90Face = k.pr(M(0, 0.1, 0));
-  return ldrBody(k, M, n, a, S);
+  const { M, a } = sensorFrame(LDR90_AT, phi, S);
+  st.fx.ldr90Face = k.pr(M(0, -0.12, 0));
+  return ldrBody(k, M, a, S);
 }
 
-function partThermistor(k) {
-  const bead = [-2.0, -3.0, 2.8];
-  const items = [
-    k.poly([[-2.05, -3.0, 3.1], [-2.05, -3.0, 10.6], [-3.5, -5.2, 11.15], [-3.85, -5.75, 10.6], [-3.85, -5.75, 8.2]]),
-    k.line([-1.92, -3.0, 3.1], [-1.92, -3.0, 6.0]),
-  ];
-  items.push(...k.cyl([-2.0, -3.0, 4.2], [-2.0, -3.0, 5.6], 0.16, 0.16, X, Y, 'pf', 12));
-  const b = [];
-  for (const [dz, r] of [[-0.3, 0.12], [-0.15, 0.27], [0.05, 0.3], [0.25, 0.2], [0.35, 0.08]]) b.push(...circ(add3(bead, [0, 0, dz]), r, X, Y, 16));
-  items.push(k.hull(b));
-  items.push(...k.solid(corners(-4.05, -5.95, 7.4, -3.65, -5.55, 8.2)));
-  return items;
-}
-
-function partEsp(k, st) {
-  const x0 = -9.0, x1 = -3.9, y0 = 5.9, y1 = 8.2, z0 = 0.15, z1 = 0.32;
+function unoBoard(k, { x0, x1, y0, y1, z0, z1 }) {
   const items = k.solid(corners(x0, y0, z0, x1, y1, z1));
-  items.push(...k.solid(corners(-6.7, 6.35, z1, -4.3, 7.75, 0.62))); // module can
-  items.push(k.poly([[-4.25, 6.45, z1 + 0.01], [-4.0, 6.45, z1 + 0.01], [-4.0, 7.65, z1 + 0.01], [-4.25, 7.65, z1 + 0.01]], true)); // antenna
-  items.push(...k.solid(corners(x0 - 0.15, 6.7, z1, x0 + 0.6, 7.4, 0.62))); // USB-C
+  // USB-C on the short edge, the processor can, the LED matrix, the two header rows, mounting holes
+  items.push(...k.solid(corners(x0 - 0.12, y0 + 2.2, z1, x0 + 0.65, y0 + 3.1, z1 + 0.32)));
+  items.push(...k.solid(corners(x0 + 1.3, y0 + 1.0, z1, x0 + 2.9, y0 + 2.4, z1 + 0.22)));
+  const mx0 = x0 + 3.5, my0 = y0 + 1.0, dots = [];
+  for (let i = 0; i < 13; i++) for (let j = 0; j < 8; j++) {
+    const px = mx0 + i * 0.2, py = my0 + j * 0.2;
+    dots.push([[px, py, z1], [px + 0.05, py, z1]]);
+  }
+  items.push(k.multi(dots, 'w'));
+  items.push(k.poly([[mx0 - 0.15, my0 - 0.15, z1], [mx0 + 2.55, my0 - 0.15, z1], [mx0 + 2.55, my0 + 1.55, z1], [mx0 - 0.15, my0 + 1.55, z1]], true, 'g'));
   const pins = [];
-  for (let i = 0; i < 16; i++) pins.push([[x0 + 0.65 + i * 0.254, y0 + 0.15, z1], [x0 + 0.65 + i * 0.254, y0 + 0.15, z1 + 0.32]]);
-  for (let i = 0; i < 12; i++) pins.push([[x0 + 1.15 + i * 0.254, y1 - 0.15, z1], [x0 + 1.15 + i * 0.254, y1 - 0.15, z1 + 0.32]]);
+  for (let i = 0; i < 18; i++) pins.push([[x0 + 1.6 + i * 0.254, y0 + 0.15, z1], [x0 + 1.6 + i * 0.254, y0 + 0.15, z1 + 0.32]]);
+  for (let i = 0; i < 16; i++) pins.push([[x0 + 2.1 + i * 0.254, y1 - 0.15, z1], [x0 + 2.1 + i * 0.254, y1 - 0.15, z1 + 0.32]]);
   items.push(k.multi(pins));
-  items.push(k.ring([x0 + 0.95, y1 - 0.55, z1], 0.12, X, Y, 'p', 10)); // reset button
-  st.fx.esp = k.pr([-5.5, 7.05, 0.62]); // where the data stream leaves the module can
+  for (const [hx, hy] of [[x0 + 0.4, y0 + 0.4], [x1 - 0.4, y0 + 0.4], [x1 - 0.4, y1 - 0.4]]) items.push(k.ring([hx, hy, z1], 0.12, X, Y, 'p', 10));
   return items;
 }
 
-function partPi(k, st, lead = true) {
-  const { x, y0, y1, zb, lean } = PI_BASE;
-  const L = ([px, py, pz]) => {
-    const h = pz - zb;
-    return [px - h * Math.sin(lean), py, zb + h * Math.cos(lean)];
-  };
+function partUno(k, st) {
+  const items = unoBoard(k, UNO);
+  st.fx.esp = k.pr([UNO.x0 + 0.3, UNO.y0 + 2.65, UNO.z1 + 0.3]); // the data leaves by the USB-C port
+  return items;
+}
+
+function breadboard(k, { x0, x1, y0, y1, z0, z1 }) {
+  const items = k.solid(corners(x0, y0, z0, x1, y1, z1));
+  const ym = (y0 + y1) / 2;
+  // power rails, the centre channel, hole rows (dashed), and the three resistors: 10 kΩ, 10 kΩ, 330 Ω
+  items.push(k.multi([[[x0 + 0.3, y0 + 0.35, z1], [x1 - 0.3, y0 + 0.35, z1]], [[x0 + 0.3, y1 - 0.35, z1], [x1 - 0.3, y1 - 0.35, z1]]]));
+  items.push(k.poly([[x0 + 0.3, ym - 0.12, z1], [x1 - 0.3, ym - 0.12, z1], [x1 - 0.3, ym + 0.12, z1], [x0 + 0.3, ym + 0.12, z1]], true));
+  const rows = [];
+  for (const dy of [-1.6, -1.1, -0.6, 0.6, 1.1, 1.6]) rows.push([[x0 + 0.5, ym + dy, z1], [x1 - 0.5, ym + dy, z1]]);
+  items.push(k.multi(rows, 'g'));
+  for (const rx of [x0 + 2.0, x0 + 4.0, x0 + 6.2]) {
+    items.push(k.multi([[[rx - 0.55, ym - 0.6, z1], [rx - 0.55, ym - 0.6, z1 + 0.25]], [[rx + 0.55, ym - 0.6, z1], [rx + 0.55, ym - 0.6, z1 + 0.25]]]));
+    items.push(...k.cyl([rx - 0.35, ym - 0.6, z1 + 0.25], [rx + 0.35, ym - 0.6, z1 + 0.25], 0.11, 0.11, Y, Z, 'rf', 12));
+  }
+  return items;
+}
+
+function partBreadboard(k) { return breadboard(k, BB); }
+
+function partLaptop(k, st, lead = true) {
+  const { x, y0, y1, zb, lean, depth, h } = LAP;
+  const L = ([px, py, pz]) => { const d = pz - zb; return [px - d * Math.sin(lean), py, zb + d * Math.cos(lean)]; };
   const items = [];
-  // Pi 3 board on the back of the display; slides up and out when exploded
-  const lift = st.piBoard;
-  const B = (p) => add3(L(p), [-3.5 * lift, -2.5 * lift, 8.5 * lift]);
-  const bx = x - 2.4, by0 = -26.5, by1 = -35.0, bz0 = 3.6, bz1 = 9.2;
-  items.push(...k.solid(corners(bx - 0.16, by1, bz0, bx, by0, bz1, B)));
-  items.push(...k.solid(corners(bx - 0.5, by0 - 3.3, bz0 + 2.0, bx - 0.16, by0 - 1.9, bz0 + 3.4, B))); // SoC
-  items.push(...k.solid(corners(bx - 1.6, by1 - 0.4, bz0 + 0.4, bx - 0.16, by1 + 1.6, bz0 + 2.1, B))); // USB stack
-  items.push(...k.solid(corners(bx - 1.4, by1 - 0.4, bz0 + 2.6, bx - 0.16, by1 + 1.4, bz0 + 4.2, B))); // Ethernet
-  const gpio = [];
-  for (let i = 0; i < 20; i++) gpio.push([B([bx - 0.16, by0 - 0.6 - i * 0.254, bz1 - 0.35]), B([bx - 0.55, by0 - 0.6 - i * 0.254, bz1 - 0.35])]);
-  items.push(k.multi(gpio));
-  // kickstand legs
-  items.push(k.multi([[L([x - 2.0, y0 - 2.5, 9.5]), [x - 6.6, y0 - 2.5, 0]], [L([x - 2.0, y1 + 2.5, 9.5]), [x - 6.6, y1 + 2.5, 0]]]));
-  // display case + active area
-  items.push(...k.solid(corners(x - 2.0, y1, zb, x, y0, zb + 11.0, L)));
+  // deck: keyboard and trackpad in front of the hinge
+  items.push(...k.solid(corners(x, y1, 0, x + depth, y0, zb)));
+  items.push(k.poly([[x + 0.6, y0 - 0.8, zb], [x + 3.8, y0 - 0.8, zb], [x + 3.8, y1 + 0.8, zb], [x + 0.6, y1 + 0.8, zb]], true, 'g'));
+  const ym = (y0 + y1) / 2;
+  items.push(k.poly([[x + 4.5, ym + 2.0, zb], [x + 6.9, ym + 2.0, zb], [x + 6.9, ym - 2.0, zb], [x + 4.5, ym - 2.0, zb]], true));
+  // lid, leaning back from the hinge; the screen faces +x
+  items.push(...k.solid(corners(x - 0.4, y1, zb, x, y0, zb + h, L)));
   const face = (yy, zz) => L([x, yy, zz]);
-  items.push(k.poly([face(y0 - 1.95, zb + 1.45), face(y1 + 1.95, zb + 1.45), face(y1 + 1.95, zb + 10.05), face(y0 - 1.95, zb + 10.05)], true));
-  // screen UI: title bar, three readout rows, PASS box + dot, and the settling curve (draws in last)
-  const ui = [
-    [face(y0 - 2.8, zb + 9.1), face(y0 - 7.5, zb + 9.1)],
-    [face(y0 - 2.8, zb + 7.2), face(y0 - 8.6, zb + 7.2)],
-    [face(y0 - 2.8, zb + 6.1), face(y0 - 7.2, zb + 6.1)],
-    [face(y0 - 2.8, zb + 5.0), face(y0 - 8.0, zb + 5.0)],
-  ];
-  items.push(k.multi(ui));
-  items.push(k.poly([face(y0 - 2.8, zb + 2.4), face(y0 - 8.4, zb + 2.4), face(y0 - 8.4, zb + 3.7), face(y0 - 2.8, zb + 3.7)], true));
-  items.push(k.poly([face(y0 - 10.2, zb + 8.0), face(y0 - 10.2, zb + 2.4), face(y1 + 2.4, zb + 2.4)], false, 'g'));
+  items.push(k.poly([face(y0 - 0.5, zb + 0.6), face(y1 + 0.5, zb + 0.6), face(y1 + 0.5, zb + h - 0.5), face(y0 - 0.5, zb + h - 0.5)], true));
+  // Pill Gate on screen: title bar, readout rows, the answer box, and the run's curve (draws in last)
+  items.push(k.multi([
+    [face(y0 - 1.2, zb + h - 1.3), face(y0 - 4.6, zb + h - 1.3)],
+    [face(y0 - 1.2, zb + h - 2.6), face(y0 - 3.8, zb + h - 2.6)],
+    [face(y0 - 1.2, zb + h - 3.4), face(y0 - 3.4, zb + h - 3.4)],
+  ]));
+  items.push(k.poly([face(y0 - 1.2, zb + 1.3), face(y0 - 4.2, zb + 1.3), face(y0 - 4.2, zb + 2.4), face(y0 - 1.2, zb + 2.4)], true));
+  items.push(k.poly([face(y0 - 5.4, zb + h - 1.6), face(y0 - 5.4, zb + 1.3), face(y1 + 1.2, zb + 1.3)], false, 'g'));
   const curve = [];
   for (let i = 0; i <= 24; i++) {
     const t = i / 24;
-    curve.push(face(y0 - 10.5 - 6.3 * t, zb + 2.75 + 4.6 * Math.exp(-3.4 * t)));
+    curve.push(face(y0 - 5.6 - (y0 - y1 - 6.8) * t, zb + 1.5 + 4.3 * (1 - Math.exp(-3.4 * t))));
   }
   items.push({ ...k.poly(curve), draw: st.piCurve });
-  const ex = [0, -1, 0], ez = [-Math.sin(lean), 0, Math.cos(lean)];
-  items.push(k.ring(face(y1 + 3.4, zb + 8.9), 0.32, ex, ez, 'ok', 16));
-  st.fx.pi = k.pr(face(y0 - 5.2, zb + 8.2)); // the stream lands on the screen's title bar
-  // USB lead from the Pi toward the dark box port (guide)
-  if (lead) items.push(k.poly([[x - 4, y0 + 0.4, 0], [x - 4, -8, 0], [4.0, 11.0, 0], [4.0, 11.0, 1.2]], false, 'g'));
+  st.fx.pi = k.pr(face(y0 - 2.9, zb + h - 1.3)); // the stream lands on the screen's title bar
+  // USB-C lead from the UNO Q (guide)
+  if (lead) items.push(k.poly([[x + 0.4, y0 + 0.2, 0], [x + 0.4, -4.6, 0], [-5.0, -4.6, 0], [UNO.x0 - 0.8, UNO.y0 + 2.65, 0]], false, 'g'));
   return items;
 }
 
 function partGuides(k, st, off) {
-  // construction lines: vertical axis through the paddle, floor extensions, explode trails
-  const [sx, sy] = STEP.shaft;
+  // construction lines: the chamber's axis, the beam axis and the 90° axis, and the explode trails
   const items = [
-    k.line([sx, sy, -6], [sx, sy, 40], 'g'),
-    k.multi([[[11, -11, 0], [11, -20, 0]], [[11, 11, 0], [20, 11, 0]], [[-11, 11, 0], [-11, 20, 0]], [[11, 11, 0], [11, 18, 0]]], 'g'),
+    k.line([0, 0, -2], [0, 0, 24], 'g'),
+    k.line([0, -8, CH.az], [0, 11, CH.az], 'g'),
+    k.line([0, 0, CH.az], [9, 0, CH.az], 'g'),
   ];
   const trail = (anchor, o) => [anchor, add3(anchor, o)];
   items.push(k.multi([
     trail(LED_AT, off.led), trail(LDR_AT, off.ldr), trail(LDR90_AT, off.ldr90),
-    trail([-9, 7, 0.3], off.esp32), trail([-3.85, -5.75, 8], off.thermistor),
+    trail([UNO.x1, UNO.y1, 0.16], off.uno),
   ], 'g'));
   return items;
 }
 
 const PARTS = [
-  { id: 'box', draw: partBox },
-  // the Feather is tiny: it is lifted out of the box and magnified as it goes
-  { id: 'esp32', draw: partEsp, mag: { c: [-6.45, 7.05, 0.3], k: 0.8 } },
-  { id: 'thermistor', draw: partThermistor },
-  { id: 'container', draw: partContainer },
-  { id: 'ldr90', draw: partLdr90 },
+  { id: 'laptop', draw: partLaptop },
+  { id: 'uno', draw: partUno, mag: { c: [(UNO.x0 + UNO.x1) / 2, (UNO.y0 + UNO.y1) / 2, 0.1], k: 0.35 } },
+  { id: 'breadboard', draw: partBreadboard },
+  { id: 'shim', draw: partShim },
+  { id: 'cup', draw: partCup },
   { id: 'ldr', draw: partLdr },
+  { id: 'ldr90', draw: partLdr90 },
+  { id: 'body', draw: partBody },
+  { id: 'diffuser', draw: partDiffuser },
   { id: 'led', draw: partLed },
   { id: 'lid', draw: partLid },
-  { id: 'stepper', draw: partStepper },
-  { id: 'phone', draw: partPhone },
-  { id: 'boxlid', draw: partBoxLid },
-  { id: 'pi', draw: partPi },
 ];
 
-// Exploded offsets (world cm) at full progress for each part's progress value.
-// The phone and stepper ride on the lid first, so their offsets are composed in frameState().
+// Exploded offsets (world cm) at full progress for each part's progress value. The shim ring hops out of the
+// well onto the table on an arc, composed in frameState().
 const EXPLODE = {
-  box: [-11, 7, -6],
-  boxlid: [-11, 7, -11.4],
-  lid: [0, 0, 8],
-  container: [6, 4, -6],
-  led: [10, 4, -2],
-  ldr: [14, -4, -1],
-  ldr90: [18, 2, -3],
-  thermistor: [2, -10, -1],
-  esp32: [-11, 7, 17],
-  pi: [3, -3, 0],
+  lid: [0, 0, 12],
+  cup: [0, 0, 7.4],
+  diffuser: [0, 0, 6],
+  led: [0, 4, 2],
+  ldr: [0, -4.6, 0.6],
+  ldr90: [5, 0, 0.6],
+  uno: [-3.5, -1, 3.5],
+  laptop: [2, -2, 0],
 };
-const PHONE_SLIDE = [-12, 3, 12]; // off the tilted lid to the left, clear of the rising stepper
-const STEP_RISE = [0, 0, 20]; // up the shaft axis, out of the lid, so the paddle hangs clear
-const BOXLID_UP = [0, 0, 5]; // the cardboard lid swings higher before it settles
-const LID_HINGE = [0, -6.2, 11.3];
-const LID_TILT = 14 * RAD;
-const CONT_TILT = -7 * RAD;
+const SHIM_HOP = { to: [11.5, 1, 0], up: 9 };
+const CUP_TILT = -7 * RAD;
 
 const LABELS = [
-  { id: 'lid', no: '01', title: 'LIGHT-TIGHT LID', sub: 'opening it marks tablet-in', at: [[-5.9, 10.6, 12.6], 'phone'], x: 40, y: 92, side: 'L' },
-  { id: 'stepper', no: '02', title: 'STIRRER · NEXT', sub: 'today: stirred by hand, wooden stick', at: [[3.0, 3.6, 13.85], 'stepper'], x: 655, y: 92, side: 'R' },
-  { id: 'container', no: '03', title: 'SMALL CUP', sub: 'one whole tablet · thermistor is next', at: [[[3.46, 3.46, 0.3], 'container'], [[-2.0, -3.0, 3.1], 'thermistor']], x: 640, y: 770, side: 'R' },
-  { id: 'optics', no: '04', title: 'OPTICS', sub: 'blue · white · red LEDs → LDR · LDR at 90°', at: [[LED_AT, 'led'], [LDR_AT, 'ldr'], [LDR90_AT, 'ldr90']], x: 820, y: 690, side: 'R' },
-  { id: 'esp32', no: '05', title: 'ARDUINO UNO Q', sub: '3.3 V · 12-bit · 1 CSV line/s', at: [[-9.0, 8.2, 0.3], 'esp32'], x: 40, y: 252, side: 'L' },
-  { id: 'pi', no: '06', title: 'PILL GATE APP', sub: 'laptop: curves · reference · answer', at: [[PI_BASE.x, PI_BASE.y1 + 1, PI_BASE.zb + 3], 'pi'], x: 960, y: 440, side: 'R' },
+  { id: 'lid', no: '01', title: 'FLAT LID', sub: 'one small hole · skirt keeps light out', at: [[0, LID.r, LID.z1], 'lid'], x: 40, y: 92, side: 'L' },
+  { id: 'body', no: '02', title: '3D-PRINTED CHAMBER', sub: 'Ø 70 mm · purple print · dark inside', at: [[-CH.Ro * 0.71, CH.Ro * 0.71, 5.6], 'body'], x: 40, y: 160, side: 'L' },
+  { id: 'cup', no: '03', title: 'CLEAR CUP', sub: 'water + one tablet · shim ring centres it', at: [[[CUP.r1 * 0.71, -CUP.r1 * 0.71, CUP.z1], 'cup'], [[SHIM.ro * 0.71, SHIM.ro * 0.71, SHIM.z1], 'shim']], x: 860, y: 92, side: 'R' },
+  { id: 'app', no: '04', title: 'PILL GATE APP', sub: 'laptop: curves · reference · answer', at: [[LAP.x, (LAP.y0 + LAP.y1) / 2, LAP.zb + 6], 'laptop'], x: 860, y: 160, side: 'R' },
+  { id: 'led', no: '05', title: 'LED BOX', sub: 'white · blue · red, 5 mm · diffuser slot', at: [[[LED_AT[0], LED_AT[1] + 0.4, LED_AT[2]], 'led'], [[DIFF.w, DIFF.y1, DIFF.z1], 'diffuser']], x: 40, y: 700, side: 'L' },
+  { id: 'uno', no: '06', title: 'ARDUINO UNO Q', sub: '3.3 V · 12-bit · breadboard dividers', at: [[[UNO.x1, UNO.y1, UNO.z1], 'uno'], [[BB.x0 + 2, BB.y1, BB.z1], 'breadboard']], x: 40, y: 762, side: 'L' },
+  { id: 'sensors', no: '07', title: 'TWO PHOTORESISTORS', sub: 'in line (A0) · 90° side (A1)', at: [[LDR_AT, 'ldr'], [LDR90_AT, 'ldr90']], x: 860, y: 730, side: 'R' },
 ];
 
 /* ───────────────────────── mount ───────────────────────── */
 
-const SCENE_CAM = { S: 15, ox: 575, oy: 470, pivot: [2, -14, 6] };
+const SCENE_CAM = { S: 22, ox: 600, oy: 470, pivot: [0, -4.7, 4] };
 const CHAR_W = 7.04; // 11px JetBrains Mono advance + letter-spacing
-const GLYPHS = 10; // '1'/'0' glyphs streaming ESP32 → Pi
-const AMBIENT_FROM = 0.05; // paddle, beam pulse, light and stream run above this progress
+const GLYPHS = 10; // '1'/'0' glyphs streaming UNO Q → laptop
+const AMBIENT_FROM = 0.05; // beam pulse, light and stream run above this progress
 
 function el(tag, attrs, parent) {
   const n = document.createElementNS(NS, tag);
@@ -493,7 +459,7 @@ export function mountStation(host, opts = {}) {
   const svg = el('svg', {
     viewBox: `0 0 ${VB_W} ${VB_H}`,
     role: 'img',
-    'aria-label': opts.label || 'Exploded line drawing of the Pill station: dark box, deli container, lid with phone window, LEDs and light sensors, an Arduino UNO Q streaming readings to the Pill Gate app; the stirrer paddle and thermistor are drawn as next steps.',
+    'aria-label': opts.label || 'Exploded line drawing of the Pill station as built: a 3D-printed cylinder chamber with a flat lid that has one small hole, a clear cup of water on a shim ring inside, an LED box on one side with white, blue and red LEDs and a diffuser plate, one photoresistor holder straight across from the LED box and one at 90°, an Arduino UNO Q and a breadboard, and the laptop running the Pill Gate app.',
   });
   const root = el('g', { class: 'st-root' }, svg);
   const guides = el('g', { class: 'st-guides' }, root);
@@ -532,11 +498,9 @@ export function mountStation(host, opts = {}) {
   host.appendChild(svg);
 
   const st = {
-    yaw: 0, elev: 0, zoom: 1, panX: 0, panY: -60,
-    box: 0, boxlid: 0, boxUp: 0, lid: 0, lidTilt: 0, phone: 0, stepper: 0, container: 0,
-    led: 0, ldr: 0, ldr90: 0, spin: 0, thermistor: 0, esp32: 0, pi: 0, piBoard: 0, piCurve: 0,
+    yaw: 0, elev: 0, zoom: 1, panX: 0, panY: -70,
+    lid: 0, cup: 0, shim: 0, diffuser: 0, led: 0, ldr: 0, ldr90: 0, spin: 0, uno: 0, laptop: 0, piCurve: 0,
     guide: 0, stream: 0,
-    paddle: 0, // radians; advanced by the ambient loop, not the timeline
     fx: {}, // projected anchor points the parts report while drawing
   };
   LABELS.forEach((_, i) => { st['ld' + i] = 0; st['ty' + i] = 0; });
@@ -554,6 +518,8 @@ export function mountStation(host, opts = {}) {
       p.setAttribute('d', it.d);
       if (it.draw != null) p.style.strokeDashoffset = String(1 - it.draw);
     }
+    // parts that draw fewer paths this frame (the diffuser leaving its slot) clear the rest
+    for (let i = items.length; i < paths.length; i++) paths[i].setAttribute('d', '');
   }
 
   const guideEntry = { g: guides, paths: [] };
@@ -564,16 +530,11 @@ export function mountStation(host, opts = {}) {
     const cam = makeCam({ ...SCENE_CAM, ox: SCENE_CAM.ox + st.panX, oy: SCENE_CAM.oy + st.panY, yaw: st.yaw, elev: st.elev, zoom: st.zoom });
     const off = {};
     for (const id in EXPLODE) off[id] = mul3(EXPLODE[id], st[id]);
-    off.boxlid = add3(off.boxlid, mul3(BOXLID_UP, st.boxUp));
-    off.phone = add3(off.lid, mul3(PHONE_SLIDE, st.phone));
-    off.stepper = add3(off.lid, mul3(STEP_RISE, st.stepper));
-    const lt = LID_TILT * st.lidTilt;
-    const pre = {
-      lid: tiltX(lt, LID_HINGE),
-      phone: tiltX(lt * (1 - st.phone), LID_HINGE),
-      stepper: tiltX(lt * (1 - st.stepper), LID_HINGE),
-      container: tiltY(CONT_TILT * st.container, [0, 0, 0]),
-    };
+    // the shim ring lifts out of the well and lands on the table beside the chamber
+    off.shim = add3(mul3(SHIM_HOP.to, st.shim), [0, 0, SHIM_HOP.up * Math.sin(Math.PI * st.shim)]);
+    off.body = [0, 0, 0];
+    off.breadboard = [0, 0, 0];
+    const pre = { cup: tiltY(CUP_TILT * st.cup, [0, 0, 0]) };
     for (const p of PARTS) {
       if (!p.mag) continue;
       const { c, k } = p.mag;
@@ -594,8 +555,6 @@ export function mountStation(host, opts = {}) {
     for (const p of PARTS) drawPart(p.id);
     syncPaths(guideEntry, partGuides(kit(cam), st, off));
     guides.style.opacity = String(0.35 + 0.65 * st.guide);
-    groups.box.g.style.opacity = String(1 - 0.5 * st.box);
-    groups.boxlid.g.style.opacity = String(1 - 0.45 * st.boxlid);
     renderFxGeometry();
     renderFx();
     labels.forEach((lab, i) => {
@@ -629,16 +588,16 @@ export function mountStation(host, opts = {}) {
     beam.setAttribute('d', `M${f1(ledTip[0])} ${f1(ledTip[1])}L${f1(ldrFace[0])} ${f1(ldrFace[1])}`);
     const mid = lerp2(ledTip, ldrFace, 0.5);
     scatter.setAttribute('d', `M${f1(mid[0])} ${f1(mid[1])}L${f1(ldr90Face[0])} ${f1(ldr90Face[1])}`);
-    scatter.style.opacity = String(0.2 + 0.5 * st.spin);
-    // data link: a low arc under the floating lid from the ESP32 module to the Pi's screen
+    scatter.style.opacity = String(0.35 + 0.5 * st.spin);
+    // data link: a low arc in front of the chamber from the UNO Q's USB-C port to the laptop screen
     const dx = pi[0] - esp[0];
-    streamBez = [esp, [esp[0] + dx * 0.3, esp[1] + 150], [esp[0] + dx * 0.7, pi[1] + 110], pi];
+    streamBez = [esp, [esp[0] + dx * 0.3, esp[1] + 170], [esp[0] + dx * 0.75, pi[1] + 150], pi];
     const [a, b, c, d] = streamBez;
     stream.setAttribute('d', `M${f1(a[0])} ${f1(a[1])}C${f1(b[0])} ${f1(b[1])} ${f1(c[0])} ${f1(c[1])} ${f1(d[0])} ${f1(d[1])}`);
     stream.style.opacity = String(st.stream);
   }
 
-  // time-driven fx: beam pulse, light travelling LED → LDR, '1'/'0' glyphs travelling ESP32 → Pi
+  // time-driven fx: beam pulse, light travelling LED → photoresistor, '1'/'0' glyphs travelling UNO Q → laptop
   let ambT = 0;
   function renderFx() {
     const live = !reduced && current > AMBIENT_FROM;
@@ -672,36 +631,29 @@ export function mountStation(host, opts = {}) {
     .add(st, { yaw: 16, duration: 100, ease: 'outBack(2.2)' }, 900)
     .add(st, { elev: 6, duration: 600, ease: 'inOutSine' }, 300)
     .add(st, { elev: 5, duration: 100, ease: 'outBack(2.2)' }, 900)
-    .add(st, { zoom: 0.76, panY: -15, panX: 40, duration: 600, ease: 'inOutSine' }, 40)
-    // 1. the cardboard lid swings open and the lid assembly (lid + phone + stepper) lifts and tips
-    .add(st, { boxUp: 1, duration: 200, ease: 'outCubic' }, 0)
-    .add(st, { lid: 1, duration: 360, ease: 'inOutQuart' }, 60)
-    .add(st, { lidTilt: 1, duration: 260, ease: 'outCubic' }, 80)
-    // 2. the phone slides off the tipped lid; the box recedes and its lid settles shut
-    .add(st, { phone: 1, duration: 340, ease: 'inOutQuart' }, 280)
-    .add(st, { boxlid: 1, box: 1, duration: 420 }, 280)
-    .add(st, { boxUp: 0, duration: 260, ease: 'inOutSine' }, 300)
-    .add(st, { guide: 1, duration: 500, ease: 'inOutSine' }, 250)
-    // 3. the stepper rises off the lid, the chamber drops and leans, the lid levels out
-    .add(st, { stepper: 1, duration: 360, ease: 'inOutQuart' }, 400)
-    .add(st, { container: 1, duration: 380, ease: 'inOutQuart' }, 360)
-    .add(st, { lidTilt: 0.3, duration: 300, ease: 'inOutSine' }, 520)
-    .add(st, { thermistor: 1, duration: 360 }, 430)
-    // 4. ESP32 lifts out of the box; optics fan out; the Pi slides over and its board lifts off
-    .add(st, { esp32: 1, duration: 400, ease: 'inOutQuart' }, 380)
+    .add(st, { zoom: 0.8, panY: -50, duration: 600, ease: 'inOutSine' }, 40)
+    // 1. the lid lifts off
+    .add(st, { lid: 1, duration: 380, ease: 'inOutQuart' }, 40)
+    .add(st, { guide: 1, duration: 500, ease: 'inOutSine' }, 200)
+    // 2. the cup rises out of the well and leans; the shim ring hops out onto the table
+    .add(st, { cup: 1, duration: 380, ease: 'inOutQuart' }, 220)
+    .add(st, { shim: 1, duration: 380, ease: 'inOutSine' }, 360)
+    // 3. the diffuser slides up out of its slot, the LEDs pull out of the box, the photoresistors out of their holders
+    .add(st, { diffuser: 1, duration: 320, ease: 'inOutQuart' }, 420)
     .add(st, { led: 1, duration: 360, ease: 'inOutQuart' }, 470)
     .add(st, { ldr: 1, duration: 360, ease: 'inOutQuart' }, 500)
     .add(st, { ldr90: 1, duration: 360, ease: 'inOutQuart' }, 530)
     .add(st, { spin: 1, duration: 360, ease: 'inOutSine' }, 520)
-    .add(st, { pi: 1, duration: 380 }, 420)
-    .add(st, { piBoard: 1, duration: 340, ease: 'inOutQuart' }, 560)
-    // 5. data starts streaming, the screen curve draws in
+    // 4. the UNO Q lifts off the table; the laptop slides back
+    .add(st, { uno: 1, duration: 400, ease: 'inOutQuart' }, 400)
+    .add(st, { laptop: 1, duration: 380 }, 420)
+    // 5. data starts streaming, the curve on the laptop draws in
     .add(st, { stream: 1, duration: 220, ease: 'outSine' }, 700)
     .add(st, { piCurve: 1, duration: 140, ease: 'inOutSine' }, 860);
-  // 6. labels 01 → 06: leader draws in, number lands, title types; reversed they leave first
+  // 6. labels 01 → 07: leader draws in, number lands, title types; reversed they leave first
   LABELS.forEach((_, i) => {
-    tl.add(st, { ['ld' + i]: 1, duration: 100, ease: 'outCubic' }, 720 + i * 24)
-      .add(st, { ['ty' + i]: 1, duration: 120, ease: 'linear' }, 760 + i * 24);
+    tl.add(st, { ['ld' + i]: 1, duration: 100, ease: 'outCubic' }, 720 + i * 22)
+      .add(st, { ['ty' + i]: 1, duration: 120, ease: 'linear' }, 760 + i * 22);
   });
 
   const total = tl.duration;
@@ -713,7 +665,7 @@ export function mountStation(host, opts = {}) {
     wake();
   }
 
-  // ambient loop: spins the paddle and runs the fx while exploded and on screen
+  // ambient loop: runs the beam pulse, the travelling light and the data glyphs while exploded and on screen
   let amb = 0, ambLast = 0, onScreen = false, destroyed = false;
   function ambient(now) {
     amb = 0;
@@ -725,8 +677,6 @@ export function mountStation(host, opts = {}) {
     const dt = ambLast ? Math.min(64, now - ambLast) : 16;
     ambLast = now;
     ambT += dt;
-    st.paddle = (st.paddle + dt * 0.0042 * clamp01((current - AMBIENT_FROM) / 0.1)) % TAU;
-    drawPart('stepper');
     renderFx();
     amb = requestAnimationFrame(ambient);
   }
@@ -901,6 +851,7 @@ export function attachScroll(handle, { stage, idleAfterMs = 2500, enter = 'botto
   return { stop };
 }
 
+
 /* ───────────────────────── standalone FIG part drawings ───────────────────────── */
 
 const FIG_STYLE = {
@@ -912,6 +863,15 @@ const FIG_STYLE = {
   bf: 'fill="#0B0C0E" style="stroke:var(--blue,#2F6BFF)" stroke-width="1.25"',
   bb: 'fill="none" style="stroke:var(--blue,#2F6BFF)" stroke-width="1.25" stroke-dasharray="4 3"',
   ok: 'style="fill:var(--pass,#1B8A5A)" stroke="none"',
+  // the only fills with colour: the purple print, the clear cup, the tablet, the LEDs, the resistors, the diffuser
+  vf: 'fill="#2E2A55" stroke="rgba(255,255,255,0.55)" stroke-width="1.25"',
+  cf: 'fill="rgba(190,225,255,0.05)" stroke="rgba(255,255,255,0.55)" stroke-width="1.25"',
+  tf: 'fill="#E9EEF2" stroke="rgba(255,255,255,0.55)" stroke-width="1"',
+  df: 'fill="rgba(255,255,255,0.16)" stroke="rgba(255,255,255,0.55)" stroke-width="1"',
+  rf: 'fill="#C9B48A" stroke="rgba(255,255,255,0.55)" stroke-width="1"',
+  lw: 'fill="#F2F1EC" stroke="rgba(255,255,255,0.7)" stroke-width="1.25"',
+  lb: 'fill="#2F6BFF" stroke="rgba(255,255,255,0.7)" stroke-width="1.25"',
+  lr: 'fill="#C8574B" stroke="rgba(255,255,255,0.7)" stroke-width="1.25"',
 };
 
 // Every path carries data-draw="<order>" so the page can stroke-draw the figure in.
@@ -920,170 +880,136 @@ function figSvg(items) {
   return `<svg xmlns="${NS}" viewBox="0 0 300 300" fill="none" aria-hidden="true">${body}</svg>`;
 }
 
-function figKit(S, pivot, oy = 160) {
-  return kit(makeCam({ S, ox: 150, oy, pivot }));
+function figKit(S, pivot, oy = 160, yaw = 0) {
+  return kit(makeCam({ S, ox: 150, oy, pivot, yaw }));
 }
 
-function figEsp32() {
-  const k = figKit(44, [-0.2, 0, 0], 168);
-  const x0 = -2.55, x1 = 2.55, y0 = -1.15, y1 = 1.15, z0 = 0, z1 = 0.16;
-  const items = [
-    k.multi([[[-3.6, -2.0, 0], [3.6, -2.0, 0]], [[-3.6, 2.0, 0], [3.6, 2.0, 0]], [[0, -2.6, 0], [0, 2.6, 0]]], 'g'),
-    ...k.solid(corners(x0, y0, z0, x1, y1, z1)),
-    ...k.solid(corners(-0.6, -0.8, z1, 1.6, 0.8, 0.5)),
-    k.poly([[1.65, -0.7, z1], [2.2, -0.7, z1], [2.2, 0.7, z1], [1.65, 0.7, z1]], true),
-    ...k.solid(corners(x0 - 0.15, -0.35, z1, x0 + 0.6, 0.35, 0.45)),
-  ];
-  const pins = [], holes = [];
-  for (let i = 0; i < 16; i++) {
-    const x = x0 + 0.5 + i * 0.254;
-    pins.push([[x, y0 + 0.14, z1], [x, y0 + 0.14, z1 + 0.28]]);
-  }
-  for (let i = 0; i < 12; i++) {
-    const x = x0 + 1.0 + i * 0.254;
-    pins.push([[x, y1 - 0.14, z1], [x, y1 - 0.14, z1 + 0.28]]);
-  }
-  items.push(k.multi(pins));
-  for (const [hx, hy] of [[x0 + 0.25, y0 + 0.25], [x1 - 0.25, y0 + 0.25], [x0 + 0.25, y1 - 0.25], [x1 - 0.25, y1 - 0.25]]) holes.push(circ([hx, hy, z1], 0.1, X, Y, 10, 0, TAU));
-  items.push(k.multi(holes.map((h) => h.concat([h[0]]))));
-  items.push(k.ring([x0 + 0.95, y1 - 0.5, z1], 0.12, X, Y, 'p', 10));
+const FIG_ST = { led: 0, spin: 0, diffuser: 0, piCurve: 1, fx: {} };
+
+// Fig 0.1: the chamber with its lid off: the cup of water in the well, the beam across, the 90° path
+function figChamber() {
+  const k = figKit(19, [0, 1.34, 3.4], 150);
+  const a = k.cam.a;
+  const items = [k.line([0, 0, -1], [0, 0, 10], 'g')];
+  items.push(...partBody(k));
+  // inside the well: the back half of the cup rim and of the water surface show over the far wall
+  items.push(k.arc([0, 0, CUP.z1], CUP.r1, Math.PI - a, TAU - a, 'p', X, Y, 32));
+  items.push(k.arc([0, 0, CUP.water], CUP.r0 + 0.25, Math.PI - a, TAU - a, 'w', X, Y, 32));
+  // light path: LED box → across the cup → in-line holder; the scatter path to the 90° holder
+  items.push(k.line([0, POD.y0, CH.az], [0, -CH.Rw, CH.az], 'bb'));
+  items.push(k.line([0, 0, CH.az], [CH.Rw, 0, CH.az], 'g'));
+  for (const [c, dx] of LEDS) items.push(k.ring([dx, POD.y1, CH.az], 0.26, X, Z, c, 14));
   return figSvg(items);
 }
 
-function figLdr() {
-  // photoresistor seen face-up: disc, serpentine track, two leads to the ground plane
-  const k = figKit(52, [0, 0, 1.0], 150);
-  const r = 1.0, zt = 2.0, zb = 1.7;
+// Fig 0.2: the LED box: three LEDs pulled out of their holes, the diffuser plate lifted out of its slot
+function figLedBox() {
+  const k = figKit(24, [0, 6, 3.5], 158);
   const items = [
-    k.multi([[[0, 0, -0.8], [0, 0, 3.0]], [[-1.8, 0, 0], [1.8, 0, 0]], [[0, -1.8, 0], [0, 1.8, 0]]], 'g'),
-    k.multi([[[-0.32, 0, zb], [-0.32, 0, 0]], [[0.32, 0, zb], [0.32, 0, 0]]]),
-    ...k.cyl([0, 0, zb], [0, 0, zt], r, r, X, Y),
-    k.ring([0, 0, zt], r * 0.86, X, Y),
+    k.arc([0, 0, 0], CH.Ro, Math.PI / 2 - 0.7, Math.PI / 2 + 0.7, 'g', X, Y, 16),
+    k.arc([0, 0, POD.z1 + 1.2], CH.Ro, Math.PI / 2 - 0.7, Math.PI / 2 + 0.7, 'g', X, Y, 16),
+    ...k.solid(corners(-POD.w, POD.y0, 0, POD.w, POD.y1, POD.z1), 'vf'),
   ];
-  // zigzag track between two comb rails
-  const zz = [];
-  const n = 9;
-  for (let i = 0; i <= n; i++) {
-    const y = -0.62 + (1.24 * i) / n;
-    const w = Math.sqrt(Math.max(0, 0.78 * 0.78 - y * y)) - 0.1;
-    zz.push([i % 2 ? w : -w, y, zt]);
-    zz.push([i % 2 ? w : -w, Math.min(0.62, y + 1.24 / n), zt]);
-  }
-  zz.pop();
-  items.push(k.poly(zz));
-  items.push(k.arc([0, 0, zt], 0.8, -2.2, -0.94, 'p'));
-  items.push(k.arc([0, 0, zt], 0.8, 0.94, 2.2, 'p'));
-  items.push(k.ring([-0.32, 0, 0], 0.07, X, Y, 'g', 10));
-  items.push(k.ring([0.32, 0, 0], 0.07, X, Y, 'g', 10));
+  for (const [dx, dz] of [[0, 0.8], [0, -0.8], [-0.8, 0], [0, 0], [0.8, 0]]) items.push(k.ring([dx, POD.y1, CH.az + dz], 0.26, X, Z, 'p', 14));
+  items.push(k.poly([[-DIFF.w, DIFF.y0, POD.z1], [DIFF.w, DIFF.y0, POD.z1], [DIFF.w, DIFF.y1, POD.z1], [-DIFF.w, DIFF.y1, POD.z1]], true));
+  // diffuser plate halfway out of its slot
+  items.push(...k.solid(corners(-DIFF.w, DIFF.y0, POD.z1 + 0.6, DIFF.w, DIFF.y1, POD.z1 + 0.6 + (DIFF.z1 - DIFF.z0)), 'df'));
+  // the three LEDs, pulled 1.6 cm out of their holes along the insertion axis
+  const lk = kit(k.cam, [0, 1.6, 0]);
+  items.push(k.multi(LEDS.map(([, dx]) => [[dx, POD.y1, CH.az], [dx, POD.y1 + 1.6, CH.az]]), 'g'));
+  items.push(...partLed(lk, FIG_ST));
   return figSvg(items);
 }
 
-function figLed() {
-  const k = figKit(50, [0, 0, 1.3], 160);
-  const r = 0.5, rf = 0.58;
-  const dome = [];
-  for (const [z, rr] of [[2.0, 0.5], [2.2, 0.47], [2.35, 0.39], [2.45, 0.24], [2.5, 0.04]]) dome.push(...circ([0, 0, z], rr, X, Y, 32));
+// Fig 0.3: a photoresistor holder seen from inside the well: the pocket in the wall, the photoresistor pulled
+// out toward the cup, its leads lined up with the pocket (they leave through the holder's two leg holes)
+function figLdrHolder() {
+  const k = figKit(28, [2.6, 0, 3], 160, 180);
+  const t0 = -0.62, t1 = 0.62, zt = 6;
+  const inner = (z) => circ([0, 0, z], CH.Rw, X, Y, 16, t0, t1);
+  const outer = (z) => circ([0, 0, z], CH.Ro, X, Y, 16, t0, t1);
   const items = [
-    k.multi([[[0, 0, -0.6], [0, 0, 3.4]], [[-1.6, 0, 0], [1.6, 0, 0]]], 'g'),
-    k.multi([[[-0.2, 0, 1.0], [-0.2, 0, -0.4]], [[0.2, 0, 1.0], [0.2, 0, 0.1], [0.42, 0, -0.1], [0.42, 0, -0.2]]]),
-    ...k.cyl([0, 0, 1.0], [0, 0, 1.18], rf, rf, X, Y, 'bf'),
-    ...k.cyl([0, 0, 1.18], [0, 0, 2.0], r, r, X, Y, 'bf'),
-    k.hull(dome, 'bf'),
-    // die and anvil inside the clear epoxy
-    k.multi([[[-0.12, 0, 1.4], [-0.12, 0, 1.75], [0.05, 0, 1.75]], [[0.12, 0, 1.4], [0.12, 0, 1.62]]], 'b'),
-    // emission cone
-    k.multi([[[0, 0, 2.62], [-0.6, 0, 3.25]], [[0, 0, 2.62], [0.6, 0, 3.25]], [[0, 0, 2.62], [0, 0, 3.35]]], 'bb'),
+    // the holder fin behind the wall (hidden)
+    k.poly(holderFace(0, BOSS.out).pts, true, 'g'),
+    k.hull(inner(0).concat(inner(zt)), 'vf'),
+    k.poly(inner(zt).concat(outer(zt).reverse()), true, 'vf'),
+    k.ring([CH.Rw, 0, CH.az], 0.27, Y, Z, 'p', 20), // the pocket
+    k.line([1.0, 0, CH.az], [CH.Rw, 0, CH.az], 'g'),
   ];
+  const S = 2.4;
+  const { M, a } = sensorFrame([1.25, 0, CH.az], Math.PI, S);
+  items.push(...ldrBody(k, M, a, S));
   return figSvg(items);
 }
 
+// Fig 0.4 (next): a thermistor bead dangling through the lid's one small hole into the water
 function figThermistor() {
-  const k = figKit(56, [0, 0, 1.9], 150);
+  const k = figKit(28, [0, 0, -0.67], 150);
+  const [hx, hy] = LID.hole;
+  const items = [
+    k.ring([0, 0, -3], CUP.r1, X, Y, 'w', 48),
+    k.multi([[[hx - 0.06, hy, LID.z1 - LID.z0 + 1.6], [hx - 0.06, hy, -2.6]], [[hx + 0.06, hy, LID.z1 - LID.z0 + 1.6], [hx + 0.06, hy, -2.6]]], 'p'),
+    ...k.cyl([0, 0, 0], [0, 0, LID.z1 - LID.z0], LID.r, LID.r, X, Y, 'vf', 56),
+    k.ring([hx, hy, LID.z1 - LID.z0], LID.holeR, X, Y, 'p', 14),
+    k.multi([[[hx - 0.06, hy, LID.z1 - LID.z0], [hx - 0.06, hy, LID.z1 - LID.z0 + 1.6], [hx - 0.5, hy, LID.z1 - LID.z0 + 2.2]], [[hx + 0.06, hy, LID.z1 - LID.z0], [hx + 0.06, hy, LID.z1 - LID.z0 + 1.6], [hx + 0.5, hy, LID.z1 - LID.z0 + 2.2]]]),
+  ];
+  // the bead, below the lid (hidden behind it → dashed), sitting under the water line
   const bead = [];
-  for (const [z, r] of [[0.35, 0.1], [0.5, 0.33], [0.72, 0.4], [0.95, 0.3], [1.1, 0.1]]) bead.push(...circ([0, 0, z], r, X, Y, 24));
+  for (const [dz, r] of [[-0.3, 0.1], [-0.15, 0.25], [0.05, 0.28], [0.2, 0.18], [0.3, 0.06]]) bead.push(...circ([hx, hy, -2.9 + dz], r, X, Y, 16));
+  items.push(k.hull(bead, 'g'));
+  return figSvg(items);
+}
+
+// Fig 0.5 (next): the DC-motor lid from the CAD: a tower on the lid, the motor in its pocket, a rod down to a
+// four-blade paddle that turns below the beam
+function figStirrer() {
+  const k = figKit(17, [0, 0, -1.6], 150);
+  const lz = LID.z1 - LID.z0; // plate top (lid local, skirt bottom at 0)
+  const tw = 0.99, tl = 1.24; // tower half-sizes: (motor 15.8 × 20.8 mm) + 4 mm walls
   const items = [
-    k.multi([[[0, 0, -0.2], [0, 0, 3.6]], [[-1.6, 0.4, 0.72], [1.6, 0.4, 0.72]]], 'g'),
-    k.multi([[[-0.1, 0, 0.9], [-0.1, 0, 3.4], [-0.6, 0, 3.9]], [[0.1, 0, 0.9], [0.1, 0, 3.4], [0.6, 0, 3.9]]]),
-    ...k.cyl([0, 0, 1.6], [0, 0, 2.6], 0.24, 0.24, X, Y, 'pf', 20),
-    k.hull(bead),
-    // water line it dips below
-    k.multi([[[-1.4, -0.9, 1.25], [1.4, -0.9, 1.25]], [[-1.4, 0.9, 1.25], [1.4, 0.9, 1.25]]], 'w'),
+    k.line([0, 0, -9.4], [0, 0, 6.6], 'g'),
+    // paddle: hub and four blades
+    ...k.cyl([0, 0, -8.6], [0, 0, -7.6], 0.45, 0.45, X, Y, 'pf', 16),
+  ];
+  for (const t of [0, 90, 180, 270]) {
+    const c = Math.cos(t * RAD), s = Math.sin(t * RAD);
+    items.push(k.poly([[0.4 * c, 0.4 * s, -8.6], [1.8 * c, 1.8 * s, -8.6], [1.8 * c, 1.8 * s, -7.6], [0.4 * c, 0.4 * s, -7.6]], true));
+  }
+  items.push(k.line([0, 0, -7.6], [0, 0, -1.6], 'p')); // the rod
+  items.push(...k.cyl([0, 0, -1.9], [0, 0, -0.5], 0.45, 0.45, X, Y, 'pf', 16)); // coupler
+  items.push(...k.cyl([0, 0, 0], [0, 0, lz], LID.r, LID.r, X, Y, 'vf', 56));
+  items.push(...k.solid(corners(-tw, -tl, lz, tw, tl, lz + 2.0), 'vf'));
+  // the motor, lifted out of its pocket
+  items.push(...k.solid(corners(-0.79, -1.04, lz + 2.8, 0.79, 1.04, lz + 2.8 + 2.55)));
+  items.push(k.multi([[[0, 0, lz + 2.8], [0, 0, lz + 2.2]]]));
+  return figSvg(items);
+}
+
+// Fig 0.6: the Arduino UNO Q and the breadboard with the two 10 kΩ dividers and the shared 330 Ω
+function figUno() {
+  const k = figKit(15, [0, 2.9, 0], 158);
+  const items = [
+    k.multi([[[-5.2, -4.0, 0], [5.2, -4.0, 0]], [[-5.2, 9.8, 0], [5.2, 9.8, 0]]], 'g'),
+    ...unoBoard(k, { x0: -3.43, x1: 3.43, y0: -3.1, y1: 2.23, z0: 0, z1: 0.16 }),
+    ...breadboard(k, { x0: -4.1, x1: 4.15, y0: 3.4, y1: 8.9, z0: 0, z1: 0.85 }),
   ];
   return figSvg(items);
 }
 
-function figStepper() {
-  const k = figKit(34, [0.4, 0, 0.6], 165);
-  const cx = -1.4, cy = 1.0;
-  const items = [
-    k.multi([[[cx - 0.8, cy, -0.6], [cx - 0.8, cy, 4.2]], [[-4.2, -3.0, 0], [4.2, -3.0, 0]]], 'g'),
-    // shaft + flats (28BYJ-48 shaft is offset from the can centre)
-    ...k.cyl([cx - 0.8, cy, 1.9], [cx - 0.8, cy, 2.9], 0.25, 0.25, X, Y, 'pf', 16),
-    ...k.solid(corners(cx - 1.75, cy - 0.35, 1.9, cx + 1.75, cy + 0.35, 2.0)),
-    ...k.cyl([cx, cy, 0], [cx, cy, 1.9], 1.4, 1.4, X, Y),
-    k.ring([cx - 0.8, cy, 1.9], 0.45, X, Y, 'p', 20),
-    k.ring([cx - 1.45, cy, 2.0], 0.17, X, Y, 'p', 12),
-    k.ring([cx + 1.45, cy, 2.0], 0.17, X, Y, 'p', 12),
-    ...k.solid(corners(cx + 1.1, cy - 0.65, 0.1, cx + 1.85, cy + 0.65, 1.6)),
-    k.poly([[cx + 1.85, cy, 0.9], [cx + 2.8, cy - 0.6, 0.4], [1.4, -1.0, 0.2]]),
-    // ULN2003 board
-    ...k.solid(corners(1.0, -3.2, 0, 4.2, -0.2, 0.16)),
-    ...k.solid(corners(1.8, -2.4, 0.16, 3.6, -1.75, 0.5)),
-  ];
-  const leds = [], pins = [];
-  for (let i = 0; i < 4; i++) leds.push(circ([1.5 + i * 0.6, -0.6, 0.16], 0.12, X, Y, 10, 0, TAU).concat([[1.62 + i * 0.6, -0.6, 0.16]]));
-  for (let i = 0; i < 7; i++) pins.push([[3.9, -2.9 + i * 0.4, 0.16], [3.9, -2.9 + i * 0.4, 0.7]]);
-  for (let i = 0; i < 5; i++) pins.push([[1.3 + i * 0.4, -2.95, 0.16], [1.3 + i * 0.4, -2.95, 0.7]]);
-  items.push(k.multi(leds), k.multi(pins));
-  return figSvg(items);
-}
-
-function figContainer() {
-  const k = figKit(14.5, [0, 0, 5.4], 158);
-  const { r0, r1, z0, z1 } = CONT;
-  const a = 45 * RAD;
-  const bottom = circ([0, 0, z0], r0, X, Y, 64), top = circ([0, 0, z1], r1, X, Y, 64);
-  const wr = contR(CONT.water), fr = contR(CONT.fill);
-  const fc = Math.PI / 2 - a + 0.75;
-  const tick = (t) => [[fr * Math.cos(t), fr * Math.sin(t), CONT.fill - 0.35], [fr * Math.cos(t), fr * Math.sin(t), CONT.fill + 0.35]];
-  const items = [
-    k.line([0, 0, -1.5], [0, 0, 13.5], 'g'),
-    k.hull(bottom.concat(top), 'p'),
-    k.poly(top, true),
-    k.ring([0, 0, z1], 6.05, X, Y, 'p', 64),
-    k.ring([0, 0, z1 - 0.35], 6.05, X, Y, 'p', 64),
-    k.arc([0, 0, z0], r0, Math.PI - a, TAU - a, 'g', X, Y, 40),
-    k.ring([0, 0, CONT.water], wr, X, Y, 'w', 64),
-    k.arc([0, 0, CONT.fill], fr, fc - 0.5, fc + 0.5, 'p', X, Y, 20),
-    k.multi([tick(fc - 0.5), tick(fc + 0.5)]),
-  ];
-  // corner light path: LED → 1.8 cm chord → LDR, plus the 90° sensor
-  const led = [OPT_R * Math.cos(10 * RAD), OPT_R * Math.sin(10 * RAD), OPT_Z];
-  const ldr = [OPT_R * Math.cos(-10 * RAD), OPT_R * Math.sin(-10 * RAD), OPT_Z];
-  const s90 = [OPT_R + 0.3, 0, OPT_Z];
-  items.push(k.line(led, ldr, 'bb'));
-  items.push(...k.cyl(add3(led, [0, 0.15, 0]), add3(led, [0, 1.3, 0]), 0.45, 0.45, X, Z, 'bf', 16));
-  items.push(...k.cyl(add3(ldr, [0, -0.15, 0]), add3(ldr, [0, -0.8, 0]), 0.5, 0.5, X, Z, 'pf', 16));
-  items.push(...k.cyl(add3(s90, [0.05, 0, 0]), add3(s90, [0.7, 0, 0]), 0.5, 0.5, Y, Z, 'pf', 16));
-  items.push(k.multi([[[OPT_R * 0.35, -0.9, OPT_Z], [OPT_R * 0.35, 0.9, OPT_Z]], [[OPT_R, 0, OPT_Z], [OPT_R * 0.35, 0, OPT_Z]]], 'g'));
-  return figSvg(items);
-}
-
-function figPi() {
-  // Raspberry Pi 3 lifted off the back of the 7" touchscreen, settling curve on screen
-  const k = figKit(9, [5.1, -31.2, 7.2], 150);
-  const { x, y0, y1 } = PI_BASE;
-  const items = [k.multi([[[x - 7, y0 + 2, 0], [x + 2, y0 + 2, 0]], [[x - 7, y1 - 2, 0], [x + 2, y1 - 2, 0]]], 'g')];
-  items.push(...partPi(k, { piBoard: 1, piCurve: 1, fx: {} }, false));
+// Fig 0.7: the laptop with Pill Gate on screen
+function figLaptop() {
+  const k = figKit(14, [LAP.x + 2.2, (LAP.y0 + LAP.y1) / 2, 3.4], 156);
+  const items = [k.multi([[[LAP.x - 3, LAP.y0 + 2, 0], [LAP.x + LAP.depth + 2, LAP.y0 + 2, 0]], [[LAP.x - 3, LAP.y1 - 2, 0], [LAP.x + LAP.depth + 2, LAP.y1 - 2, 0]]], 'g')];
+  items.push(...partLaptop(k, FIG_ST, false));
   return figSvg(items);
 }
 
 export const partFigures = {
-  esp32: figEsp32(),
-  ldr: figLdr(),
-  led: figLed(),
+  container: figChamber(),
+  led: figLedBox(),
+  ldr: figLdrHolder(),
   thermistor: figThermistor(),
-  stepper: figStepper(),
-  container: figContainer(),
-  pi: figPi(),
+  stepper: figStirrer(),
+  esp32: figUno(),
+  pi: figLaptop(),
 };
