@@ -43,14 +43,14 @@ CUTS = [
     dict(id="C1", name="Hook: what we built is Pill (J-cut to the hardware)", src=(44.30, 48.58), fx="hook", join=None,
          jcut=dict(head=0.90, src=125.10, speed=0.75),
          caps=[(44.50, "So what we built is Pill."), (46.66, "Pill is a hardware and software device.")]),
-    dict(id="C2", name="Problem: why pills", src=(8.20, 13.60), fx="push", join=("fade", DISS),
+    dict(id="C2", name="Problem: why pills", src=(8.20, 13.60), fx="push", join=("fade", DISS), seated=True,
          caps=[(8.60, "Why are we talking about pills?"), (10.60, "Pills go through a very intense process"),
                (12.48, "with the FDA,")]),
-    dict(id="C3", name="Problem: checked again, the pharmacy shelf", src=(13.80, 23.25), fx="push", join=("cut", CUT_D),
+    dict(id="C3", name="Problem: checked again, the pharmacy shelf", src=(13.80, 23.25), fx="push", join=("cut", CUT_D), seated=True,
          caps=[(14.22, "they have to go through this process several times"),
                (16.20, "before being checked out through a normal pharmacy,"), (18.48, "like Walgreens."),
                (19.84, "I got this from Walgreens: it's an aspirin 81.")]),
-    dict(id="C4", name="Problem: the last step can fail", src=(27.65, 35.60), fx="push", join=("cut", CUT_D),
+    dict(id="C4", name="Problem: the last step can fail", src=(27.65, 35.60), fx="push", join=("cut", CUT_D), seated=True,
          caps=[(27.66, "In the final process,"), (29.44, "some of them could be malfunctioned,"),
                (31.80, "people could have bad intentions and put different drugs in here.")]),
     dict(id="C5", name="App: the prescription, what the tablet looks like", src=(55.85, 63.40), fx="push", join=("fade", DISS),
@@ -72,7 +72,7 @@ CUTS = [
     dict(id="C11", name="Result: Unable to verify", src=(164.00, 170.20), fx="push", join=("fade", DISS),
          caps=[(164.10, "As the timer runs out,"), (166.78, "it's going to check."),
                (168.10, "And oh no: it's unable to verify.")]),
-    dict(id="C12", name="Close: swallow the right pills", src=(173.30, 179.20), fx="push", join=("cut", CUT_D),
+    dict(id="C12", name="Close: swallow the right pills", src=(173.30, 179.20), fx="push", join=("cut", CUT_D), seated=True,
          caps=[(174.04, "So watch out."), (176.76, "Please swallow the right pills."), (178.14, "Thank you.")]),
 ]
 END_JOIN = ("fadeblack", 0.45)
@@ -80,6 +80,8 @@ PUSH = 0.04        # slow push-in over each cut (≤ 6 %)
 HOOK_PUSH = 0.06   # the hardware shot
 MUSIC_GAIN = 0.24  # v2's 0.34 minus 3 dB; ducked under the voice
 WHOOSH_GAIN = 0.12 # one soft whoosh per card entry
+CAP_MV = 300       # caption block bottom at y=1620
+CAP_MV_HIGH = 800  # seated cuts (laptop screen in the lower third): bottom at y=1120, over his shirt, above the cards
 
 # ── timeline ──────────────────────────────────────────────────────────────────────────────────────
 for c in CUTS:
@@ -111,7 +113,7 @@ for c in CUTS:
                 print(f"WARN {c['id']}: '{w['word'].strip()}' ({w['start']:.2f}–{w['end']:.2f}) straddles {edge}")
 
 # ── caption phrases on real onsets ────────────────────────────────────────────────────────────────
-PHRASES = []  # (out start, out end, text)
+PHRASES, PHRASE_HIGH = [], []  # (out start, out end, text); caption sits high (seated cut)
 for i, c in enumerate(CUTS):
     caps = [(e[0], e[1], e[2] if len(e) > 2 else e[1].split()[0]) for e in c["caps"]]  # (approx, text, anchor word)
     srcs = [onset(anchor, approx) for approx, _, anchor in caps]
@@ -122,7 +124,7 @@ for i, c in enumerate(CUTS):
         s1 = min(nxt, (e if e else nxt) + 0.45)
         a, b = max(c["out"], to_out(c["id"], s0)), min(hold, to_out(c["id"], s1))
         b = max(b, min(a + 0.9, to_out(c["id"], nxt), hold))
-        PHRASES.append((a, b, text))
+        PHRASES.append((a, b, text)); PHRASE_HIGH.append(bool(c.get("seated")))
 
 # ── cards (lower-third: 2-px purple rule + tracked caps label), all on cue-word onsets ─────────────
 # card(cut, approx src, cue word, label, until=(cut, src) | None → until the next card in the slot)
@@ -183,14 +185,32 @@ def soft(layer, a, b, style, tags, text, ml=0, mr=0, mv=0, dx=0, dy=3):
         dlg(layer, a, b, style, sh + rf"\1c{BLACK}\1a&H60&\blur4", text)
     dlg(layer + 1, a, b, style, tags, text, ml, mr, mv)
 
-# captions: sentence/phrase level, no fade-in (visible on the onset frame), 80-ms fade-out
-for (a, b, text) in PHRASES:
-    soft(4, a, b, "Cap", r"\fad(0,80)", wrap2(text), ml=90, mr=90, mv=300)
+# captions: sentence/phrase level, no fade-in (visible on the onset frame), 80-ms fade-out. On the seated cuts the
+# laptop screen fills the lower third, so their captions sit higher, over his dark shirt, just above the card stack.
+for (a, b, text), high in zip(PHRASES, PHRASE_HIGH):
+    soft(4, a, b, "Cap", r"\fad(0,80)", wrap2(text), ml=90, mr=90, mv=CAP_MV_HIGH if high else CAP_MV)
 # hook title: clean serif, no halo; fades up and rises 24 px over 300 ms on the word "Pill"
 soft(4, HOOK_TITLE, CUTS[0]["dur"] - 0.05, "Hook", r"\an5\move(540,524,540,500,0,300)\fad(300,200)", "Pill", dy=4)
 RULE = r"{\p1}m 0 0 l 96 0 96 2 0 2{\p0}"
 X0 = 80
-def card(a, b, y, label, style="Label", rule=True):
+PAD = 24
+PANEL_A = "&H6B&"  # black at 58 % opacity
+EM = {" ": 0.26, "·": 0.32, ",": 0.32, "+": 0.67, "-": 0.40, ".": 0.30, ":": 0.30}
+def textw(s, size, spacing=0):
+    """Estimated advance width (Inter averages: caps 0.69 em, lowercase 0.55 em, digits 0.61 em)."""
+    return sum((EM.get(ch) or (0.69 if ch.isupper() else 0.61 if ch.isdigit() else 0.55)) * size + spacing for ch in s)
+def rrect(w, h, r=12):
+    k = r * 0.552
+    return (rf"{{\p1}}m {r} 0 l {w - r} 0 b {w - r + k:.1f} 0 {w} {r - k:.1f} {w} {r} l {w} {h - r} "
+            rf"b {w} {h - r + k:.1f} {w - r + k:.1f} {h} {w - r} {h} l {r} {h} b {r - k:.1f} {h} 0 {h - r + k:.1f} 0 {h - r} "
+            rf"l 0 {r} b 0 {r - k:.1f} {r - k:.1f} 0 {r} 0{{\p0}}")
+def panel(a, b, top, w, h, fin=200, fout=160):
+    """Soft dark rounded panel (12-px corners, 24-px padding, slightly blurred edge) behind a card or list."""
+    dlg(2, a, b, "Rule", rf"\an7\pos({X0 - PAD},{top})\fad({fin},{fout})\1c{BLACK}\1a{PANEL_A}\blur2",
+        rrect(round(w + 2 * PAD), round(h)))
+def card(a, b, y, label, style="Label", rule=True, with_panel=True):
+    if with_panel:
+        panel(a, b, y - PAD, max(96, textw(label, 30, 4)), 14 + 34 + 2 * PAD)
     if rule:
         dlg(3, a, b, "Rule", rf"\an7\move({X0 - 40},{y},{X0},{y},0,200)\fad(200,160)\1c{PURPLE}", RULE)
     soft(4, a, b, style, rf"\an7\move({X0 - 24},{y + 14},{X0},{y + 14},0,200)\fad(200,160)", label, dy=2)
@@ -200,12 +220,17 @@ for k, (a, label) in enumerate(CARDS):
     b = min(stop, CARDS[k + 1][0]) if k + 1 < len(CARDS) else stop
     card(a, b, 1300, label)
 # the problem list
-card(LIST_HEAD[0], LIST_END, 1150, LIST_HEAD[1], style="ListHead")
+# the problem list: one panel that grows a row at a time (fixed width so it doesn't jitter)
+card(LIST_HEAD[0], LIST_END, 1150, LIST_HEAD[1], style="ListHead", with_panel=False)
+lw = max(textw(l, 30, 4) for _, l in LIST)
 for k, (a, label) in enumerate(LIST):
+    nxt = LIST[k + 1][0] if k + 1 < len(LIST) else LIST_END
+    panel(a, nxt, 1150 - PAD, lw, (1196 + 52 * k + 34) - 1150 + 2 * PAD, fin=200 if k == 0 else 0, fout=160 if k == len(LIST) - 1 else 0)
     soft(4, a, LIST_END, "Label", rf"\an7\move({X0 - 24},{1196 + 52 * k},{X0},{1196 + 52 * k},0,200)\fad(200,160)", label, dy=2)
 # the answers
 a0 = ANS_HEAD[0]
-card(a0, ANS_END, 1150, ANS_HEAD[1], style="ListHead")
+card(a0, ANS_END, 1150, ANS_HEAD[1], style="ListHead", with_panel=False)
+panel(a0, ANS_END, 1150 - PAD, 40 + max(textw(t, 40) for t, _ in ANSWERS), (1200 + 62 * 2 + 48) - 1150 + 2 * PAD)
 for k, (txt, col) in enumerate(ANSWERS):
     y = 1200 + 62 * k
     last = k == len(ANSWERS) - 1

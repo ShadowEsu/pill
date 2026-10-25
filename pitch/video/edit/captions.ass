@@ -24,26 +24,26 @@ Dialogue: 4,0:00:00.20,0:00:02.36,Cap,,90,90,297,,{\fad(0,80)\1c&H00000000&\1a&H
 Dialogue: 5,0:00:00.20,0:00:02.36,Cap,,90,90,300,,{\fad(0,80)}So what we built is Pill.
 Dialogue: 4,0:00:02.36,0:00:04.01,Cap,,90,90,297,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}Pill is a hardware\Nand software device.
 Dialogue: 5,0:00:02.36,0:00:04.01,Cap,,90,90,300,,{\fad(0,80)}Pill is a hardware\Nand software device.
-Dialogue: 4,0:00:04.41,0:00:06.41,Cap,,90,90,297,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}Why are we talking about pills?
-Dialogue: 5,0:00:04.41,0:00:06.41,Cap,,90,90,300,,{\fad(0,80)}Why are we talking about pills?
-Dialogue: 4,0:00:06.41,0:00:08.29,Cap,,90,90,297,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}Pills go through a\Nvery intense process
-Dialogue: 5,0:00:06.41,0:00:08.29,Cap,,90,90,300,,{\fad(0,80)}Pills go through a\Nvery intense process
-Dialogue: 4,0:00:08.29,0:00:09.38,Cap,,90,90,297,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}with the FDA,
-Dialogue: 5,0:00:08.29,0:00:09.38,Cap,,90,90,300,,{\fad(0,80)}with the FDA,
-Dialogue: 4,0:00:09.80,0:00:11.78,Cap,,90,90,297,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}they have to go through\Nthis process several times
-Dialogue: 5,0:00:09.80,0:00:11.78,Cap,,90,90,300,,{\fad(0,80)}they have to go through\Nthis process several times
-Dialogue: 4,0:00:11.78,0:00:14.06,Cap,,90,90,297,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}before being checked out\Nthrough a normal pharmacy,
-Dialogue: 5,0:00:11.78,0:00:14.06,Cap,,90,90,300,,{\fad(0,80)}before being checked out\Nthrough a normal pharmacy,
-Dialogue: 4,0:00:14.06,0:00:15.23,Cap,,90,90,297,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}like Walgreens.
-Dialogue: 5,0:00:14.06,0:00:15.23,Cap,,90,90,300,,{\fad(0,80)}like Walgreens.
-Dialogue: 4,0:00:15.42,0:00:18.79,Cap,,90,90,297,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}I got this from Walgreens:\Nit's an aspirin 81.
-Dialogue: 5,0:00:15.42,0:00:18.79,Cap,,90,90,300,,{\fad(0,80)}I got this from Walgreens:\Nit's an aspirin 81.
-Dialogue: 4,0:00:18.80,0:00:20.58,Cap,,90,90,297,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}In the final process,
-Dialogue: 5,0:00:18.80,0:00:20.58,Cap,,90,90,300,,{\fad(0,80)}In the final process,
-Dialogue: 4,0:00:20.58,0:00:22.94,Cap,,90,90,297,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}some of them could\Nbe malfunctioned,
-Dialogue: 5,0:00:20.58,0:00:22.94,Cap,,90,90,300,,{\fad(0,80)}some of them could\Nbe malfunctioned,
-Dialogue: 4,0:00:22.94,0:00:26.47,Cap,,90,90,297,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}people could have bad intentions\Nand put different drugs in here.
-Dialogue: 5,0:00:22.94,0:00:26.47,Cap,,90,90,300,,{\fad(0,80)}people could have bad intentions\Nand put different drugs in here.
+Dialogue: 4,0:00:04.41,0:00:06.41,Cap,,90,90,797,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}Why are we talking about pills?
+Dialogue: 5,0:00:04.41,0:00:06.41,Cap,,90,90,800,,{\fad(0,80)}Why are we talking about pills?
+Dialogue: 4,0:00:06.41,0:00:08.29,Cap,,90,90,797,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}Pills go through a\Nvery intense process
+Dialogue: 5,0:00:06.41,0:00:08.29,Cap,,90,90,800,,{\fad(0,80)}Pills go through a\Nvery intense process
+Dialogue: 4,0:00:08.29,0:00:09.38,Cap,,90,90,797,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}with the FDA,
+Dialogue: 5,0:00:08.29,0:00:09.38,Cap,,90,90,800,,{\fad(0,80)}with the FDA,
+Dialogue: 4,0:00:09.80,0:00:11.78,Cap,,90,90,797,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}they have to go through\Nthis process several times
+Dialogue: 5,0:00:09.80,0:00:11.78,Cap,,90,90,800,,{\fad(0,80)}they have to go through\Nthis process several times
+Dialogue: 4,0:00:11.78,0:00:14.06,Cap,,90,90,797,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}before being checked out\Nthrough a normal pharmacy,
+Dialogue: 5,0:00:11.78,0:00:14.06,Cap,,90,90,800,,{\fad(0,80)}before being checked out\Nthrough a normal pharmacy,
+Dialogue: 4,0:00:14.06,0:00:15.23,Cap,,90,90,797,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}like Walgreens.
+Dialogue: 5,0:00:14.06,0:00:15.23,Cap,,90,90,800,,{\fad(0,80)}like Walgreens.
+Dialogue: 4,0:00:15.42,0:00:18.79,Cap,,90,90,797,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}I got this from Walgreens:\Nit's an aspirin 81.
+Dialogue: 5,0:00:15.42,0:00:18.79,Cap,,90,90,800,,{\fad(0,80)}I got this from Walgreens:\Nit's an aspirin 81.
+Dialogue: 4,0:00:18.80,0:00:20.58,Cap,,90,90,797,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}In the final process,
+Dialogue: 5,0:00:18.80,0:00:20.58,Cap,,90,90,800,,{\fad(0,80)}In the final process,
+Dialogue: 4,0:00:20.58,0:00:22.94,Cap,,90,90,797,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}some of them could\Nbe malfunctioned,
+Dialogue: 5,0:00:20.58,0:00:22.94,Cap,,90,90,800,,{\fad(0,80)}some of them could\Nbe malfunctioned,
+Dialogue: 4,0:00:22.94,0:00:26.47,Cap,,90,90,797,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}people could have bad intentions\Nand put different drugs in here.
+Dialogue: 5,0:00:22.94,0:00:26.47,Cap,,90,90,800,,{\fad(0,80)}people could have bad intentions\Nand put different drugs in here.
 Dialogue: 4,0:00:26.70,0:00:29.47,Cap,,90,90,297,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}First we put in the\Nprescription of the drug,
 Dialogue: 5,0:00:26.70,0:00:29.47,Cap,,90,90,300,,{\fad(0,80)}First we put in the\Nprescription of the drug,
 Dialogue: 4,0:00:29.50,0:00:31.54,Cap,,90,90,297,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}and then we use it,
@@ -80,55 +80,69 @@ Dialogue: 4,0:01:10.56,0:01:11.51,Cap,,90,90,297,,{\fad(0,80)\1c&H00000000&\1a&H
 Dialogue: 5,0:01:10.56,0:01:11.51,Cap,,90,90,300,,{\fad(0,80)}it's going to check.
 Dialogue: 4,0:01:11.88,0:01:13.94,Cap,,90,90,297,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}And oh no: it's unable to verify.
 Dialogue: 5,0:01:11.88,0:01:13.94,Cap,,90,90,300,,{\fad(0,80)}And oh no: it's unable to verify.
-Dialogue: 4,0:01:14.68,0:01:15.81,Cap,,90,90,297,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}So watch out.
-Dialogue: 5,0:01:14.68,0:01:15.81,Cap,,90,90,300,,{\fad(0,80)}So watch out.
-Dialogue: 4,0:01:17.40,0:01:18.77,Cap,,90,90,297,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}Please swallow the right pills.
-Dialogue: 5,0:01:17.40,0:01:18.77,Cap,,90,90,300,,{\fad(0,80)}Please swallow the right pills.
-Dialogue: 4,0:01:18.78,0:01:19.68,Cap,,90,90,297,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}Thank you.
-Dialogue: 5,0:01:18.78,0:01:19.68,Cap,,90,90,300,,{\fad(0,80)}Thank you.
+Dialogue: 4,0:01:14.68,0:01:15.81,Cap,,90,90,797,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}So watch out.
+Dialogue: 5,0:01:14.68,0:01:15.81,Cap,,90,90,800,,{\fad(0,80)}So watch out.
+Dialogue: 4,0:01:17.40,0:01:18.77,Cap,,90,90,797,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}Please swallow the right pills.
+Dialogue: 5,0:01:17.40,0:01:18.77,Cap,,90,90,800,,{\fad(0,80)}Please swallow the right pills.
+Dialogue: 4,0:01:18.78,0:01:19.68,Cap,,90,90,797,,{\fad(0,80)\1c&H00000000&\1a&H60&\blur4}Thank you.
+Dialogue: 5,0:01:18.78,0:01:19.68,Cap,,90,90,800,,{\fad(0,80)}Thank you.
 Dialogue: 4,0:00:01.28,0:00:04.23,Hook,,0,0,0,,{\an5\move(540,528,540,504,0,300)\fad(300,200)\1c&H00000000&\1a&H60&\blur4}Pill
 Dialogue: 5,0:00:01.28,0:00:04.23,Hook,,0,0,0,,{\an5\move(540,524,540,500,0,300)\fad(300,200)}Pill
+Dialogue: 2,0:00:27.66,0:00:32.56,Rule,,0,0,0,,{\an7\pos(56,1276)\fad(200,160)\1c&H00000000&\1a&H6B&\blur2}{\p1}m 12 0 l 635 0 b 641.6 0 647 5.4 647 12 l 647 84 b 647 90.6 641.6 96 635 96 l 12 96 b 5.4 96 0 90.6 0 84 l 0 12 b 0 5.4 5.4 0 12 0{\p0}
 Dialogue: 3,0:00:27.66,0:00:32.56,Rule,,0,0,0,,{\an7\move(40,1300,80,1300,0,200)\fad(200,160)\1c&H00FF5C7C&}{\p1}m 0 0 l 96 0 96 2 0 2{\p0}
 Dialogue: 4,0:00:27.66,0:00:32.56,Label,,0,0,0,,{\an7\move(56,1316,80,1316,0,200)\fad(200,160)\1c&H00000000&\1a&H60&\blur4}01 · ENTER THE PRESCRIPTION
 Dialogue: 5,0:00:27.66,0:00:32.56,Label,,0,0,0,,{\an7\move(56,1314,80,1314,0,200)\fad(200,160)}01 · ENTER THE PRESCRIPTION
+Dialogue: 2,0:00:32.56,0:00:33.99,Rule,,0,0,0,,{\an7\pos(56,1276)\fad(200,160)\1c&H00000000&\1a&H6B&\blur2}{\p1}m 12 0 l 708 0 b 714.6 0 720 5.4 720 12 l 720 84 b 720 90.6 714.6 96 708 96 l 12 96 b 5.4 96 0 90.6 0 84 l 0 12 b 0 5.4 5.4 0 12 0{\p0}
 Dialogue: 3,0:00:32.56,0:00:33.99,Rule,,0,0,0,,{\an7\move(40,1300,80,1300,0,200)\fad(200,160)\1c&H00FF5C7C&}{\p1}m 0 0 l 96 0 96 2 0 2{\p0}
 Dialogue: 4,0:00:32.56,0:00:33.99,Label,,0,0,0,,{\an7\move(56,1316,80,1316,0,200)\fad(200,160)\1c&H00000000&\1a&H60&\blur4}02 · WHAT THE TABLET LOOKS LIKE
 Dialogue: 5,0:00:32.56,0:00:33.99,Label,,0,0,0,,{\an7\move(56,1314,80,1314,0,200)\fad(200,160)}02 · WHAT THE TABLET LOOKS LIKE
+Dialogue: 2,0:00:35.86,0:00:38.88,Rule,,0,0,0,,{\an7\pos(56,1276)\fad(200,160)\1c&H00000000&\1a&H6B&\blur2}{\p1}m 12 0 l 753 0 b 759.6 0 765 5.4 765 12 l 765 84 b 765 90.6 759.6 96 753 96 l 12 96 b 5.4 96 0 90.6 0 84 l 0 12 b 0 5.4 5.4 0 12 0{\p0}
 Dialogue: 3,0:00:35.86,0:00:38.88,Rule,,0,0,0,,{\an7\move(40,1300,80,1300,0,200)\fad(200,160)\1c&H00FF5C7C&}{\p1}m 0 0 l 96 0 96 2 0 2{\p0}
 Dialogue: 4,0:00:35.86,0:00:38.88,Label,,0,0,0,,{\an7\move(56,1316,80,1316,0,200)\fad(200,160)\1c&H00000000&\1a&H60&\blur4}THE STATION · 3D-PRINTED CHAMBER
 Dialogue: 5,0:00:35.86,0:00:38.88,Label,,0,0,0,,{\an7\move(56,1314,80,1314,0,200)\fad(200,160)}THE STATION · 3D-PRINTED CHAMBER
+Dialogue: 2,0:00:38.88,0:00:43.21,Rule,,0,0,0,,{\an7\pos(56,1276)\fad(200,160)\1c&H00000000&\1a&H6B&\blur2}{\p1}m 12 0 l 499 0 b 505.6 0 511 5.4 511 12 l 511 84 b 511 90.6 505.6 96 499 96 l 12 96 b 5.4 96 0 90.6 0 84 l 0 12 b 0 5.4 5.4 0 12 0{\p0}
 Dialogue: 3,0:00:38.88,0:00:43.21,Rule,,0,0,0,,{\an7\move(40,1300,80,1300,0,200)\fad(200,160)\1c&H00FF5C7C&}{\p1}m 0 0 l 96 0 96 2 0 2{\p0}
 Dialogue: 4,0:00:38.88,0:00:43.21,Label,,0,0,0,,{\an7\move(56,1316,80,1316,0,200)\fad(200,160)\1c&H00000000&\1a&H60&\blur4}03 · WATER TO THE MARK
 Dialogue: 5,0:00:38.88,0:00:43.21,Label,,0,0,0,,{\an7\move(56,1314,80,1314,0,200)\fad(200,160)}03 · WATER TO THE MARK
+Dialogue: 2,0:00:46.23,0:00:46.96,Rule,,0,0,0,,{\an7\pos(56,1276)\fad(200,160)\1c&H00000000&\1a&H6B&\blur2}{\p1}m 12 0 l 438 0 b 444.6 0 450 5.4 450 12 l 450 84 b 450 90.6 444.6 96 438 96 l 12 96 b 5.4 96 0 90.6 0 84 l 0 12 b 0 5.4 5.4 0 12 0{\p0}
 Dialogue: 3,0:00:46.23,0:00:46.96,Rule,,0,0,0,,{\an7\move(40,1300,80,1300,0,200)\fad(200,160)\1c&H00FF5C7C&}{\p1}m 0 0 l 96 0 96 2 0 2{\p0}
 Dialogue: 4,0:00:46.23,0:00:46.96,Label,,0,0,0,,{\an7\move(56,1316,80,1316,0,200)\fad(200,160)\1c&H00000000&\1a&H60&\blur4}04 · ADD THE TABLET
 Dialogue: 5,0:00:46.23,0:00:46.96,Label,,0,0,0,,{\an7\move(56,1314,80,1314,0,200)\fad(200,160)}04 · ADD THE TABLET
+Dialogue: 2,0:00:50.21,0:00:50.83,Rule,,0,0,0,,{\an7\pos(56,1276)\fad(200,160)\1c&H00000000&\1a&H6B&\blur2}{\p1}m 12 0 l 586 0 b 592.6 0 598 5.4 598 12 l 598 84 b 598 90.6 592.6 96 586 96 l 12 96 b 5.4 96 0 90.6 0 84 l 0 12 b 0 5.4 5.4 0 12 0{\p0}
 Dialogue: 3,0:00:50.21,0:00:50.83,Rule,,0,0,0,,{\an7\move(40,1300,80,1300,0,200)\fad(200,160)\1c&H00FF5C7C&}{\p1}m 0 0 l 96 0 96 2 0 2{\p0}
 Dialogue: 4,0:00:50.21,0:00:50.83,Label,,0,0,0,,{\an7\move(56,1316,80,1316,0,200)\fad(200,160)\1c&H00000000&\1a&H60&\blur4}05 · DISSOLVE AND MEASURE
 Dialogue: 5,0:00:50.21,0:00:50.83,Label,,0,0,0,,{\an7\move(56,1314,80,1314,0,200)\fad(200,160)}05 · DISSOLVE AND MEASURE
+Dialogue: 2,0:00:53.57,0:00:57.57,Rule,,0,0,0,,{\an7\pos(56,1276)\fad(200,160)\1c&H00000000&\1a&H6B&\blur2}{\p1}m 12 0 l 603 0 b 609.6 0 615 5.4 615 12 l 615 84 b 615 90.6 609.6 96 603 96 l 12 96 b 5.4 96 0 90.6 0 84 l 0 12 b 0 5.4 5.4 0 12 0{\p0}
 Dialogue: 3,0:00:53.57,0:00:57.57,Rule,,0,0,0,,{\an7\move(40,1300,80,1300,0,200)\fad(200,160)\1c&H00FF5C7C&}{\p1}m 0 0 l 96 0 96 2 0 2{\p0}
 Dialogue: 4,0:00:53.57,0:00:57.57,Label,,0,0,0,,{\an7\move(56,1316,80,1316,0,200)\fad(200,160)\1c&H00000000&\1a&H60&\blur4}ARDUINO UNO Q · MAIN BOARD
 Dialogue: 5,0:00:53.57,0:00:57.57,Label,,0,0,0,,{\an7\move(56,1314,80,1314,0,200)\fad(200,160)}ARDUINO UNO Q · MAIN BOARD
+Dialogue: 2,0:00:57.57,0:01:03.04,Rule,,0,0,0,,{\an7\pos(56,1276)\fad(200,160)\1c&H00000000&\1a&H6B&\blur2}{\p1}m 12 0 l 911 0 b 917.6 0 923 5.4 923 12 l 923 84 b 923 90.6 917.6 96 911 96 l 12 96 b 5.4 96 0 90.6 0 84 l 0 12 b 0 5.4 5.4 0 12 0{\p0}
 Dialogue: 3,0:00:57.57,0:01:03.04,Rule,,0,0,0,,{\an7\move(40,1300,80,1300,0,200)\fad(200,160)\1c&H00FF5C7C&}{\p1}m 0 0 l 96 0 96 2 0 2{\p0}
 Dialogue: 4,0:00:57.57,0:01:03.04,Label,,0,0,0,,{\an7\move(56,1316,80,1316,0,200)\fad(200,160)\1c&H00000000&\1a&H60&\blur4}RED · BLUE · WHITE LIGHT + PHOTORESISTOR
 Dialogue: 5,0:00:57.57,0:01:03.04,Label,,0,0,0,,{\an7\move(56,1314,80,1314,0,200)\fad(200,160)}RED · BLUE · WHITE LIGHT + PHOTORESISTOR
+Dialogue: 2,0:01:04.08,0:01:07.78,Rule,,0,0,0,,{\an7\pos(56,1276)\fad(200,160)\1c&H00000000&\1a&H6B&\blur2}{\p1}m 12 0 l 739 0 b 745.6 0 751 5.4 751 12 l 751 84 b 751 90.6 745.6 96 739 96 l 12 96 b 5.4 96 0 90.6 0 84 l 0 12 b 0 5.4 5.4 0 12 0{\p0}
 Dialogue: 3,0:01:04.08,0:01:07.78,Rule,,0,0,0,,{\an7\move(40,1300,80,1300,0,200)\fad(200,160)\1c&H00FF5C7C&}{\p1}m 0 0 l 96 0 96 2 0 2{\p0}
 Dialogue: 4,0:01:04.08,0:01:07.78,Label,,0,0,0,,{\an7\move(56,1316,80,1316,0,200)\fad(200,160)\1c&H00000000&\1a&H60&\blur4}THREE COLOURS · ONE MEASUREMENT
 Dialogue: 5,0:01:04.08,0:01:07.78,Label,,0,0,0,,{\an7\move(56,1314,80,1314,0,200)\fad(200,160)}THREE COLOURS · ONE MEASUREMENT
 Dialogue: 3,0:00:08.69,0:00:26.47,Rule,,0,0,0,,{\an7\move(40,1150,80,1150,0,200)\fad(200,160)\1c&H00FF5C7C&}{\p1}m 0 0 l 96 0 96 2 0 2{\p0}
 Dialogue: 4,0:00:08.69,0:00:26.47,ListHead,,0,0,0,,{\an7\move(56,1166,80,1166,0,200)\fad(200,160)\1c&H00000000&\1a&H60&\blur4}HOW A PILL REACHES YOU
 Dialogue: 5,0:00:08.69,0:00:26.47,ListHead,,0,0,0,,{\an7\move(56,1164,80,1164,0,200)\fad(200,160)}HOW A PILL REACHES YOU
+Dialogue: 2,0:00:08.69,0:00:11.16,Rule,,0,0,0,,{\an7\pos(56,1126)\fad(200,0)\1c&H00000000&\1a&H6B&\blur2}{\p1}m 12 0 l 760 0 b 766.6 0 772 5.4 772 12 l 772 116 b 772 122.6 766.6 128 760 128 l 12 128 b 5.4 128 0 122.6 0 116 l 0 12 b 0 5.4 5.4 0 12 0{\p0}
 Dialogue: 4,0:00:08.69,0:00:26.47,Label,,0,0,0,,{\an7\move(56,1198,80,1198,0,200)\fad(200,160)\1c&H00000000&\1a&H60&\blur4}01 · FDA REVIEW
 Dialogue: 5,0:00:08.69,0:00:26.47,Label,,0,0,0,,{\an7\move(56,1196,80,1196,0,200)\fad(200,160)}01 · FDA REVIEW
+Dialogue: 2,0:00:11.16,0:00:13.64,Rule,,0,0,0,,{\an7\pos(56,1126)\fad(0,0)\1c&H00000000&\1a&H6B&\blur2}{\p1}m 12 0 l 760 0 b 766.6 0 772 5.4 772 12 l 772 168 b 772 174.6 766.6 180 760 180 l 12 180 b 5.4 180 0 174.6 0 168 l 0 12 b 0 5.4 5.4 0 12 0{\p0}
 Dialogue: 4,0:00:11.16,0:00:26.47,Label,,0,0,0,,{\an7\move(56,1250,80,1250,0,200)\fad(200,160)\1c&H00000000&\1a&H60&\blur4}02 · CHECKED AGAIN, SEVERAL TIMES
 Dialogue: 5,0:00:11.16,0:00:26.47,Label,,0,0,0,,{\an7\move(56,1248,80,1248,0,200)\fad(200,160)}02 · CHECKED AGAIN, SEVERAL TIMES
+Dialogue: 2,0:00:13.64,0:00:19.80,Rule,,0,0,0,,{\an7\pos(56,1126)\fad(0,0)\1c&H00000000&\1a&H6B&\blur2}{\p1}m 12 0 l 760 0 b 766.6 0 772 5.4 772 12 l 772 220 b 772 226.6 766.6 232 760 232 l 12 232 b 5.4 232 0 226.6 0 220 l 0 12 b 0 5.4 5.4 0 12 0{\p0}
 Dialogue: 4,0:00:13.64,0:00:26.47,Label,,0,0,0,,{\an7\move(56,1302,80,1302,0,200)\fad(200,160)\1c&H00000000&\1a&H60&\blur4}03 · THE PHARMACY SHELF
 Dialogue: 5,0:00:13.64,0:00:26.47,Label,,0,0,0,,{\an7\move(56,1300,80,1300,0,200)\fad(200,160)}03 · THE PHARMACY SHELF
+Dialogue: 2,0:00:19.80,0:00:26.47,Rule,,0,0,0,,{\an7\pos(56,1126)\fad(0,160)\1c&H00000000&\1a&H6B&\blur2}{\p1}m 12 0 l 760 0 b 766.6 0 772 5.4 772 12 l 772 272 b 772 278.6 766.6 284 760 284 l 12 284 b 5.4 284 0 278.6 0 272 l 0 12 b 0 5.4 5.4 0 12 0{\p0}
 Dialogue: 4,0:00:19.80,0:00:26.47,Label,,0,0,0,,{\an7\move(56,1354,80,1354,0,200)\fad(200,160)\1c&H00000000&\1a&H60&\blur4}04 · THE LAST STEP CAN FAIL
 Dialogue: 5,0:00:19.80,0:00:26.47,Label,,0,0,0,,{\an7\move(56,1352,80,1352,0,200)\fad(200,160)}04 · THE LAST STEP CAN FAIL
 Dialogue: 3,0:01:10.88,0:01:20.59,Rule,,0,0,0,,{\an7\move(40,1150,80,1150,0,200)\fad(200,160)\1c&H00FF5C7C&}{\p1}m 0 0 l 96 0 96 2 0 2{\p0}
 Dialogue: 4,0:01:10.88,0:01:20.59,ListHead,,0,0,0,,{\an7\move(56,1166,80,1166,0,200)\fad(200,160)\1c&H00000000&\1a&H60&\blur4}06 · THE ANSWER
 Dialogue: 5,0:01:10.88,0:01:20.59,ListHead,,0,0,0,,{\an7\move(56,1164,80,1164,0,200)\fad(200,160)}06 · THE ANSWER
+Dialogue: 2,0:01:10.88,0:01:20.59,Rule,,0,0,0,,{\an7\pos(56,1126)\fad(200,160)\1c&H00000000&\1a&H6B&\blur2}{\p1}m 12 0 l 432 0 b 438.6 0 444 5.4 444 12 l 444 258 b 444 264.6 438.6 270 432 270 l 12 270 b 5.4 270 0 264.6 0 258 l 0 12 b 0 5.4 5.4 0 12 0{\p0}
 Dialogue: 3,0:01:10.88,0:01:20.59,Rule,,0,0,0,,{\an7\move(56,1212,80,1212,0,200)\fad(200,160)\1c&H00559E2E&\alpha&H70&}{\p1}m 0 0 l 22 0 22 22 0 22{\p0}
 Dialogue: 4,0:01:10.88,0:01:20.59,Answer,,0,0,0,,{\an7\move(96,1202,120,1202,0,200)\fad(200,160)\alpha&H70&\1c&H00000000&\1a&H60&\blur4}Passed the screen
 Dialogue: 5,0:01:10.88,0:01:20.59,Answer,,0,0,0,,{\an7\move(96,1200,120,1200,0,200)\fad(200,160)\alpha&H70&}Passed the screen
