@@ -1,0 +1,452 @@
+{
+  "LOG": {
+    "welcome-390": {
+      "file": "welcome-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "home-clinic-390": {
+      "file": "home-clinic-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "history-390": {
+      "file": "history-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "profiles-390": {
+      "file": "profiles-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "settings-390": {
+      "file": "settings-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "station-390": {
+      "file": "station-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "station-flow-390": {
+      "file": "station-flow-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "station-flow-scrolled-390": {
+      "file": "station-flow-scrolled-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "bottle-390": {
+      "file": "bottle-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "tablet-390": {
+      "file": "tablet-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "measure-prepare-390": {
+      "file": "measure-prepare-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "measure-water-390": {
+      "file": "measure-water-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "measure-add-390": {
+      "file": "measure-add-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "measure-dissolving-390": {
+      "file": "measure-dissolving-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "history-midrun-390": {
+      "file": "history-midrun-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "measure-reattached-390": {
+      "file": "measure-reattached-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "result-top-390": {
+      "file": "result-top-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "result-390": {
+      "file": "result-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "result-stages-390": {
+      "file": "result-stages-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "result-sources-390": {
+      "file": "result-sources-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "askpill-open-390": {
+      "file": "askpill-open-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "askpill-answer-390": {
+      "file": "askpill-answer-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "askpill-help-390": {
+      "file": "askpill-help-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "settings-reset-390": {
+      "file": "settings-reset-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "home-personal-390": {
+      "file": "home-personal-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "medicines-390": {
+      "file": "medicines-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "schedule-empty-390": {
+      "file": "schedule-empty-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "schedule-390": {
+      "file": "schedule-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "more-390": {
+      "file": "more-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "home-personal-easy-390": {
+      "file": "home-personal-easy-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "medicines-easy-390": {
+      "file": "medicines-easy-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "home-personal-easyoff-390": {
+      "file": "home-personal-easyoff-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "runbar-phone-390": {
+      "file": "runbar-phone-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "runbar-reset-armed-390": {
+      "file": "runbar-reset-armed-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "measure-resetrow-390": {
+      "file": "measure-resetrow-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "result-startover-390": {
+      "file": "result-startover-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "show-bottle-390": {
+      "file": "show-bottle-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "show-runbar-390": {
+      "file": "show-runbar-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "show-result-390": {
+      "file": "show-result-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "show-result-curve-390": {
+      "file": "show-result-curve-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "show-off-result-390": {
+      "file": "show-off-result-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "show-result-default-390": {
+      "file": "show-result-default-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "settings-show-off-390": {
+      "file": "settings-show-off-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "settings-show-on-390": {
+      "file": "settings-show-on-390.webp",
+      "errors": 0,
+      "width": "390/390"
+    },
+    "welcome-1280": {
+      "file": "welcome-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "home-clinic-1280": {
+      "file": "home-clinic-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "bottle-1280": {
+      "file": "bottle-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "tablet-1280": {
+      "file": "tablet-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "measure-prepare-1280": {
+      "file": "measure-prepare-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "history-1280": {
+      "file": "history-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "profiles-1280": {
+      "file": "profiles-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "settings-1280": {
+      "file": "settings-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "station-1280": {
+      "file": "station-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "station-flow-1280": {
+      "file": "station-flow-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "result-1280": {
+      "file": "result-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "show-result-1280": {
+      "file": "show-result-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "show-off-result-1280": {
+      "file": "show-off-result-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "askpill-open-1280": {
+      "file": "askpill-open-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "measure-water-1280": {
+      "file": "measure-water-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "runbar-desktop-1280": {
+      "file": "runbar-desktop-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "home-personal-1280": {
+      "file": "home-personal-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "medicines-1280": {
+      "file": "medicines-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "schedule-1280": {
+      "file": "schedule-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "more-1280": {
+      "file": "more-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "home-personal-easy-1280": {
+      "file": "home-personal-easy-1280.webp",
+      "errors": 0,
+      "width": "1280/1280"
+    },
+    "nodevice": {
+      "390": {
+        "chip": "board not found: replug the USB-C cable, wait 60 s",
+        "start": true,
+        "line": "board-miss | board not found: replug the USB-C cable, wait 60 s",
+        "file": "nodevice-measure-390.webp",
+        "errors": 0,
+        "width": "390/390"
+      },
+      "1280": {
+        "chip": "board not found: replug the USB-C cable, wait 60 s",
+        "start": true,
+        "line": "board-miss | board not found: replug the USB-C cable, wait 60 s",
+        "file": "nodevice-measure-1280.webp",
+        "errors": 0,
+        "width": "1280/1280"
+      }
+    }
+  },
+  "RUN1": {
+    "water": [
+      "wc-ok: Lid closed Room light is 1 % of the blue LED light at the sensor (dark enough)",
+      "wc-ok: Sensor in range Sensor not saturated",
+      "wc-ok: Light reaches the sensor Blue LED light reaching the sensor: 2614 counts",
+      "wc-wait: Steady Waiting for steady readings (6/10 s)"
+    ],
+    "mini": [
+      "A0 3711",
+      "A1 2563"
+    ],
+    "bar": [
+      false,
+      "Run in progress · Dissolving 0:12 of 1:00\nReset\n↩ back to the run"
+    ],
+    "bar2": "Run in progress · Dissolving 0:16 of 1:00\nReset\n↩ back to the run",
+    "back": [
+      "#/check/measure",
+      "Dissolving",
+      true
+    ]
+  },
+  "RES1": {
+    "sid": "scan_1025_004158_2057",
+    "done": true,
+    "seen": [
+      "4 of 7 | first report · template",
+      "5 of 7 | first report · template",
+      "done | final report · written by claude-sonnet-5"
+    ],
+    "info": {
+      "stamp": "Unable to verify",
+      "noref": "We read Aspirin 325 mg from the label. Unable to verify means there is no reference for Aspirin on this station yet: record 3 good runs to build one. Profiles →",
+      "headline": "Aspirin: Unable to verify",
+      "by": "final report · written by claude-sonnet-5",
+      "nsrc": 8,
+      "nstages": 7
+    }
+  },
+  "ASK": {
+    "about": "latest scan · Aspirin · Unable to verify",
+    "ans": "This scan was marked \"Unable to verify\" because no reference profile existed to match this specific Aspirin product's label and tablet characteristics against, even though recalls were found for Time-Cap Labs (the manufacturer) — none of th"
+  },
+  "PERS": {
+    "meds": [
+      "Aspirin | 325 mg · Time-Cap Labs, Inc. (distributed by Prestige Brands, Inc.) | Unable to verify | Other lots of this product have recalls | Tested 5 times · la"
+    ],
+    "sched": {
+      "rows": [
+        "dose dose-taken: 12:30 AM | Aspirin 325 mg | 1 tablet with food · taken at 12:43 AM | Undo",
+        "dose dose-later: 8:00 PM | Aspirin 325 mg | 1 tablet with food | I took it"
+      ],
+      "log": 1,
+      "hash": "#/schedule"
+    },
+    "ics": "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Pill Gate//Schedule//EN\nCALSCALE:GREGORIAN\nBEGIN:VEVENT\nUID:mmvnitvnq-0030@pillgate.local\nDTSTAMP:20261025T074339Z\nDTSTART:20261025T003000\nDURATION:PT10M\nRRULE:FREQ=DAILY\nSUMMARY:Take Aspirin 325 mg (1 tablet with food)\nDESCRIPTION:From your Pill Gate schedule.\nBEGIN:VALARM\nACTION:DISPLAY",
+    "easyOn": [
+      true,
+      "on",
+      true
+    ],
+    "easyOff": [
+      false,
+      "off"
+    ]
+  },
+  "RESET": {
+    "armedTxt": "Tap again",
+    "after": [
+      "#/",
+      true,
+      ""
+    ],
+    "live": false,
+    "runs": [
+      "run_1025_004436_5d20 cancelled",
+      "run_1025_004158_92b8 check"
+    ],
+    "over": [
+      "#/",
+      ""
+    ]
+  },
+  "SHOW": {
+    "sid": "scan_1025_004630_5bd5",
+    "chip": [
+      true,
+      "on"
+    ],
+    "showInfo": {
+      "title": "Aspirin 325 mg",
+      "name": "Aspirin 325 mg",
+      "ring": "100 %\nmatch",
+      "stamp": "Passed the screen",
+      "note": "Show mode: this result is staged for the table demo; the curve and numbers are the real run (measured: Unable to verify). Turn it off",
+      "curve": true,
+      "nsrc": 10
+    },
+    "honest": [
+      "Unable to verify",
+      false,
+      "Result"
+    ],
+    "hist": "UNABLE_TO_VERIFY"
+  }
+}

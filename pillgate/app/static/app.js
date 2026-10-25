@@ -282,7 +282,7 @@ const BOARD_MISSING = "board not found: replug the USB-C cable, wait 60 s";
 const boardMissing = (st = S.live && S.live.status) => !!st && (st.mode === "no device" || st.mode === "error");
 function deviceText(st) {
   if (!st) return ["server offline", "bad"];
-  if (boardMissing(st)) return [BOARD_MISSING, "bad"];
+  if (boardMissing(st)) return [BOARD_MISSING, "warn"];   // amber: red is only for held / recall
   const fresh = st.seconds_since_last !== null && st.seconds_since_last < 4;
   if (st.mode.startsWith("replay")) return ["REPLAY (not live) · " + st.mode.slice(7), "warn"];
   return [`${st.mode}${fresh ? " · live" : " · waiting"}`, st.mode.startsWith("serial") && fresh ? "ok beat" : "bad"];
