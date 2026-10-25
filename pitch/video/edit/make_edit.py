@@ -189,9 +189,14 @@ JC = CUTS[0]["jcut"]
 inputs.append(f'-ss {JC["src"]:.3f} -t {(CUTS[0]["dur"] - JC["head"]) * JC["speed"]:.3f} -i "$SRC"')
 GRADE = "eq=contrast=1.05:saturation=1.10:gamma=1.04"
 BASE = f"fps={FPS},scale={W}:{H}:flags=lanczos,setsar=1"
+# Every segment is forced to its exact nominal length (clone-pad the last frame, then trim). Without this, the 31.58-fps VFR
+# source loses a frame or two per segment in -ss/-t + fps=30; the deficit accumulates past the 1-frame "cut" xfades, a later
+# xfade's offset lands beyond the end of its first input and the video ends early (the 2026-10-25 render stopped at 62.77 s).
+def fit(d): return f"tpad=stop_mode=clone:stop_duration=2,trim=duration={d:.3f},setpts=PTS-STARTPTS"
+def afit(d): return f"apad=whole_dur={d:.3f},atrim=duration={d:.3f},asetpts=PTS-STARTPTS"
 for i, c in enumerate(CUTS):
     if c["fx"] == "glow":  # head on the speaker (graded), then the slowed hardware shot with glow + push-in + vignette
-        fc.append(f"[{i}:v]trim=0:{JC['head']:.3f},setpts=PTS-STARTPTS,{BASE},{GRADE},format=yuv420p,settb=1/{FPS}[hd]")
+        fc.append(f"[{i}:v]trim=0:{JC['head']:.3f},setpts=PTS-STARTPTS,{BASE},{GRADE},format=yuv420p,{fit(JC['head'])},settb=1/{FPS}[hd]")
         fc.append(f"[{iHW}:v]setpts=(PTS-STARTPTS)/{JC['speed']},fps={FPS},scale={2 * W}:{2 * H}:flags=bicubic,"
                   f"zoompan=z='min(1+0.0030*on\\,1.30)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s={W}x{H}:fps={FPS},"
                   f"setsar=1,format=gbrp,split=3[h0][h1][h2]")
@@ -199,16 +204,16 @@ for i, c in enumerate(CUTS):
         fc.append("[h2]edgedetect=low=0.06:high=0.18:mode=wires,negate,gblur=sigma=1.1[he]")
         fc.append("[h0][hg]blend=all_mode=screen:all_opacity=0.62[hs]")
         fc.append("[hs][he]blend=all_mode=multiply:all_opacity=0.35[hc]")
-        fc.append(f"[hc]eq=contrast=1.14:saturation=1.30,vignette=angle=PI/3.2,format=yuv420p,settb=1/{FPS}[hw]")
-        fc.append(f"[hd][hw]concat=n=2:v=1:a=0,trim=0:{c['dur']:.3f},settb=1/{FPS}[v{i}]")
+        fc.append(f"[hc]eq=contrast=1.14:saturation=1.30,vignette=angle=PI/3.2,format=yuv420p,{fit(c['dur'] - JC['head'])},settb=1/{FPS}[hw]")
+        fc.append(f"[hd][hw]concat=n=2:v=1:a=0,{fit(c['dur'])},settb=1/{FPS}[v{i}]")
     elif c["fx"] == "punch":  # static 8% punch-in ("zoom cut")
         fc.append(f"[{i}:v]fps={FPS},scale={round(W * 1.08 / 2) * 2}:{round(H * 1.08 / 2) * 2}:flags=lanczos,"
-                  f"crop={W}:{H},setsar=1,{GRADE},format=yuv420p,settb=1/{FPS}[v{i}]")
+                  f"crop={W}:{H},setsar=1,{GRADE},format=yuv420p,{fit(c['dur'])},settb=1/{FPS}[v{i}]")
     else:
-        fc.append(f"[{i}:v]{BASE},{GRADE},format=yuv420p,settb=1/{FPS}[v{i}]")
-    fc.append(f"[{i}:a]aresample=48000,aformat=channel_layouts=stereo,highpass=f=90,afftdn=nr=10,asetpts=PTS-STARTPTS[a{i}]")
-fc.append(f"[{iEND}:v]format=yuv420p,setsar=1,settb=1/{FPS}[v{NC}]")
-fc.append(f"[{iSIL}:a]aformat=channel_layouts=stereo[a{NC}]")
+        fc.append(f"[{i}:v]{BASE},{GRADE},format=yuv420p,{fit(c['dur'])},settb=1/{FPS}[v{i}]")
+    fc.append(f"[{i}:a]aresample=48000,aformat=channel_layouts=stereo,highpass=f=90,afftdn=nr=10,asetpts=PTS-STARTPTS,{afit(c['dur'])}[a{i}]")
+fc.append(f"[{iEND}:v]format=yuv420p,setsar=1,{fit(END_DUR)},settb=1/{FPS}[v{NC}]")
+fc.append(f"[{iSIL}:a]aformat=channel_layouts=stereo,{afit(END_DUR)}[a{NC}]")
 joins = [c["join"] for c in CUTS[1:]] + [END_JOIN]
 segstarts = starts[1:] + [END_START]
 pv, pa = "[v0]", "[a0]"
@@ -234,13 +239,13 @@ for j, (cid, st, name, wd, x, y, dur, alpha) in enumerate(POPS):
               f"enable='between(t,{T0},{T0 + dur:.3f})':eof_action=pass{nv}")
     vcur = nv
 fc.append(f"{vcur}ass=captions.ass:fontsdir=fonts,format=yuv420p[vout]")
-# audio: voice ladder + film score ducked under it (sidechain), score ticks muted, loudness to -14 LUFS
+# audio: voice ladder + film score ducked under it (sidechain), score ticks muted, loudness to -16 LUFS (the film's level)
 tick_mute = "+".join(f"between(t,{tk - 0.01:.2f},{tk + 0.09:.2f})" for tk in MUSIC_TICKS if tk < TOTAL)
 fc.append(f"{pa}asplit=2[vo][vsc]")
 fc.append(f"[{iMUS}:a]atrim=0:{TOTAL},asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,"
           f"volume=0:enable='{tick_mute}',volume=0.55,afade=t=in:st=0:d=0.4,afade=t=out:st={TOTAL - 1.6:.2f}:d=1.6[mu]")
 fc.append("[mu][vsc]sidechaincompress=threshold=0.025:ratio=9:attack=15:release=380:makeup=1[duck]")
-fc.append("[vo][duck]amix=inputs=2:normalize=0:duration=longest,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000[aout]")
+fc.append("[vo][duck]amix=inputs=2:normalize=0:duration=longest,loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000[aout]")
 
 graph = ";\n".join(fc)
 open(os.path.join(HERE, "graph.txt"), "w").write(graph + "\n")

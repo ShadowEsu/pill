@@ -1,8 +1,8 @@
 # Pitch video edit plan (owner's night take, Palace of Fine Arts)
 
-Source: `pitch/video-raw/preston-pitch-raw.mp4`: 179.42 s, h264 1024×576 with a −90° rotation side-data tag (displays **portrait 576×1024**), 600/19 fps (31.58), AAC 44.1 kHz stereo. Output: **1080×1920**, 30 fps, h264 CRF 20, AAC 192k, faststart, loudnorm −14 LUFS.
+Source: `pitch/video-raw/preston-pitch-raw.mp4`: 179.42 s, h264 1024×576 with a −90° rotation side-data tag (displays **portrait 576×1024**), 600/19 fps (31.58), AAC 44.1 kHz stereo. Output: **1080×1920**, 30 fps, h264 CRF 20, AAC 192k, faststart, loudnorm −16 LUFS.
 
-**Status: prepared, NOT rendered** (quiet hours). Everything below is in `pitch/video/edit/`, all generated from one cut list in `make_edit.py`.
+**Status: rendered** to `pitch/video/pill-pitch-90s.mp4` (2026-10-25). Everything below is in `pitch/video/edit/`, all generated from one cut list in `make_edit.py`.
 
 ```
 bash pitch/video/edit/build.sh --preview   # seconds 0–10 (hook glow + first dip + captions) → pitch/video/pill-pitch-preview10.mp4
@@ -57,7 +57,7 @@ Hook first; then the problem in his words; the app and the box in the order he f
 ## Music
 The film's own generated score, `pitch/film/work/music.wav` (158 s, 96 BPM soft pad, sine bass on the bar, quiet pluck: rendered by `pitch/film/film.html` `renderAudio()`; original, so no licence or attribution needed). It's used from 0:00. Its scene ticks (22.5, 39.5, 51.5, 62.5 s) are muted with a volume envelope.
 - **Cue points:** 0:00 score in at full under the hook (0.4 s fade-in) · from ~0:00.8 ducked under his voice by `sidechaincompress` (threshold 0.025, ratio 9, attack 15 ms, release 380 ms) · lifts in his pauses (whips at 0:27.1, 0:47.1, 1:07.3) · 1:18.2 voice ends, score comes back up under the end card · 1:20.6 1.6 s fade-out.
-- Voice: high-pass 90 Hz + light `afftdn` (outdoor wind/noise); final `loudnorm I=-14 TP=-1.5 LRA=11`.
+- Voice: high-pass 90 Hz + light `afftdn` (outdoor wind/noise); final `loudnorm I=-16 TP=-1.5 LRA=11`.
 - `pitch/film/work/` is untracked: the render needs this machine (or `MUSIC=/path/to.wav bash build.sh`).
 
 ## End card (1:18.21–1:22.21, 4 s)
