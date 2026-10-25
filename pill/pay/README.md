@@ -87,10 +87,10 @@ A malformed body gets a `400` before the payment gate, so nobody pays for a bad 
 
 | `SERIAL_PORT` | mode |
 |---|---|
-| unset | scans `/dev/cu.usbmodem*` and `/dev/cu.usbserial*` every 3 s, so a board plugged in after the service starts is picked up. Unplugging ends the current run as `lost`. |
+| unset or `off` | **never opens a port** (the default). The USB serial port belongs to the Pill Gate Python app (`pillgate/app/server.py`) reading the UNO Q, and to flashing tools, so a plain `npm run serve` leaves it alone. |
+| `auto` | scans `/dev/cu.usbmodem*` and `/dev/cu.usbserial*` every 3 s, so a board plugged in after the service starts is picked up. Unplugging ends the current run as `lost`. Opt-in only: it takes the first USB serial port it sees, whatever board that is. |
 | `/dev/cu.usbmodem1101` | that port only (retried every 3 s) |
 | `sim` | built-in simulator: same commands and line format at 1 line/s (`SIM_SPEED=n` for n lines per second) with a riboflavin-like curve (inline A → 0.43, τ 30 s; 90° glow → 0.30, τ 33 s). Its lines say `"src":"sim"`, `/station/status` says `mode:'sim', src:'sim'`, and the app badges the run SIMULATED. |
-| `off` | never opens a port. Use it when another program owns the USB serial port, for example the Pill Gate Python app (`pillgate/app/server.py`) reading the UNO Q. |
 
 With no port and no `sim`, the mode is `no_station`. Nothing is invented: the app hides its station chip and Start plays the replay.
 

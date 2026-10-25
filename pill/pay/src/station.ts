@@ -1,7 +1,8 @@
 // The station bridge: the Uno's JSON lines over USB serial (SOFTWARE-PLAN §2) in, app-shaped samples over SSE out.
 // The firmware measures and streams; this file owns the run state machine (idle → dark → blank → running → plateau |
 // timeout, any → fault) and decides when a run ends. It never decides a verdict: the app's rules do, from the samples.
-//   SERIAL_PORT unset → scan /dev/cu.usbmodem* and /dev/cu.usbserial* every 3 s (a board plugged in later is picked up)
+//   SERIAL_PORT unset (or off) → mode 'no_station', the port is never touched: the Pill Gate Python app and flashing tools own it
+//   SERIAL_PORT=auto → scan /dev/cu.usbmodem* and /dev/cu.usbserial* every 3 s (a board plugged in later is picked up)
 //   SERIAL_PORT=/dev/… → that port only     SERIAL_PORT=sim → the built-in simulator below (status says mode:'sim')
 // No port and no sim → mode:'no_station' and nothing is ever invented: the app keeps its replays.
 import { readdirSync } from 'node:fs';
@@ -145,13 +146,14 @@ class Station {
 
   start() {
     const want = process.env.SERIAL_PORT?.trim();
-    if (want === 'off') return; // another program owns the USB serial port (e.g. the Pill Gate Python app)
+    // opt-in only: an unasked-for open would steal the board from the Pill Gate app or a flashing job
+    if (!want || want === 'off') return;
     if (want === 'sim') { this.src = new SimStation((s) => this.onText(s)); return; }
     let opening = false;
     const tryOpen = async () => {
       if (this.src || opening) return;
-      let path = want || null;
-      if (!path) {
+      let path: string | null = want;
+      if (want === 'auto') {
         try { path = readdirSync('/dev').filter((f) => /^cu\.(usbmodem|usbserial)/.test(f)).sort().map((f) => `/dev/${f}`)[0] ?? null; } catch { path = null; }
       }
       if (!path) return;
