@@ -271,10 +271,13 @@ function mountBinaryPill(cv, { dark = true, cell = 8, scale = 1.9 } = {}) {
 }
 
 // ================================================================ device chip + live polling (2×/s)
+const BOARD_MISSING = "board not found: replug the USB-C cable, wait 60 s";
+/** No board (and not replay): the run can't start. */
+const boardMissing = (st = S.live && S.live.status) => !!st && (st.mode === "no device" || st.mode === "error");
 function deviceText(st) {
   if (!st) return ["server offline", "bad"];
+  if (boardMissing(st)) return [BOARD_MISSING, "bad"];
   const fresh = st.seconds_since_last !== null && st.seconds_since_last < 4;
-  if (st.mode === "no device") return ["no device", "bad"];
   if (st.mode.startsWith("replay")) return ["REPLAY (not live) · " + st.mode.slice(7), "warn"];
   return [`${st.mode}${fresh ? " · live" : " · waiting"}`, st.mode.startsWith("serial") && fresh ? "ok beat" : "bad"];
 }
@@ -444,19 +447,45 @@ const Run = {
     } catch (e) { this.recording = false; this.save(); toast("Could not stop: " + e.message); this.set("idle"); }
     this.stopping = false;
   },
+  /** "Reset this check": cancel any recording (backend saves it as cancelled_run_*), forget photos and run state, go back to the start. */
+  async reset() {
+    this.stopping = true;
+    let recording = this.recording;
+    try { const st = await api("/api/live"); recording = recording || !!(st.status && st.status.recording); } catch {}
+    if (recording) { try { await post("/api/run/stop", { label: "cancelled" }); } catch {} }
+    this.recording = false; this.stopping = false; this.readyScan = null; this.continuedAt = null; this.dissolveS = 0;
+    try { sessionStorage.removeItem(RUN_KEY); } catch {}
+    resetCheck();
+    Object.assign(S.check, { profileId: "", runMode: "quick" });
+    this.set("idle");
+    toast(recording ? "Check reset · the run was saved as cancelled" : "Check reset");
+    const to = mode() === "check" ? "#/check/bottle" : "#/";
+    if (location.hash === to) render(); else location.hash = to;
+  },
   async cancel() {
     this.stopping = true;
     try { await post("/api/run/stop", { label: "cancelled" }); } catch {}
     this.recording = false; this.stopping = false; this.set("idle");
   },
 };
+/** Two-tap confirm on a button: the first tap arms it (label changes for 4 s), the second runs `fn`. */
+function armed(btn, fn, armedLabel = "Tap again to reset") {
+  btn.addEventListener("click", (e) => {
+    e.preventDefault(); e.stopPropagation();
+    if (btn.dataset.armed) { delete btn.dataset.armed; fn(); return; }
+    const old = btn.textContent; btn.dataset.armed = "1"; btn.textContent = armedLabel; btn.classList.add("armed");
+    setTimeout(() => { if (btn.dataset.armed) { delete btn.dataset.armed; btn.textContent = old; btn.classList.remove("armed"); } }, 4000);
+  });
+}
 const onPath = (re) => re.test((location.hash.slice(1) || "/").split("?")[0]);
 /** Slim sticky bar on every page except Measure while a run is going, then "Result ready" once its scan exists. */
 function paintRunBar() {
   const bar = $("runbar"); if (!bar) return;
   const show = (cls, html) => {             // only touch the DOM when the words change (it runs 2×/s)
     if (bar.className !== cls) bar.className = cls;
-    if (bar._html !== html) { bar._html = html; bar.innerHTML = html; }
+    const r = bar.querySelector(".rb-reset");
+    if (r && r.dataset.armed) return;       // don't repaint away an armed Reset
+    if (bar._html !== html) { bar._html = html; bar.innerHTML = html; const b = bar.querySelector(".rb-reset"); if (b) armed(b, () => Run.reset(), "Tap again"); }
     if (bar.hidden) { document.documentElement.style.setProperty("--top-h", $("topbar").offsetHeight + "px"); bar.hidden = false; }
   };
   const onMeasure = onPath(/^\/check\/measure$/);
@@ -467,7 +496,7 @@ function paintRunBar() {
       : Run.phase === "add" ? "Add the tablet now"
       : Run.phase === "dissolving" ? `Dissolving ${mmss(Run.dissolveS)}${S.check.runMode === "quick" ? " of " + mmss(T.quick_s) : ""}`
       : "Building the result…";
-    show("runbar" + (Run.phase === "add" ? " urgent" : ""), `<span class="rb-dot" aria-hidden="true"></span><span class="rb-text"><b>Run in progress</b> · ${esc(what)}</span><a class="rb-go" href="#/check/measure">↩ back to the run</a>`);
+    show("runbar" + (Run.phase === "add" ? " urgent" : ""), `<span class="rb-dot" aria-hidden="true"></span><span class="rb-text"><b>Run in progress</b> · ${esc(what)}</span><button type="button" class="rb-reset">Reset</button><a class="rb-go" href="#/check/measure">↩ back to the run</a>`);
     return;
   }
   if (Run.readyScan && onPath(new RegExp("^/result/" + Run.readyScan.replace(/[^\w-]/g, "") + "$"))) Run.readyScan = null;   // seen it
@@ -841,7 +870,8 @@ route(/^\/check\/measure$/, async (v) => {
           <span class="chip ${S.check.bottle ? "ok" : ""}"><span class="dot"></span>bottle ${S.check.bottle ? "photo ready" : "skipped"}</span>
           <span class="chip ${S.check.imprint ? "ok" : ""}"><span class="dot"></span>tablet ${S.check.imprint ? "photo ready" : "skipped"}</span>
         </div>
-        <button type="button" class="btn" id="btn-start" style="min-width:220px">Start</button>
+        <button type="button" class="btn" id="btn-start" style="min-width:220px"${boardMissing() ? " disabled" : ""}>Start</button>
+        <p class="board-miss${boardMissing() ? "" : " hidden"}" id="board-miss" role="status">${esc(BOARD_MISSING)}</p>
         <a class="footnote" href="#/station" style="color:var(--ink);font-weight:600">Where everything sits →</a>`;
       scene.querySelectorAll("[data-run]").forEach((b) => (b.onclick = () => { S.check.runMode = b.dataset.run; drawRail(); drawScene(); }));
       $("profile").onchange = (e) => (S.check.profileId = e.target.value);
@@ -888,6 +918,8 @@ route(/^\/check\/measure$/, async (v) => {
     }
     const c = $("btn-cancel"); if (c) c.onclick = () => Run.cancel();
   };
+  v.insertAdjacentHTML("beforeend", `<div class="reset-row"><button type="button" class="btn ghost sm" id="btn-reset">Reset this check</button><span class="footnote">Stops any recording (saved as cancelled), forgets the photos and starts over.</span></div>`);
+  armed($("btn-reset"), () => Run.reset());
   const onPhase = () => { drawRail(); drawScene(); };
   Run.listeners.add(onPhase); S.leave.push(() => { Run.listeners.delete(onPhase); clearInterval(countdown); if (chart) chart.destroy(); });
   onPhase();
@@ -898,6 +930,8 @@ route(/^\/check\/measure$/, async (v) => {
     const raw = (l && l.raw_last) || d.raw_last;
     if (raw && $("raw")) $("raw").innerHTML = rawTable(raw);
     paintStationCounts("st-m", raw);
+    const bs = $("btn-start"), miss = boardMissing(d.status);
+    if (bs && Run.phase === "idle") { bs.disabled = miss; $("board-miss").classList.toggle("hidden", !miss); }
     const fresh = d.status && d.status.seconds_since_last !== null && d.status.seconds_since_last < 4;
     v.querySelectorAll("[data-lines]").forEach((el) => el.classList.toggle("breathe", !!fresh));
     $("l-in").textContent = Run.phase === "dissolving" && l && l.tablet_in_at_s ? `tablet in at ${Math.round(l.tablet_in_at_s)} s into the recording` : "";
@@ -972,10 +1006,12 @@ route(/^\/result\/([^/]+)$/, async (v, id) => {
     <section class="card actions" style="align-items:center">
       <a class="btn ghost" href="#/ask/${encodeURIComponent(id)}">Ask about this result</a>
       <a class="btn ghost" href="#/issue/${encodeURIComponent(id)}">Report an issue</a>
+      <button type="button" class="btn ghost" id="r-over">Start over</button>
       <button type="button" class="btn" id="r-new">Check another</button>
     </section>
     <p class="disclaimer">${esc(DISCLAIMER)} Results that need lab testing should go to a qualified laboratory or pharmacist.</p>`;
   $("r-new").onclick = () => { resetCheck(); location.hash = "#/check/bottle"; };
+  $("r-over").onclick = () => Run.reset();
   S.leave.push(() => { left = true; clearTimeout(timer); if (chart) chart.destroy(); });
 
   const profiles = await api("/api/profiles").catch(() => []);
@@ -1270,7 +1306,8 @@ route(/^\/settings$/, (v) => {
         <div class="set-row"><span><b>Sounds</b><small>Beeps when it's time to add the tablet and when the run stops.</small></span>${sw("s-sound", PREF.sound, "Sounds")}</div>
         <div class="set-row"><span><b>Easy mode</b><small>Bigger text (125 %), stronger contrast, answers read aloud.</small></span>${sw("s-easy", PREF.easy, "Easy mode")}</div>
         <div class="set-row"><span><b>Read answers aloud</b><small>On the Ask page and in Ask Pill.</small></span>${sw("s-speak", PREF.speak, "Read answers aloud")}</div>
-        <div class="set-row"><span><b>Reset local preferences</b><small>Forgets the mode and these switches on this browser only.</small></span><button type="button" class="btn ghost sm" id="s-reset">Reset</button></div>
+        <div class="set-row"><span><b>Reset local preferences</b><small>Forgets the mode and these switches on this browser only. Your schedule stays.</small></span><button type="button" class="btn ghost sm" id="s-reset">Reset</button></div>
+        <div class="set-row"><span><b>Reset everything on this device</b><small>Preferences, mode, schedule and its log, reminders, chats and the check's photos. Keeps nothing. Scans saved on the station are not touched.</small></span><button type="button" class="btn ghost sm" id="s-wipe">Reset everything</button></div>
       </section>
       <section class="card stack span-2"><h2 class="h">Server</h2>
         <dl class="kv"><dt>app</dt><dd>${esc(c.app_name)}</dd><dt>AI</dt><dd>${c.ai ? "on · " + esc(c.model) : "mock mode (no API key)"}</dd>
@@ -1283,6 +1320,15 @@ route(/^\/settings$/, (v) => {
   $("s-sound").onclick = (e) => { PREF.sound = !PREF.sound; e.currentTarget.setAttribute("aria-checked", String(PREF.sound)); if (PREF.sound) beep(1); };
   $("s-speak").onclick = (e) => { PREF.speak = !PREF.speak; e.currentTarget.setAttribute("aria-checked", String(PREF.speak)); };
   $("s-easy").onclick = (e) => { PREF.easy = !PREF.easy; e.currentTarget.setAttribute("aria-checked", String(PREF.easy)); $("s-speak").setAttribute("aria-checked", String(PREF.speak)); toast(PREF.easy ? "Easy mode on" : "Easy mode off"); };
+  armed($("s-wipe"), async () => {
+    await Run.reset().catch(() => {});
+    Object.keys(localStorage).filter((k) => k.startsWith("pillgate.")).forEach((k) => localStorage.removeItem(k));
+    try { Object.keys(sessionStorage).filter((k) => k.startsWith("pillgate.")).forEach((k) => sessionStorage.removeItem(k)); } catch {}
+    try { indexedDB.deleteDatabase("pillgate"); } catch {}
+    S.chats = {}; Dock.chats = { help: [] };
+    document.body.classList.remove("easy"); navMode = null;
+    location.hash = "#/welcome"; toast("Everything on this device was reset");
+  }, "Tap again: erase all");
   $("s-reset").onclick = (e) => {
     const b = e.currentTarget;
     if (b.dataset.armed) { PREF.reset(); navMode = null; location.hash = "#/welcome"; return; }
