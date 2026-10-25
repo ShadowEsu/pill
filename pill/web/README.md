@@ -34,7 +34,9 @@ Open http://127.0.0.1:5183/welcome. For the kiosk screen on the Pi: `/kiosk` at 
 | `/agent` | the policy agent's record: counts, limits, the 6-case downgrade-only test, where it could go wrong |
 | `/ask` | Ask Pill (Claude, answers only from Pill's record; refusals) |
 | `/verify` | the real x402 402 from the service |
-| `/settings` | sound, big text, calendar status, reset demo data |
+| `/medicines` | personal: the medicines tested on the station app (`GET /gate/station-scans`, every 10 s), then my bottles |
+| `/schedule` | personal: big dose rows (I took it, Remind me = browser notification while a tab is open, daily Google Calendar event) |
+| `/settings` | Easy mode (125 % text, contrast, big buttons, read aloud), sound, big text, calendar status, reset demo data |
 
 Replay keys: `B2-07` PASS/P1, `TM-02` NEEDS LAB/N2, `B2-LID` UNABLE/U2 (lid opened), `AMX-01` UNABLE/U1 (no reference).
 
