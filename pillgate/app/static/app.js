@@ -392,7 +392,7 @@ const Run = {
     }
     if (this.phase === "dissolving" && g.phase === "dissolving" && g.stop) { beep(3); this.finish("auto: " + g.why); }
   },
-  async tabletIn() { await post("/api/run/mark", { name: "tablet_in" }); this.set("dissolving"); },
+  async tabletIn() { await post("/api/run/mark", { name: "tablet_in" }); this.continuedAt = Date.now(); this.set("dissolving"); },
   async finish() {
     if (this.phase === "analyzing") return;
     this.set("analyzing");
@@ -584,9 +584,25 @@ const checkpointPlugin = {
   id: "checkpoints",
   afterDatasetsDraw(chart, _a, opts) {
     const xs = opts && opts.at; if (!xs || !xs.length) return;
-    const { ctx, chartArea: a, scales: { x } } = chart;
-    ctx.save(); ctx.strokeStyle = "rgba(22,24,27,.16)"; ctx.setLineDash([2, 3]); ctx.fillStyle = "#16181B";
-    xs.forEach((t) => { const px = x.getPixelForValue(t); if (px < a.left || px > a.right) return; ctx.beginPath(); ctx.moveTo(px, a.top); ctx.lineTo(px, a.bottom); ctx.stroke(); ctx.beginPath(); ctx.arc(px, a.top + 3, 2.2, 0, Math.PI * 2); ctx.fill(); });
+    const { ctx, chartArea: a, scales: { x, y } } = chart;
+    // the signal line the checkpoints are judged on (dashed "colour only" / cloudiness line, else the first line)
+    const ds = chart.data.datasets.find((d) => d.borderDash && d.borderDash.length && d.label !== "reference") || chart.data.datasets[0];
+    const pts = ds ? ds.data : [];
+    const lastT = pts.length ? pts[pts.length - 1].x : -1;
+    const yAt = (t) => { let best = null; for (const p of pts) { if (p.x > t) break; best = p; } return best ? best.y : null; };
+    ctx.save();
+    xs.forEach((t) => {
+      const px = x.getPixelForValue(t); if (px < a.left || px > a.right) return;
+      ctx.strokeStyle = "rgba(22,24,27,.12)"; ctx.setLineDash([2, 3]); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(px, a.top); ctx.lineTo(px, a.bottom); ctx.stroke(); ctx.setLineDash([]);
+      const v = t <= lastT ? yAt(t) : null;
+      if (v !== null) {          // reached: a filled dot sitting on the curve
+        const py = Math.max(a.top, Math.min(a.bottom, y.getPixelForValue(v)));
+        ctx.beginPath(); ctx.arc(px, py, 4.5, 0, Math.PI * 2); ctx.fillStyle = "#16181B"; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = "#fff"; ctx.stroke();
+      } else {                   // still to come: a hollow dot on the top rail
+        ctx.beginPath(); ctx.arc(px, a.top + 4, 3.2, 0, Math.PI * 2); ctx.fillStyle = "#fff"; ctx.fill(); ctx.lineWidth = 1.5; ctx.strokeStyle = "rgba(22,24,27,.45)"; ctx.stroke();
+      }
+    });
     ctx.restore();
   },
 };
@@ -598,7 +614,7 @@ function makeChart(canvas, { checkpoints = null, xTitle = "seconds after tablet 
     options: {
       animation: false, maintainAspectRatio: false, parsing: false, normalized: true,
       scales: {
-        x: { type: "linear", title: { display: true, text: xTitle, color: "#7C8188", font: mono }, ticks: { color: "#7C8188", font: mono }, grid: { color: "rgba(22,24,27,.06)" }, border: { color: "rgba(22,24,27,.12)" } },
+        x: { type: "linear", min: checkpoints ? 0 : undefined, max: checkpoints ? checkpoints[checkpoints.length - 1] : undefined, title: { display: true, text: xTitle, color: "#7C8188", font: mono }, ticks: { color: "#7C8188", font: mono }, grid: { color: "rgba(22,24,27,.06)" }, border: { color: "rgba(22,24,27,.12)" } },
         y: { title: { display: true, text: "absorbance", color: "#7C8188", font: mono }, ticks: { color: "#7C8188", font: mono }, grid: { color: "rgba(22,24,27,.06)" }, border: { color: "rgba(22,24,27,.12)" } },
       },
       plugins: { legend: { labels: { color: "#16181B", boxWidth: 10, boxHeight: 2, padding: 8, font: { family: "Inter, system-ui, sans-serif", size: 11 } } }, checkpoints: { at: checkpoints }, tooltip: { enabled: false } },
@@ -617,6 +633,17 @@ function setCurve(chart, curve, extra = []) {
   chart.update();
 }
 const tickSvg = `<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.4l2.3 2.3 4.7-5" pathLength="1"/></svg>`;
+const crossSvg = `<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3.5 3.5l5 5M8.5 3.5l-5 5"/></svg>`;
+// guide.water_check() check names → the headline for each row; the backend message is the one-line reason under it
+const CHECK_NAME = { dark: "Lid closed", range: "Sensor in range", light: "Light reaches the sensor", steady: "Steady", reference: "Same as your last clean water" };
+const RAW_COLS = [["dark", "dark"], ["B", "blue"], ["W", "white"], ["R", "red"]];
+/** Raw ADC counts from the board: A0 = LDR A (light through the cup), A1 = LDR B (side, 90°). */
+function rawTable(raw) {
+  const cell = (k) => { const v = raw ? raw[k] : null; return v === null || v === undefined || v === "" || isNaN(+v) ? "–" : String(Math.round(+v)); };
+  return `<table class="raw"><thead><tr><th></th>${RAW_COLS.map(([, n]) => `<th>${n}</th>`).join("")}</tr></thead><tbody>
+    <tr><th>A0 <small>through</small></th>${RAW_COLS.map(([c]) => `<td>${cell(c + "_a")}</td>`).join("")}</tr>
+    <tr><th>A1 <small>side 90°</small></th>${RAW_COLS.map(([c]) => `<td>${cell(c + "_b")}</td>`).join("")}</tr></tbody></table>`;
+}
 const ringHtml = (id, color) => `<div class="ring" id="${id}" style="--rc:${color}"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="track" cx="60" cy="60" r="52"/><circle class="glow" cx="60" cy="60" r="52" pathLength="100" stroke-dashoffset="100"/><circle class="val" cx="60" cy="60" r="52" pathLength="100" stroke-dashoffset="100"/></svg><div class="ring-txt"><span class="num">0</span><small></small></div></div>`;
 function setRing(el, frac, big, small) {
   if (!el) return;
@@ -650,7 +677,9 @@ route(/^\/check\/measure$/, async (v) => {
         </section>
         <section class="card stack">
           <div class="row between wrap"><h2 class="h">Device</h2>${deviceChip()}</div>
-          <dl class="live-stats"><div><dt>seconds</dt><dd id="l-sec">–</dd></div><div><dt>samples</dt><dd id="l-n">–</dd></div><div><dt>lines read</dt><dd data-lines>–</dd></div></dl>
+          <dl class="live-stats"><div><dt>lines read</dt><dd data-lines>–</dd></div><div><dt>seconds</dt><dd id="l-sec">–</dd></div><div><dt>samples</dt><dd id="l-n">–</dd></div></dl>
+          <div id="raw" class="raw-wrap">${rawTable(null)}</div>
+          <p class="footnote">Raw counts from the board, newest line. A0 = light through the cup, A1 = side sensor at 90°.</p>
           <p class="footnote" id="l-in"></p>
         </section>
         <details class="card alt">
@@ -713,13 +742,20 @@ route(/^\/check\/measure$/, async (v) => {
         <p class="lead">Water looks good. <b>Lift the lid, drop the tablet in the middle, stir 5 slow circles with the stick, take the stick out and close the lid, all within about 10 seconds.</b> Then press <b>Continue</b> right away.</p>
         <div class="row wrap" style="justify-content:center"><button type="button" class="btn" id="btn-continue" style="min-width:240px">Tablet is in · Continue</button><button type="button" class="btn ghost" id="btn-cancel">Cancel</button></div>`;
       $("ring").classList.add("pulse");
-      const t0 = Date.now();
-      const step = () => { const left = Math.max(0, 10 - (Date.now() - t0) / 1000); setRing($("ring"), left / 10, String(Math.ceil(left)), left > 0 ? "seconds" : "press Continue"); };
+      const t0 = Date.now(); let rang = false;
+      const step = () => {
+        const left = Math.max(0, 10 - (Date.now() - t0) / 1000);
+        setRing($("ring"), left / 10, String(Math.ceil(left)), left > 0 ? "seconds" : "press Continue");
+        if (!left && !rang) { rang = true; beep(1); $("ring").classList.add("due"); }
+      };
       step(); countdown = setInterval(step, 200);
       $("btn-continue").onclick = (e) => { e.target.disabled = true; Run.tabletIn().catch((err) => { toast(err.message); e.target.disabled = false; }); };
     }
     if (p === "dissolving") {
-      scene.innerHTML = `${ringHtml("ring", "var(--sky-ink)")}<p class="serif big">Dissolving…</p><p class="lead" id="d-text">Keep the lid closed.</p>
+      const cps = S.check.runMode === "quick" ? Math.round(T.quick_s / 5) : 0;
+      scene.innerHTML = `${Run.continuedAt ? `<span class="chip ok confirm"><span class="dot"></span>You pressed Continue at ${new Date(Run.continuedAt).toLocaleTimeString()} · tablet in marked</span>` : ""}
+        ${ringHtml("ring", "var(--sky-ink)")}<p class="serif big">Dissolving…</p><p class="lead" id="d-text">Keep the lid closed.</p>
+        ${cps ? `<div class="cp-strip" aria-label="${cps} checkpoints, one every 5 s"><span class="eyebrow">checkpoints</span><ol id="cp">${Array.from({ length: cps }, (_, k) => `<li title="${(k + 1) * 5} s"></li>`).join("")}</ol><span class="mono small" id="cp-n">0 / ${cps}</span></div>` : ""}
         <div class="row wrap" style="justify-content:center">${S.check.runMode === "full" ? `<button type="button" class="btn" id="btn-stop">Stop now &amp; analyze</button>` : ""}<button type="button" class="btn ghost" id="btn-cancel">Cancel</button></div>`;
       setRing($("ring"), 0, "0:00", S.check.runMode === "quick" ? `of ${mmss(T.quick_s)}` : "elapsed");
       if ($("btn-stop")) $("btn-stop").onclick = () => Run.finish();
@@ -738,10 +774,17 @@ route(/^\/check\/measure$/, async (v) => {
   S.onLive = (d) => {
     const l = d.live, g = d.guide;
     if (l && l.curve) { $("l-sec").textContent = Math.round(l.seconds); $("l-n").textContent = l.samples; }
+    const raw = (l && l.raw_last) || d.raw_last;
+    if (raw && $("raw")) $("raw").innerHTML = rawTable(raw);
+    const fresh = d.status && d.status.seconds_since_last !== null && d.status.seconds_since_last < 4;
+    v.querySelectorAll("[data-lines]").forEach((el) => el.classList.toggle("breathe", !!fresh));
     $("l-in").textContent = Run.phase === "dissolving" && l && l.tablet_in_at_s ? `tablet in at ${Math.round(l.tablet_in_at_s)} s into the recording` : "";
     if (!g) return;
     if (Run.phase === "water" && g.phase === "water") {
-      $("w-checks").innerHTML = (g.checks || []).map((c) => `<li><span class="tick ${c.ok ? "ok" : "wait"}">${c.ok ? tickSvg : ""}</span><span>${esc(c.message)}</span></li>`).join("");
+      $("w-checks").innerHTML = (g.checks || []).map((c) => {
+        const st = c.ok ? "ok" : c.name === "steady" ? "wait" : "bad";
+        return `<li class="wc-${st}"><span class="tick ${st}">${c.ok ? tickSvg : st === "bad" ? crossSvg : ""}</span><span><b>${esc(CHECK_NAME[c.name] || c.name)}</b><span class="why">${esc(c.message)}</span></span></li>`;
+      }).join("");
       setRing($("ring"), (g.steady_s || 0) / (g.needed || T.blank_s), String(Math.floor(g.steady_s || 0)), `of ${g.needed || T.blank_s} s steady`);
     }
     if (Run.phase === "dissolving" && g.phase === "dissolving") {
@@ -757,6 +800,8 @@ route(/^\/check\/measure$/, async (v) => {
       }
       $("r-time").textContent = `${mmss(e)} · ${g.mode === "quick" ? mmss(g.quick_s || T.quick_s) : "auto"}`;
       if (chart && l && l.curve) setCurve(chart, l.curve);
+      const cp = $("cp");
+      if (cp) { const n = Math.min(cp.children.length, Math.floor(e / 5)); [...cp.children].forEach((li, k) => li.classList.toggle("on", k < n)); $("cp-n").textContent = `${n} / ${cp.children.length}`; }
     }
   };
   $("btn-paste").onclick = async () => {
