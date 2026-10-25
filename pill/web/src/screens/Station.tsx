@@ -16,7 +16,7 @@ import type { Sample } from '../lib/types';
 import '../phases.css';
 
 const STORY: Record<PhaseKey, string> = {
-  dark: 'Both LEDs go off inside the purple chamber. It has to read dark: a light leak over 100 counts means the lid is open.',
+  dark: 'All three LEDs (white, blue, red) go off inside the purple chamber. It has to read dark: a light leak over 100 counts means the lid is open.',
   blank: 'Clean water, lid closed, nothing moving, 10 seconds. Readings that hold within 2 % become the 100 % everything is measured against.',
   drop: 'The whole tablet goes in through the hole in the lid; stir 5 circles with the stick. The station waits for the inline light to fall 6 %, and asks again after 30 s.',
   dissolve: 'The tablet dissolves: Quick about 60–90 s, Full 2–10 min. Straight through, blue light dims; at 90°, riboflavin glows. Chalk only dims.',

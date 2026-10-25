@@ -32,7 +32,7 @@ export default function DarkCheck({ readings, progress, secs, fault = null, onRe
         <span className="ph-ring-num mono">{Math.min(3, secs).toFixed(1)}<small> / 3 s</small></span>
       </div>
       <p className="serif ph-big">The box goes dark.</p>
-      <p className="ph-sub">Both LEDs are off. The sensors read the dark, so the station knows what nothing looks like.</p>
+      <p className="ph-sub">All three LEDs (white, blue, red) are off. The sensors read the dark, so the station knows what nothing looks like.</p>
       <dl className="ph-reads mono" aria-live="off">
         <div><dt>dark0</dt><dd key={`a${readings.length}`} className="ph-tickval">{last ? last.dark0 : '—'}</dd></div>
         <div><dt>dark90</dt><dd key={`b${readings.length}`} className="ph-tickval">{last ? last.dark90 : '—'}</dd></div>

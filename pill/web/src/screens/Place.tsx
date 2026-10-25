@@ -103,7 +103,7 @@ export default function Place() {
           </section>
         </div>
       </div>
-      <Action note="Quick about 60–90 s, Full 2–10 min: lights off, clean water, then the tablet. Keep the lid closed.">
+      <Action>
         <button type="button" className={'btn' + (allDone ? ' cn-ready' : '')} disabled={!allDone} onClick={start}>
           {allDone ? 'Start' : live ? 'Waiting for the station…' : `Checking the station… ${checked}/${CHECKS.length}`}
         </button>
