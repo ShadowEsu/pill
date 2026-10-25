@@ -7,6 +7,7 @@ import { mountBinaryPill } from './pill.js';
 import './station.css';
 import './pay.css';
 import { mountRail, mountX402, mountCalc } from './pay.js';
+import { mountFlow } from './flow.js';
 import { mountStory, mountCoinbase, mountFigArrows, mountScreens } from './story.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -204,6 +205,21 @@ if (!reduced) {
     });
   });
 }
+/* ---------- the money tree: ink arrows draw in once, heads and the dashed (not yet run) arrow fade in after ---------- */
+{
+  const mount = document.getElementById('flow-mount');
+  const svg = mount && mountFlow(mount);
+  if (svg && !reduced) {
+    const lines = [...svg.querySelectorAll('[data-arrow]')];
+    const late = [...svg.querySelectorAll('[data-head], [data-arrow-dash]')];
+    lines.forEach((p) => { const len = p.getTotalLength(); p.style.strokeDasharray = len; p.style.strokeDashoffset = len; });
+    late.forEach((p) => { p.style.opacity = 0; });
+    const trigger = { target: svg, enter: 'bottom-=15% top', sync: 'play', repeat: false };
+    animate(lines, { strokeDashoffset: 0, duration: 900, delay: stagger(45), ease: 'inOutSine', autoplay: onScroll(trigger) });
+    animate(late, { opacity: [0, 1], duration: 400, delay: stagger(30, { start: 700 }), ease: 'outQuad', autoplay: onScroll({ ...trigger }) });
+  }
+}
+
 /* ---------- phone mock ---------- */
 {
   const loops = {

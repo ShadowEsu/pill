@@ -137,3 +137,60 @@
   .cbx-step { min-height: 0; }
   .cbx-arrow { transform: rotate(90deg); width: 36px; height: 22px; margin: 2px auto; }
 }
+
+/* ---------- the money tree (src/flow.js): wide SVG ≥ 1100 px, stacked cards below ---------- */
+.flow-wrap { margin-top: 56px; }
+.flow-title { margin-top: 6px; }
+.flow-lead { margin-top: 10px; }
+.flow { margin-top: 28px; }
+.fl-wide { width: min(1560px, calc(100vw - 32px)); margin-inline: calc((100% - min(1560px, calc(100vw - 32px))) / 2); }
+.fl-wide svg { display: block; width: 100%; height: auto; }
+.fl-stack { display: none; }
+@media (max-width: 1099px) {
+  .fl-wide { display: none; }
+  .fl-stack { display: block; }
+}
+.fs-group { border: 1px solid var(--line); border-radius: 18px; padding: 16px; background: #fff; }
+.fs-g-x402 { background: rgba(0, 82, 255, 0.05); }
+.fs-title { font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); }
+.fs-sub, .fs-note, .fs-in { margin-top: 6px; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
+.fs-in { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.fs-card { margin-top: 8px; padding: 10px 12px; border: 1.3px solid var(--ink); border-radius: 10px; background: #fff; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fs-card b { font-size: 15px; font-weight: 600; color: var(--ink); }
+.fs-card b.mono { font-family: var(--mono); font-size: 14px; }
+.fs-card span { font-size: 13px; line-height: 1.4; color: var(--ink-2); }
+.fs-chipcard { border-radius: 999px; font-family: var(--mono); }
+.fs-chipcard span { font-family: var(--mono); font-size: 12px; }
+.fs-dash { border-style: dashed; }
+.fs-station { background: rgba(124, 110, 230, 0.18); }
+.fs-pass { background: rgba(47, 181, 119, 0.22); }
+.fs-lab { background: rgba(230, 150, 40, 0.26); }
+.fs-unable { background: rgba(124, 129, 136, 0.20); }
+.fs-hold { background: rgba(214, 48, 49, 0.18); }
+.fs-cb { background: rgba(0, 82, 255, 0.12); }
+.fs-cbSoft { background: rgba(0, 82, 255, 0.05); }
+.fs-core { background: rgba(22, 24, 27, 0.05); border-width: 2px; }
+.fs-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.fs-row .fs-card { margin-top: 8px; }
+.fs-via { margin: 8px 0 0; font-family: var(--mono); font-size: 12px; color: var(--ink); }
+.fs-via--big { margin: 6px 0; text-align: center; font-size: 18px; }
+.fs-chips { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.fs-chips li { padding: 6px 10px; border: 1px solid var(--ink); border-radius: 999px; font-size: 13px; color: var(--ink); background: #fff; }
+.fs-chips small { color: var(--ink-2); font-size: 12px; }
+.fl-models { width: 100%; margin-top: 28px; border-collapse: collapse; font-size: 14px; line-height: 1.45; }
+.fl-models caption { text-align: left; font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); padding-bottom: 8px; }
+.fl-models th, .fl-models td { text-align: left; vertical-align: top; padding: 10px 12px 10px 0; border-top: 1px solid var(--line); color: var(--ink); }
+.fl-models thead th { font-family: var(--mono); font-size: 12px; font-weight: 600; border-top: 1px solid var(--ink); }
+.fl-models tbody th { font-weight: 600; white-space: nowrap; }
+.fl-models tbody th small { display: block; font-family: var(--mono); font-size: 11px; font-weight: 400; color: var(--ink-2); }
+@media (max-width: 700px) {
+  .fl-models, .fl-models tbody, .fl-models tr, .fl-models td, .fl-models tbody th { display: block; width: 100%; }
+  .fl-models thead { display: none; }
+  .fl-models tr { border-top: 1px solid var(--ink); padding: 8px 0; }
+  .fl-models td, .fl-models tbody th { border-top: 0; padding: 4px 0; white-space: normal; }
+  .fl-models td:nth-of-type(1)::before { content: "Does: "; font-weight: 600; }
+  .fl-models td:nth-of-type(2)::before { content: "Never: "; font-weight: 600; }
+}
+.fl-foot { margin-top: 12px; font-size: 13px; color: var(--muted); }
+.fl-foot a { color: var(--ink); }
+.fs-lane { margin: 22px 0 8px; font-weight: 600; }
