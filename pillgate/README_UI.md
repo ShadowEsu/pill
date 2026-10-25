@@ -29,6 +29,7 @@ Choose a mode on Welcome; it is stored in `localStorage.pillgate.mode`. The mode
 
 - **Clinic**: home is "Today's gate", with today's counts and the last five checks. A "Needs lab testing" result is also marked **held**, and the delivery is held.
 - **Personal** (written for older people): home is a "Check my medicine" hero, your last check, the next dose, a big **Easy mode** button and a "how it works" strip. The nav is Home · Check · Medicines · Schedule · More. A result other than "Passed the screen" says to show it to a pharmacist.
+- **Show mode (table demo)** (`localStorage.pillgate.show`, Settings, or `?show=1` / `?show=0` on any route; default off): a SHOW chip in the top bar and run bar; the Result page (every mode) and Personal home's last check show the product (label name + strength if the photo was read, else `SHOW_PRODUCT` at the top of `app.js`, "Aspirin 81 mg") at 100 % with "Passed the screen". The real curve, numbers, stage log, report and sources stay below, plus a line naming the measured result. Nothing is written to the backend; History shows the real results.
 - **Easy mode** (`localStorage.pillgate.easy`, Settings or the Personal home button): the page, the Ask Pill sheet and the run bar at 125 % (CSS `zoom`), stronger ink and lines, and answers read aloud unless read-aloud was switched off.
 - **Check**: `#/` goes straight to the stepper.
 

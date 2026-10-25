@@ -533,3 +533,17 @@ body.easy .chip { border-color: var(--line-2); }
 .board-miss { margin: 0; padding: 8px 12px; border-radius: 12px; background: var(--amber-tint); border: 1px solid rgba(224,154,58,.45); font-size: 14px; font-weight: 600; }
 .board-miss.hidden { display: none; }
 @media (max-width: 420px) { .runbar .rb-text { font-size: 13px; } .runbar .rb-go { padding: 7px 10px; } }
+
+/* ---------- round 6: Show mode (table demo) ---------- */
+.show-chip { background: var(--violet-tint); border-color: rgba(122,92,255,.45); font: 600 11px var(--mono); letter-spacing: .08em; text-decoration: none; color: var(--ink); flex: none; }
+.runbar .show-chip { background: rgba(122,92,255,.35); border-color: transparent; color: #fff; }
+.show-id { display: flex; align-items: center; gap: 18px; min-width: 0; }
+.show-name { font-size: clamp(34px, 9vw, 56px); line-height: 1; margin: 0; overflow-wrap: anywhere; }
+.show-ring { --p: 100; flex: none; width: 96px; height: 96px; border-radius: 50%; display: grid; place-content: center; text-align: center;
+  background: radial-gradient(closest-side, #fff 78%, transparent 79%), conic-gradient(var(--mint) calc(var(--p) * 1%), var(--line) 0); animation: show-ring 1.1s var(--ease) backwards; }
+.show-ring .mono { font-size: 20px; font-weight: 500; } .show-ring small { font-size: 11px; color: var(--ink-2); }
+@property --p { syntax: "<number>"; inherits: false; initial-value: 0; }
+@keyframes show-ring { from { --p: 0; } }
+.show-bar { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.show-bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--mint), var(--sky)); transform-origin: left; animation: tile-bar 1.1s var(--ease) backwards; }
+.show-note { color: var(--ink-2); } .show-note a { color: var(--ink); }

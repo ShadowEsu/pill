@@ -3,6 +3,10 @@
 // copy, the home page and the nav labels. Words stay ink; colour lives in fills, lines and chips.
 "use strict";
 
+// Show mode (table demo, Settings → "Show mode", or ?show=1 in the URL): the Result page names this product at 100 %
+// and shows "Passed the screen" whatever the run measured. The bottle photo's name + strength win when the label was read.
+const SHOW_PRODUCT = "Aspirin 81 mg";
+
 // ================================================================ helpers
 const $ = (id) => document.getElementById(id);
 const api = async (path, opts = {}) => {
@@ -61,6 +65,8 @@ const PREF = {
   get sound() { return localStorage.getItem("pillgate.sound") !== "off"; },
   set sound(v) { localStorage.setItem("pillgate.sound", v ? "on" : "off"); },
   get speak() { const v = localStorage.getItem("pillgate.speak"); return v ? v === "on" : PREF.easy; },   // Easy mode reads aloud unless switched off
+  get show() { return localStorage.getItem("pillgate.show") === "on"; },
+  set show(v) { localStorage.setItem("pillgate.show", v ? "on" : "off"); paintShow(); },
   get easy() { return localStorage.getItem("pillgate.easy") === "on"; },
   set easy(v) { localStorage.setItem("pillgate.easy", v ? "on" : "off"); document.body.classList.toggle("easy", !!v); },
   set speak(v) { localStorage.setItem("pillgate.speak", v ? "on" : "off"); },
@@ -281,6 +287,18 @@ function deviceText(st) {
   if (st.mode.startsWith("replay")) return ["REPLAY (not live) · " + st.mode.slice(7), "warn"];
   return [`${st.mode}${fresh ? " · live" : " · waiting"}`, st.mode.startsWith("serial") && fresh ? "ok beat" : "bad"];
 }
+/** The SHOW chip in the top bar (and the body class the run bar reads) while Show mode is on. */
+function paintShow() {
+  document.body.classList.toggle("show-mode", PREF.show);
+  let c = $("showChip");
+  if (PREF.show && !c) { $("devicePill").insertAdjacentHTML("beforebegin", `<a id="showChip" class="chip show-chip" href="#/settings" title="Show mode is on: results are staged for the demo. Tap to change.">SHOW</a>`); }
+  else if (!PREF.show && c) c.remove();
+}
+/** What Show mode names: the label's drug + strength if the photo was read, else SHOW_PRODUCT. */
+function showProduct(s) {
+  const L = (s && s.label) || {};
+  return L.drug_name && !L.mock ? `${String(L.drug_name).trim()}${L.strength ? " " + String(L.strength).trim() : ""}` : SHOW_PRODUCT;
+}
 function paintDevice() {
   const [text, cls] = deviceText(S.live && S.live.status);
   document.querySelectorAll("[data-device]").forEach((el) => { el.className = "chip " + cls; el.querySelector(".dp-text").textContent = text; el.title = text; });
@@ -361,6 +379,8 @@ const ROUTES = [];
 const route = (re, fn) => ROUTES.push([re, fn]);
 async function render() {
   const path = (location.hash.slice(1) || "/").split("?")[0];
+  const flag = new URLSearchParams(location.hash.split("?")[1] || "").get("show");
+  if (flag === "1" || flag === "0") PREF.show = flag === "1";
   if (!mode() && path !== "/welcome") { location.replace("#/welcome"); return; }
   if (path === "/" && mode() === "check") { location.replace("#/check/bottle"); return; }
   if (/^\/check\/(bottle|tablet)$/.test(path) && (Run.recording || Run.phase === "analyzing")) { location.replace("#/check/measure"); return; }   // mid-run "Check" goes back to the run
@@ -496,7 +516,8 @@ function paintRunBar() {
       : Run.phase === "add" ? "Add the tablet now"
       : Run.phase === "dissolving" ? `Dissolving ${mmss(Run.dissolveS)}${S.check.runMode === "quick" ? " of " + mmss(T.quick_s) : ""}`
       : "Building the result…";
-    show("runbar" + (Run.phase === "add" ? " urgent" : ""), `<span class="rb-dot" aria-hidden="true"></span><span class="rb-text"><b>Run in progress</b> · ${esc(what)}</span><button type="button" class="rb-reset">Reset</button><a class="rb-go" href="#/check/measure">↩ back to the run</a>`);
+    const showTag = PREF.show ? `<span class="chip show-chip">SHOW</span>` : "";
+    show("runbar" + (Run.phase === "add" ? " urgent" : ""), `<span class="rb-dot" aria-hidden="true"></span>${showTag}<span class="rb-text"><b>Run in progress</b> · ${esc(what)}</span><button type="button" class="rb-reset">Reset</button><a class="rb-go" href="#/check/measure">↩ back to the run</a>`);
     return;
   }
   if (Run.readyScan && onPath(new RegExp("^/result/" + Run.readyScan.replace(/[^\w-]/g, "") + "$"))) Run.readyScan = null;   // seen it
@@ -651,7 +672,7 @@ route(/^\/$/, async (v) => {
     </section>
     <div class="wide-2">
       <section class="card stack rise" style="--i:1"><div class="row between"><h2 class="h">Your last check</h2><a class="footnote" href="#/medicines">My medicines →</a></div>
-        ${last ? `<div class="capsules">${capsule(last)}</div>` : `<p class="muted">Nothing checked yet.</p>`}</section>
+        ${last ? `<div class="capsules">${capsule(PREF.show && last.overall ? { ...last, overall: "PASSED_SCREEN", drug: last.drug ? last.drug : SHOW_PRODUCT } : last)}</div>` : `<p class="muted">Nothing checked yet.</p>`}</section>
       <section class="card stack tile rise" style="--accent:var(--sky);--i:2"><div class="row between"><h2 class="h">Next dose</h2><a class="footnote" href="#/schedule">Schedule →</a></div>
         ${nextDose ? `<p class="next-dose"><span class="mono">${esc(fmtTime(nextDose.t))}</span><b>${esc(nextDose.m.name)}</b>${nextDose.m.dose ? `<small>${esc(nextDose.m.dose)}</small>` : ""}</p>` : `<p class="muted">${Sched.meds.length ? "All of today's doses are marked." : "Add your medicines and times to get a daily list and reminders."}</p>`}</section>
     </div>
@@ -1024,10 +1045,12 @@ route(/^\/result\/([^/]+)$/, async (v, id) => {
     const what = `${name}${L.strength ? " " + String(L.strength).trim() : ""}`;
     return `<div class="noref"><span class="g-ic">${glyph("bottle", 30)}</span><p>We read <b>${esc(what)}</b> from the label. <b>Unable to verify</b> means there is no reference for ${esc(name)} on this station yet${prof && !prof.reference ? ` (the ${esc(prof.name)} profile has no reference runs)` : ""}: record 3 good runs to build one. <a href="#/profiles">Profiles →</a></p></div>`;
   };
+  const show = PREF.show;           // read once per page so the page never flips mid-view
   const render1 = (s) => {
-    const a = s.analysis, verdict = s.overall || (a && a.result);
-    const title = verdict ? "Result" : "Checking…";
-    if (title !== lastTitle) { lastTitle = title; $("r-head").innerHTML = head({ eyebrow: `Step 4 of 4 · ${id}${s.label && s.label.drug_name ? " · " + s.label.drug_name : ""}`, title, tone: verdict ? RESULT_TONE[verdict] : "sky", back: "#/history" }); }
+    const a = s.analysis, real = s.overall || (a && a.result);
+    const verdict = real && show ? "PASSED_SCREEN" : real;
+    const title = verdict ? (show ? showProduct(s) : "Result") : "Checking…";
+    if (title !== lastTitle) { lastTitle = title; $("r-head").innerHTML = head({ eyebrow: `Step 4 of 4 · ${id}${!show && s.label && s.label.drug_name ? " · " + s.label.drug_name : ""}`, title, tone: verdict ? RESULT_TONE[verdict] : "sky", back: "#/history" }); }
     // stamp
     const st = $("stamp");
     if (verdict && !st.dataset.v) {
@@ -1040,7 +1063,15 @@ route(/^\/result\/([^/]+)$/, async (v, id) => {
         k.push(kpiCell("final level (A)", n.A_specific_end ?? "–"));
         k.push(kpiCell("run after tablet in", Math.round(n.run_s_after_drop) + " s"));
       }
-      st.innerHTML = `<p class="eyebrow">Screening result</p><span class="stamp" role="status">${esc(RESULT_TEXT[verdict])}</span>
+      if (show) {
+        st.innerHTML = `<p class="eyebrow">Product identified</p>
+          <div class="show-id"><div class="show-ring" style="--p:100" role="img" aria-label="100 percent match"><span class="mono">100 %</span><small>match</small></div>
+            <div class="stack" style="gap:6px"><p class="show-name serif">${esc(showProduct(s))}</p><span class="stamp" role="status">${esc(RESULT_TEXT.PASSED_SCREEN)}</span></div></div>
+          <div class="show-bar" aria-hidden="true"><i></i></div>
+          ${modeLine("PASSED_SCREEN") ? `<p class="mode-line">${modeLine("PASSED_SCREEN")}</p>` : ""}
+          ${k.length ? `<dl class="kpis">${k.join("")}</dl>` : ""}
+          <p class="footnote show-note">Show mode: this result is staged for the table demo; the curve and numbers are the real run (measured: ${esc(RESULT_TEXT[real] || real)}). <a href="#/settings">Turn it off</a></p>`;
+      } else st.innerHTML = `<p class="eyebrow">Screening result</p><span class="stamp" role="status">${esc(RESULT_TEXT[verdict])}</span>
         ${noRefLine(s, verdict)}
         <p class="headline" id="r-headline"></p>
         <ul class="reasons">${(a ? a.reasons : []).map((r) => `<li>${esc(r)}</li>`).join("")}</ul>
@@ -1304,6 +1335,7 @@ route(/^\/settings$/, (v) => {
       </section>
       <section class="card stack"><h2 class="h">This device</h2>
         <div class="set-row"><span><b>Sounds</b><small>Beeps when it's time to add the tablet and when the run stops.</small></span>${sw("s-sound", PREF.sound, "Sounds")}</div>
+        <div class="set-row"><span><b>Show mode (table demo)</b><small>Results name the product at 100 % and read "Passed the screen" whatever was measured. The curve and numbers stay real; nothing is saved differently. Off = the honest result.</small></span>${sw("s-show", PREF.show, "Show mode (table demo)")}</div>
         <div class="set-row"><span><b>Easy mode</b><small>Bigger text (125 %), stronger contrast, answers read aloud.</small></span>${sw("s-easy", PREF.easy, "Easy mode")}</div>
         <div class="set-row"><span><b>Read answers aloud</b><small>On the Ask page and in Ask Pill.</small></span>${sw("s-speak", PREF.speak, "Read answers aloud")}</div>
         <div class="set-row"><span><b>Reset local preferences</b><small>Forgets the mode and these switches on this browser only. Your schedule stays.</small></span><button type="button" class="btn ghost sm" id="s-reset">Reset</button></div>
@@ -1319,6 +1351,7 @@ route(/^\/settings$/, (v) => {
   v.querySelectorAll("[data-mode]").forEach((b) => (b.onclick = () => { PREF.mode = b.dataset.mode; navMode = null; render(); toast(MODES[b.dataset.mode].name + " mode"); }));
   $("s-sound").onclick = (e) => { PREF.sound = !PREF.sound; e.currentTarget.setAttribute("aria-checked", String(PREF.sound)); if (PREF.sound) beep(1); };
   $("s-speak").onclick = (e) => { PREF.speak = !PREF.speak; e.currentTarget.setAttribute("aria-checked", String(PREF.speak)); };
+  $("s-show").onclick = (e) => { PREF.show = !PREF.show; e.currentTarget.setAttribute("aria-checked", String(PREF.show)); toast(PREF.show ? "Show mode on" : "Show mode off: honest results"); };
   $("s-easy").onclick = (e) => { PREF.easy = !PREF.easy; e.currentTarget.setAttribute("aria-checked", String(PREF.easy)); $("s-speak").setAttribute("aria-checked", String(PREF.speak)); toast(PREF.easy ? "Easy mode on" : "Easy mode off"); };
   armed($("s-wipe"), async () => {
     await Run.reset().catch(() => {});
@@ -1727,6 +1760,7 @@ async function boot() {
     $("appName").textContent = c.app_name; document.title = c.app_name;
   } catch {}
   document.body.classList.toggle("easy", PREF.easy);
+  paintShow();
   Dock.mount();
   render();
   tick(); setInterval(tick, 500);
