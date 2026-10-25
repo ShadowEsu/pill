@@ -17,6 +17,10 @@ Unverified work since the 20:05 freeze (all committed, all pushed):
 ## 2. Deck rebuild (FigmaFinish; ~15 min, no browser except the PNG shoot)
 - [ ] `cd figma && ./station-photos.sh && node build-deck.mjs && node shoot-deck.mjs && node build-pptx.mjs && node package.mjs`; checks (`measure-plugin.mjs`, banned-word grep, python-pptx readback = 21 slides, PDF 21 pages); commit + push; post the two changed slide PNGs (04, 05) to #plan.
 
+## 1b. Pitch video render (first thing after the lift; ~5 min CPU)
+- [ ] `bash pitch/video/edit/build.sh --preview` → view `pitch/video/pill-pitch-90s.mp4` frames at 1 s / 3 s / 6 s (him, then the hardware glow at "it's Pill"; captions legible at 1080×1920). Then the full `bash pitch/video/edit/build.sh` (82 s, 12 cuts + end card). Check: `ffprobe` duration ≈ 82–86 s, loudness via `-af ebur128` (I ≈ −16 LUFS), frames at 10 s / 40 s / 70 s / 80 s (end card: pill-site.vercel.app + repo); the music ducks under his voice. Post the mp4 to #plan (python multipart upload) and copy to `~/Downloads/pill-pitch-90s.mp4`; `open` it. Source timecodes in `pitch/video/EDIT-PLAN.md`; the hardware shot is 2:05.10–2:08.03 (checked: chamber + UNO Q + bottle fill the frame).
+- [ ] Pill Gate Show mode proof: `http://127.0.0.1:8001/#/check/bottle?show=1` → run → Result shows "Aspirin 81 mg · 100 % · Passed the screen" with the real curve; toggle off → honest result. Screenshot both to `pillgate/dev-shots/ui3/`.
+
 ## 3. Deploys (after the proofs pass; one at a time; ≥ 2 h apart per project)
 - [ ] `vercel-budget` (exit 1 → stop, tell BOSS).
 - [ ] **pill-app** (`pill/web`): `npx -y vercel@latest build --prod --yes` → secret-grep `.vercel/output/static` (`sk-`, `sk-ant-`, `AIza`, `ghp_`, `eyJ`, `Bearer `) → `deploy --prebuilt --prod --yes --scope shadowesus-projects > ~/calhacks-13/.deploy-app.log`; `vercel ls` once; smoke https://pill-app-delta.vercel.app/{welcome,demo,station,medicines,schedule} at 390 (0 errors); send dpl id to BOSS + security (`tell security`).
