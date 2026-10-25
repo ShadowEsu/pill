@@ -29,10 +29,10 @@ export const FLOW_BOXES: Box[] = [
   { id: 'fork-note', group: 'answers', x: 252, y: 284, w: 172, h: 50, title: '', sub: 'Three answers, never four. No model sets a verdict.', tone: 'note' },
   // 3 · The policy agent: five inputs, one box, three outputs
   { id: 'verdict-note', group: 'policy', x: 426, y: 98, w: 44, h: 30, title: '', sub: 'the verdict', tone: 'note' },
-  { id: 'recall', group: 'policy', x: 470, y: 34, w: 88, h: 92, title: 'Recall lookup', sub: 'openFDA', small: true },
-  { id: 'label', group: 'policy', x: 560.67, y: 34, w: 88, h: 92, title: 'Bottle label', sub: 'Gemini → editable fields; unreadable = null', small: true },
-  { id: 'amount', group: 'policy', x: 651.33, y: 34, w: 88, h: 92, title: 'Invoice amount', sub: 'vs cap', small: true },
-  { id: 'tap', group: 'policy', x: 742, y: 34, w: 88, h: 92, title: "Pharmacist's tap", small: true },
+  { id: 'recall', group: 'policy', x: 470, y: 28, w: 88, h: 110, title: 'Recall lookup', sub: 'openFDA', small: true },
+  { id: 'label', group: 'policy', x: 560.67, y: 28, w: 88, h: 110, title: 'Bottle label', sub: 'Gemini → editable fields; unreadable = null', small: true },
+  { id: 'amount', group: 'policy', x: 651.33, y: 28, w: 88, h: 110, title: 'Invoice amount', sub: 'vs cap', small: true },
+  { id: 'tap', group: 'policy', x: 742, y: 28, w: 88, h: 110, title: "Pharmacist's tap", small: true },
   { id: 'policy', group: 'policy', x: 470, y: 150, w: 360, h: 96, title: 'Policy agent · clinic app (pill/pay)', sub: 'Six clauses P1–P6, in code → a ceiling. Claude may only return the ceiling or escalate.' },
   { id: 'escalate', group: 'policy', x: 470, y: 290, w: 112, h: 104, title: 'Escalate', sub: 'Unable to verify → to a person; nothing moves' },
   { id: 'hold', group: 'policy', x: 594, y: 290, w: 112, h: 104, title: 'Hold', sub: 'Needs lab → hold + lab referral draft', tone: 'hold' },
@@ -41,7 +41,7 @@ export const FLOW_BOXES: Box[] = [
   { id: 'clinic', group: 'money', x: 880, y: 36, w: 170, h: 44, title: 'pill-clinic', sub: 'CDP server wallet', mono: true },
   { id: 'escrow', group: 'money', x: 880, y: 136, w: 170, h: 44, title: 'pill-escrow', sub: 'CDP server wallet', mono: true },
   { id: 'supplier', group: 'money', x: 880, y: 236, w: 170, h: 44, title: 'pill-supplier', sub: 'CDP server wallet', mono: true },
-  { id: 'nessie', group: 'money', x: 1070, y: 120, w: 98, h: 100, title: 'Nessie', sub: 'Capital One mirrors every move in sandbox dollars (SANDBOX)' },
+  { id: 'nessie', group: 'money', x: 1070, y: 116, w: 98, h: 116, title: 'Nessie', sub: 'Capital One mirrors every move in sandbox dollars (SANDBOX)' },
   { id: 'usdc-note', group: 'money', x: 880, y: 296, w: 288, h: 36, title: '', sub: 'USDC on Base Sepolia (TESTNET) · Coinbase CDP SDK server wallets', tone: 'note' },
   { id: 'escrow-mode', group: 'money', x: 880, y: 338, w: 288, h: 40, title: '', sub: 'escrow moves: mode: simulated until a CDP key', tone: 'chip', mono: true },
   // the second lane: selling a verdict over x402
@@ -141,6 +141,7 @@ export default function FlowDiagram({ active = [], compact = false, label = 'How
   const vb = compact ? '456 0 724 400' : `0 0 ${W} ${H}`;
   const uid = 'flow' + useId().replace(/[^a-zA-Z0-9_-]/g, '');
   const paid200 = arrows.some((a) => a.pending && lit(a));
+  // phones scroll sideways at this width; from 900 px up the diagram scales to fit its card (flow.css)
   const minW = compact ? 700 : 1080;
 
   return (
@@ -153,7 +154,7 @@ export default function FlowDiagram({ active = [], compact = false, label = 'How
       </div>
       <p className="flow-hint" aria-hidden="true">Swipe sideways to follow the arrows →</p>
       <div className="flow-scroll" tabIndex={0} role="region" aria-label={`${label}, scrollable`}>
-        <svg viewBox={vb} style={{ minWidth: minW } as CSSProperties} role="img" aria-labelledby={`${uid}-t`}>
+        <svg viewBox={vb} style={{ '--flow-min': `${minW}px` } as CSSProperties} role="img" aria-labelledby={`${uid}-t`}>
           <title id={`${uid}-t`}>{label}</title>
           <defs>
             <marker id={`${uid}-h`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink)" /></marker>

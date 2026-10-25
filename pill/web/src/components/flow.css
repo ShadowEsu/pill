@@ -6,7 +6,7 @@
 .flow-scroll { overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; border-radius: 14px; padding-bottom: 4px; }
 .flow-scroll:focus-visible { outline: 2px solid var(--cb); outline-offset: 2px; }
 .flow-scroll svg { display: block; width: 100%; height: auto; overflow: visible; }
-@media (max-width: 899px) { .flow-hint { display: block; } }
+@media (max-width: 899px) { .flow-hint { display: block; } .flow-scroll svg { min-width: var(--flow-min); } }
 .flow.compact .flow-hint { display: none; }
 @media (max-width: 760px) { .flow.compact .flow-hint { display: block; } }
 

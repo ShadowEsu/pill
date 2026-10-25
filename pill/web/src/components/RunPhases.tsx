@@ -6,8 +6,8 @@
 // A fault freezes the pointer where it happened and greys everything after it.
 export const PHASES = [
   { key: 'dark', name: 'Lights off', short: 'dark', dur: '3 s', from: -13, to: -10, color: 'var(--navy)', status: 'lights off', doing: 'the lights are off for 3 seconds; the box has to read dark' },
-  { key: 'blank', name: 'Clean water', short: 'water', dur: '10 s', from: -10, to: 0, color: 'var(--c6)', status: 'clean water', doing: 'reading clean water with the lid closed and nothing moving; the reading has to hold steady' },
-  { key: 'drop', name: 'Drop', short: 'drop', dur: '≤ 30 s', from: 0, to: 5, color: 'var(--violet)', status: 'drop the tablet', doing: 'the whole tablet goes in; stir 5 circles with the stick, lid closed; the inline reading has to fall 6 %' },
+  { key: 'blank', name: 'Clean water', short: 'water', dur: '10 s', from: -10, to: 0, color: 'var(--c6)', status: 'clean water', doing: 'clean water, lid closed, still; the reading has to hold steady' },
+  { key: 'drop', name: 'Drop', short: 'drop', dur: '≤ 30 s', from: 0, to: 5, color: 'var(--violet)', status: 'drop the tablet', doing: 'the whole tablet goes in, 5 stirs; the inline reading has to fall 6 %' },
   { key: 'dissolve', name: 'Dissolving', short: 'dissolve', dur: '1–10 min', from: 5, to: 110, color: 'var(--c1)', status: 'dissolving', doing: 'the tablet is dissolving; both channels are being watched' },
   { key: 'settle', name: 'Settling', short: 'settle', dur: '20 s', from: 110, to: 180, color: 'var(--c4)', status: 'settling', doing: 'the reading is settling; it has to hold flat for 20 seconds' },
   { key: 'verdict', name: 'Verdict', short: 'verdict', dur: 'rules', from: 180, to: 186, color: 'var(--ink)', status: 'verdict', doing: 'the rules read the curve' },

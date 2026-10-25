@@ -166,7 +166,7 @@ export default function Kiosk() {
   const phase = phaseAt(t);
   const running = !!run && !ev;
   const status = !run ? 'ready' : phase.status;
-  const doing = !run ? 'Clean water in, lid closed, press Start. The tablet goes in after the 10-second water check.' : `${phase.doing[0].toUpperCase()}${phase.doing.slice(1)}.`;
+  const doing = !run ? 'Clean water in, lid closed, press Start.' : `${phase.doing[0].toUpperCase()}${phase.doing.slice(1)}.`;
   const startBtn = (
     <button type="button" className={'btn' + (!running ? ' cn-ready' : '')} style={{ flex: short ? 'none' : '1 0 280px', width: short ? '100%' : 'auto', minHeight: short ? 64 : 72, fontSize: 22 }} disabled={running} onClick={() => { setLeft(null); playSound('rise'); setRunId(actions.startRun({ drug: 'riboflavin', lot: 'B2-07', src: 'replay' }).id); }}>
       {running ? `Running · ${clock(t)} / 3:00` : ev ? 'Start again (replay B2-07)' : 'Start (replay B2-07)'}
