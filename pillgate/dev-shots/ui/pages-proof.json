@@ -1,0 +1,33 @@
+{
+  "server": "http://127.0.0.1:8001/",
+  "results": {
+    "welcome-390": "390/390 errs=0 shot=true",
+    "home-390": "390/390 errs=0 shot=true",
+    "bottle-390": "390/390 errs=0 shot=true",
+    "tablet-390": "390/390 errs=0 shot=true",
+    "measure-390": "390/390 errs=0 shot=true",
+    "result-390": "390/390 errs=0 shot=true",
+    "ask-390": "390/390 errs=0 shot=true",
+    "issue-390": "390/390 errs=0 shot=true",
+    "history-390": "390/390 errs=0 shot=true",
+    "profiles-390": "390/390 errs=0 shot=true",
+    "atlas-390": "390/390 errs=0 shot=true",
+    "settings-390": "390/390 errs=0 shot=true",
+    "home-personal-390": "390/390",
+    "welcome-1280": "1280/1280 errs=0 shot=true",
+    "home-1280": "1280/1280 errs=0 shot=true",
+    "bottle-1280": "1280/1280 errs=0 shot=true",
+    "tablet-1280": "1280/1280 errs=0 shot=true",
+    "measure-1280": "1280/1280 errs=0 shot=true",
+    "result-1280": "1280/1280 errs=0 shot=true",
+    "ask-1280": "1280/1280 errs=0 shot=true",
+    "issue-1280": "1280/1280 errs=0 shot=true",
+    "history-1280": "1280/1280 errs=0 shot=true",
+    "profiles-1280": "1280/1280 errs=0 shot=true",
+    "atlas-1280": "1280/1280 errs=0 shot=true",
+    "settings-1280": "1280/1280 errs=0 shot=true",
+    "home-personal-1280": "1280/1280"
+  },
+  "totalErrors": 0
+}
+{"backForward":[["#/history","History"],["#/profiles","Profiles"]]}

@@ -1,0 +1,8 @@
+Fonts in this folder (copied from the Pill React app, pill/web/public/fonts) so the booth laptop works offline:
+
+- Inter (inter-400/500/600.woff2) by Rasmus Andersson: SIL Open Font License 1.1, https://github.com/rsms/inter/blob/master/LICENSE.txt
+- Instrument Serif (instrument-serif-400*.woff2) by Instrument: SIL Open Font License 1.1, https://github.com/Instrument/instrument-serif/blob/main/OFL.txt
+- JetBrains Mono (jetbrains-mono-400/500.woff2) by JetBrains: SIL Open Font License 1.1, https://github.com/JetBrains/JetBrainsMono/blob/master/OFL.txt
+
+The SIL Open Font License 1.1 allows use, bundling and redistribution with software; the fonts themselves may not be sold on their own.
+Full text: https://openfontlicense.org/open-font-license-official-text/

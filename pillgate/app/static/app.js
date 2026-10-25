@@ -413,12 +413,13 @@ async function startScan(runId) {
   if (S.check.bottle) fd.append("bottle", S.check.bottle);
   if (S.check.imprint) fd.append("imprint", S.check.imprint);
   const r = await api("/api/scans", { method: "POST", body: fd });
+  S.check.scanId = r.scan_id;
   Run.set("idle");
   location.hash = "#/result/" + encodeURIComponent(r.scan_id);
 }
 function resetCheck() {
   ["bottleUrl", "imprintUrl"].forEach((k) => S.check[k] && URL.revokeObjectURL(S.check[k]));
-  Object.assign(S.check, { bottle: null, imprint: null, bottleUrl: "", imprintUrl: "" });
+  Object.assign(S.check, { bottle: null, imprint: null, bottleUrl: "", imprintUrl: "", scanId: null });
 }
 
 // ================================================================ shared bits: result chips, scan capsules
@@ -796,7 +797,7 @@ route(/^\/result\/([^/]+)$/, async (v, id) => {
     <div class="wide-2">
       <section class="card stack"><div class="row between"><h2 class="h">Dissolution curve</h2><span class="footnote" id="r-ref"></span></div><div class="chartbox"><canvas id="r-chart"></canvas></div>
         <details><summary class="small">Quality checks</summary><ul class="gates" id="gates"></ul></details></section>
-      <section class="card stack"><h2 class="h">Label and tablet</h2><div id="recall"></div><dl class="kv" id="fields"></dl><p class="banner note hidden" id="mock">Mock mode: the AI is off on this server, so the bottle and tablet photos were not read and no profile was matched automatically.</p></section>
+      <section class="card stack"><h2 class="h">Label and tablet</h2>${S.check.scanId === id && (S.check.bottleUrl || S.check.imprintUrl) ? `<div class="thumbs">${[S.check.bottleUrl, S.check.imprintUrl].filter(Boolean).map((u) => `<img src="${esc(u)}" alt="Your photo">`).join("")}</div>` : ""}<div id="recall"></div><dl class="kv" id="fields"></dl><p class="banner note hidden" id="mock">Mock mode: the AI is off on this server, so the bottle and tablet photos were not read and no profile was matched automatically.</p></section>
     </div>
     <section class="card actions" style="align-items:center">
       <a class="btn ghost" href="#/ask/${encodeURIComponent(id)}">Ask about this result</a>

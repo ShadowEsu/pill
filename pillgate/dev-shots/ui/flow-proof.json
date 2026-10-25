@@ -1,0 +1,53 @@
+{
+  "server": "http://127.0.0.1:8001/",
+  "viewport": "390x844",
+  "log": [
+    [
+      "water done after s",
+      25,
+      "Add the tablet"
+    ],
+    [
+      "dissolve->result s",
+      59
+    ]
+  ],
+  "out": {
+    "routes": [
+      [
+        "2026-10-25T02:06:08.651Z",
+        "#/welcome"
+      ],
+      [
+        "2026-10-25T02:06:09.108Z",
+        "#/check/bottle"
+      ],
+      [
+        "2026-10-25T02:06:12.466Z",
+        "#/check/tablet"
+      ],
+      [
+        "2026-10-25T02:06:15.566Z",
+        "#/check/measure"
+      ],
+      [
+        "2026-10-25T02:07:42.276Z",
+        "#/result/scan_1024_190742_3e4c"
+      ]
+    ],
+    "stamp": "Unable to verify",
+    "stages": [
+      "Read the run 3 ms",
+      "Read the photos 3 ms",
+      "Match the name and profile 9 ms",
+      "RxNav and openFDA lookups 0 ms",
+      "Regulator web search no ANTHROPIC_API_KEY (mock mode) skipped",
+      "Write the report 0 ms",
+      "Check the report against the records 0 ms"
+    ],
+    "hash": "#/result/scan_1024_190742_3e4c",
+    "sw": 390
+  },
+  "errs": [],
+  "done": true
+}
