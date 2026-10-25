@@ -5,5 +5,8 @@
   "outputDirectory": "dist",
   "functions": { "api/check.ts": { "maxDuration": 60 }, "api/label.ts": { "maxDuration": 30 }, "api/assist.ts": { "maxDuration": 40 }, "api/assist-tip.ts": { "maxDuration": 25 } },
   "rewrites": [{ "source": "/((?!api/|assets/|fonts/|favicon.svg).*)", "destination": "/index.html" }],
-  "headers": [{ "source": "/fonts/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }]
+  "headers": [
+    { "source": "/fonts/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] },
+    { "source": "/(.*)", "headers": [{ "key": "X-Content-Type-Options", "value": "nosniff" }, { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }] }
+  ]
 }
