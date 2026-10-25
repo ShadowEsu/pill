@@ -39,3 +39,6 @@ If the board fails, run `./start.sh replay`. The badge says REPLAY (not live), a
 - **Say only:** **Passed the screen** · **Needs lab testing** · **Unable to verify** · "screening, not a lab test".
 - **Never say:** safe, authentic, verified, genuine, certified, fake, counterfeit. The app's guardrail bans these in reports too.
 - **Always say whether the data is live or recorded.** Never call a replay or a simulated profile live.
+
+## Open with Preston (he said he will talk about it more later, Sat 21:2x)
+- The hosts (real deal :8000 vs demo :8001), the reset flow, what the judges should see first. Ask him before changing the demo flow.
