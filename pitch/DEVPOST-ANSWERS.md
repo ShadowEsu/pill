@@ -26,7 +26,7 @@ WHO estimates about 1 in 10 medical products in low- and middle-income countries
 
 Then one of us remembered a chem lab where we read nickel(II) concentration from the colour of a solution. Same law, cheap parts. So we asked whether a clinic could screen one tablet from a delivery before it pays the supplier.
 
-Prior art: Peel (HackMIT 2026), method only, no code; every line of our code was written this weekend.
+Prior art, said plainly: Peel (HackMIT 2026 grand prize) showed the method first, and we modelled our station on its public write-up: a water blank, a cheap light sensor watching a tablet dissolve, a side sensor to tell cloudiness from colour, and the same three plain answers. We took no code from Peel. Every line of ours was written this weekend from that description.
 
 ## What it does
 
