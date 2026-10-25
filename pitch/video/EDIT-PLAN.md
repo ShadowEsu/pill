@@ -72,7 +72,7 @@ Paper background `#F4EFE6` · pill glyph · "The box measures. Pill explains." (
 - `transcribe.sh`: the Gemini Files API transcription script
 - `bin/ffmpeg` (gitignored): static ffmpeg 9.0.2 with libass from ffmpeg.martin-riedl.de, because Homebrew's ffmpeg 8.1.2 has no `ass`/`subtitles` filter. `build.sh` fetches it again if it's missing.
 
-Checks run: `bash -n build.sh` OK; `build.sh --check` configured the full graph including the J-cut concat (libass 0.17.5 loaded all three fonts, "5 styles, 75 events") and pushed 3 frames through to the null muxer in 0.7 s; `caption_check.py captions.srt`: 24 cues, 0 problems. Not run: any encode.
+Checks run: `bash -n build.sh` OK; `build.sh --check` OK; full render 2026-10-25 00:49 → `pill-pitch-90s.mp4` (57.3 MB): video 82.20 s / 2466 frames, audio 82.30 s, integrated −16.2 LUFS, LRA 4.7 LU; frames checked at 2, 30, 48, 70 (result: "Checking…"), 78 ("Thank you.") and 81 s (full end card); `caption_check.py captions.srt`: 24 cues, 0 problems.
 
 ## Trend notes (sources opened 2026-10-24)
 - Word-by-word captions with an active-word highlight are the dominant short-form look; keep 2–4 words on screen, never a full sentence (zellahq.com, "Best Caption Styles for Short-Form Video", rev. 2026-10-23: https://zellahq.com/blog/best-caption-styles-for-short-form-video/). → 2–3-word groups with a highlighted spoken word.

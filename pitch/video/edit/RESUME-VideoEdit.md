@@ -1,3 +1,0 @@
-Fix in tree: every segment forced to exact length (`fit`/`afit` in make_edit.py); C9's video came out 1 frame short, so the C10 xfade's offset fell past the end of its first input and the video stopped at 62.77 s. Loudnorm target is now -16 LUFS.
-Next step: `cd pitch/video/edit && nice -n 15 bash build.sh`, then `ffprobe -v error -show_entries stream=codec_type,duration -of csv=p=0 ../pill-pitch-90s.mp4` (both ≈ 82.2 s).
-Then extract and view frames at 70 / 78 / 81 s (`ffmpeg -ss 70 -i ../pill-pitch-90s.mp4 -frames:v 1 f70.png`), measure loudness with `-af ebur128`, delete this file and commit.
