@@ -67,7 +67,7 @@ export const FLOW_ARROWS: Arrow[] = [
   { from: 'escrow', to: 'supplier', label: 'release' },
   { from: 'escrow', to: 'nessie', link: true },
   { from: 'buyer', to: 'post' }, { from: 'post', to: 'p402' }, { from: 'p402', to: 'sign' }, { from: 'sign', to: 'facilitator' },
-  { from: 'facilitator', to: 'ok200', pending: 'paid 200: pending a CDP key / 0.05 test USDC', labelAt: [LANE_X(5) - 14.8, 566, 'middle'] },
+  { from: 'facilitator', to: 'ok200', pending: 'paid 200: pending a CDP key / 0.05 test USDC', labelAt: [LANE_X(5) + 168, 562, 'end'] },
 ];
 
 const HEADS: { x: number; group: Group; text: string }[] = [
@@ -96,6 +96,32 @@ function wrap(text: string, px: number, size: number, mono = false) {
   if (line) out.push(line);
   return out;
 }
+
+/** Wrap into as few lines as greedy wrap needs, then make them as even as possible (no orphaned last word). */
+function balance(text: string, px: number, size: number, mono = false) {
+  const n = wrap(text, px, size, mono).length;
+  let lo = 4, hi = Math.max(4, Math.floor(px / (size * (mono ? 0.6 : 0.56))));
+  while (lo < hi) { const m = (lo + hi) >> 1; if (wrap(text, m * size * (mono ? 0.6 : 0.56) + 0.5, size, mono).length <= n) hi = m; else lo = m + 1; }
+  return wrap(text, hi * size * (mono ? 0.6 : 0.56) + 0.5, size, mono);
+}
+
+/** A box's text, laid out once: title and sub lines at its sizes, and the height that holds them. */
+function layout(b: Box) {
+  const tone = b.tone ?? 'plain';
+  // small boxes (the policy agent's inputs): 11.5 / 10 px text, 6 px padding
+  const [ts, ss, pad] = b.small ? [11.5, 10, 6] : [13, tone === 'chip' ? 10.5 : 11, 8];
+  const titleLines = b.title ? wrap(b.title, b.w - pad * 2, ts, b.mono) : [];
+  const chip = tone === 'chip';
+  const subLines = b.sub ? (chip ? balance(b.sub, b.w - 28, ss, true) : wrap(b.sub, b.w - pad * 2, ss)) : [];
+  const tl = ts + 2, sl = ss + 2;
+  // the last baseline (same offsets the render uses), then 4 px descent and the padding
+  const S = subLines.length, T = titleLines.length;
+  const last = chip ? 16 + (S - 1) * 13 : S ? 18 + T * tl + (S - 1) * sl : 18 + (T - 1) * tl;
+  const need = last + 4 + (chip ? 7 : pad);
+  return { ts, ss, pad, titleLines, subLines, tl, sl, h: tone === 'note' ? b.h : Math.max(b.h, Math.ceil(need)) };
+}
+/** Boxes grown to their text, so nothing crosses a border; arrows route against these heights. */
+const FITTED: Box[] = FLOW_BOXES.map((b) => ({ ...b, h: layout(b).h }));
 
 const cy = (b: Box) => b.y + b.h / 2;
 
@@ -134,7 +160,7 @@ export function deliveryPath(outcome: 'pending' | 'release' | 'hold' | 'escalate
 export default function FlowDiagram({ active = [], compact = false, label = 'How Pill moves money and uses models' }: { active?: string[]; compact?: boolean; label?: string }) {
   const on = new Set(active);
   const shown = (g: Group) => !compact || g === 'policy' || g === 'money';
-  const boxes = FLOW_BOXES.filter((b) => shown(b.group) && !(compact && b.id === 'verdict-note'));
+  const boxes = FITTED.filter((b) => shown(b.group) && !(compact && b.id === 'verdict-note'));
   const byId = (k: string) => boxes.find((b) => b.id === k);
   const arrows = FLOW_ARROWS.filter((a) => byId(a.from) && byId(a.to));
   const lit = (a: Arrow) => on.has(id(a)) || (!a.explicit && on.has(a.from) && on.has(a.to));
@@ -172,7 +198,7 @@ export default function FlowDiagram({ active = [], compact = false, label = 'How
             return (
               <g key={id(a)} className={'flow-arrow' + (isOn ? ' on' : '') + (dashed ? ' pending' : '') + (a.link ? ' link' : '')} data-arrow={id(a)}>
                 <path d={r.d} markerEnd={a.link ? undefined : `url(#${uid}-${isOn ? 'hon' : 'h'})`} />
-                {text && wrap(text, a.labelAt ? 230 : 120, 10.5).map((l, i) => <text key={i} x={lx} y={ly + i * 12.5} textAnchor={anchor} className="flow-alabel">{l}</text>)}
+                {text && (a.pending ? text.split(' / ') : wrap(text, a.labelAt ? 230 : 120, 10.5)).map((l, i) => <text key={i} x={lx} y={ly + i * 12.5} textAnchor={anchor} className="flow-alabel">{l}</text>)}
               </g>
             );
           })}
@@ -182,11 +208,7 @@ export default function FlowDiagram({ active = [], compact = false, label = 'How
             if (tone === 'note') {
               return <text key={b.id} className="flow-note" data-node={b.id}>{wrap(b.sub ?? '', b.w, 11).map((l, i) => <tspan key={i} x={b.x} y={b.y + 12 + i * 14}>{l}</tspan>)}</text>;
             }
-            // small boxes (the policy agent's inputs): 11.5 / 10 px text, 6 px padding
-            const [ts, ss, pad] = b.small ? [11.5, 10, 6] : [13, tone === 'chip' ? 10.5 : 11, 8];
-            const titleLines = b.title ? wrap(b.title, b.w - pad * 2, ts, b.mono) : [];
-            const subLines = b.sub ? wrap(b.sub, b.w - pad * 2, ss, tone === 'chip') : [];
-            const tl = ts + 2, sl = ss + 2;
+            const { ts, ss, pad, titleLines, subLines, tl, sl } = layout(b);
             return (
               <g key={b.id} className={`flow-box t-${tone}${isOn ? ' on' : ''}`} data-node={b.id} data-on={isOn || undefined}>
                 <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={tone === 'chip' ? b.h / 2 : 10} />
