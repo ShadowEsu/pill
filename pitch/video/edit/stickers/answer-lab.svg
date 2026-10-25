@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024"><g transform="translate(62.0 410.0)">
+<rect x="10" y="22" width="880" height="168" rx="84.0" fill="#111111" opacity="0.18"/>
+<rect x="6" y="6" width="880" height="168" rx="84.0" fill="#F6D7A0" stroke="#111111" stroke-width="6"/>
+<circle cx="90.0" cy="90.0" r="22" fill="#D98E04" stroke="#111111" stroke-width="5"/>
+<text x="140.0" y="115.2" font-family="Inter, Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="700" font-size="72" fill="#111111" text-anchor="start">Needs lab testing</text>
+</g></svg>

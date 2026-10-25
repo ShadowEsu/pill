@@ -1,0 +1,35 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "[\n  {\"start\":\"0:02.5\",\"end\":\"0:08.0\",\"text\":\"Pills, one of the highest exports and highest imports to all hospitals and medical centers around the world.\"},\n  {\"start\":\"0:08.5\",\"end\":\"0:10.0\",\"text\":\"So why are we talking about pills?\"},\n  {\"start\":\"0:10.3\",\"end\":\"0:13.5\",\"text\":\"So pills actually go through a very intense process with the FDA.\"},\n  {\"start\":\"0:13.9\",\"end\":\"0:19.3\",\"text\":\"And they have to go through this process several times before being checked out to a normal pharmacy like Walgreens.\"},\n  {\"start\":\"0:19.5\",\"end\":\"0:23.2\",\"text\":\"And which I got this from Walgreens and it's some aspirin aspirin 81.\"},\n  {\"start\":\"0:24.2\",\"end\":\"0:35.5\",\"text\":\"However, these numbers are actually bad because in the final process, some of them could be malfunction, as well as people could have bad intentions and put different drugs in here.\"},\n  {\"start\":\"0:36.1\",\"end\":\"0:43.8\",\"text\":\"And these numbers are actually real because 1.3 million people get injured from the right prescriptions as well as 98,000 Americans.\"},\n  {\"start\":\"0:44.3\",\"end\":\"0:45.8\",\"text\":\"So what we built is pill.\"},\n  {\"start\":\"0:46.3\",\"end\":\"0:51.5\",\"text\":\"So pill is a hardware and software device where let me go through the app first.\"},\n  {\"start\":\"0:52.5\",\"end\":\"0:55.5\",\"text\":\"So if we put check my medical.\"},\n  {\"start\":\"0:55.8\",\"end\":\"1:00.5\",\"text\":\"So first we have to put the prescription of the drug and then we use it.\"},\n  {\"start\":\"1:00.8\",\"end\":\"1:02.8\",\"text\":\"As well as what it looks like in the pill.\"},\n  {\"start\":\"1:03.5\",\"end\":\"1:08.0\",\"text\":\"And as we click this, it's going to tell us to get the water inside.\"},\n  {\"start\":\"1:08.5\",\"end\":\"1:17.8\",\"text\":\"So what we have in this beautifully 3D printed device is we're going to put some water in there, there's going to be a marking just like so.\"},\n  {\"start\":\"1:19.8\",\"end\":\"1:24.5\",\"text\":\"And as I click start, I'm going to push this medicine in.\"},\n  {\"start\":\"1:24.8\",\"end\":\"1:27.8\",\"text\":\"So first I'm going to pound it, medicine in.\"},\n  {\"start\":\"1:28.8\",\"end\":\"1:30.0\",\"text\":\"Pounding it.\"},\n  {\"start\":\"1:31.5\",\"end\":\"1:32.0\",\"text\":\"Okay.\"},\n  {\"start\":\"1:32.5\",\"end\":\"1:36.8\",\"text\":\"And as that countdown is going, I'm going to put the medicine inside.\"},\n  {\"start\":\"1:37.5\",\"end\":\"1:40.8\",\"text\":\"And I'm going to mix it with my hand, excuse the disturbance.\"},\n  {\"start\":\"1:42.2\",\"end\":\"1:43.0\",\"text\":\"Perfect.\"},\n  {\"start\":\"1:44.2\",\"end\":\"1:47.8\",\"text\":\"Righty, now that it's ready, we will go through the countdown.\"},\n  {\"start\":\"1:48.2\",\"end\":\"1:52.2\",\"text\":\"This is going to take 6 seconds and as I walk you through the process, this is going to keep going.\"},\n  {\"start\":\"1:52.5\",\"end\":\"1:57.2\",\"text\":\"So as you see in this hardware, we're going to use an Arduino Uno for the main head and CPU.\"},\n  {\"start\":\"1:57.5\",\"end\":\"2:04.5\",\"text\":\"And what it does, it it uses red, blue, and white lights as well as a photo resistor at the back.\"},\n  {\"start\":\"2:05.2\",\"end\":\"2:13.5\",\"text\":\"So since this is black and there are no lights inside, we're going to use these three colors to find a good measurement from what you see here.\"},\n  {\"start\":\"2:14.2\",\"end\":\"2:17.0\",\"text\":\"This measures the concentration of the vitamin.\"},\n  {\"start\":\"2:17.3\",\"end\":\"2:27.5\",\"text\":\"And using the prescription and AI models, it can find the right concentration to the amount of cloudy things inside this um inside the stability.\"},\n  {\"start\":\"2:27.8\",\"end\":\"2:37.2\",\"text\":\"And as we use the water and it does the 10 second countdown, it goes through what is inside the water and sees it as stable, variable.\"},\n  {\"start\":\"2:37.5\",\"end\":\"2:43.5\",\"text\":\"And using these lights, we can find the true concentration of what is in the prescription and what is in the clouds.\"},\n  {\"start\":\"2:44.2\",\"end\":\"2:48.0\",\"text\":\"So as the timer runs out, we're going to see and it's going to check.\"},\n  {\"start\":\"2:48.5\",\"end\":\"2:50.0\",\"text\":\"And oh no, it's unable to verify.\"},\n  {\"start\":\"2:50.3\",\"end\":\"2:53.5\",\"text\":\"Because guess what, I put morphine in here instead of aspirin.\"},\n  {\"start\":\"2:53.8\",\"end\":\"2:54.8\",\"text\":\"So watch out.\"},\n  {\"start\":\"2:55.8\",\"end\":\"2:58.5\",\"text\":\"Um please swallow the right pills, thank you.\"}\n]",
+            "thoughtSignature": "EnMKcQFpFH0T8gbASjZSWsVgZftso383q4PcAtz6fexz/6vT+1vRZHUk6ZchZMGP8n1hcciTWXqZCa+eXDy169fTlCyDehTrwUO2z+s0HdImVjYp8/xjimmvnBa6vEgQhZyERflHJDDuyklRVBTGSYjWRDC9"
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "index": 0
+    }
+  ],
+  "usageMetadata": {
+    "promptTokenCount": 4598,
+    "candidatesTokenCount": 1414,
+    "totalTokenCount": 6012,
+    "promptTokensDetails": [
+      {
+        "modality": "AUDIO",
+        "tokenCount": 4486
+      },
+      {
+        "modality": "TEXT",
+        "tokenCount": 112
+      }
+    ],
+    "serviceTier": "standard"
+  },
+  "modelVersion": "gemini-3.1-flash-lite",
+  "responseId": "y6bdap3YLuCg1MkPjbXtyQw"
+}

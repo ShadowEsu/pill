@@ -1,0 +1,35 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "{\n  \"segments\": [\n    {\n      \"start\": 0.0,\n      \"end\": 0.9,\n      \"text\": \"Pills.\"\n    },\n    {\n      \"start\": 2.3,\n      \"end\": 8.0,\n      \"text\": \"What are the highest exports and highest imports through all hospitals and medical centers around the world?\"\n    },\n    {\n      \"start\": 8.5,\n      \"end\": 10.0,\n      \"text\": \"So, why are we talking about pills?\"\n    },\n    {\n      \"start\": 10.5,\n      \"end\": 13.3,\n      \"text\": \"So, pills actually go through a very intense process with the FDA.\"\n    },\n    {\n      \"start\": 14.0,\n      \"end\": 19.3,\n      \"text\": \"And they have to go through this process several times until it's being checked out through a normal pharmacy like Walgreens.\"\n    },\n    {\n      \"start\": 19.6,\n      \"end\": 23.2,\n      \"text\": \"And which I got this from Walgreens and it's an aspirin aspirin 81.\"\n    },\n    {\n      \"start\": 24.2,\n      \"end\": 31.3,\n      \"text\": \"However, these numbers are actually bad because in the final process, some of them could be malfunction.\"\n    },\n    {\n      \"start\": 31.5,\n      \"end\": 35.5,\n      \"text\": \"As well as people can have bad intentions and put different drugs in here.\"\n    },\n    {\n      \"start\": 35.9,\n      \"end\": 37.7,\n      \"text\": \"And these numbers are actually real.\"\n    },\n    {\n      \"start\": 37.9,\n      \"end\": 43.9,\n      \"text\": \"Because 1.3 million people get injured from the right prescriptions, as well as 98,000 Americans.\"\n    },\n    {\n      \"start\": 44.4,\n      \"end\": 46.0,\n      \"text\": \"So what we built is pill.\"\n    },\n    {\n      \"start\": 46.5,\n      \"end\": 48.7,\n      \"text\": \"So pill is a hardware and software device.\"\n    },\n    {\n      \"start\": 49.0,\n      \"end\": 51.4,\n      \"text\": \"Where let me go through the app first.\"\n    },\n    {\n      \"start\": 52.5,\n      \"end\": 55.4,\n      \"text\": \"So, if we put check my medical.\"\n    },\n    {\n      \"start\": 55.9,\n      \"end\": 58.5,\n      \"text\": \"So first we have to put the prescription of the drug.\"\n    },\n    {\n      \"start\": 58.9,\n      \"end\": 1.0.9,\n      \"text\": \"And then we use it,\"\n    },\n    {\n      \"start\": 1.1.4,\n      \"end\": 1.3.3,\n      \"text\": \"as well as what it looks like in the pill.\"\n    },\n    {\n      \"start\": 1.4.0,\n      \"end\": 1.8.2,\n      \"text\": \"And as we click this, it's going to tell us to get the water inside.\"\n    },\n    {\n      \"start\": 1.8.7,\n      \"end\": 1.11.8,\n      \"text\": \"So what we have in this beautifully 3D printed device is\"\n    },\n    {\n      \"start\": 1.12.5,\n      \"end\": 1.17.5,\n      \"text\": \"we're going to put some water in there, there's going to be a marking just like so.\"\n    },\n    {\n      \"start\": 1.18.6,\n      \"end\": 1.19.2,\n      \"text\": \"Perfect.\"\n    },\n    {\n      \"start\": 1.20.3,\n      \"end\": 1.22.0,\n      \"text\": \"And as I click start,\"\n    },\n    {\n      \"start\": 1.22.9,\n      \"end\": 1.24.2,\n      \"text\": \"I'm going to push this medicine in.\"\n    },\n    {\n      \"start\": 1.24.7,\n      \"end\": 1.27.4,\n      \"text\": \"So first I'm going to pound it like this in.\"\n    },\n    {\n      \"start\": 1.28.9,\n      \"end\": 1.29.8,\n      \"text\": \"Pounding it.\"\n    },\n    {\n      \"start\": 1.31.6,\n      \"end\": 1.32.2,\n      \"text\": \"Okay.\"\n    },\n    {\n      \"start\": 1.33.0,\n      \"end\": 1.36.4,\n      \"text\": \"And as that countdown is going, I'm going to put the medicine inside.\"\n    },\n    {\n      \"start\": 1.37.7,\n      \"end\": 1.41.2,\n      \"text\": \"And I'm going to mix it with my hand, excuse the disturbance.\"\n    },\n    {\n      \"start\": 1.42.5,\n      \"end\": 1.43.1,\n      \"text\": \"Perfect.\"\n    },\n    {\n      \"start\": 1.44.5,\n      \"end\": 1.47.7,\n      \"text\": \"Righty, now that it's ready, we will go through the countdown.\"\n    },\n    {\n      \"start\": 1.48.3,\n      \"end\": 1.52.3,\n      \"text\": \"This is going to take 16 seconds and as I walk you through the process, this is going to keep going.\"\n    },\n    {\n      \"start\": 1.52.6,\n      \"end\": 1.57.2,\n      \"text\": \"So as you see in this hardware, we're going to use an Arduino Uno for the main head and CPU.\"\n    },\n    {\n      \"start\": 1.57.7,\n      \"end\": 2.4.5,\n      \"text\": \"And what it does, it it uses red, blue and white lights, as well as a photo resistor at the back.\"\n    },\n    {\n      \"start\": 2.5.4,\n      \"end\": 2.13.5,\n      \"text\": \"So, since this is black and there are no lights inside, we're going to use this three colors to find a good measurement from what you see here.\"\n    },\n    {\n      \"start\": 2.14.3,\n      \"end\": 2.17.0,\n      \"text\": \"This measures the concentration of the vitamin.\"\n    },\n    {\n      \"start\": 2.17.5,\n      \"end\": 2.27.2,\n      \"text\": \"And using the prescription and AI models, it can find the right concentration to the amount of cloudy things inside this um inside the stability.\"\n    },\n    {\n      \"start\": 2.27.7,\n      \"end\": 2.37.2,\n      \"text\": \"And as we use the water and it does the 10-second countdown, it goes through what is inside the water and sees it as stable variable.\"\n    },\n    {\n      \"start\": 2.37.6,\n      \"end\": 2.43.3,\n      \"text\": \"And using these lights, we can find the true concentration of what is in the prescription and what is in the clouds.\"\n    },\n    {\n      \"start\": 2.44.1,\n      \"end\": 2.47.7,\n      \"text\": \"So as the timer runs out, you're going to see and it's going to check.\"\n    },\n    {\n      \"start\": 2.48.5,\n      \"end\": 2.53.4,\n      \"text\": \"And oh no, it's unable to verify because guess what, I put morphine in here instead of aspirin.\"\n    },\n    {\n      \"start\": 2.53.9,\n      \"end\": 2.57.9,\n      \"text\": \"So, watch out, um, please swallow the right pills.\"\n    },\n    {\n      \"start\": 2.58.4,\n      \"end\": 2.59.0,\n      \"text\": \"Thank you.\"\n    }\n  ]\n}"
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "index": 0
+    }
+  ],
+  "usageMetadata": {
+    "promptTokenCount": 5855,
+    "candidatesTokenCount": 2153,
+    "totalTokenCount": 9450,
+    "promptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 112
+      },
+      {
+        "modality": "AUDIO",
+        "tokenCount": 5743
+      }
+    ],
+    "thoughtsTokenCount": 1442,
+    "serviceTier": "standard"
+  },
+  "modelVersion": "gemini-2.5-flash",
+  "responseId": "u6bdat_aJsDSjMcPpK3IuQk"
+}
