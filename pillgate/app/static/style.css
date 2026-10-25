@@ -457,3 +457,68 @@ body.easy { --ink-2: #23262B; --muted: #3E4248; --line: rgba(22,24,27,.20); --li
 body.easy #view, body.easy .sheet, body.easy .runbar { zoom: 1.25; }
 body.easy .nav-item { color: var(--ink-2); font-weight: 600; }
 body.easy .chip { border-color: var(--line-2); }
+
+/* ---------- round 4: the station (drawing, photos, blueprints) ---------- */
+.st-svg { width: 100%; height: auto; display: block; overflow: visible; }
+.st-svg .st-wall { fill: rgba(122,92,255,.30); stroke: rgba(122,92,255,.85); stroke-width: 2; }
+.st-svg .st-inside { fill: #23262B; }
+.st-svg .st-cup { fill: rgba(255,255,255,.10); stroke: rgba(255,255,255,.75); stroke-width: 2; }
+.st-svg .st-water { fill: rgba(79,179,255,.22); }
+.st-svg .st-wline { stroke: rgba(79,179,255,.9); stroke-width: 1.5; stroke-dasharray: 4 3; fill: none; }
+.st-svg .st-lid { fill: rgba(122,92,255,.45); stroke: rgba(122,92,255,.9); stroke-width: 1.5; }
+.st-svg .st-hole { fill: #23262B; }
+.st-svg .st-beam { mix-blend-mode: screen; }
+.st-svg .st-flow { stroke: rgba(255,255,255,.85); stroke-width: 1.6; stroke-dasharray: 2 9; fill: none; animation: st-flow 1.2s linear infinite; }
+.st-svg .st-scatter { stroke: rgba(122,92,255,.0); stroke-width: 1.6; stroke-dasharray: 3 6; fill: none; }
+.st-svg .st-scatter.on { stroke: rgba(196,184,255,.95); animation: st-flow 1.6s linear infinite; }
+.st-svg .st-tablet { fill: #fff; stroke: rgba(22,24,27,.3); }
+.st-svg .st-ledbox rect { fill: rgba(122,92,255,.55); stroke: rgba(122,92,255,.95); stroke-width: 1.5; }
+.st-svg .st-slot { stroke: #F7F8F7; stroke-width: 2; stroke-linecap: round; }
+.st-svg .st-led { stroke: rgba(22,24,27,.35); stroke-width: 1; }
+.st-svg .st-led.glow { filter: drop-shadow(0 0 5px #4FB3FF); animation: eb-dot 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.st-svg .st-sensor rect { fill: rgba(122,92,255,.55); stroke: rgba(122,92,255,.95); stroke-width: 1.5; }
+.st-svg .st-ldr { fill: #8C7A55; stroke: rgba(22,24,27,.5); stroke-width: 1; }
+.st-svg .st-face { fill: rgba(122,92,255,.55); stroke: rgba(122,92,255,.95); stroke-width: 1.5; }
+.st-svg .st-sensor.on .st-ldr { fill: #FFD66B; filter: drop-shadow(0 0 4px rgba(255,214,107,.9)); }
+.st-svg .st-lead { stroke: rgba(22,24,27,.45); stroke-width: 1; fill: none; }
+.st-svg text { fill: var(--ink); font: 600 13px var(--sans); }
+.st-svg .st-n { font: 400 11.5px var(--mono); fill: var(--ink-2); }
+@keyframes st-flow { to { stroke-dashoffset: -22; } }
+.st-hero { padding: 0; overflow: hidden; display: grid; margin: 0; }
+.st-hero img { width: 100%; height: auto; max-height: 520px; object-fit: cover; object-position: 50% 62%; display: block; }
+.st-hero figcaption { padding: 12px 16px; font-size: 14px; color: var(--ink-2); }
+.st-hero figcaption b { color: var(--ink); }
+@media (min-width: 900px) { .st-hero { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: end; } .st-hero img { max-height: 440px; } .st-hero figcaption { padding: 22px; font-size: 16px; } }
+.parts { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+@media (min-width: 900px) { .parts { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; } }
+.parts li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; align-items: start; padding: 10px 0; border-top: 1px solid var(--line); }
+.parts b { display: block; font-weight: 600; } .parts small { display: block; font-size: 14px; color: var(--ink-2); line-height: 1.45; }
+.bp-grid { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 700px) { .bp-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.bp { display: grid; gap: 10px; padding: 10px; text-align: left; cursor: zoom-in; font: inherit; color: var(--ink); border: 1px solid var(--line); min-width: 0; transition: transform .25s var(--ease), box-shadow .25s var(--ease); }
+.bp:hover { transform: translateY(-2px); }
+.bp img { width: 100%; aspect-ratio: 16 / 9; object-fit: contain; background: #fff; border-radius: 12px; border: 1px solid var(--line); }
+.bp b { display: block; } .bp small { display: block; color: var(--ink-2); font-size: 13px; }
+.ph-grid { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 900px) { .ph-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+.ph { padding: 0; border: 0; border-radius: 14px; overflow: hidden; cursor: zoom-in; background: var(--line); }
+.ph img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; display: block; transition: transform .4s var(--ease); }
+.ph:hover img { transform: scale(1.04); }
+.lightbox { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 56px 12px 16px; background: rgba(14,18,22,.86); animation: wash-in .2s ease; cursor: zoom-out; }
+.lightbox figure { margin: 0; display: grid; gap: 10px; max-width: min(1600px, 100%); max-height: 100%; cursor: default; }
+.lightbox img { max-width: 100%; max-height: calc(100dvh - 120px); object-fit: contain; border-radius: 12px; background: #fff; animation: page-in .3s var(--ease); }
+.lightbox figcaption { color: #fff; font-size: 14px; text-align: center; }
+.lightbox .lb-x { position: absolute; top: 12px; right: 12px; }
+/* Measure: the small top view next to the ring */
+.st-mini { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 12px; align-items: center; width: 100%; max-width: 440px; padding: 10px 12px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); text-align: left; }
+.st-mini .st-svg { width: 132px; }
+.st-mini p { margin: 0; font-size: 14px; color: var(--ink-2); } .st-mini p b { color: var(--ink); }
+.st-mini a { font-size: 13px; color: var(--ink); font-weight: 600; }
+.sm-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; font-size: 14px; color: var(--ink-2); }
+.sm-list li { display: flex; align-items: center; gap: 8px; }
+.sm-list li .mono { margin-left: auto; color: var(--ink-2); }
+.sm-list li.on { color: var(--ink); font-weight: 600; } .sm-list li.on .mono { color: var(--ink); }
+.sm-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line-2); flex: none; }
+.sm-list li.on .sm-dot { background: #FFD66B; box-shadow: 0 0 0 3px rgba(255,214,107,.3); }
+@media (max-width: 380px) { .st-mini { grid-template-columns: 104px minmax(0, 1fr); } .st-mini .st-svg { width: 104px; } }
+.st-link { color: inherit; text-decoration: none; } .st-link:hover { text-decoration: underline; }

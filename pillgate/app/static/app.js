@@ -306,6 +306,7 @@ const ICONS = {
   history: "M3 18c3 0 4-11 7-11s3 7 5 7 2-3 6-3",
   profiles: "M5 6h14M5 12h14M5 18h9",
   atlas: "M12 4a3 3 0 1 1 0 .1zM5 17a2.5 2.5 0 1 1 0 .1zM19 17a2.5 2.5 0 1 1 0 .1zM10.6 6.6l-4 8.2M13.4 6.6l4 8.2M7.5 17.5h9",
+  station: "M5 8.5a7 3 0 1 0 14 0 7 3 0 1 0-14 0zM5 8.5V18c0 1.7 3.1 3 7 3s7-1.3 7-3V8.5M17 13h3v5h-1.6",
   medicines: "M8.5 3h7v3.2h-7zM7 6.2h10V19a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2zM9.8 13.6h4.4M12 11.4v4.4",
   schedule: "M12 3.5a8.5 8.5 0 1 1 0 17 8.5 8.5 0 0 1 0-17zM12 7.6V12l3 2",
   more: "M5 10.8a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4zM12 10.8a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4zM19 10.8a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z",
@@ -317,7 +318,7 @@ const NAV = {
   check: [["/check/bottle", "Check", "check"], ["/history", "History", "history"], ["/profiles", "Profiles", "profiles"], ["/atlas", "Atlas", "atlas"], ["/settings", "Settings", "settings"]],
 };
 const navKey = (path) => (/^\/(check|result|ask|issue)\b/.test(path) ? "/check/bottle"
-  : mode() === "personal" && /^\/(history|profiles|atlas|settings)$/.test(path) ? "/more" : path);
+  : mode() === "personal" && /^\/(history|profiles|atlas|settings|station)$/.test(path) ? "/more" : path);
 let navMode = null, navArmed = false;
 function renderNav(path) {
   const nav = $("nav"), m = mode();
@@ -594,7 +595,7 @@ route(/^\/$/, async (v) => {
           <div class="capsules">${scans.slice(0, 5).map(capsule).join("") || `<p class="muted">No checks yet. Start one: it takes about two minutes.</p>`}</div></section>
         <div class="stack">
         <section class="card ink-panel station rise" style="--i:4">
-          <div class="row between"><p class="eyebrow">Station</p><span class="lines">quick ${S.config.timing.quick_s} s · full ${mmss(S.config.timing.min_s)}–${mmss(S.config.timing.max_s)}</span></div>
+          <div class="row between"><a class="eyebrow st-link" href="#/station">Station · see the parts →</a><span class="lines">quick ${S.config.timing.quick_s} s · full ${mmss(S.config.timing.min_s)}–${mmss(S.config.timing.max_s)}</span></div>
           <canvas class="bpill" style="width:100%;height:120px" role="img" aria-label="Pill printed in ones and zeros"></canvas>
           <div class="row wrap">${deviceChip()}</div>
           <dl class="st-stats"><div><dt>lines read</dt><dd data-lines>–</dd></div><div><dt>last run</dt><dd>${lastRun && lastRun.created ? esc(timeAgo(lastRun.created)) : "none yet"}</dd></div><div><dt>runs saved</dt><dd>${runs.length}</dd></div></dl>
@@ -772,6 +773,10 @@ route(/^\/check\/measure$/, async (v) => {
   const [profiles, runs] = await Promise.all([api("/api/profiles").catch(() => []), api("/api/runs").catch(() => [])]);
   const usable = profiles.filter((p) => p.calibration || p.reference);
   let chart = null, countdown = null;
+  // which sensor the result leans on: the chosen profile's signal ("scatter" = the 90° sensor); auto-match: both
+  const chosen = () => usable.find((p) => p.id === S.check.profileId) || null;
+  const sensorFor = () => { const p = chosen(); return !p ? "both" : p.signal === "scatter" ? "a1" : "a0"; };
+  const sensorWhy = () => { const p = chosen(); return !p ? "the profile is matched from the label after the run" : p.signal === "scatter" ? `${p.name} is measured by light scattered sideways` : p.signal === "cloud" ? `${p.name} clouds the water, so less light gets straight across` : `${p.name} colours the water, so less light gets straight across`; };
   const dissolveLabel = () => (S.check.runMode === "quick" ? `${T.quick_s} s` : `${mmss(T.min_s)}–${mmss(T.max_s)}`);
   v.innerHTML = `<div id="m-head"></div>${stepsRail(2)}
     <section class="card rail" aria-label="Run phases">
@@ -836,7 +841,8 @@ route(/^\/check\/measure$/, async (v) => {
           <span class="chip ${S.check.bottle ? "ok" : ""}"><span class="dot"></span>bottle ${S.check.bottle ? "photo ready" : "skipped"}</span>
           <span class="chip ${S.check.imprint ? "ok" : ""}"><span class="dot"></span>tablet ${S.check.imprint ? "photo ready" : "skipped"}</span>
         </div>
-        <button type="button" class="btn" id="btn-start" style="min-width:220px">Start</button>`;
+        <button type="button" class="btn" id="btn-start" style="min-width:220px">Start</button>
+        <a class="footnote" href="#/station" style="color:var(--ink);font-weight:600">Where everything sits →</a>`;
       scene.querySelectorAll("[data-run]").forEach((b) => (b.onclick = () => { S.check.runMode = b.dataset.run; drawRail(); drawScene(); }));
       $("profile").onchange = (e) => (S.check.profileId = e.target.value);
       $("btn-start").onclick = async (e) => { e.target.disabled = true; try { await Run.start(); } catch (err) { toast("Could not start: " + err.message); e.target.disabled = false; } };
@@ -844,6 +850,7 @@ route(/^\/check\/measure$/, async (v) => {
     if (p === "water") {
       scene.innerHTML = `${ringHtml("ring", "var(--sky)")}<p class="serif big">Checking the water…</p>
         <p class="lead" id="w-text">Keep the lid closed and don't touch the box.</p><ul class="checks" id="w-checks"></ul>
+        ${stationMini("a0", "the clean-water check looks at light straight across the cup")}
         <div class="row wrap" style="justify-content:center"><button type="button" class="btn hidden" id="btn-anyway">Continue anyway</button><button type="button" class="btn ghost" id="btn-cancel">Cancel</button></div>`;
       setRing($("ring"), 0, "0", `of ${T.blank_s} s steady`);
       if (Run.slow) { $("w-text").innerHTML = "Still not steady after a minute. Check the lid is closed and nothing moves, or press <b>Continue anyway</b> (the result may be less reliable)."; $("btn-anyway").classList.remove("hidden"); }
@@ -868,6 +875,7 @@ route(/^\/check\/measure$/, async (v) => {
       const cps = S.check.runMode === "quick" ? Math.round(T.quick_s / 5) : 0;
       scene.innerHTML = `${Run.continuedAt ? `<span class="chip ok confirm"><span class="dot"></span>You pressed Continue at ${new Date(Run.continuedAt).toLocaleTimeString()} · tablet in marked</span>` : ""}
         ${ringHtml("ring", "var(--sky-ink)")}<p class="serif big">Dissolving…</p><p class="lead" id="d-text">Keep the lid closed.</p>
+        ${stationMini(sensorFor(), sensorWhy(), true)}
         ${cps ? `<div class="cp-strip" aria-label="${cps} checkpoints, one every 5 s"><span class="eyebrow">checkpoints</span><ol id="cp">${Array.from({ length: cps }, (_, k) => `<li title="${(k + 1) * 5} s"></li>`).join("")}</ol><span class="mono small" id="cp-n">0 / ${cps}</span></div>` : ""}
         <div class="row wrap" style="justify-content:center">${S.check.runMode === "full" ? `<button type="button" class="btn" id="btn-stop">Stop now &amp; analyze</button>` : ""}<button type="button" class="btn ghost" id="btn-cancel">Cancel</button></div>`;
       setRing($("ring"), 0, "0:00", S.check.runMode === "quick" ? `of ${mmss(T.quick_s)}` : "elapsed");
@@ -889,6 +897,7 @@ route(/^\/check\/measure$/, async (v) => {
     if (l && l.curve) { $("l-sec").textContent = Math.round(l.seconds); $("l-n").textContent = l.samples; }
     const raw = (l && l.raw_last) || d.raw_last;
     if (raw && $("raw")) $("raw").innerHTML = rawTable(raw);
+    paintStationCounts("st-m", raw);
     const fresh = d.status && d.status.seconds_since_last !== null && d.status.seconds_since_last < 4;
     v.querySelectorAll("[data-lines]").forEach((el) => el.classList.toggle("breathe", !!fresh));
     $("l-in").textContent = Run.phase === "dissolving" && l && l.tablet_in_at_s ? `tablet in at ${Math.round(l.tablet_in_at_s)} s into the recording` : "";
@@ -1281,6 +1290,121 @@ route(/^\/settings$/, (v) => {
   };
 });
 
+// ================================================================ The station (photos, a to-scale-ish drawing, the blueprints)
+// Geometry from the real build (photos/station-17, -171): purple printed cylinder; LED box low on the outside wall with
+// white, blue and red LEDs shining in through holes; the in-line photoresistor straight across from the LED box (A0);
+// the 90° photoresistor on the side wall (A1); a clear plastic cup of water inside; a flat lid with one small hole.
+const LED_DOTS = [["white", "#FFFFFF"], ["blue", "#4FB3FF"], ["red", "#F28B7D"]];
+/**
+ * Top view, looking down with the lid off. `mini` drops the call-outs (Measure puts the counts beside it, see stationMini).
+ * `on`: which sensor the current step reads: "a0", "a1" or "both".
+ */
+function stationTop({ id = "st-top", mini = false, on = "both", tablet = false } = {}) {
+  const lit = (k) => on === "both" || on === k;
+  const cx = 160, cy = 158;
+  return `<svg class="st-svg st-top${mini ? " mini" : ""}" id="${id}" viewBox="${mini ? "10 4 300 300" : "-70 -6 460 330"}" role="img" aria-label="Station from above: LED box at the bottom shining across the cup to the in-line sensor at the top; the 90 degree sensor on the left wall">
+    <defs><linearGradient id="${id}-beam" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#4FB3FF" stop-opacity=".55"/><stop offset="1" stop-color="#4FB3FF" stop-opacity=".12"/></linearGradient></defs>
+    <circle cx="${cx}" cy="${cy}" r="118" class="st-wall"/>
+    <circle cx="${cx}" cy="${cy}" r="104" class="st-inside"/>
+    <circle cx="${cx}" cy="${cy}" r="88" class="st-cup"/>
+    <circle cx="${cx}" cy="${cy}" r="80" class="st-water"/>
+    <path class="st-beam" d="M${cx - 16} 262 L${cx - 7} 52 L${cx + 7} 52 L${cx + 16} 262 Z" fill="url(#${id}-beam)"/>
+    <path class="st-flow" d="M${cx} 258 V58"/>
+    <path class="st-scatter${lit("a1") ? " on" : ""}" d="M${cx - 4} ${cy} H64"/>
+    ${tablet ? `<circle cx="${cx}" cy="${cy}" r="9" class="st-tablet"/>` : ""}
+    <g class="st-ledbox"><rect x="${cx - 38}" y="262" width="76" height="40" rx="6"/><path d="M${cx - 26} 270 H${cx + 26}" class="st-slot"/>
+      ${LED_DOTS.map(([, c], i) => `<circle cx="${cx - 20 + i * 20}" cy="288" r="6.5" fill="${c}" class="st-led${i === 1 ? " glow" : ""}"/>`).join("")}</g>
+    <g class="st-sensor${lit("a0") ? " on" : ""}"><rect x="${cx - 13}" y="24" width="26" height="22" rx="5"/><circle cx="${cx}" cy="40" r="5.5" class="st-ldr"/></g>
+    <g class="st-sensor${lit("a1") ? " on" : ""}"><rect x="30" y="${cy - 13}" width="22" height="26" rx="5"/><circle cx="46" cy="${cy}" r="5.5" class="st-ldr"/></g>
+    ${mini ? "" : `
+      <path class="st-lead" d="M${cx + 14} 34 H250"/><text x="254" y="30" class="st-t">in-line sensor</text><text x="254" y="46" class="st-n" id="${id}-a0">A0 · straight across</text>
+      <path class="st-lead" d="M30 ${cy} H-4"/><text x="-66" y="${cy - 30}" class="st-t">90° sensor</text><text x="-66" y="${cy - 14}" class="st-n" id="${id}-a1">A1 · side wall</text>
+      <path class="st-lead" d="M${cx + 38} 282 H262"/><text x="266" y="278" class="st-t">LED box</text><text x="266" y="294" class="st-n">white · blue · red</text>
+      <path class="st-lead" d="M${cx + 62} ${cy + 56} L268 214"/><text x="272" y="212" class="st-t">clear cup</text><text x="272" y="228" class="st-n">of clean water</text>
+      <path class="st-lead" d="M${cx - 92} ${cy + 66} L-6 254"/><text x="-66" y="262" class="st-t">chamber</text><text x="-66" y="278" class="st-n">printed, dark inside</text>
+      <text x="${cx - 6}" y="${cy - 54}" class="st-n" transform="rotate(-90 ${cx - 6} ${cy - 54})">beam</text>`}
+  </svg>`;
+}
+/** Side view cut through the beam: lid with its one hole, cup and water line, LED box low on the wall. */
+function stationSide() {
+  return `<svg class="st-svg st-side" viewBox="-60 0 440 270" role="img" aria-label="Station from the side: a lid with one small hole on top, the cup of water inside, the LED box low on the right shining across to the in-line sensor on the left">
+    <path class="st-wall" d="M60 52 H260 V244 a10 10 0 0 1 -10 10 H70 a10 10 0 0 1 -10 -10 Z"/>
+    <path class="st-inside" d="M72 56 H248 V238 a6 6 0 0 1 -6 6 H78 a6 6 0 0 1 -6 -6 Z"/>
+    <rect x="54" y="36" width="212" height="16" rx="4" class="st-lid"/><rect x="156" y="36" width="8" height="16" class="st-hole"/>
+    <path class="st-cup" d="M92 72 H228 L222 240 H98 Z"/>
+    <path class="st-water" d="M95.5 118 H224.5 L222 240 H98 Z"/>
+    <path class="st-wline" d="M95.5 118 H224.5"/>
+    <path class="st-beam" d="M260 196 L72 191 L72 205 L260 214 Z" fill="rgba(79,179,255,.32)"/>
+    <path class="st-flow" d="M256 205 H78"/>
+    <g class="st-ledbox"><rect x="260" y="172" width="44" height="72" rx="5"/><path d="M268 180 H296" class="st-slot"/>${LED_DOTS.map(([, c], i) => `<circle cx="${270 + i * 12}" cy="${205}" r="4.5" fill="${c}" class="st-led${i === 1 ? " glow" : ""}"/>`).join("")}</g>
+    <g class="st-sensor on"><rect x="44" y="186" width="16" height="24" rx="4"/><circle cx="56" cy="198" r="4.5" class="st-ldr"/></g>
+    <g class="st-sensor on"><circle cx="160" cy="166" r="9" class="st-face"/><circle cx="160" cy="166" r="4" class="st-ldr"/></g>
+    <path class="st-lead" d="M160 44 V20 H200"/><text x="204" y="18" class="st-t">lid</text><text x="204" y="32" class="st-n">one small hole</text>
+    <path class="st-lead" d="M224 118 H330"/><text x="306" y="110" class="st-t" text-anchor="end">water line</text>
+    <path class="st-lead" d="M282 244 V258"/><text x="300" y="264" class="st-n" text-anchor="end">LED box, low on the wall</text>
+    <path class="st-lead" d="M44 198 H10"/><text x="-56" y="194" class="st-t">in-line</text><text x="-56" y="208" class="st-n">sensor A0</text>
+    <path class="st-lead" d="M151 166 H40 V150 H10"/><text x="-56" y="146" class="st-t">90° sensor</text><text x="-56" y="160" class="st-n">A1, facing you</text>
+  </svg>`;
+}
+/** Measure's small top view: which sensor this step reads, lit, with its live count beside it. */
+function stationMini(on, why, tablet = false) {
+  const row = (k, name) => `<li class="${on === "both" || on === k ? "on" : ""}"><span class="sm-dot" aria-hidden="true"></span>${name} <span class="mono" id="st-m-${k}">${k.toUpperCase()} –</span></li>`;
+  return `<div class="st-mini">${stationTop({ id: "st-m", mini: true, on, tablet })}
+    <div class="stack" style="gap:6px"><p><b>${on === "a1" ? "Reading the 90° sensor" : on === "a0" ? "Reading the in-line sensor" : "Reading both sensors"}</b> · ${esc(why)}</p>
+      <ul class="sm-list">${row("a0", "in line")}${row("a1", "90°")}</ul><a href="#/station">Where everything sits →</a></div></div>`;
+}
+/** Live counts next to the sensors (blue LED, the newest line). */
+function paintStationCounts(id, raw, mini = true) {
+  if (!raw) return;
+  const a0 = $(id + "-a0"), a1 = $(id + "-a1");   // mini: the HTML list beside the drawing (#st-m-a0/a1); big: SVG call-outs
+  if (a0 && raw.B_a != null) a0.textContent = mini ? `A0 ${raw.B_a}` : `A0 · ${raw.B_a} (blue on)`;
+  if (a1 && raw.B_b != null) a1.textContent = mini ? `A1 ${raw.B_b}` : `A1 · ${raw.B_b} (blue on)`;
+}
+const BLUEPRINTS = [["01_wiring_overview", "Wiring overview", "Board, LEDs and both photoresistors"], ["02_breadboard_layout", "Breadboard layout", "Where every jumper goes"], ["03_chamber_cross_sections", "Chamber cross-sections", "Top and side, cut through the beam (design drawing; the build uses a plain lid)"]];
+const STATION_PHOTOS = [["station-19", "The blue LED lit, shining in through the LED box"], ["station-17", "From above: cup of water inside the chamber, LED box at the bottom right"], ["station-191", "LED box: white, blue and red LEDs, diffuser slot on top"], ["station-171", "From above with the blue LED on"], ["station-102", "The station on the bench with the board"]];
+function lightbox(src, alt) {
+  const w = document.createElement("div");
+  w.className = "lightbox"; w.setAttribute("role", "dialog"); w.setAttribute("aria-modal", "true"); w.setAttribute("aria-label", alt);
+  w.innerHTML = `<button type="button" class="btn ghost icon lb-x" aria-label="Close">✕</button><figure><img src="${esc(src)}" alt="${esc(alt)}"><figcaption>${esc(alt)}</figcaption></figure>`;
+  const opener = document.activeElement;
+  const close = () => { w.remove(); document.removeEventListener("keydown", key); if (opener && opener.focus) opener.focus(); };
+  const key = (e) => { if (e.key === "Escape") close(); };
+  w.addEventListener("click", (e) => { if (e.target === w || e.target.closest(".lb-x")) close(); });
+  document.addEventListener("keydown", key);
+  document.body.appendChild(w); w.querySelector(".lb-x").focus();
+  S.leave.push(() => { if (w.isConnected) close(); });
+}
+route(/^\/station$/, (v) => {
+  const PARTS = [
+    ["led", "LED box", "Three LEDs (white, blue, red) sit low on the outside wall and shine in through small holes, one colour at a time, through a frosted slot."],
+    ["sensor", "In-line sensor (A0)", "A photoresistor straight across from the LED box. Less light reaching it means the water got darker or more coloured."],
+    ["sensor", "90° sensor (A1)", "A photoresistor on the side wall, out of the beam. It only sees light that bounces off particles, so it rises when the water turns cloudy."],
+    ["quarter", "Dark reading", "Every cycle also reads both sensors with all LEDs off. That is subtracted, so room light doesn't count."],
+    ["cup", "Cup of water", "A clear plastic cup of clean water fills the beam. The station checks the water is steady before the tablet goes in."],
+    ["station", "Lid", "Flat, with one small hole. Closed, it keeps the inside dark; lift it only to drop the tablet in and stir."],
+  ];
+  v.innerHTML = `${head({ eyebrow: "Hardware", title: "The station", tone: "violet", back: "#/", side: `<div class="row wrap" style="gap:8px">${deviceChip()}<span class="chip"><span class="dot"></span>lines read&nbsp;<span class="mono" data-lines>–</span></span></div>` })}
+    <figure class="card st-hero rise"><img src="/static/photos/station-19.webp" alt="The real station: a purple printed chamber with a cup of water inside, the LED box on its side with the blue LED lit, wired to the board" width="900" height="1200">
+      <figcaption><b>The real build.</b> Purple printed chamber, cup of clean water inside, LED box on the wall with the blue LED on.</figcaption></figure>
+    <div class="wide-2">
+      <section class="card stack rise" style="--i:1"><div class="row between"><h2 class="h">From above</h2><span class="footnote">lid off</span></div>${stationTop({ id: "st-big" })}
+        <p class="footnote">Light from the LED box crosses the cup to the in-line sensor. The 90° sensor sits out of the beam. Live counts are the newest line with the blue LED on.</p></section>
+      <section class="card stack rise" style="--i:2"><div class="row between"><h2 class="h">From the side</h2><span class="footnote">cut through the beam</span></div>${stationSide()}
+        <p class="footnote">Fill to the line so the water covers the beam. The lid has one small hole; keep it closed while it measures.</p></section>
+    </div>
+    <section class="card stack rise" style="--i:3"><h2 class="h">What each part does</h2>
+      <ol class="parts">${PARTS.map(([g, t, p], i) => `<li style="--i:${i}"><span class="part-ic">${glyph(g, 40)}</span><span><b>${esc(t)}</b><small>${esc(p)}</small></span></li>`).join("")}</ol></section>
+    <section class="stack"><div class="row between"><h2 class="h">Blueprints</h2><span class="footnote">tap to open full size</span></div>
+      <div class="bp-grid">${BLUEPRINTS.map(([f, t, p], i) => `<button type="button" class="card bp rise" style="--i:${i + 4}" data-src="/static/blueprints/${f}.webp" data-alt="${esc(t)}"><img src="/static/blueprints/${f}.webp" alt="" loading="lazy"><span><b>${esc(t)}</b><small>${esc(p)}</small></span></button>`).join("")}</div></section>
+    <section class="stack"><h2 class="h">Photos</h2>
+      <div class="ph-grid">${STATION_PHOTOS.map(([f, t], i) => `<button type="button" class="ph rise" style="--i:${i + 7}" data-src="/static/photos/${f}.webp" data-alt="${esc(t)}"><img src="/static/photos/${f}.webp" alt="${esc(t)}" loading="lazy"></button>`).join("")}</div></section>
+    <p class="disclaimer">${esc(DISCLAIMER)}</p>`;
+  v.querySelectorAll("[data-src]").forEach((b) => (b.onclick = () => lightbox(b.dataset.src, b.dataset.alt)));
+  const paint = (d) => paintStationCounts("st-big", (d.live && d.live.raw_last) || d.raw_last, false);
+  if (S.live) paint(S.live);
+  S.onLive = paint;
+});
+
 // ================================================================ Personal: My medicines (every drug read off a label, grouped by name + strength)
 const normName = (x) => String(x || "").trim().replace(/\s+/g, " ");
 const recallChip = (rs) => (!rs ? "" : `<span class="chip ${RECALL_CLASS[rs] ?? ""}"><span class="dot"></span>${esc(RECALL_TEXT[rs] || rs)}</span>`);
@@ -1448,11 +1572,12 @@ route(/^\/schedule$/, (v) => {
 // ================================================================ Personal: More (the rest of the app, one tap away)
 route(/^\/more$/, (v) => {
   const items = [["/history", "history", "History", "Every check, newest first"], ["/profiles", "profiles", "Profiles", "Reference runs for each medicine"],
+    ["/station", "station", "The station", "Photos, drawings and blueprints of the box"],
     ["/atlas", "atlas", "Atlas", "Recalls and lots as a 3D map"], ["/settings", "settings", "Settings", "Easy mode, sounds, mode"]];
   v.innerHTML = `${head({ eyebrow: MODES[mode()] ? MODES[mode()].name + " mode" : "", title: "More", tone: "grey" })}
     <section class="more-grid">${items.map(([to, ic, t, p], i) => `<a class="card more-tile rise" style="--i:${i}" href="#${to}"><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path d="${ICONS[ic]}"/></svg><b>${t}</b><small>${p}</small></a>`).join("")}
-      <button type="button" class="card more-tile rise" style="--i:4" id="more-ask"><span class="dock-ic" aria-hidden="true"><i></i><i></i></span><b>Ask Pill</b><small>Questions about a result or the app</small></button>
-      <a class="card more-tile rise" style="--i:5" href="#/welcome"><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg><b>Change mode</b><small>Clinic, Personal or Check</small></a></section>`;
+      <button type="button" class="card more-tile rise" style="--i:5" id="more-ask"><span class="dock-ic" aria-hidden="true"><i></i><i></i></span><b>Ask Pill</b><small>Questions about a result or the app</small></button>
+      <a class="card more-tile rise" style="--i:6" href="#/welcome"><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg><b>Change mode</b><small>Clinic, Personal or Check</small></a></section>`;
   $("more-ask").onclick = () => Dock.show();
 });
 
